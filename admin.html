@@ -2723,10 +2723,11 @@
         // 퀴즈 템플릿 다운로드
         function downloadQuizTemplate() {
             const template = [
-                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '정답', '해설'],
-                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', '1', 'Seoul is the capital city.'],
-                [2, 'OX', 'English is easy.', 'O', 'X', '', '', '2', 'It depends on the learner.'],
-                [3, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', 'go', 'Simple present tense']
+                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '선택지5', '정답', '해설'],
+                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', 'Gwangju', '1', 'Seoul is the capital city of Korea.'],
+                [2, '객관식', 'Which color is NOT in the rainbow?', 'Red', 'Orange', 'Yellow', 'Green', 'Pink', '5', 'Pink is not a color in the rainbow.'],
+                [3, 'OX', 'English is easy.', 'O', 'X', '', '', '', '2', 'It depends on the learner.'],
+                [4, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', '', 'go', 'Simple present tense']
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(template);
@@ -2735,10 +2736,19 @@
             
             // 컬럼 너비 설정
             ws['!cols'] = [
-                { wch: 10 }, { wch: 12 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 30 }
+                { wch: 10 },  // 문제번호
+                { wch: 12 },  // 문제유형
+                { wch: 45 },  // 질문
+                { wch: 20 },  // 선택지1
+                { wch: 20 },  // 선택지2
+                { wch: 20 },  // 선택지3
+                { wch: 20 },  // 선택지4
+                { wch: 20 },  // 선택지5 ✨ 추가
+                { wch: 10 },  // 정답
+                { wch: 35 }   // 해설
             ];
 
-            XLSX.writeFile(wb, 'quiz_template.xlsx');
+            XLSX.writeFile(wb, 'quiz_template_5options.xlsx');
         }
 
         // 엑셀 파일 업로드 처리
@@ -2767,6 +2777,7 @@
                     const option2 = row['선택지2'] || row['보기2'] || '';
                     const option3 = row['선택지3'] || row['보기3'] || '';
                     const option4 = row['선택지4'] || row['보기4'] || '';
+                    const option5 = row['선택지5'] || row['보기5'] || '';
                     const correctAnswer = String(row['정답'] || '').trim();
                     const explanation = row['해설'] || '';
 
@@ -2786,6 +2797,7 @@
                         option2,
                         option3,
                         option4,
+                        option5,
                         correctAnswer,
                         explanation
                     };
@@ -2830,7 +2842,7 @@
                                 }">${quiz.questionType}</span>
                             </div>
                             <p class="text-sm text-white">${quiz.question}</p>
-                            ${quiz.option1 ? `<p class="text-xs text-gray-500 mt-1">① ${quiz.option1} ${quiz.option2 ? `② ${quiz.option2}` : ''} ${quiz.option3 ? `③ ${quiz.option3}` : ''} ${quiz.option4 ? `④ ${quiz.option4}` : ''}</p>` : ''}
+                            ${quiz.option1 ? `<p class="text-xs text-gray-500 mt-1">① ${quiz.option1} ${quiz.option2 ? `② ${quiz.option2}` : ''} ${quiz.option3 ? `③ ${quiz.option3}` : ''} ${quiz.option4 ? `④ ${quiz.option4}` : ''} ${quiz.option5 ? `⑤ ${quiz.option5}` : ''}</p>` : ''}
                             <p class="text-xs text-green-400 mt-1">정답: ${quiz.correctAnswer}</p>
                         </div>
                     </div>
@@ -2870,6 +2882,7 @@
                     option2: quiz.option2 || null,
                     option3: quiz.option3 || null,
                     option4: quiz.option4 || null,
+                    option5: quiz.option5 || null,
                     correct_answer: quiz.correctAnswer,
                     explanation: quiz.explanation || null
                 }));
@@ -2913,6 +2926,7 @@
                         option2: q.option2 || '',
                         option3: q.option3 || '',
                         option4: q.option4 || '',
+                        option5: q.option5 || '',
                         correctAnswer: q.correct_answer,
                         explanation: q.explanation || ''
                     }));

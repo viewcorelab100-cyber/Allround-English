@@ -232,6 +232,47 @@
                             다음 레슨 →
                         </button>
                     </div>
+
+                    <!-- Quiz Section (90% 이상 수강 시 표시) -->
+                    <div id="quiz-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-2xl font-bold text-white">📝 퀴즈</h2>
+                                <div id="quiz-score" class="hidden text-sm px-4 py-2 rounded-lg bg-white bg-opacity-10">
+                                    <span class="text-white">점수: </span>
+                                    <span id="quiz-score-text" class="text-green-400 font-bold"></span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-400">강의 내용을 얼마나 이해하셨는지 확인해보세요!</p>
+                            
+                            <!-- Quiz Container -->
+                            <div id="quiz-container" class="space-y-6">
+                                <!-- 퀴즈 로딩 중 -->
+                                <div class="text-center py-8 text-gray-500">
+                                    퀴즈를 불러오는 중...
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div id="quiz-submit-container" class="hidden flex justify-center pt-4">
+                                <button onclick="submitQuiz()" class="px-8 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition">
+                                    제출하기
+                                </button>
+                            </div>
+
+                            <!-- Result Container -->
+                            <div id="quiz-result-container" class="hidden p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
+                                <div class="text-center">
+                                    <p class="text-3xl font-bold text-white mb-2" id="final-score"></p>
+                                    <p class="text-gray-400" id="result-message"></p>
+                                </div>
+                                <button onclick="retryQuiz()" class="w-full py-3 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
+                                    다시 풀기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1031,6 +1072,11 @@
             setupNavigation(courseLessons, currentLesson.id);
             await loadComments();
             
+            // 퀴즈 로드
+            if (currentUser) {
+                await loadQuizzes(currentLesson.id);
+            }
+            
             if (!currentUser) { 
                 document.getElementById('comment-form-container').innerHTML = `<p class="text-gray-500 text-center py-4">댓글을 작성하려면 <a href="auth.html" class="text-white underline">로그인</a>해주세요.</p>`; 
             }
@@ -1045,12 +1091,19 @@
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
             const assignmentSection = document.getElementById('assignment-section');
+            const quizSection = document.getElementById('quiz-section');
             
             if (progress >= 90 && currentUser) {
                 assignmentSection.classList.remove('hidden');
                 loadAssignmentStatus();
+                
+                // 퀴즈도 90% 이상일 때 표시
+                if (quizzes.length > 0) {
+                    quizSection.classList.remove('hidden');
+                }
             } else {
                 assignmentSection.classList.add('hidden');
+                quizSection.classList.add('hidden');
             }
         }
 
@@ -1810,6 +1863,262 @@
                 closeQnaListModal();
             }
         });
+
+        // ========== 퀴즈 관련 함수 ==========
+        let quizzes = [];
+        let userAnswers = {};
+
+        // 퀴즈 로드
+        async function loadQuizzes(lessonId) {
+            try {
+                const { data, error } = await window.supabase
+                    .from('quizzes')
+                    .select('*')
+                    .eq('lesson_id', lessonId)
+                    .order('question_number');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    document.getElementById('quiz-section').classList.add('hidden');
+                    return;
+                }
+
+                quizzes = data;
+                userAnswers = {};
+                renderQuizzes();
+                
+                // 퀴즈 섹션 표시
+                document.getElementById('quiz-section').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('퀴즈 로드 오류:', error);
+            }
+        }
+
+        // 퀴즈 렌더링
+        function renderQuizzes() {
+            const container = document.getElementById('quiz-container');
+            
+            container.innerHTML = quizzes.map((quiz, index) => {
+                const isAnswered = userAnswers[quiz.id] !== undefined;
+                
+                return `
+                    <div class="p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-3">
+                                    <span class="text-lg font-bold text-white">${quiz.question_number}.</span>
+                                    <span class="text-xs px-3 py-1 rounded ${
+                                        quiz.question_type === '객관식' ? 'bg-green-500 bg-opacity-20 text-green-400' :
+                                        quiz.question_type === 'OX' ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' :
+                                        'bg-purple-500 bg-opacity-20 text-purple-400'
+                                    }">${quiz.question_type}</span>
+                                </div>
+                                <p class="text-white text-lg mb-4">${quiz.question}</p>
+                                
+                                ${renderQuizInput(quiz, isAnswered)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 제출 버튼 표시
+            document.getElementById('quiz-submit-container').classList.remove('hidden');
+            document.getElementById('quiz-result-container').classList.add('hidden');
+        }
+
+        // 퀴즈 입력 렌더링
+        function renderQuizInput(quiz, isAnswered) {
+            if (quiz.question_type === '객관식') {
+                const options = [
+                    quiz.option1, quiz.option2, quiz.option3, quiz.option4, quiz.option5
+                ].filter(opt => opt);
+
+                return `
+                    <div class="space-y-3">
+                        ${options.map((option, i) => `
+                            <label class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition">
+                                <input type="radio" 
+                                       name="quiz-${quiz.id}" 
+                                       value="${i + 1}"
+                                       onchange="saveAnswer('${quiz.id}', '${i + 1}')"
+                                       ${isAnswered && userAnswers[quiz.id] === String(i + 1) ? 'checked' : ''}
+                                       class="w-5 h-5 text-white focus:ring-white">
+                                <span class="text-white">${i + 1}. ${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (quiz.question_type === 'OX') {
+                return `
+                    <div class="flex space-x-4">
+                        <label class="flex-1 p-4 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition text-center">
+                            <input type="radio" 
+                                   name="quiz-${quiz.id}" 
+                                   value="1"
+                                   onchange="saveAnswer('${quiz.id}', '1')"
+                                   ${isAnswered && userAnswers[quiz.id] === '1' ? 'checked' : ''}
+                                   class="hidden">
+                            <span class="text-2xl ${isAnswered && userAnswers[quiz.id] === '1' ? 'text-green-400' : 'text-white'}">⭕ O</span>
+                        </label>
+                        <label class="flex-1 p-4 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition text-center">
+                            <input type="radio" 
+                                   name="quiz-${quiz.id}" 
+                                   value="2"
+                                   onchange="saveAnswer('${quiz.id}', '2')"
+                                   ${isAnswered && userAnswers[quiz.id] === '2' ? 'checked' : ''}
+                                   class="hidden">
+                            <span class="text-2xl ${isAnswered && userAnswers[quiz.id] === '2' ? 'text-red-400' : 'text-white'}">❌ X</span>
+                        </label>
+                    </div>
+                `;
+            } else { // 주관식
+                return `
+                    <input type="text" 
+                           id="quiz-${quiz.id}"
+                           value="${userAnswers[quiz.id] || ''}"
+                           onchange="saveAnswer('${quiz.id}', this.value)"
+                           placeholder="정답을 입력하세요"
+                           class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30">
+                `;
+            }
+        }
+
+        // 답변 저장
+        function saveAnswer(quizId, answer) {
+            userAnswers[quizId] = answer;
+        }
+
+        // 퀴즈 제출
+        async function submitQuiz() {
+            // 모든 문제에 답했는지 확인
+            if (Object.keys(userAnswers).length < quizzes.length) {
+                alert('모든 문제에 답해주세요!');
+                return;
+            }
+
+            // 채점
+            let correctCount = 0;
+            const results = quizzes.map(quiz => {
+                const userAnswer = userAnswers[quiz.id];
+                const isCorrect = String(userAnswer).trim().toLowerCase() === String(quiz.correct_answer).trim().toLowerCase();
+                
+                if (isCorrect) correctCount++;
+
+                return {
+                    quiz_id: quiz.id,
+                    user_answer: userAnswer,
+                    is_correct: isCorrect
+                };
+            });
+
+            const score = Math.round((correctCount / quizzes.length) * 100);
+
+            // 결과 표시
+            showQuizResult(score, correctCount, results);
+
+            // DB에 저장
+            try {
+                const user = await window.supabase.auth.getUser();
+                if (!user.data.user) return;
+
+                const responses = results.map(result => ({
+                    quiz_id: result.quiz_id,
+                    user_id: user.data.user.id,
+                    lesson_id: currentLesson.id,
+                    user_answer: result.user_answer,
+                    is_correct: result.is_correct
+                }));
+
+                // 기존 응답 삭제 후 새로 저장
+                await window.supabase
+                    .from('quiz_responses')
+                    .delete()
+                    .eq('user_id', user.data.user.id)
+                    .eq('lesson_id', currentLesson.id);
+
+                const { error } = await window.supabase
+                    .from('quiz_responses')
+                    .insert(responses);
+
+                if (error) throw error;
+
+            } catch (error) {
+                console.error('퀴즈 결과 저장 오류:', error);
+            }
+        }
+
+        // 퀴즈 결과 표시
+        function showQuizResult(score, correctCount, results) {
+            const container = document.getElementById('quiz-container');
+            
+            container.innerHTML = quizzes.map((quiz, index) => {
+                const result = results[index];
+                const userAnswer = result.user_answer;
+                const isCorrect = result.is_correct;
+                
+                return `
+                    <div class="p-6 rounded-xl ${isCorrect ? 'bg-green-500 bg-opacity-10 border-2 border-green-500 border-opacity-30' : 'bg-red-500 bg-opacity-10 border-2 border-red-500 border-opacity-30'}">
+                        <div class="space-y-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-3">
+                                        <span class="text-lg font-bold text-white">${quiz.question_number}.</span>
+                                        <span class="text-xs px-3 py-1 rounded ${isCorrect ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}">${isCorrect ? '정답' : '오답'}</span>
+                                    </div>
+                                    <p class="text-white text-lg mb-4">${quiz.question}</p>
+                                    
+                                    <div class="space-y-2 mb-4">
+                                        <p class="text-sm"><span class="text-gray-400">내 답변:</span> <span class="${isCorrect ? 'text-green-400' : 'text-red-400'} font-semibold">${userAnswer}</span></p>
+                                        ${!isCorrect ? `<p class="text-sm"><span class="text-gray-400">정답:</span> <span class="text-green-400 font-semibold">${quiz.correct_answer}</span></p>` : ''}
+                                    </div>
+                                    
+                                    ${quiz.explanation ? `
+                                        <div class="p-4 rounded-lg bg-white bg-opacity-5">
+                                            <p class="text-xs text-gray-400 mb-2">💡 해설</p>
+                                            <p class="text-white text-sm">${quiz.explanation}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 점수 표시
+            document.getElementById('quiz-score').classList.remove('hidden');
+            document.getElementById('quiz-score-text').textContent = `${correctCount}/${quizzes.length} (${score}점)`;
+
+            // 결과 컨테이너 표시
+            document.getElementById('quiz-submit-container').classList.add('hidden');
+            document.getElementById('quiz-result-container').classList.remove('hidden');
+            
+            const finalScore = document.getElementById('final-score');
+            const resultMessage = document.getElementById('result-message');
+            
+            finalScore.textContent = `${score}점`;
+            
+            if (score >= 90) {
+                resultMessage.textContent = '🎉 완벽합니다! 강의 내용을 완전히 이해하셨네요!';
+            } else if (score >= 70) {
+                resultMessage.textContent = '👍 잘했어요! 조금만 더 복습하면 완벽해요!';
+            } else if (score >= 50) {
+                resultMessage.textContent = '💪 괜찮아요! 강의를 다시 한 번 복습해보세요!';
+            } else {
+                resultMessage.textContent = '📚 조금 더 공부가 필요해요. 강의를 다시 들어보세요!';
+            }
+        }
+
+        // 퀴즈 다시 풀기
+        function retryQuiz() {
+            userAnswers = {};
+            renderQuizzes();
+            document.getElementById('quiz-score').classList.add('hidden');
+        }
+        // ========== 퀴즈 관련 함수 끝 ==========
     </script>
 </body>
 </html>
