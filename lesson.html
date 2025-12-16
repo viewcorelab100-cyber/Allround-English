@@ -27,6 +27,11 @@
             font-family: 'Playfair Display', "aileron", serif;
         }
         
+        /* 제출 내역 숨기기 */
+        #submission-history {
+            display: none !important;
+        }
+        
         /* 상단바는 aileron 유지 */
         header, header * {
             font-family: "aileron", sans-serif;
@@ -1481,7 +1486,6 @@
                     
                     // 제출 상태 업데이트
                     updateSubmissionStatus();
-                    loadSubmissionHistory();
 
                 } else {
                     // Fallback: grading.js가 로드되지 않은 경우 직접 처리
@@ -1526,7 +1530,6 @@
                     
                     // 제출 상태 업데이트
                     updateSubmissionStatus();
-                    loadSubmissionHistory();
                 }
 
             } catch (error) {
@@ -1590,18 +1593,21 @@
             }
         }
 
-        // 제출 내역 로드 (비활성화됨 - 제출 내역 표시 불필요)
-        async function loadSubmissionHistory() {
-            // 제출 내역을 표시하지 않음
-            return;
-        }
+        // 제출 내역 로드 (완전히 제거됨)
+        // 제출 내역 기능이 제거되었습니다.
 
         // 페이지 로드 시 제출 상태 확인
         document.addEventListener('DOMContentLoaded', function() {
             // 기존 init 후에 제출 상태 로드
             setTimeout(() => {
                 updateSubmissionStatus();
-                loadSubmissionHistory();
+                // loadSubmissionHistory(); // 제출 내역 제거됨
+                
+                // 혹시 남아있는 submission-history 요소 제거
+                const submissionHistory = document.getElementById('submission-history');
+                if (submissionHistory) {
+                    submissionHistory.remove();
+                }
             }, 1000);
         });
 
