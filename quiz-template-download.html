@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>퀴즈 템플릿 다운로드 — ALLROUND</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS for Excel generation -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full">
+        <div class="bg-neutral-900 rounded-xl p-8">
+            <h1 class="text-3xl font-bold mb-6">📊 퀴즈 엑셀 템플릿</h1>
+            
+            <!-- 템플릿 설명 -->
+            <div class="mb-8 space-y-4">
+                <div class="bg-white bg-opacity-5 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold mb-4">📝 엑셀 양식 구조</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border border-gray-700">
+                            <thead class="bg-white bg-opacity-10">
+                                <tr>
+                                    <th class="border border-gray-700 px-3 py-2">문제번호</th>
+                                    <th class="border border-gray-700 px-3 py-2">문제유형</th>
+                                    <th class="border border-gray-700 px-3 py-2">질문</th>
+                                    <th class="border border-gray-700 px-3 py-2">선택지1</th>
+                                    <th class="border border-gray-700 px-3 py-2">선택지2</th>
+                                    <th class="border border-gray-700 px-3 py-2">선택지3</th>
+                                    <th class="border border-gray-700 px-3 py-2">선택지4</th>
+                                    <th class="border border-gray-700 px-3 py-2 bg-yellow-500 bg-opacity-20">선택지5</th>
+                                    <th class="border border-gray-700 px-3 py-2">정답</th>
+                                    <th class="border border-gray-700 px-3 py-2">해설</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr>
+                                    <td class="border border-gray-700 px-3 py-2">1</td>
+                                    <td class="border border-gray-700 px-3 py-2">객관식</td>
+                                    <td class="border border-gray-700 px-3 py-2">What is...?</td>
+                                    <td class="border border-gray-700 px-3 py-2">Seoul</td>
+                                    <td class="border border-gray-700 px-3 py-2">Busan</td>
+                                    <td class="border border-gray-700 px-3 py-2">Incheon</td>
+                                    <td class="border border-gray-700 px-3 py-2">Daegu</td>
+                                    <td class="border border-gray-700 px-3 py-2 bg-yellow-500 bg-opacity-10">Gwangju</td>
+                                    <td class="border border-gray-700 px-3 py-2">1</td>
+                                    <td class="border border-gray-700 px-3 py-2">Seoul is...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-yellow-400 mt-3">✨ 이제 선택지를 <strong>5개</strong>까지 입력할 수 있습니다!</p>
+                </div>
+
+                <div class="bg-blue-500 bg-opacity-10 rounded-lg p-6">
+                    <h3 class="font-semibold mb-3">📌 작성 규칙</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><strong>문제유형:</strong> 
+                            <span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">객관식</span>
+                            <span class="px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-xs">OX</span>
+                            <span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-xs">주관식</span>
+                        </li>
+                        <li><strong>정답 형식:</strong>
+                            <ul class="ml-6 mt-1 space-y-1">
+                                <li>• 객관식: <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">1</code>, <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">2</code>, <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">3</code>, <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">4</code>, <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded bg-yellow-500 bg-opacity-20">5</code> (선택지 번호)</li>
+                                <li>• OX: <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">1</code> (O) 또는 <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">2</code> (X)</li>
+                                <li>• 주관식: 정답 텍스트 직접 입력 (예: <code class="bg-white bg-opacity-10 px-2 py-0.5 rounded">go</code>)</li>
+                            </ul>
+                        </li>
+                        <li><strong>선택지:</strong> 사용하지 않는 선택지는 <strong>비워두세요</strong></li>
+                        <li><strong>해설:</strong> 선택사항 (비워둘 수 있음)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 다운로드 버튼 -->
+            <div class="flex justify-center">
+                <button onclick="downloadQuizTemplate()" 
+                        class="px-8 py-4 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold text-lg">
+                    📥 퀴즈 템플릿 다운로드 (5지선다형)
+                </button>
+            </div>
+
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-sm text-gray-400 hover:text-white transition">← 홈으로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function downloadQuizTemplate() {
+            // 템플릿 데이터 (5지선다형)
+            const template = [
+                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '선택지5', '정답', '해설'],
+                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', 'Gwangju', '1', 'Seoul is the capital city of Korea.'],
+                [2, '객관식', 'Which color is NOT in the rainbow?', 'Red', 'Orange', 'Yellow', 'Green', 'Pink', '5', 'Pink is not a color in the rainbow.'],
+                [3, 'OX', 'English is easy.', 'O', 'X', '', '', '', '2', 'It depends on the learner.'],
+                [4, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', '', 'go', 'Simple present tense']
+            ];
+
+            // 워크시트 생성
+            const ws = XLSX.utils.aoa_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Quiz Template');
+            
+            // 컬럼 너비 설정
+            ws['!cols'] = [
+                { wch: 10 },  // 문제번호
+                { wch: 12 },  // 문제유형
+                { wch: 45 },  // 질문
+                { wch: 20 },  // 선택지1
+                { wch: 20 },  // 선택지2
+                { wch: 20 },  // 선택지3
+                { wch: 20 },  // 선택지4
+                { wch: 20 },  // 선택지5 (새로 추가)
+                { wch: 10 },  // 정답
+                { wch: 35 }   // 해설
+            ];
+
+            // 파일 다운로드
+            XLSX.writeFile(wb, 'quiz_template_5options.xlsx');
+            
+            // 성공 메시지
+            alert('✅ 퀴즈 템플릿이 다운로드되었습니다!\n\n엑셀 파일을 열어서 퀴즈를 작성한 후,\n관리자 페이지에서 업로드하세요.');
+        }
+
+        // 페이지 로드 시 자동 안내
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ 퀴즈 템플릿 페이지 로드 완료');
+            console.log('📊 선택지 5개 지원');
+        });
+    </script>
+</body>
+</html>
+
