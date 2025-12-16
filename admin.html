@@ -286,9 +286,9 @@
                                        class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                             </div>
                             <div>
-                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분)</label>
-                                <input type="number" id="lesson-duration" min="0"
-                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분) <span class="text-xs text-gray-500">- 자동 계산됨</span></label>
+                                <input type="number" id="lesson-duration" min="0" readonly
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-gray-400 placeholder-gray-500 focus:outline-none cursor-not-allowed">
                             </div>
                         </div>
                         <div>
@@ -2063,6 +2063,60 @@
             document.getElementById('quiz-preview-container').classList.add('hidden');
             document.getElementById('lesson-modal').classList.add('hidden');
         }
+
+        // Vimeo 영상 길이 자동 가져오기
+        async function fetchVimeoDuration(videoUrl) {
+            try {
+                const vimeoId = extractVimeoId(videoUrl);
+                if (!vimeoId) return null;
+
+                // Vimeo oEmbed API 사용
+                const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vimeoId}`);
+                if (!response.ok) return null;
+
+                const data = await response.json();
+                
+                // duration은 초 단위로 반환되므로 분으로 변환
+                if (data.duration) {
+                    const minutes = Math.ceil(data.duration / 60);
+                    return minutes;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Vimeo duration fetch error:', error);
+                return null;
+            }
+        }
+
+        // Vimeo ID 추출
+        function extractVimeoId(url) {
+            if (!url) return null;
+            const regExp = /vimeo\.com\/(?:video\/)?(\d+)/;
+            const match = url.match(regExp);
+            return match ? match[1] : null;
+        }
+
+        // Vimeo URL 입력 시 자동으로 영상 길이 가져오기
+        document.getElementById('lesson-video-url')?.addEventListener('blur', async function() {
+            const videoUrl = this.value.trim();
+            const durationInput = document.getElementById('lesson-duration');
+            
+            if (videoUrl && videoUrl.includes('vimeo.com')) {
+                // 로딩 표시
+                durationInput.value = '';
+                durationInput.placeholder = '계산 중...';
+                
+                const duration = await fetchVimeoDuration(videoUrl);
+                
+                if (duration) {
+                    durationInput.value = duration;
+                    durationInput.placeholder = '';
+                } else {
+                    durationInput.placeholder = '자동 계산 실패';
+                }
+            }
+        });
 
         // 레슨 저장
         document.getElementById('lesson-form')?.addEventListener('submit', async (e) => {

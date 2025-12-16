@@ -163,3 +163,135 @@ async function getLessonById(lessonId) {
     }
 }
 
+// 코스 리포트 생성
+async function generateCourseReport(userId, courseId) {
+    try {
+        // 1. 사용자 정보 가져오기
+        const { data: userData, error: userError } = await window.supabase
+            .from('users')
+            .select('name, email')
+            .eq('id', userId)
+            .single();
+        
+        if (userError) throw userError;
+        
+        // 2. 코스 정보 가져오기
+        const { data: courseData, error: courseError } = await window.supabase
+            .from('courses')
+            .select(`
+                title,
+                lessons (
+                    id,
+                    duration
+                )
+            `)
+            .eq('id', courseId)
+            .single();
+        
+        if (courseError) throw courseError;
+        
+        const lessons = courseData.lessons || [];
+        const lessonIds = lessons.map(l => l.id);
+        const totalLessons = lessons.length;
+        
+        if (totalLessons === 0) {
+            throw new Error('강의에 레슨이 없습니다.');
+        }
+        
+        // 3. 진도 정보 가져오기
+        const { data: progressData, error: progressError } = await window.supabase
+            .from('lesson_progress')
+            .select('*')
+            .eq('user_id', userId)
+            .in('lesson_id', lessonIds);
+        
+        if (progressError) throw progressError;
+        
+        // 4. 과제 정보 가져오기
+        const { data: assignmentData, error: assignmentError } = await window.supabase
+            .from('assignments')
+            .select('*')
+            .eq('user_id', userId)
+            .in('lesson_id', lessonIds);
+        
+        if (assignmentError) throw assignmentError;
+        
+        // 5. 통계 계산
+        const completedLessons = progressData ? progressData.filter(p => p.is_completed).length : 0;
+        const totalProgress = Math.round((completedLessons / totalLessons) * 100);
+        
+        // 평균 시청률 계산
+        let totalWatchRate = 0;
+        if (progressData && progressData.length > 0) {
+            totalWatchRate = progressData.reduce((sum, p) => {
+                const watchRate = p.total_seconds > 0 
+                    ? Math.round((p.watched_seconds / p.total_seconds) * 100) 
+                    : 0;
+                return sum + watchRate;
+            }, 0);
+        }
+        const averageWatchRate = progressData && progressData.length > 0 
+            ? Math.round(totalWatchRate / progressData.length) 
+            : 0;
+        
+        // 과제 완료율 계산
+        const completedAssignments = assignmentData ? assignmentData.filter(a => a.status === 'submitted' || a.status === 'graded').length : 0;
+        const assignmentRate = totalLessons > 0 ? Math.round((completedAssignments / totalLessons) * 100) : 0;
+        
+        // 6. public_id 생성 (외부 공유용)
+        const publicId = `report_${userId}_${courseId}_${Date.now()}`;
+        
+        // 7. 기존 리포트 확인 (있으면 업데이트, 없으면 생성)
+        const { data: existingReport } = await window.supabase
+            .from('course_reports')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('course_id', courseId)
+            .maybeSingle();
+        
+        const reportData = {
+            user_id: userId,
+            course_id: courseId,
+            student_name: userData.name || '학생',
+            course_title: courseData.title,
+            total_lessons: totalLessons,
+            completed_lessons: completedLessons,
+            total_progress: totalProgress,
+            average_watch_rate: averageWatchRate,
+            assignment_rate: assignmentRate,
+            public_id: publicId,
+            updated_at: new Date().toISOString()
+        };
+        
+        let result;
+        if (existingReport) {
+            // 업데이트
+            const { data, error } = await window.supabase
+                .from('course_reports')
+                .update(reportData)
+                .eq('id', existingReport.id)
+                .select()
+                .single();
+            
+            if (error) throw error;
+            result = data;
+        } else {
+            // 새로 생성
+            reportData.created_at = new Date().toISOString();
+            const { data, error } = await window.supabase
+                .from('course_reports')
+                .insert(reportData)
+                .select()
+                .single();
+            
+            if (error) throw error;
+            result = data;
+        }
+        
+        return { success: true, data: result };
+    } catch (error) {
+        console.error('Generate report error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
