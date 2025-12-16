@@ -1593,21 +1593,13 @@
             }
         }
 
-        // 제출 내역 로드 (완전히 제거됨)
-        // 제출 내역 기능이 제거되었습니다.
-
+        // 제출 내역은 CSS로 숨김 처리됨 (관리자 페이지 등에서는 필요할 수 있음)
+        
         // 페이지 로드 시 제출 상태 확인
         document.addEventListener('DOMContentLoaded', function() {
             // 기존 init 후에 제출 상태 로드
             setTimeout(() => {
                 updateSubmissionStatus();
-                // loadSubmissionHistory(); // 제출 내역 제거됨
-                
-                // 혹시 남아있는 submission-history 요소 제거
-                const submissionHistory = document.getElementById('submission-history');
-                if (submissionHistory) {
-                    submissionHistory.remove();
-                }
             }, 1000);
         });
 
