@@ -196,15 +196,11 @@
                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">카테 고리</label>
-                            <input type="text" id="course-category-text"
-                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
-                        </div>
-                        <div>
                             <label class="block text-sm text-gray-400 mb-2">카테고리</label>
                             <select id="course-category" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none cursor-pointer">
-                                <option value="">카테고리 선택</option>
+                                    class="w-full px-4 py-3 bg-neutral-800 border border-white border-opacity-10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent cursor-pointer appearance-none"
+                                    style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25rem; padding-right: 2.5rem;">
+                                <option value="" disabled selected style="color: #9CA3AF;">카테고리 선택</option>
                             </select>
                             <p class="text-xs text-yellow-400 mt-1">💡 카테고리가 없으면 "카테고리 편집" 버튼에서 추가하세요</p>
                         </div>
@@ -222,8 +218,11 @@
                             </div>
                             <div>
                                 <label class="block text-sm text-gray-400 mb-2">총 시간 (시간)</label>
-                                <input type="number" id="course-duration" min="0" step="0.5"
-                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                                <div class="w-full px-4 py-3 bg-neutral-800 border border-white border-opacity-10 rounded-lg text-yellow-400 flex items-center justify-between">
+                                    <span id="course-duration-display">0시간</span>
+                                    <span class="text-xs text-gray-500">자동 계산됨</span>
+                                </div>
+                                <input type="hidden" id="course-duration">
                             </div>
                         </div>
                         <div>
@@ -906,13 +905,13 @@
                 let statusBadge = '';
                 if (sub.status === 'graded') {
                     const score = sub.feedback?.score || '-';
-                    statusBadge = `<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm">${score}점</span>`;
+                    statusBadge = `<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm whitespace-nowrap">${score}점</span>`;
                 } else if (sub.status === 'returned') {
-                    statusBadge = '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm">재제출</span>';
+                    statusBadge = '<span class="inline-block px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm whitespace-nowrap">재제출</span>';
                 } else if (sub.image_url || sub.status === 'submitted') {
-                    statusBadge = '<span class="px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-sm">대기중</span>';
+                    statusBadge = '<span class="inline-block px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-sm whitespace-nowrap">대기중</span>';
                 } else {
-                    statusBadge = '<span class="px-2 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-sm">미제출</span>';
+                    statusBadge = '<span class="inline-block px-3 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-sm whitespace-nowrap">미제출</span>';
                 }
 
                 return `
@@ -1065,7 +1064,7 @@
                                                 </div>
                                                 <div class="flex items-center space-x-2">
                                                     <span class="text-sm text-green-400 font-bold">${lesson.watchRate}%</span>
-                                                    ${lesson.completed ? '<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">완료</span>' : ''}
+                                                    ${lesson.completed ? '<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">완료</span>' : ''}
                                                 </div>
                                             </div>
                                             
@@ -1193,13 +1192,13 @@
         function getImageSubmissionStatus(sub) {
             const feedback = sub.teacher_feedback?.[0];
             if (sub.status === 'graded' && feedback) {
-                return `<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">${feedback.score}점 / ${feedback.grade}</span>`;
+                return `<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">${feedback.score}점 / ${feedback.grade}</span>`;
             } else if (sub.status === 'submitted') {
-                return '<span class="px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-xs">채점 대기</span>';
+                return '<span class="inline-block px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-xs whitespace-nowrap">채점 대기</span>';
             } else if (sub.status === 'returned') {
-                return '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs">재제출</span>';
+                return '<span class="inline-block px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs whitespace-nowrap">재제출</span>';
             }
-            return '<span class="px-2 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-xs">대기</span>';
+            return '<span class="inline-block px-3 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-xs whitespace-nowrap">대기</span>';
         }
 
         // 시간 포맷 (초 -> 분:초)
@@ -1736,7 +1735,7 @@
                         <td class="px-6 py-4 text-gray-400">${course.category || '-'}</td>
                         <td class="px-6 py-4 text-white">₩${(course.price || 0).toLocaleString()}</td>
                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded text-xs ${course.is_published ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-gray-500 bg-opacity-20 text-gray-400'}">
+                            <span class="inline-block px-3 py-1 rounded text-xs whitespace-nowrap ${course.is_published ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-gray-500 bg-opacity-20 text-gray-400'}">
                                 ${course.is_published ? '공개' : '비공개'}
                             </span>
                         </td>
@@ -1746,9 +1745,9 @@
                                 영상 관리
                             </button>
                         </td>
-                        <td class="px-6 py-4 text-right space-x-3">
-                            <button onclick="editCourse('${course.id}')" class="text-gray-400 hover:text-white transition">수정</button>
-                            <button onclick="deleteCourse('${course.id}')" class="text-red-400 hover:text-red-300 transition">삭제</button>
+                        <td class="px-4 py-4 text-right whitespace-nowrap">
+                            <button onclick="editCourse('${course.id}')" class="text-gray-400 hover:text-white transition text-sm">수정</button>
+                            <button onclick="deleteCourse('${course.id}')" class="text-red-400 hover:text-red-300 transition text-sm ml-2">삭제</button>
                         </td>
                     </tr>
                 `).join('');
@@ -1807,9 +1806,9 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <button onclick="editLesson('${lesson.id}')" class="text-gray-400 hover:text-white transition">수정</button>
-                            <button onclick="deleteLesson('${lesson.id}')" class="text-red-400 hover:text-red-300 transition">삭제</button>
+                        <div class="flex items-center space-x-2 whitespace-nowrap">
+                            <button onclick="editLesson('${lesson.id}')" class="text-gray-400 hover:text-white transition text-sm">수정</button>
+                            <button onclick="deleteLesson('${lesson.id}')" class="text-red-400 hover:text-red-300 transition text-sm">삭제</button>
                         </div>
                     </div>
                 `).join('');
@@ -1835,10 +1834,81 @@
             
             if (courseId) {
                 loadCourseData(courseId);
+            } else {
+                // 새 강의인 경우 총 시간 0으로 초기화
+                document.getElementById('course-duration-display').textContent = '0시간';
+                document.getElementById('course-duration').value = '0';
             }
         }
 
         // 강의 데이터 로드 (수정 시)
+        // 강의의 총 시간 자동 계산 (화면 표시용)
+        async function calculateCourseDuration(courseId) {
+            try {
+                if (!courseId) {
+                    document.getElementById('course-duration-display').textContent = '0시간';
+                    document.getElementById('course-duration').value = '0';
+                    return;
+                }
+
+                // 해당 강의의 모든 레슨 가져오기
+                const { data: lessons, error } = await window.supabase
+                    .from('lessons')
+                    .select('duration')
+                    .eq('course_id', courseId);
+
+                if (error) throw error;
+
+                // 총 시간 계산 (분 단위)
+                const totalMinutes = lessons.reduce((sum, lesson) => sum + (lesson.duration || 0), 0);
+                const totalHours = (totalMinutes / 60).toFixed(1);
+
+                // 화면에 표시
+                document.getElementById('course-duration-display').textContent = `${totalHours}시간`;
+                document.getElementById('course-duration').value = totalHours;
+
+            } catch (error) {
+                console.error('Calculate duration error:', error);
+                document.getElementById('course-duration-display').textContent = '계산 오류';
+                document.getElementById('course-duration').value = '0';
+            }
+        }
+
+        // 강의의 총 시간 자동 업데이트 (DB 저장용)
+        async function updateCourseDuration(courseId) {
+            try {
+                if (!courseId) return;
+
+                // 해당 강의의 모든 레슨 가져오기
+                const { data: lessons, error: fetchError } = await window.supabase
+                    .from('lessons')
+                    .select('duration')
+                    .eq('course_id', courseId);
+
+                if (fetchError) throw fetchError;
+
+                // 총 시간 계산 (분 단위)
+                const totalMinutes = lessons.reduce((sum, lesson) => sum + (lesson.duration || 0), 0);
+                const totalHours = parseFloat((totalMinutes / 60).toFixed(1));
+
+                // DB 업데이트
+                const { error: updateError } = await window.supabase
+                    .from('courses')
+                    .update({ 
+                        duration: totalHours,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', courseId);
+
+                if (updateError) throw updateError;
+
+                console.log(`✅ 강의 총 시간 자동 업데이트: ${totalHours}시간`);
+
+            } catch (error) {
+                console.error('Update course duration error:', error);
+            }
+        }
+
         async function loadCourseData(courseId) {
             try {
                 const { data: course, error } = await window.supabase
@@ -1850,13 +1920,14 @@
                 if (error) throw error;
 
                 document.getElementById('course-title').value = course.title || '';
-                document.getElementById('course-category-text').value = course.category || '';
                 document.getElementById('course-category').value = course.category || '';
                 document.getElementById('course-description').value = course.description || '';
                 document.getElementById('course-price').value = course.price || '';
-                document.getElementById('course-duration').value = course.duration || '';
                 document.getElementById('course-thumbnail').value = course.thumbnail_url || '';
                 document.getElementById('course-published').checked = course.is_published || false;
+
+                // 총 시간 자동 계산
+                await calculateCourseDuration(courseId);
 
                 if (course.thumbnail_url) {
                     document.getElementById('thumbnail-preview').classList.remove('hidden');
@@ -1880,7 +1951,7 @@
             const courseId = document.getElementById('course-id').value;
             const courseData = {
                 title: document.getElementById('course-title').value,
-                category: document.getElementById('course-category-text').value || document.getElementById('course-category').value,
+                category: document.getElementById('course-category').value,
                 description: document.getElementById('course-description').value,
                 price: parseInt(document.getElementById('course-price').value) || 0,
                 duration: parseFloat(document.getElementById('course-duration').value) || 0,
@@ -2037,6 +2108,9 @@
                     await saveQuizzesForLesson(savedLessonId);
                 }
 
+                // 강의의 총 시간 자동 업데이트
+                await updateCourseDuration(selectedCourseId);
+                
                 closeLessonModal();
                 loadLessons(selectedCourseId);
                 
@@ -2065,6 +2139,9 @@
 
                 if (error) throw error;
 
+                // 강의의 총 시간 자동 업데이트
+                await updateCourseDuration(selectedCourseId);
+                
                 loadLessons(selectedCourseId);
                 alert('영상이 삭제되었습니다.');
             } catch (error) {
@@ -2126,8 +2203,8 @@
         // 카테고리 드롭다운 로드
         function loadCategoryDropdown() {
             const select = document.getElementById('course-category');
-            select.innerHTML = '<option value="">카테고리 선택</option>' + 
-                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            select.innerHTML = '<option value="" disabled selected style="color: #9CA3AF;">카테고리 선택</option>' + 
+                categories.map(cat => `<option value="${cat}" style="background-color: #1F2937; color: white;">${cat}</option>`).join('');
         }
 
         // 썸네일 업로드 처리
@@ -2524,9 +2601,9 @@
                         <td class="px-4 py-4">${getShippingStatusBadge(order.shipping_status)}</td>
                         <td class="px-4 py-4 text-sm text-gray-300">${shippingAddress}</td>
                         <td class="px-4 py-4 text-sm text-gray-300">${trackingInfo}</td>
-                        <td class="px-4 py-4">
+                        <td class="px-4 py-4 whitespace-nowrap">
                             <button onclick="openOrderModal('${order.id}')" 
-                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20 whitespace-nowrap">
                                 수정
                             </button>
                         </td>
@@ -2537,10 +2614,10 @@
 
         function getShippingStatusBadge(status) {
             const badges = {
-                'PENDING_ADDRESS': '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm">배송정보 미입력</span>',
-                'PREPARING': '<span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-sm">배송준비중</span>',
-                'SHIPPING': '<span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-sm">배송중</span>',
-                'DELIVERED': '<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm">배송완료</span>'
+                'PENDING_ADDRESS': '<span class="inline-block px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm whitespace-nowrap">배송정보 미입력</span>',
+                'PREPARING': '<span class="inline-block px-3 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-sm whitespace-nowrap">배송준비중</span>',
+                'SHIPPING': '<span class="inline-block px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-sm whitespace-nowrap">배송중</span>',
+                'DELIVERED': '<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm whitespace-nowrap">배송완료</span>'
             };
             return badges[status] || badges['PENDING_ADDRESS'];
         }
@@ -2746,7 +2823,7 @@
                         <div class="flex-1">
                             <div class="flex items-center space-x-2 mb-1">
                                 <span class="text-xs font-semibold text-blue-400">${quiz.questionNumber}번</span>
-                                <span class="text-xs px-2 py-0.5 rounded ${
+                                <span class="inline-block text-xs px-3 py-1 rounded whitespace-nowrap ${
                                     quiz.questionType === '객관식' ? 'bg-green-500 bg-opacity-20 text-green-400' :
                                     quiz.questionType === 'OX' ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' :
                                     'bg-purple-500 bg-opacity-20 text-purple-400'
