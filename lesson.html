@@ -2074,6 +2074,18 @@
         // 답변 저장
         function saveAnswer(quizId, answer) {
             userAnswers[quizId] = answer;
+            // 즉시 UI 업데이트 - 선택된 답변 하얗게 표시
+            const quizElement = document.querySelector(`input[name="quiz-${quizId}"][value="${answer}"]`);
+            if (quizElement) {
+                const label = quizElement.closest('label');
+                const allLabels = document.querySelectorAll(`input[name="quiz-${quizId}"]`).forEach(input => {
+                    const otherLabel = input.closest('label');
+                    // 모든 라벨 초기화
+                    otherLabel.className = otherLabel.className.replace(/bg-white text-black shadow-lg/g, 'bg-white bg-opacity-5 hover:bg-opacity-10');
+                });
+                // 선택된 라벨만 하얗게
+                label.className = label.className.replace(/bg-white bg-opacity-5 hover:bg-opacity-10/g, 'bg-white text-black shadow-lg');
+            }
         }
 
         // 퀴즈 제출
