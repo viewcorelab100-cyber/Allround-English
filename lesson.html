@@ -259,33 +259,33 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                             
                             <!-- 카드 1: QR 코드 제출 -->
-                            <div class="aspect-square p-4 rounded-xl bg-white bg-opacity-5 flex flex-col items-center justify-center text-center space-y-2">
-                                <div id="qr-code-container" class="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
+                                <div id="qr-code-container" class="w-16 h-16 bg-black rounded-lg flex items-center justify-center">
                                     <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
                                 </div>
-                                <p class="text-xs text-gray-400">카톡 제출</p>
-                                <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-white hover:text-gray-300">열기 →</a>
+                                <p class="text-xs text-gray-600">카톡 제출</p>
+                                <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">열기 →</a>
                             </div>
                             
                             <!-- 카드 2: 블로그 숙제 -->
-                            <div id="blog-card" class="hidden aspect-square p-4 rounded-xl bg-white bg-opacity-5 flex flex-col items-center justify-center text-center space-y-2">
+                            <div id="blog-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
                                 <span class="text-3xl">📝</span>
-                                <p class="text-xs text-gray-400">블로그 숙제</p>
-                                <a id="blog-link" href="#" target="_blank" class="text-xs text-blue-400 hover:text-blue-300">보기 →</a>
+                                <p class="text-xs text-gray-600">블로그 숙제</p>
+                                <a id="blog-link" href="#" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">보기 →</a>
                             </div>
                             
                             <!-- 카드 3: 체크리스트 -->
-                            <div class="aspect-square p-4 rounded-xl bg-white bg-opacity-5 flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-white hover:bg-opacity-10 transition-colors" onclick="openChecklistModal()">
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openChecklistModal()">
                                 <span class="text-3xl">✅</span>
-                                <p class="text-xs text-gray-400">체크리스트</p>
-                                <p id="checklist-status" class="text-xs text-white">0/3 완료</p>
+                                <p class="text-xs text-gray-600">체크리스트</p>
+                                <p id="checklist-status" class="text-xs text-black font-semibold">0/3 완료</p>
                             </div>
                             
                             <!-- 카드 4: 이미지 제출 -->
-                            <div class="aspect-square p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:from-blue-500/20 hover:to-purple-500/20 transition-colors" onclick="openImageSubmitModal()">
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openImageSubmitModal()">
                                 <span class="text-3xl">📷</span>
-                                <p class="text-xs text-gray-400">사진 제출</p>
-                                <span id="image-submission-status" class="text-xs text-white">미제출</span>
+                                <p class="text-xs text-gray-600">사진 제출</p>
+                                <span id="image-submission-status" class="text-xs text-black font-semibold">미제출</span>
                             </div>
                             
                             <!-- 카드 5: 퀴즈 -->
@@ -2012,14 +2012,18 @@
                 return `
                     <div class="space-y-3">
                         ${options.map((option, i) => `
-                            <label class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition ${
+                                isAnswered && userAnswers[quiz.id] === String(i + 1)
+                                    ? 'bg-white text-black shadow-lg'
+                                    : 'bg-white bg-opacity-5 hover:bg-opacity-10'
+                            }">
                                 <input type="radio" 
                                        name="quiz-${quiz.id}" 
                                        value="${i + 1}"
                                        onchange="saveAnswer('${quiz.id}', '${i + 1}')"
                                        ${isAnswered && userAnswers[quiz.id] === String(i + 1) ? 'checked' : ''}
-                                       class="w-5 h-5 text-white focus:ring-white">
-                                <span class="text-white">${i + 1}. ${option}</span>
+                                       class="hidden">
+                                <span class="font-semibold">${i + 1}. ${option}</span>
                             </label>
                         `).join('')}
                     </div>
@@ -2027,23 +2031,31 @@
             } else if (quiz.question_type === 'OX') {
                 return `
                     <div class="flex space-x-4">
-                        <label class="flex-1 p-4 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition text-center">
+                        <label class="flex-1 p-4 rounded-xl cursor-pointer transition text-center ${
+                            isAnswered && userAnswers[quiz.id] === '1' 
+                                ? 'bg-white text-black shadow-lg' 
+                                : 'bg-white bg-opacity-5 hover:bg-opacity-10'
+                        }">
                             <input type="radio" 
                                    name="quiz-${quiz.id}" 
                                    value="1"
                                    onchange="saveAnswer('${quiz.id}', '1')"
                                    ${isAnswered && userAnswers[quiz.id] === '1' ? 'checked' : ''}
                                    class="hidden">
-                            <span class="text-2xl ${isAnswered && userAnswers[quiz.id] === '1' ? 'text-green-400' : 'text-white'}">⭕ O</span>
+                            <span class="text-2xl font-bold">⭕ O</span>
                         </label>
-                        <label class="flex-1 p-4 rounded-lg hover:bg-white hover:bg-opacity-5 cursor-pointer transition text-center">
+                        <label class="flex-1 p-4 rounded-xl cursor-pointer transition text-center ${
+                            isAnswered && userAnswers[quiz.id] === '2' 
+                                ? 'bg-white text-black shadow-lg' 
+                                : 'bg-white bg-opacity-5 hover:bg-opacity-10'
+                        }">
                             <input type="radio" 
                                    name="quiz-${quiz.id}" 
                                    value="2"
                                    onchange="saveAnswer('${quiz.id}', '2')"
                                    ${isAnswered && userAnswers[quiz.id] === '2' ? 'checked' : ''}
                                    class="hidden">
-                            <span class="text-2xl ${isAnswered && userAnswers[quiz.id] === '2' ? 'text-red-400' : 'text-white'}">❌ X</span>
+                            <span class="text-2xl font-bold">❌ X</span>
                         </label>
                     </div>
                 `;
