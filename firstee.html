@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Allround — Firstee</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <style>
+        /* 메인 컨텐츠 */
+        .main-content.visible {
+            opacity: 1;
+        }
+        
+        /* ========== 기존 스타일 ========== */
+        body {
+            font-family: "aileron", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000000;
+        }
+        
+        /* 기본 자간 */
+        * {
+            letter-spacing: 0.02em;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            letter-spacing: 0.03em;
+        }
+
+        /* 상단바 제외한 본문 영문 폰트 */
+        #mainContent {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        /* 버튼 호버 효과 */
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 부드러운 스크롤 */
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        body {
+            overflow-x: hidden;
+        }
+
+        /* 네비게이션 링크 호버 */
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        /* 헤더 숨김/표시 애니메이션 */
+        .header-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        
+        .header-visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    
+    <!-- ========== MAIN CONTENT ========== -->
+    <div id="mainContent" class="main-content visible">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black transition-all duration-300 header-hidden" id="main-header">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- 모바일: 햄버거 메뉴 -->
+                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                </button>
+                <div class="hidden md:block md:w-32"></div>
+                
+                <!-- 로고 -->
+                <a href="index.html" class="text-xl md:text-2xl font-bold text-white tracking-wider">ALLROUND</a>
+                
+                <!-- Auth 버튼 영역 -->
+                <div class="w-auto md:w-32 flex justify-end">
+                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4">
+                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm">Login</a>
+                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm hidden sm:inline">Sign Up</a>
+                    </div>
+                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm hidden sm:inline">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="board.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section - Typographic Texture Style -->
+    <section class="relative min-h-screen flex flex-col justify-center overflow-hidden" style="background-color: #FFE5E3;" id="hero-section">
+        
+        <!-- Line 1 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(-8%);">
+            <span style="color: #000;">WHAT</span> HURTS YOU TEACHES <span style="color: #000;">YOU</span>
+        </p>
+        <!-- Line 2 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(5%);">
+            WHAT HURTS <span style="color: #000;">YOU</span> TEACHES YOU
+        </p>
+        <!-- Line 3 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(-15%);">
+            WHAT <span style="color: #000;">HURTS</span> YOU <span style="color: #000;">TEACHES</span> YOU
+        </p>
+        <!-- Line 4 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(12%);">
+            <span style="color: #000;">WHAT</span> HURTS <span style="color: #000;">YOU</span> TEACHES YOU
+        </p>
+        <!-- Line 5 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(-5%);">
+            WHAT <span style="color: #000;">HURTS</span> YOU TEACHES <span style="color: #000;">YOU</span>
+        </p>
+        <!-- Line 6 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(-20%);">
+            WHAT HURTS YOU <span style="color: #000;">TEACHES</span> YOU
+        </p>
+        <!-- Line 7 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(8%);">
+            <span style="color: #000;">WHAT</span> HURTS YOU TEACHES YOU
+        </p>
+        <!-- Line 8 -->
+        <p class="m-0 whitespace-nowrap" 
+           style="font-weight: 800; font-size: clamp(50px, 9vw, 85px); color: rgba(0,0,0,0.1); line-height: 0.85; transform: translateX(-12%);">
+            WHAT HURTS <span style="color: #000;">YOU</span> <span style="color: #000;">TEACHES</span> YOU
+        </p>
+        
+    </section>
+
+    <!-- 이미지 섹션 -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="rounded-2xl overflow-hidden shadow-2xl">
+                <img src="m3.gif" alt="Allround Firstee" class="w-full h-auto">
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Embrace the Challenge -->
+    <section class="py-32 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-[8vw] md:text-[6vw] lg:text-[5vw] font-normal leading-[0.95] tracking-tight text-white">
+                Embrace<br>the Challenge
+            </h2>
+        </div>
+    </section>
+
+    <!-- Section 3: Your First Steps Matter -->
+    <section class="relative py-32 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-[8vw] md:text-[6vw] lg:text-[5vw] font-normal leading-[0.95] tracking-tight text-white">
+                Your First Steps<br>Matter
+            </h2>
+        </div>
+    </section>
+
+    <!-- Section 4: Principles for Beginners -->
+    <section class="py-32 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-[8vw] md:text-[6vw] lg:text-[5vw] font-normal leading-[0.95] tracking-tight text-white">
+                Principles<br>for Beginners
+            </h2>
+        </div>
+    </section>
+
+    <!-- Section 5: From Fear to Freedom -->
+    <section class="py-32 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-[8vw] md:text-[6vw] lg:text-[5vw] font-normal leading-[0.95] tracking-tight text-white">
+                From Fear<br>to Freedom
+            </h2>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="max-w-5xl mx-auto text-center space-y-6">
+                <div class="text-sm text-gray-400 space-y-3">
+                    <p>본 서비스는 초심자를 위한 실용적 영어 커뮤니케이션 프로그램입니다.</p>
+                    <p>모든 프로그램은 개인의 속도와 목표에 맞춰 진행됩니다.</p>
+                </div>
+                
+                <div class="pt-8">
+                    <p class="text-2xl font-bold text-white tracking-wider">ALLROUND</p>
+                </div>
+                
+                <div class="text-xs text-gray-500 pt-4">
+                    <p>&copy; 2025 Allround. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    </div><!-- End of main-content -->
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    
+    <script>
+        // 스크롤 시 헤더 표시
+        const header = document.getElementById('main-header');
+        const heroSection = document.getElementById('hero-section');
+        
+        window.addEventListener('scroll', () => {
+            const heroHeight = heroSection.offsetHeight;
+            const scrollPosition = window.scrollY;
+            
+            if (scrollPosition > heroHeight - 100) {
+                header.classList.remove('header-hidden');
+                header.classList.add('header-visible');
+            } else {
+                header.classList.remove('header-visible');
+                header.classList.add('header-hidden');
+            }
+        });
+        
+        // 모바일 메뉴 토글
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

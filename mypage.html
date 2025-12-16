@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>My Page — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <style>
+        body {
+            font-family: "aileron", sans-serif;
+            background-color: #000000;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .course-card {
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+    <!-- 다음 주소 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- 모바일: 햄버거 메뉴 -->
+                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                </button>
+                <div class="hidden md:block md:w-32"></div>
+                
+                <!-- 로고 -->
+                <a href="index.html" class="text-xl md:text-2xl font-bold text-white tracking-wider">ALLROUND</a>
+                
+                <!-- User 메뉴 영역 -->
+                <div class="w-auto md:w-32 flex justify-end">
+                    <div id="user-menu" class="flex flex-row items-center space-x-2 md:space-x-4">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm hidden">관리자</a>
+                        <span class="nav-link text-white text-xs md:text-sm hidden sm:inline">My Page</span>
+                        <button onclick="handleSignOut()" class="nav-link text-gray-400 text-xs md:text-sm">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="board.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="h-36"></div>
+
+    <!-- Main Content -->
+    <section class="py-12 md:py-20 px-4 md:px-6">
+        <div class="max-w-5xl mx-auto">
+            
+            <!-- Profile Header -->
+            <div class="mb-8 md:mb-12 space-y-3 md:space-y-4">
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white">My Page</h1>
+                <p id="user-email" class="text-base md:text-xl text-gray-400"></p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6 md:mb-8 border-b border-white border-opacity-10 pb-3 md:pb-4">
+                <button onclick="showTab('courses')" id="tab-courses" class="tab-btn active px-4 md:px-6 py-2 md:py-3 rounded-xl text-white font-semibold text-sm md:text-base">
+                    수강 강의
+                </button>
+                <button onclick="showTab('orders')" id="tab-orders" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
+                    📦 주문/배송
+                </button>
+                <button onclick="showTab('profile')" id="tab-profile" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
+                    프로필 설정
+                </button>
+            </div>
+
+            <!-- Tab Content: Courses -->
+            <div id="content-courses" class="space-y-8">
+                <div id="my-courses" class="grid md:grid-cols-2 gap-6">
+                    <div class="text-center text-gray-500 col-span-full py-20">
+                        강의 정보를 불러오는 중...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Orders/Shipping -->
+            <div id="content-orders" class="hidden space-y-6">
+                <div id="my-orders" class="space-y-4">
+                    <div class="text-center text-gray-500 py-20">
+                        주문 내역을 불러오는 중...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Profile -->
+            <div id="content-profile" class="hidden space-y-8">
+                <div class="max-w-md space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">이름</label>
+                        <input type="text" id="profile-name" 
+                               class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">이메일</label>
+                        <input type="email" id="profile-email" 
+                               class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-gray-500 cursor-not-allowed"
+                               disabled>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">휴대폰</label>
+                        <input type="tel" id="profile-phone" 
+                               class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                               placeholder="010-0000-0000">
+                    </div>
+                    
+                    <!-- 학부모 정보 섹션 -->
+                    <div class="pt-6 mt-6 border-t border-white border-opacity-10 space-y-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-white">📱 학부모 알림 설정</h3>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" id="parent-notification-enabled" 
+                                       class="w-5 h-5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                <span class="text-sm text-gray-400">알림 활성화</span>
+                            </label>
+                        </div>
+                        <p class="text-sm text-gray-500">수강 완료 시 학부모님께 문자로 알림을 보냅니다.</p>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">학부모 이름</label>
+                            <input type="text" id="parent-name" 
+                                   class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                                   placeholder="학부모님 성함">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">학부모 연락처</label>
+                            <input type="tel" id="parent-phone" 
+                                   class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                                   placeholder="010-0000-0000">
+                        </div>
+                    </div>
+                    
+                    <div id="profile-message" class="text-sm hidden"></div>
+                    <button onclick="updateProfile()" 
+                            class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">
+                        프로필 저장
+                    </button>
+                </div>
+
+                <!-- 비밀번호 변경 섹션 -->
+                <div class="pt-8 border-t border-white border-opacity-10">
+                    <h3 class="text-xl font-bold text-white mb-6">비밀번호 변경</h3>
+                    <div class="max-w-md space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">새 비밀번호</label>
+                            <input type="password" id="new-password" 
+                                   class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                                   placeholder="8자 이상 입력해주세요">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">새 비밀번호 확인</label>
+                            <input type="password" id="new-password-confirm" 
+                                   class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                                   placeholder="비밀번호를 다시 입력해주세요">
+                        </div>
+                        <div id="password-message" class="text-sm hidden"></div>
+                        <button onclick="changePassword()" 
+                                class="btn-hover-scale w-full px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white">
+                            비밀번호 변경
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="text-2xl font-bold text-white tracking-wider">ALLROUND</div>
+                <div class="text-sm text-gray-400">
+                    © 2024 ALLROUND. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/progress.js"></script>
+    <script>
+        let currentUser = null;
+        let userProfile = null;
+
+        // 탭 전환
+        function showTab(tab) {
+            // 모든 콘텐츠와 탭 숨기기
+            ['courses', 'orders', 'profile'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`tab-${t}`).classList.add('text-gray-400');
+            });
+
+            // 선택된 탭 표시
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-400');
+
+            // 주문 탭 선택 시 데이터 로드
+            if (tab === 'orders') {
+                loadMyOrders();
+            }
+        }
+
+        // 수강 중인 강의 카드 렌더링
+        function renderMyCourseCard(purchase, progress) {
+            const course = purchase.course;
+            const progressPercent = progress?.progress || 0;
+            
+            return `
+                <div class="course-card rounded-2xl overflow-hidden bg-white bg-opacity-5">
+                    <div class="h-40 bg-cover bg-center" 
+                         style="background-image: url('${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}'); background-color: #111;">
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-white">${course.title}</h3>
+                        
+                        <!-- Progress Bar -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">수강 진도</span>
+                                <span class="text-white">${progressPercent}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                                <div class="h-full bg-white rounded-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500">${progress?.completedLessons || 0}/${progress?.totalLessons || 0} 레슨 완료</p>
+                        </div>
+                        
+                        <a href="course-detail.html?id=${course.id}" 
+                           class="btn-hover-scale block text-center px-6 py-3 bg-white text-black font-semibold rounded-xl">
+                            이어서 학습하기
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 배송 상태 배지 HTML 반환
+        function getShippingStatusBadge(status) {
+            const badges = {
+                'PENDING_ADDRESS': '<span class="px-3 py-1 rounded-full text-xs bg-yellow-500 bg-opacity-20 text-yellow-400">⏳ 배송정보 미완료</span>',
+                'PREPARING': '<span class="px-3 py-1 rounded-full text-xs bg-blue-500 bg-opacity-20 text-blue-400">📋 배송준비중</span>',
+                'SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-purple-500 bg-opacity-20 text-purple-400">🚚 배송중</span>',
+                'DELIVERED': '<span class="px-3 py-1 rounded-full text-xs bg-green-500 bg-opacity-20 text-green-400">✅ 배송완료</span>',
+                'NO_SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-gray-500 bg-opacity-20 text-gray-400">📱 배송없음</span>'
+            };
+            return badges[status] || badges['PENDING_ADDRESS'];
+        }
+
+        // 택배사 이름
+        function getCarrierName(carrier) {
+            const carriers = {
+                'cj': 'CJ대한통운',
+                'hanjin': '한진택배',
+                'lotte': '롯데택배',
+                'logen': '로젠택배',
+                'post': '우체국택배',
+                'etc': '기타'
+            };
+            return carriers[carrier] || carrier || '-';
+        }
+
+        // 주문/배송 내역 로드
+        async function loadMyOrders() {
+            const container = document.getElementById('my-orders');
+
+            try {
+                const { data: orders, error } = await window.supabase
+                    .from('orders')
+                    .select(`
+                        *,
+                        courses (title, thumbnail_url, has_textbook)
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .eq('status', 'DONE')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!orders || orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-500 py-20 space-y-4">
+                            <p class="text-xl">주문 내역이 없습니다.</p>
+                            <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-white text-black font-semibold rounded-xl">
+                                강의 둘러보기
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = orders.map(order => renderOrderCard(order)).join('');
+
+            } catch (error) {
+                console.error('Load orders error:', error);
+                container.innerHTML = '<div class="text-center text-red-400 py-10">주문 내역을 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 주문 카드 렌더링
+        function renderOrderCard(order) {
+            // 택배 정보가 있으면 표시 (has_textbook과 무관)
+            const hasShippingInfo = order.tracking_number || order.shipping_address;
+            
+            return `
+                <div class="rounded-2xl overflow-hidden bg-white bg-opacity-5 p-6 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="flex space-x-4">
+                            <div class="w-20 h-20 rounded-xl bg-cover bg-center flex-shrink-0" 
+                                 style="background-image: url('${order.courses?.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&q=80'}'); background-color: #111;">
+                            </div>
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-white">${order.courses?.title || order.order_name}</h3>
+                                <p class="text-sm text-gray-500">주문일: ${new Date(order.created_at).toLocaleDateString('ko-KR')}</p>
+                                <p class="text-sm text-gray-400">₩${(order.amount || 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+                        ${getShippingStatusBadge(order.shipping_status)}
+                    </div>
+
+                    ${hasShippingInfo ? `
+                    <div class="pt-4 border-t border-white border-opacity-10 space-y-3">
+                        <h4 class="text-sm font-semibold text-gray-300">📦 교재 배송 정보</h4>
+                        
+                        ${order.shipping_status === 'PENDING_ADDRESS' ? `
+                            <div class="p-4 rounded-xl bg-yellow-500 bg-opacity-10 border border-yellow-500 border-opacity-30 space-y-3">
+                                <p class="text-yellow-400 text-sm font-semibold">📦 배송지 정보가 입력되지 않았습니다.</p>
+                                <p class="text-gray-400 text-xs">교재를 받으실 배송지를 입력해주세요.</p>
+                                <a href="payment-success.html?orderId=${order.id}&paymentKey=${order.payment_key || ''}&amount=${order.amount}" 
+                                   class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold rounded-xl hover:bg-gray-100">
+                                    📦 배송 정보 입력하기
+                                </a>
+                            </div>
+                        ` : `
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-500">받는분</p>
+                                    <p class="text-white">${order.shipping_name || '-'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-500">연락처</p>
+                                    <p class="text-white">${order.shipping_phone || '-'}</p>
+                                </div>
+                                <div class="col-span-2">
+                                    <p class="text-gray-500">배송지</p>
+                                    <p class="text-white">${order.shipping_address || '-'} ${order.shipping_address_detail || ''}</p>
+                                </div>
+                                ${(order.shipping_status === 'SHIPPING' || order.shipping_status === 'DELIVERED') && order.tracking_number ? `
+                                    <div class="col-span-2 pt-3 border-t border-white border-opacity-10">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-gray-500 mb-1">택배 정보</p>
+                                                <p class="text-white font-semibold">${getCarrierName(order.shipping_carrier)}</p>
+                                                <p class="text-gray-400 text-sm mt-1">송장번호: ${order.tracking_number}</p>
+                                            </div>
+                                            ${order.shipping_carrier && order.tracking_number ? `
+                                                <a href="${getTrackingUrl(order.shipping_carrier, order.tracking_number)}" 
+                                                   target="_blank" 
+                                                   class="btn-hover-scale px-4 py-2 bg-white bg-opacity-10 text-white text-sm font-semibold rounded-lg hover:bg-opacity-20 border border-white border-opacity-20">
+                                                    🚚 배송조회
+                                                </a>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${order.shipping_status === 'DELIVERED' && order.delivered_at ? `
+                                    <div class="col-span-2">
+                                        <p class="text-gray-500">배송완료일</p>
+                                        <p class="text-green-400">${new Date(order.delivered_at).toLocaleDateString('ko-KR')}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `}
+                    </div>
+                    ` : `
+                    <div class="pt-4 border-t border-white border-opacity-10">
+                        <!-- 배송 정보 입력 버튼 -->
+                        <div id="shipping-btn-${order.id}" class="p-4 rounded-xl bg-white bg-opacity-5 space-y-3">
+                            <p class="text-gray-400 text-sm">📦 교재 배송을 원하시면 배송 정보를 입력해주세요.</p>
+                            <button onclick="toggleShippingForm('${order.id}')" 
+                               class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold rounded-xl hover:bg-gray-100">
+                                📦 배송 정보 입력하기
+                            </button>
+                        </div>
+
+                        <!-- 배송 정보 입력 폼 (숨김) -->
+                        <div id="shipping-form-${order.id}" class="hidden space-y-4 mt-4">
+                            <h4 class="text-lg font-bold text-white">📦 배송 정보</h4>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">받는 분 *</label>
+                                    <input type="text" id="name-${order.id}" 
+                                           class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                           placeholder="이름">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">연락처 *</label>
+                                    <input type="tel" id="phone-${order.id}" 
+                                           class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                           placeholder="010-0000-0000"
+                                           oninput="formatPhoneNumber(this)"
+                                           maxlength="13">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">우편번호 *</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="zipcode-${order.id}" readonly
+                                               class="flex-1 px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500"
+                                               placeholder="우편번호">
+                                        <button onclick="searchAddress('${order.id}')" 
+                                                class="px-4 py-3 bg-white bg-opacity-20 rounded-xl text-white hover:bg-opacity-30">
+                                            주소 검색
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">주소 *</label>
+                                    <input type="text" id="address-${order.id}" readonly
+                                           class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500"
+                                           placeholder="주소">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">상세 주소 * <span class="text-red-400">(필수)</span></label>
+                                    <input type="text" id="address-detail-${order.id}" 
+                                           class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                           placeholder="상세 주소 (동/호수 등)">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-400 mb-2">배송 메모</label>
+                                    <input type="text" id="memo-${order.id}" 
+                                           class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                           placeholder="배송 시 요청사항 (선택)">
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-3 pt-2">
+                                <button onclick="toggleShippingForm('${order.id}')" 
+                                        class="flex-1 py-3 bg-white bg-opacity-10 text-white font-semibold rounded-xl hover:bg-opacity-20">
+                                    취소
+                                </button>
+                                <button onclick="saveShippingFromMypage('${order.id}')" 
+                                        class="flex-1 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100">
+                                    📦 교재 배송하기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    `}
+                </div>
+            `;
+        }
+
+        // 택배 조회 URL 생성
+        function getTrackingUrl(carrier, trackingNumber) {
+            const urls = {
+                'cj': `https://www.cjlogistics.com/ko/tool/parcel/tracking?gnbInvcNo=${trackingNumber}`,
+                'hanjin': `https://www.hanjin.com/kor/CMS/DeliveryMgr/WaybillResult.do?mession_no=&wblnum=${trackingNumber}`,
+                'lotte': `https://www.lotteglogis.com/home/reservation/tracking/index?InvNo=${trackingNumber}`,
+                'logen': `https://www.ilogen.com/web/personal/trace/${trackingNumber}`,
+                'post': `https://service.epost.go.kr/trace.RetrieveDomRi498.parcel?sid1=${trackingNumber}`
+            };
+            return urls[carrier] || '#';
+        }
+
+        // 수강 중인 강의 로드
+        async function loadMyCourses() {
+            const container = document.getElementById('my-courses');
+            
+            const purchasesResult = await getUserPurchasedCourses(currentUser.id);
+            
+            if (!purchasesResult.success || purchasesResult.data.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 col-span-full py-20 space-y-4">
+                        <p class="text-xl">아직 수강 중인 강의가 없습니다.</p>
+                        <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-white text-black font-semibold rounded-xl">
+                            강의 둘러보기
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            // 각 강의의 진도 정보 가져오기
+            const progressPromises = purchasesResult.data.map(p => 
+                getCourseProgress(currentUser.id, p.course.id)
+            );
+            const progressResults = await Promise.all(progressPromises);
+
+            container.innerHTML = purchasesResult.data.map((purchase, index) => 
+                renderMyCourseCard(purchase, progressResults[index].data)
+            ).join('');
+        }
+
+        // 프로필 정보 로드
+        async function loadProfile() {
+            const profileResult = await getUserProfile(currentUser.id);
+            
+            if (profileResult.success) {
+                userProfile = profileResult.data;
+                document.getElementById('profile-name').value = userProfile.name || '';
+                document.getElementById('profile-email').value = currentUser.email;
+                document.getElementById('profile-phone').value = userProfile.phone || '';
+                
+                // 학부모 정보 로드
+                document.getElementById('parent-name').value = userProfile.parent_name || '';
+                document.getElementById('parent-phone').value = userProfile.parent_phone || '';
+                document.getElementById('parent-notification-enabled').checked = userProfile.parent_notification_enabled !== false;
+            }
+        }
+
+        // 프로필 업데이트
+        async function updateProfile() {
+            const name = document.getElementById('profile-name').value;
+            const phone = document.getElementById('profile-phone').value;
+            const parentName = document.getElementById('parent-name').value;
+            const parentPhone = document.getElementById('parent-phone').value;
+            const parentNotificationEnabled = document.getElementById('parent-notification-enabled').checked;
+            const messageDiv = document.getElementById('profile-message');
+
+            try {
+                const { error } = await window.supabase
+                    .from('profiles')
+                    .update({
+                        name: name,
+                        phone: phone,
+                        parent_name: parentName,
+                        parent_phone: parentPhone,
+                        parent_notification_enabled: parentNotificationEnabled,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+
+                showMessage('profile-message', '프로필이 저장되었습니다.', true);
+            } catch (error) {
+                console.error('Update profile error:', error);
+                showMessage('profile-message', '프로필 저장에 실패했습니다.', false);
+            }
+        }
+
+        // 비밀번호 변경
+        async function changePassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('new-password-confirm').value;
+            const messageDiv = document.getElementById('password-message');
+
+            if (newPassword.length < 8) {
+                showMessage('password-message', '비밀번호는 8자 이상이어야 합니다.', false);
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showMessage('password-message', '비밀번호가 일치하지 않습니다.', false);
+                return;
+            }
+
+            try {
+                const { error } = await window.supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                showMessage('password-message', '비밀번호가 변경되었습니다.', true);
+                document.getElementById('new-password').value = '';
+                document.getElementById('new-password-confirm').value = '';
+            } catch (error) {
+                console.error('Change password error:', error);
+                showMessage('password-message', '비밀번호 변경에 실패했습니다.', false);
+            }
+        }
+
+        // 로그아웃
+        async function handleSignOut() {
+            await signOut();
+        }
+
+        // 커스텀 알림
+        function showMessage(elementId, message, isSuccess) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.remove('hidden');
+            if (isSuccess) {
+                el.classList.remove('text-red-400');
+                el.classList.add('text-green-400');
+            } else {
+                el.classList.remove('text-green-400');
+                el.classList.add('text-red-400');
+            }
+        }
+
+        // 페이지 로드
+        async function init() {
+            currentUser = await getCurrentUser();
+            
+            if (!currentUser) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            document.getElementById('user-email').textContent = currentUser.email;
+            
+            // 관리자 권한 확인 및 관리자 링크 표시
+            const adminStatus = await isAdmin();
+            const adminLink = document.getElementById('admin-link');
+            if (adminLink && adminStatus) {
+                adminLink.classList.remove('hidden');
+            }
+            
+            await Promise.all([
+                loadMyCourses(),
+                loadProfile()
+            ]);
+        }
+
+        // 배송 정보 폼 토글
+        function toggleShippingForm(orderId) {
+            const btnSection = document.getElementById(`shipping-btn-${orderId}`);
+            const formSection = document.getElementById(`shipping-form-${orderId}`);
+            
+            if (formSection.classList.contains('hidden')) {
+                btnSection.classList.add('hidden');
+                formSection.classList.remove('hidden');
+            } else {
+                btnSection.classList.remove('hidden');
+                formSection.classList.add('hidden');
+            }
+        }
+
+        // 다음 주소 검색
+        function searchAddress(orderId) {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    document.getElementById(`zipcode-${orderId}`).value = data.zonecode;
+                    document.getElementById(`address-${orderId}`).value = data.address;
+                    document.getElementById(`address-detail-${orderId}`).focus();
+                }
+            }).open();
+        }
+
+        // 전화번호 자동 포맷팅
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/[^0-9]/g, '');
+            
+            if (value.length > 3 && value.length <= 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            }
+            
+            input.value = value;
+        }
+
+        // 마이페이지에서 배송 정보 저장
+        async function saveShippingFromMypage(orderId) {
+            const name = document.getElementById(`name-${orderId}`).value.trim();
+            const phone = document.getElementById(`phone-${orderId}`).value.trim();
+            const zipcode = document.getElementById(`zipcode-${orderId}`).value.trim();
+            const address = document.getElementById(`address-${orderId}`).value.trim();
+            const addressDetail = document.getElementById(`address-detail-${orderId}`).value.trim();
+            const memo = document.getElementById(`memo-${orderId}`).value.trim();
+
+            // 필수 입력 검증
+            if (!name) {
+                alert('받는 분 이름을 입력해주세요.');
+                return;
+            }
+            if (!phone) {
+                alert('연락처를 입력해주세요.');
+                return;
+            }
+            if (!zipcode || !address) {
+                alert('주소를 검색해주세요.');
+                return;
+            }
+            if (!addressDetail) {
+                alert('상세 주소를 입력해주세요. (필수)');
+                document.getElementById(`address-detail-${orderId}`).focus();
+                return;
+            }
+
+            try {
+                const { error } = await window.supabase
+                    .from('orders')
+                    .update({
+                        shipping_name: name,
+                        shipping_phone: phone.replace(/[^0-9]/g, ''),
+                        shipping_zipcode: zipcode,
+                        shipping_address: address,
+                        shipping_address_detail: addressDetail,
+                        shipping_memo: memo,
+                        shipping_status: 'PREPARING',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', orderId);
+
+                if (error) throw error;
+
+                alert('✅ 배송 정보가 저장되었습니다!');
+                
+                // 페이지 새로고침
+                loadMyOrders();
+
+            } catch (error) {
+                console.error('Save shipping error:', error);
+                alert('배송 정보 저장에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    
+    <!-- 모바일 메뉴 토글 스크립트 -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

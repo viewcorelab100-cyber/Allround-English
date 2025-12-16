@@ -1,0 +1,2855 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>관리자 페이지 — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: "aileron", sans-serif;
+            background-color: #000000;
+        }
+        
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .student-card {
+            transition: all 0.2s ease;
+        }
+
+        .student-card:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 헤더 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-bold text-white tracking-wider">ALLROUND</a>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-400">관리자</span>
+                <button onclick="handleSignOut()" class="nav-link text-gray-400 text-sm">로그아웃</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex pt-16">
+        <!-- 사이드바 -->
+        <aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-56 bg-black overflow-y-auto">
+            <nav class="py-4 space-y-1">
+                <a href="#dashboard" onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    대시보드
+                </a>
+                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    강의 관리
+                </a>
+                <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    회원 관리
+                </a>
+                <a href="#comments" onclick="showSection('comments')" id="nav-comments" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    댓글 관리
+                </a>
+                <a href="#schedule" onclick="showSection('schedule')" id="nav-schedule" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    시간표 관리
+                </a>
+                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-6 py-3 text-white text-sm">
+                    과제 관리
+                </a>
+                <a href="#orders" onclick="showSection('orders')" id="nav-orders" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    <span class="mr-2">📦</span>주문/배송 관리
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="ml-56 flex-1 min-h-screen p-8">
+            
+            <!-- 대시보드 섹션 -->
+            <section id="section-dashboard" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <span class="mr-3">📊</span>대시보드
+                </h1>
+                <p class="text-gray-400">대시보드 내용이 여기에 표시됩니다.</p>
+            </section>
+
+            <!-- 강의 관리 섹션 -->
+            <section id="section-courses" class="hidden">
+                <!-- 헤더 -->
+                <div class="flex items-center justify-between mb-8">
+                    <h1 class="text-2xl font-bold text-white">강의 관리</h1>
+                    <div class="flex space-x-3">
+                        <button onclick="openCategoryModal()" class="px-5 py-2.5 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
+                            카테고리 편집
+                        </button>
+                        <button onclick="openCourseModal()" class="px-5 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                            새 강의 추가
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 강의 목록 테이블 -->
+                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white border-opacity-10">
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">강의명</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">카테고리</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">가격</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">상태</th>
+                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">영상</th>
+                                <th class="text-right px-6 py-4 text-sm font-semibold text-gray-400">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="course-table-body">
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                    강의 목록을 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 선택된 강의의 영상 목록 -->
+                <div id="lesson-list-section" class="hidden mt-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">
+                            <span id="selected-course-title"></span>의 영상 목록
+                        </h2>
+                        <button onclick="openLessonModal()" class="px-4 py-2 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition text-sm">
+                            + 새 영상 추가
+                        </button>
+                    </div>
+                    <div id="lesson-list" class="space-y-2">
+                        <!-- 레슨 목록이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 새 강의 추가/수정 모달 -->
+            <div id="course-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-neutral-900 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                        <h3 id="course-modal-title" class="text-xl font-bold text-white">새 강의 추가</h3>
+                        <button onclick="closeCourseModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <form id="course-form" class="p-6 space-y-5">
+                        <input type="hidden" id="course-id">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">강의명</label>
+                            <input type="text" id="course-title" required
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">카테 고리</label>
+                            <input type="text" id="course-category-text"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">카테고리</label>
+                            <select id="course-category" 
+                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none cursor-pointer">
+                                <option value="">카테고리 선택</option>
+                            </select>
+                            <p class="text-xs text-yellow-400 mt-1">💡 카테고리가 없으면 "카테고리 편집" 버튼에서 추가하세요</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">설명</label>
+                            <textarea id="course-description" rows="4"
+                                      class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 resize-none"
+                                      placeholder="강의에 대한 설명을 입력하세요"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">가격 (원)</label>
+                                <input type="number" id="course-price" min="0"
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">총 시간 (시간)</label>
+                                <input type="number" id="course-duration" min="0" step="0.5"
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">썸네일 이미지</label>
+                            <label class="flex items-center justify-center w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-gray-400 cursor-pointer hover:bg-opacity-10 transition">
+                                <span class="mr-2">🖼️</span> 이미지 업로드
+                                <input type="file" id="course-thumbnail-file" accept="image/*" class="hidden" onchange="handleThumbnailUpload(this)">
+                            </label>
+                            <input type="text" id="course-thumbnail" placeholder="또는 이미지 URL 직접 입력"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 mt-2">
+                            <p class="text-xs text-yellow-400 mt-1">💡 이미지 파일을 업로드하거나 URL을 직접 입력하세요</p>
+                            <div id="thumbnail-preview" class="mt-2 hidden">
+                                <img id="thumbnail-preview-img" class="w-32 h-20 object-cover rounded-lg">
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="course-published" class="w-5 h-5 rounded bg-white bg-opacity-5 border-gray-600">
+                            <label for="course-published" class="text-white">공개</label>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" onclick="closeCourseModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
+                                취소
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                                저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 새 영상(레슨) 추가/수정 모달 -->
+            <div id="lesson-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-neutral-900 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                        <h3 id="lesson-modal-title" class="text-xl font-bold text-white">새 영상 추가</h3>
+                        <button onclick="closeLessonModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <form id="lesson-form" class="p-6 space-y-5">
+                        <input type="hidden" id="lesson-id">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">영상 제목</label>
+                            <input type="text" id="lesson-title" required
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">영상 설명</label>
+                            <textarea id="lesson-description" rows="3"
+                                      class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 resize-none"
+                                      placeholder="영상에 대한 설명"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">Vimeo 영상 URL</label>
+                            <input type="text" id="lesson-video-url" placeholder="https://vimeo.com/..."
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">순서</label>
+                                <input type="number" id="lesson-order" min="1" value="1"
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분)</label>
+                                <input type="number" id="lesson-duration" min="0"
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">블로그 숙제 링크</label>
+                            <input type="text" id="lesson-blog-link" placeholder="https://..."
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="lesson-preview" class="w-5 h-5 rounded bg-white bg-opacity-5 border-gray-600">
+                            <label for="lesson-preview" class="text-white">미리보기 허용</label>
+                        </div>
+                        
+                        <!-- 퀴즈 섹션 -->
+                        <div class="border-t border-white border-opacity-10 pt-5 mt-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-white">퀴즈 관리</h4>
+                                <span class="text-xs text-gray-500">선택사항</span>
+                            </div>
+                            
+                            <!-- 엑셀 업로드 -->
+                            <div class="mb-4">
+                                <label class="block text-sm text-gray-400 mb-2">
+                                    엑셀 파일로 퀴즈 업로드
+                                    <button type="button" onclick="downloadQuizTemplate()" class="ml-2 text-blue-400 hover:text-blue-300 text-xs underline">
+                                        📥 양식 다운로드
+                                    </button>
+                                </label>
+                                <input type="file" id="quiz-excel-file" accept=".xlsx,.xls" 
+                                       onchange="handleQuizExcelUpload(event)"
+                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200">
+                                <p class="text-xs text-gray-500 mt-2">
+                                    엑셀 파일을 업로드하면 자동으로 퀴즈가 생성됩니다. (기존 퀴즈는 덮어씌워집니다)
+                                </p>
+                            </div>
+                            
+                            <!-- 퀴즈 목록 미리보기 -->
+                            <div id="quiz-preview-container" class="hidden">
+                                <div class="bg-white bg-opacity-5 rounded-lg p-4 max-h-60 overflow-y-auto">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <p class="text-sm text-white font-semibold">업로드된 퀴즈 <span id="quiz-count" class="text-blue-400">0</span>개</p>
+                                        <button type="button" onclick="clearQuizData()" class="text-xs text-red-400 hover:text-red-300">
+                                            전체 삭제
+                                        </button>
+                                    </div>
+                                    <div id="quiz-preview-list" class="space-y-2">
+                                        <!-- 퀴즈 목록이 여기 표시됨 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" onclick="closeLessonModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
+                                취소
+                            </button>
+                            <button type="submit" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                                저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 카테고리 편집 모달 -->
+            <div id="category-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-neutral-900 rounded-xl w-full max-w-md">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                        <h3 class="text-xl font-bold text-white">카테고리 편집</h3>
+                        <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex space-x-2">
+                            <input type="text" id="new-category-input" placeholder="새 카테고리 이름"
+                                   class="flex-1 px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                            <button onclick="addCategory()" class="px-4 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                                추가
+                            </button>
+                        </div>
+                        <div id="category-list" class="space-y-2 max-h-60 overflow-y-auto">
+                            <!-- 카테고리 목록 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 회원 관리 섹션 -->
+            <section id="section-members" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <span class="mr-3">👥</span>회원 관리
+                </h1>
+
+                <!-- 통계 카드 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-blue-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-blue-300">전체 회원</p>
+                        <p id="stat-total-members" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-green-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-green-300">수강 중</p>
+                        <p id="stat-active-members" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-purple-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-purple-300">이번 달 가입</p>
+                        <p id="stat-new-members" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-yellow-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-yellow-300">총 결제 금액</p>
+                        <p id="stat-total-revenue" class="text-2xl font-bold text-white mt-1">₩0</p>
+                    </div>
+                </div>
+
+                <!-- 검색 -->
+                <div class="mb-6">
+                    <input type="text" id="search-member" 
+                           class="w-full max-w-md px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30"
+                           placeholder="이름, 이메일, 전화번호로 검색..."
+                           oninput="filterMembers()">
+                </div>
+
+                <!-- 회원 목록 -->
+                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-white bg-opacity-5">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">회원 정보</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">연락처</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">수강 강의</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">결제 금액</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">가입일</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table-body">
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 회원 상세 모달 -->
+            <div id="member-detail-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-neutral-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                        <h3 class="text-xl font-bold text-white">👤 회원 상세 정보</h3>
+                        <button onclick="closeMemberModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <div id="member-detail-content" class="p-6">
+                        <!-- 동적으로 채워짐 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 댓글 관리 섹션 -->
+            <section id="section-comments" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <span class="mr-3">💬</span>댓글 관리
+                </h1>
+                <p class="text-gray-400">댓글 관리 내용이 여기에 표시됩니다.</p>
+            </section>
+
+            <!-- 시간표 관리 섹션 -->
+            <section id="section-schedule" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <span class="mr-3">📅</span>시간표 관리
+                </h1>
+                <p class="text-gray-400">시간표 관리 내용이 여기에 표시됩니다.</p>
+            </section>
+
+            <!-- 과제 관리 섹션 -->
+            <section id="section-assignments" class="space-y-6">
+                <h1 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <span class="mr-3">📝</span>과제 관리
+                </h1>
+
+                <!-- 요약 카드들 -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="rounded-xl p-5" style="background-color: #2e1a1a;">
+                        <p class="text-xs text-orange-400 mb-1">채점 대기</p>
+                        <p id="stat-pending-grade" class="text-3xl font-bold text-orange-400">0</p>
+                    </div>
+                    <div class="rounded-xl p-5" style="background-color: #1a2e1a;">
+                        <p class="text-xs text-green-400 mb-1">채점 완료</p>
+                        <p id="stat-graded" class="text-3xl font-bold text-green-400">0</p>
+                    </div>
+                    <div class="rounded-xl p-5" style="background-color: #1a2e2e;">
+                        <p class="text-xs text-cyan-400 mb-1">전체 제출</p>
+                        <p id="stat-total-submissions" class="text-3xl font-bold text-cyan-400">0</p>
+                    </div>
+                    <div class="rounded-xl p-5" style="background-color: #2e1a2e;">
+                        <p class="text-xs text-pink-400 mb-1">재제출 요청</p>
+                        <p id="stat-returned" class="text-3xl font-bold text-pink-400">0</p>
+                    </div>
+                </div>
+
+                <!-- 필터 탭 -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterAssignments('pending')" id="filter-assign-pending" 
+                            class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
+                        채점 대기
+                    </button>
+                    <button onclick="filterAssignments('all')" id="filter-assign-all" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        전체
+                    </button>
+                    <button onclick="filterAssignments('graded')" id="filter-assign-graded" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        채점 완료
+                    </button>
+                    <button onclick="filterAssignments('returned')" id="filter-assign-returned" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        재제출 요청
+                    </button>
+                </div>
+
+                <!-- 과제 목록 -->
+                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-white bg-opacity-5">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">제출일</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">학생</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">강의/레슨</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">체크리스트</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">이미지</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">상태</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignments-table-body">
+                            <tr>
+                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 채점 모달 -->
+            <div id="grading-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden overflow-y-auto">
+                <div class="min-h-screen py-8 px-4 flex items-start justify-center">
+                    <div class="bg-neutral-900 rounded-2xl w-full max-w-4xl">
+                        <!-- 모달 헤더 -->
+                        <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                            <h2 class="text-xl font-bold text-white">📝 과제 채점</h2>
+                            <button onclick="closeGradingModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        </div>
+
+                        <div class="p-6 space-y-6">
+                            <!-- 학생 정보 -->
+                            <div class="text-center space-y-1">
+                                <p class="text-sm text-gray-400">STUDENT</p>
+                                <p id="grading-student-name" class="text-xl font-bold text-yellow-400">학생 이름</p>
+                                <p id="grading-student-email" class="text-sm text-gray-500">email@example.com</p>
+                            </div>
+
+                            <!-- 과제 정보 -->
+                            <div class="bg-white bg-opacity-5 rounded-xl p-4 text-center">
+                                <p class="text-sm text-gray-400">ASSIGNMENT</p>
+                                <p id="grading-assignment-title" class="text-lg font-bold text-white mt-1">과제 제목</p>
+                                <p id="grading-submitted-at" class="text-sm text-gray-500 mt-1">제출일: 2025. 00. 00</p>
+                            </div>
+
+                            <!-- 채점 입력 폼 -->
+                            <div class="bg-white bg-opacity-5 rounded-xl p-6 space-y-4">
+                                <p class="text-center text-sm text-gray-400 mb-4">GRADING RESULT</p>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-2">점수 (0-100)</label>
+                                        <input type="number" id="grading-score" min="0" max="100" 
+                                               class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white text-center text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                               placeholder="90">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-gray-400 mb-2">등급</label>
+                                        <select id="grading-grade" 
+                                                class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white text-center text-2xl font-bold focus:outline-none cursor-pointer"
+                                                style="color: white;">
+                                            <option value="" style="background-color: #1a1a1a; color: white;">선택</option>
+                                            <option value="A+" style="background-color: #1a1a1a; color: #10b981;">A+</option>
+                                            <option value="A" style="background-color: #1a1a1a; color: #10b981;">A</option>
+                                            <option value="B+" style="background-color: #1a1a1a; color: #3b82f6;">B+</option>
+                                            <option value="B" style="background-color: #1a1a1a; color: #3b82f6;">B</option>
+                                            <option value="C+" style="background-color: #1a1a1a; color: #f59e0b;">C+</option>
+                                            <option value="C" style="background-color: #1a1a1a; color: #f59e0b;">C</option>
+                                            <option value="D" style="background-color: #1a1a1a; color: #ef4444;">D</option>
+                                            <option value="F" style="background-color: #1a1a1a; color: #ef4444;">F</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-center gap-4 pt-2">
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="grading-pass" value="true" class="w-5 h-5 text-green-500">
+                                        <span class="text-green-400 font-semibold">PASSED</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="grading-pass" value="false" class="w-5 h-5 text-red-500">
+                                        <span class="text-red-400 font-semibold">FAILED</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 선생님 코멘트 -->
+                            <div class="bg-white bg-opacity-5 rounded-xl p-6">
+                                <p class="text-center text-sm text-gray-400 mb-4">TEACHER'S COMMENT</p>
+                                <textarea id="grading-comment" rows="3" 
+                                          class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white placeholder-gray-500 focus:outline-none resize-none"
+                                          placeholder="학생에게 전달할 피드백을 입력하세요"></textarea>
+                            </div>
+
+                            <!-- 이미지 비교 영역 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- 학생 제출 이미지 -->
+                                <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-3">
+                                    <p class="text-center text-sm text-gray-400">STUDENT'S WORK</p>
+                                    <div id="grading-student-image" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
+                                        <span class="text-gray-500">이미지 없음</span>
+                                    </div>
+                                    <button onclick="viewFullImage('student')" class="w-full py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                        🔍 크게 보기
+                                    </button>
+                                </div>
+
+                                <!-- 선생님 피드백 이미지 -->
+                                <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-3">
+                                    <p class="text-center text-sm text-gray-400">TEACHER'S FEEDBACK</p>
+                                    <div id="grading-feedback-image" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-600 hover:border-gray-400 transition"
+                                         onclick="document.getElementById('feedback-image-input').click()">
+                                        <span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(빨간펜 첨삭 이미지)</span></span>
+                                    </div>
+                                    <input type="file" id="feedback-image-input" accept="image/*" class="hidden" onchange="handleFeedbackImageUpload(this)">
+                                    <input type="hidden" id="grading-feedback-url">
+                                    <button onclick="viewFullImage('feedback')" class="w-full py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                        🔍 크게 보기
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 저장 버튼 -->
+                            <div class="flex gap-4 pt-4">
+                                <button onclick="closeGradingModal()" class="flex-1 py-3 bg-white bg-opacity-10 rounded-xl text-white font-semibold hover:bg-opacity-20">
+                                    취소
+                                </button>
+                                <button onclick="saveGrading()" class="flex-1 py-3 bg-white rounded-xl text-black font-semibold hover:bg-gray-200">
+                                    💾 채점 저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이미지 확대 모달 -->
+            <div id="image-viewer-modal" class="fixed inset-0 bg-black bg-opacity-95 z-[60] hidden flex items-center justify-center p-4" onclick="closeImageViewer()">
+                <img id="image-viewer-img" class="max-w-full max-h-full object-contain">
+            </div>
+
+            <!-- 주문/배송 관리 섹션 -->
+            <section id="section-orders" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
+                    <span class="mr-3">📦</span>주문/배송 관리
+                </h1>
+
+                <!-- 통계 카드 -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-red-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-red-300">배송정보 미입력</p>
+                        <p id="stat-pending-address" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-purple-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-purple-300">배송준비중</p>
+                        <p id="stat-preparing" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-blue-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-blue-300">배송중</p>
+                        <p id="stat-shipping" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                    <div class="bg-green-500 bg-opacity-20 rounded-xl p-4">
+                        <p class="text-sm text-green-300">배송완료</p>
+                        <p id="stat-delivered" class="text-2xl font-bold text-white mt-1">0</p>
+                    </div>
+                </div>
+
+                <!-- 필터 탭 -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="loadOrders('need_action')" id="filter-orders-need_action" 
+                            class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
+                        처리 필요
+                    </button>
+                    <button onclick="loadOrders('all')" id="filter-orders-all" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        전체
+                    </button>
+                    <button onclick="loadOrders('PENDING_ADDRESS')" id="filter-orders-PENDING_ADDRESS" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        배송정보 미입력
+                    </button>
+                    <button onclick="loadOrders('PREPARING')" id="filter-orders-PREPARING" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        배송준비중
+                    </button>
+                    <button onclick="loadOrders('SHIPPING')" id="filter-orders-SHIPPING" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        배송중
+                    </button>
+                    <button onclick="loadOrders('DELIVERED')" id="filter-orders-DELIVERED" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
+                        배송완료
+                    </button>
+                </div>
+
+                <!-- 주문 테이블 -->
+                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-white bg-opacity-5">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문일</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문번호</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">상품</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문자</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">배송상태</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">배송지</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">택배/송장</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body">
+                                <tr>
+                                    <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                                        데이터를 불러오는 중...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        let allStudents = [];
+        let allCourses = [];
+
+        // 섹션 전환
+        function showSection(section) {
+            // 모든 섹션 숨기기
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            // 모든 네비게이션 활성화 해제
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            
+            // 선택된 섹션 표시
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            document.getElementById(`nav-${section}`).classList.add('active');
+
+            // 해당 섹션 데이터 로드
+            if (section === 'assignments') {
+                loadStudentAssignments();
+            } else if (section === 'orders') {
+                loadOrders('need_action');
+            } else if (section === 'members') {
+                loadMembers();
+            }
+        }
+
+        // 과제 데이터 로드 (최근 제출순)
+        let allSubmissions = [];
+        let currentAssignmentFilter = 'pending';
+
+        async function loadStudentAssignments() {
+            try {
+                // 모든 과제 제출 데이터
+                const { data: submissions, error: subError } = await window.supabase
+                    .from('student_submissions')
+                    .select('*, teacher_feedback(*)')
+                    .order('updated_at', { ascending: false });
+
+                if (subError) throw subError;
+
+                // 모든 프로필 데이터
+                const { data: profiles, error: profileError } = await window.supabase
+                    .from('profiles')
+                    .select('id, name, email');
+
+                if (profileError) throw profileError;
+
+                // 모든 레슨 데이터
+                const { data: lessons, error: lessonError } = await window.supabase
+                    .from('lessons')
+                    .select('id, title, order_num, course_id');
+
+                if (lessonError) throw lessonError;
+
+                // 모든 강의 목록
+                const { data: courses, error: courseError } = await window.supabase
+                    .from('courses')
+                    .select('id, title');
+
+                if (courseError) throw courseError;
+
+                // 맵 생성
+                const profileMap = new Map();
+                profiles?.forEach(p => profileMap.set(p.id, p));
+
+                const lessonMap = new Map();
+                lessons?.forEach(l => lessonMap.set(l.id, l));
+
+                const courseMap = new Map();
+                courses?.forEach(c => courseMap.set(c.id, c));
+
+                // 제출물에 학생, 레슨, 강의 정보 추가
+                allSubmissions = (submissions || []).map(sub => {
+                    const profile = profileMap.get(sub.user_id);
+                    const lesson = lessonMap.get(sub.lesson_id);
+                    const course = lesson ? courseMap.get(lesson.course_id) : null;
+                    const feedback = sub.teacher_feedback?.[0];
+
+                    return {
+                        ...sub,
+                        studentName: profile?.name || '알 수 없음',
+                        studentEmail: profile?.email || '',
+                        lessonTitle: lesson?.title || '알 수 없음',
+                        lessonOrder: lesson?.order_num || 0,
+                        courseTitle: course?.title || '알 수 없음',
+                        feedback: feedback
+                    };
+                });
+
+                // 통계 업데이트
+                updateAssignmentStats();
+
+                // 기본 필터로 렌더링
+                filterAssignments('pending');
+
+            } catch (error) {
+                console.error('Load assignments error:', error);
+                document.getElementById('assignments-table-body').innerHTML = 
+                    '<tr><td colspan="7" class="px-4 py-8 text-center text-red-400">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
+            }
+        }
+
+        function updateAssignmentStats() {
+            const pending = allSubmissions.filter(s => s.status === 'submitted' || (s.image_url && !s.status)).length;
+            const graded = allSubmissions.filter(s => s.status === 'graded').length;
+            const returned = allSubmissions.filter(s => s.status === 'returned').length;
+            const total = allSubmissions.length;
+
+            document.getElementById('stat-pending-grade').textContent = pending;
+            document.getElementById('stat-graded').textContent = graded;
+            document.getElementById('stat-total-submissions').textContent = total;
+            document.getElementById('stat-returned').textContent = returned;
+        }
+
+        function filterAssignments(filter) {
+            currentAssignmentFilter = filter;
+
+            // 버튼 UI 업데이트
+            document.querySelectorAll('[id^="filter-assign-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-10', 'text-white');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`filter-assign-${filter}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'bg-opacity-10', 'text-white');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            let filtered = allSubmissions;
+            if (filter === 'pending') {
+                filtered = allSubmissions.filter(s => s.status === 'submitted' || (s.image_url && !s.status));
+            } else if (filter === 'graded') {
+                filtered = allSubmissions.filter(s => s.status === 'graded');
+            } else if (filter === 'returned') {
+                filtered = allSubmissions.filter(s => s.status === 'returned');
+            }
+
+            renderAssignmentsTable(filtered);
+        }
+
+        function renderAssignmentsTable(submissions) {
+            const tbody = document.getElementById('assignments-table-body');
+
+            if (!submissions || submissions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">제출된 과제가 없습니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = submissions.map(sub => {
+                const submittedDate = sub.updated_at ? new Date(sub.updated_at).toLocaleDateString('ko-KR') : '-';
+                
+                // 체크리스트 상태 (읽기 전용)
+                const checkNote = sub.note_completed ? '✅' : '⬜';
+                const checkBlog = sub.blog_completed ? '✅' : '⬜';
+                const checkKakao = sub.kakao_completed ? '✅' : '⬜';
+
+                // 이미지 미리보기
+                const imagePreview = sub.image_url 
+                    ? `<img src="${sub.image_url}" class="w-12 h-12 object-cover rounded cursor-pointer" onclick="viewFullImage('${sub.image_url}')">`
+                    : '<span class="text-gray-500 text-sm">없음</span>';
+
+                // 상태 뱃지
+                let statusBadge = '';
+                if (sub.status === 'graded') {
+                    const score = sub.feedback?.score || '-';
+                    statusBadge = `<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm">${score}점</span>`;
+                } else if (sub.status === 'returned') {
+                    statusBadge = '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm">재제출</span>';
+                } else if (sub.image_url || sub.status === 'submitted') {
+                    statusBadge = '<span class="px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-sm">대기중</span>';
+                } else {
+                    statusBadge = '<span class="px-2 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-sm">미제출</span>';
+                }
+
+                return `
+                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
+                        <td class="px-4 py-4 text-sm text-gray-300">${submittedDate}</td>
+                        <td class="px-4 py-4">
+                            <p class="text-white">${sub.studentName}</p>
+                            <p class="text-xs text-gray-500">${sub.studentEmail}</p>
+                        </td>
+                        <td class="px-4 py-4">
+                            <p class="text-white">${sub.courseTitle}</p>
+                            <p class="text-xs text-gray-500">${sub.lessonOrder}강 ${sub.lessonTitle}</p>
+                        </td>
+                        <td class="px-4 py-4 text-sm">
+                            <span title="노트">${checkNote}</span>
+                            <span title="블로그">${checkBlog}</span>
+                            <span title="카톡">${checkKakao}</span>
+                        </td>
+                        <td class="px-4 py-4">${imagePreview}</td>
+                        <td class="px-4 py-4">${statusBadge}</td>
+                        <td class="px-4 py-4">
+                            <button onclick="openGradingModalDirect('${sub.id}', '${sub.studentName}', '${sub.studentEmail}', '${sub.lessonOrder}강 ${sub.lessonTitle}')" 
+                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                ${sub.status === 'graded' ? '상세' : '채점'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 통계 업데이트
+        function updateStats() {
+            const totalStudents = allStudents.length;
+            const avgProgress = totalStudents > 0 
+                ? Math.round(allStudents.reduce((sum, s) => sum + s.totalProgress, 0) / totalStudents)
+                : 0;
+            const avgAssignment = totalStudents > 0
+                ? Math.round(allStudents.reduce((sum, s) => sum + s.totalAssignmentRate, 0) / totalStudents)
+                : 0;
+            
+            // 이미지 과제 통계
+            let imageSubmitted = 0;
+            let pendingGrade = 0;
+            allStudents.forEach(s => {
+                s.courses?.forEach(c => {
+                    c.imageSubmissions?.forEach(sub => {
+                        imageSubmitted++;
+                        if (sub.status === 'submitted') pendingGrade++;
+                    });
+                });
+            });
+
+            document.getElementById('stat-total-students').textContent = totalStudents;
+            document.getElementById('stat-avg-progress').textContent = avgProgress + '%';
+            document.getElementById('stat-avg-assignment').textContent = avgAssignment + '%';
+            document.getElementById('stat-image-submitted').textContent = imageSubmitted;
+            document.getElementById('stat-pending-grade').textContent = pendingGrade;
+        }
+
+        // 학생 목록 렌더링
+        function renderStudentList(students = null) {
+            const container = document.getElementById('student-list');
+            const studentsToRender = students || allStudents;
+
+            if (studentsToRender.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-20">등록된 학생이 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = studentsToRender.map(student => {
+                // 이미지 과제 수 계산
+                let imageCount = 0;
+                let pendingCount = 0;
+                student.courses?.forEach(c => {
+                    c.imageSubmissions?.forEach(s => {
+                        imageCount++;
+                        if (s.status === 'submitted') pendingCount++;
+                    });
+                });
+
+                return `
+                <div class="student-card rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <!-- 학생 헤더 -->
+                    <div class="p-5 cursor-pointer flex items-center justify-between" onclick="toggleStudentDetail('${student.id}')">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-lg">
+                                👤
+                            </div>
+                            <div>
+                                <p class="font-bold text-white">${student.name}</p>
+                                <p class="text-sm text-gray-500">${student.email}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">수강</p>
+                                <p class="text-lg font-bold text-white">${student.courses.length}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">진도율</p>
+                                <p class="text-lg font-bold text-green-400">${student.totalProgress}%</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">체크리스트</p>
+                                <p class="text-lg font-bold text-pink-400">${student.totalAssignmentRate}%</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">이미지과제</p>
+                                <p class="text-lg font-bold ${pendingCount > 0 ? 'text-orange-400' : 'text-cyan-400'}">${imageCount}건${pendingCount > 0 ? ` (${pendingCount}대기)` : ''}</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xs text-gray-500">최근활동</p>
+                                <p class="text-sm text-gray-400">${student.lastActivity ? formatDate(student.lastActivity) : '-'}</p>
+                            </div>
+                            <div id="arrow-${student.id}" class="text-gray-500 transition-transform">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 학생 상세 (숨김) -->
+                    <div id="detail-${student.id}" class="hidden border-t border-white border-opacity-10">
+                        <div class="p-5 space-y-4">
+                            <!-- 리포트 버튼 -->
+                            <div class="flex justify-end">
+                                <button onclick="generateReport('${student.id}')" class="px-4 py-2 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 text-sm">
+                                    📄 리포트 생성
+                                </button>
+                            </div>
+
+                            ${student.courses.map(course => `
+                                <div class="rounded-xl bg-white bg-opacity-5 p-4 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-3">
+                                        <h4 class="font-bold text-white text-lg">${course.title}</h4>
+                                        <div class="flex items-center space-x-4 text-sm">
+                                            <span class="text-green-400">진도 ${course.progressRate}%</span>
+                                            <span class="text-pink-400">체크리스트 ${course.assignmentRate}%</span>
+                                        </div>
+                                    </div>
+                                    
+                                    ${course.lessons.map(lesson => `
+                                        <div class="rounded-lg bg-white bg-opacity-5 p-4 space-y-3">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <p class="font-semibold text-white">${lesson.order}강 ${lesson.title || ''}</p>
+                                                    <p class="text-xs text-gray-500">수강시간: ${formatTime(lesson.watchedSeconds)} / ${formatTime(lesson.totalSeconds)}</p>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-sm text-green-400 font-bold">${lesson.watchRate}%</span>
+                                                    ${lesson.completed ? '<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">완료</span>' : ''}
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 진도 바 -->
+                                            <div class="h-2 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                                                <div class="h-full bg-green-500 progress-bar" style="width: ${lesson.watchRate}%"></div>
+                                            </div>
+                                            
+                                            <!-- 체크리스트 -->
+                                            <div class="flex flex-wrap items-center gap-4 text-sm pt-2">
+                                                <span class="text-gray-500">체크리스트:</span>
+                                                <label class="flex items-center space-x-2 cursor-pointer">
+                                                    <input type="checkbox" ${lesson.noteCompleted ? 'checked' : ''} 
+                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           onchange="updateAssignment('${student.id}', '${lesson.id}', 'note', this.checked)">
+                                                    <span class="${lesson.noteCompleted ? 'text-green-400' : 'text-gray-500'}">노트 필기</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 cursor-pointer">
+                                                    <input type="checkbox" ${lesson.blogCompleted ? 'checked' : ''} 
+                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           onchange="updateAssignment('${student.id}', '${lesson.id}', 'blog', this.checked)">
+                                                    <span class="${lesson.blogCompleted ? 'text-green-400' : 'text-gray-500'}">블로그 숙제</span>
+                                                </label>
+                                                <label class="flex items-center space-x-2 cursor-pointer">
+                                                    <input type="checkbox" ${lesson.kakaoCompleted ? 'checked' : ''} 
+                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           onchange="updateAssignment('${student.id}', '${lesson.id}', 'kakao', this.checked)">
+                                                    <span class="${lesson.kakaoCompleted ? 'text-green-400' : 'text-gray-500'}">카톡 숙제</span>
+                                                </label>
+                                            </div>
+                                            
+                                            <!-- 이미지 과제 -->
+                                            ${lesson.imageSubmission ? `
+                                                <div class="flex items-center justify-between bg-white bg-opacity-5 rounded-lg p-3 mt-2">
+                                                    <div class="flex items-center space-x-3">
+                                                        <div class="w-12 h-12 bg-neutral-800 rounded overflow-hidden">
+                                                            <img src="${lesson.imageSubmission.image_url}" class="w-full h-full object-cover">
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm text-white">📷 이미지 과제</p>
+                                                            <p class="text-xs text-gray-500">${lesson.imageSubmission.submitted_at ? new Date(lesson.imageSubmission.submitted_at).toLocaleString('ko-KR') : ''}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center space-x-3">
+                                                        ${getImageSubmissionStatus(lesson.imageSubmission)}
+                                                        <button onclick="openGradingModalDirect('${lesson.imageSubmission.id}', '${student.name}', '${student.email}', '${lesson.order}강 ${lesson.title || ''}')" 
+                                                                class="px-3 py-1.5 bg-white bg-opacity-10 rounded text-white text-sm hover:bg-opacity-20">
+                                                            ${lesson.imageSubmission.status === 'graded' ? '상세' : '채점'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <!-- 📱 모바일 과제 제출용 QR 코드 -->
+                                            <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg p-3 mt-2 flex items-center justify-between border border-blue-500/20">
+                                                <div class="flex-1">
+                                                    <p class="text-sm text-white font-semibold mb-1">📱 핸드폰으로 제출하기</p>
+                                                    <p class="text-xs text-gray-400">QR 스캔 → 강의 페이지 → 이미지 업로드</p>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <div id="qr-${student.id}-${lesson.id}" class="w-20 h-20 bg-white rounded p-1 shadow-lg"></div>
+                                                    <button onclick="copyLessonUrl('${course.id}', '${lesson.id}')" 
+                                                            class="px-2 py-1.5 bg-white bg-opacity-10 rounded text-white text-xs hover:bg-opacity-20 transition-all"
+                                                            title="링크 복사">
+                                                        🔗 복사
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+            
+            // QR 코드 생성 (렌더링 후 실행)
+            setTimeout(() => {
+                studentsToRender.forEach(student => {
+                    student.courses.forEach(course => {
+                        course.lessons.forEach(lesson => {
+                            generateQRCode(student.id, lesson.id, course.id);
+                        });
+                    });
+                });
+            }, 100);
+        }
+
+        // QR 코드 생성 함수
+        function generateQRCode(studentId, lessonId, courseId) {
+            const qrContainer = document.getElementById(`qr-${studentId}-${lessonId}`);
+            if (!qrContainer) return;
+            
+            // 기존 QR 코드 제거
+            qrContainer.innerHTML = '';
+            
+            // lesson.html로 이동하는 URL 생성 (과제 제출용 파라미터 추가)
+            const lessonUrl = `${window.location.origin}/lesson.html?id=${lessonId}&directSubmit=true`;
+            
+            // QR 코드 생성
+            new QRCode(qrContainer, {
+                text: lessonUrl,
+                width: 80,
+                height: 80,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // 레슨 URL 복사
+        function copyLessonUrl(courseId, lessonId) {
+            const lessonUrl = `${window.location.origin}/lesson.html?id=${lessonId}&directSubmit=true`;
+            
+            navigator.clipboard.writeText(lessonUrl).then(() => {
+                alert('링크가 복사되었습니다!\n학생에게 전달하여 핸드폰에서 바로 과제를 제출할 수 있습니다.');
+            }).catch(err => {
+                console.error('복사 실패:', err);
+                alert('링크 복사에 실패했습니다.');
+            });
+        }
+
+        // 이미지 제출 상태 배지
+        function getImageSubmissionStatus(sub) {
+            const feedback = sub.teacher_feedback?.[0];
+            if (sub.status === 'graded' && feedback) {
+                return `<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs">${feedback.score}점 / ${feedback.grade}</span>`;
+            } else if (sub.status === 'submitted') {
+                return '<span class="px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-xs">채점 대기</span>';
+            } else if (sub.status === 'returned') {
+                return '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs">재제출</span>';
+            }
+            return '<span class="px-2 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-xs">대기</span>';
+        }
+
+        // 시간 포맷 (초 -> 분:초)
+        function formatTime(seconds) {
+            if (!seconds) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 직접 채점 모달 열기 (학생 목록에서)
+        function openGradingModalDirect(submissionId, studentName, studentEmail, lessonTitle) {
+            currentSubmissionId = submissionId;
+            
+            // 학생 정보 설정
+            document.getElementById('grading-student-name').textContent = studentName;
+            document.getElementById('grading-student-email').textContent = studentEmail;
+            document.getElementById('grading-assignment-title').textContent = lessonTitle;
+            
+            // submission 데이터 로드
+            loadSubmissionForGrading(submissionId);
+            
+            document.getElementById('grading-modal').classList.remove('hidden');
+        }
+
+        async function loadSubmissionForGrading(submissionId) {
+            try {
+                const { data: sub, error } = await window.supabase
+                    .from('student_submissions')
+                    .select('*, teacher_feedback(*)')
+                    .eq('id', submissionId)
+                    .single();
+                
+                if (error) throw error;
+
+                currentStudentImageUrl = sub.image_url;
+                document.getElementById('grading-submitted-at').textContent = sub.submitted_at 
+                    ? `Submitted: ${new Date(sub.submitted_at).toLocaleString('ko-KR')}` 
+                    : '';
+
+                // 학생 이미지
+                const studentImageContainer = document.getElementById('grading-student-image');
+                if (sub.image_url) {
+                    studentImageContainer.innerHTML = `<img src="${sub.image_url}" class="w-full h-full object-contain">`;
+                } else {
+                    studentImageContainer.innerHTML = `<span class="text-gray-500">이미지 없음</span>`;
+                }
+
+                // 기존 채점 결과
+                const feedback = sub.teacher_feedback?.[0];
+                if (feedback) {
+                    document.getElementById('grading-score').value = feedback.score || '';
+                    document.getElementById('grading-grade').value = feedback.grade || '';
+                    document.getElementById('grading-comment').value = feedback.comment || '';
+                    document.getElementById('grading-feedback-url').value = feedback.feedback_image_url || '';
+                    
+                    if (feedback.is_passed !== null) {
+                        const passRadio = document.querySelector(`input[name="grading-pass"][value="${feedback.is_passed}"]`);
+                        if (passRadio) passRadio.checked = true;
+                    }
+
+                    if (feedback.feedback_image_url) {
+                        document.getElementById('grading-feedback-image').innerHTML = `<img src="${feedback.feedback_image_url}" class="w-full h-full object-contain">`;
+                    }
+                } else {
+                    document.getElementById('grading-score').value = '';
+                    document.getElementById('grading-grade').value = '';
+                    document.getElementById('grading-comment').value = '';
+                    document.getElementById('grading-feedback-url').value = '';
+                    document.querySelectorAll('input[name="grading-pass"]').forEach(r => r.checked = false);
+                    document.getElementById('grading-feedback-image').innerHTML = `<span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드</span>`;
+                }
+
+            } catch (error) {
+                console.error('제출물 로드 오류:', error);
+            }
+        }
+
+        // 리포트 생성
+        function generateReport(studentId) {
+            const student = allStudents.find(s => s.id === studentId);
+            if (!student) return;
+            
+            // report.html로 이동하거나 새 창에서 리포트 표시
+            // 여기서는 간단히 알림으로 표시
+            alert(`${student.name} 학생의 리포트를 생성합니다.\n\n진도율: ${student.totalProgress}%\n체크리스트: ${student.totalAssignmentRate}%`);
+            
+            // TODO: 실제 리포트 생성 로직 구현
+        }
+
+        // 과제 완료율 계산
+        function getAssignmentRate(lesson) {
+            let completed = 0;
+            if (lesson.noteCompleted) completed++;
+            if (lesson.blogCompleted) completed++;
+            if (lesson.kakaoCompleted) completed++;
+            return Math.round((completed / 3) * 100);
+        }
+
+        // 날짜 포맷
+        function formatDate(date) {
+            if (!date) return '-';
+            const d = new Date(date);
+            return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}.`;
+        }
+
+        // 학생 상세 토글
+        function toggleStudentDetail(studentId) {
+            const detail = document.getElementById(`detail-${studentId}`);
+            const arrow = document.getElementById(`arrow-${studentId}`);
+            
+            if (detail.classList.contains('hidden')) {
+                detail.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                detail.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 과제 업데이트
+        async function updateAssignment(userId, lessonId, type, completed) {
+            try {
+                // 기존 제출 데이터 확인
+                const { data: existing, error: fetchError } = await window.supabase
+                    .from('student_submissions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('lesson_id', lessonId)
+                    .single();
+
+                const updateData = {
+                    user_id: userId,
+                    lesson_id: lessonId,
+                    updated_at: new Date().toISOString()
+                };
+
+                if (type === 'note') updateData.note_completed = completed;
+                if (type === 'blog') updateData.blog_completed = completed;
+                if (type === 'kakao') updateData.kakao_completed = completed;
+
+                if (existing) {
+                    // 업데이트
+                    const { error } = await window.supabase
+                        .from('student_submissions')
+                        .update(updateData)
+                        .eq('id', existing.id);
+
+                    if (error) throw error;
+                } else {
+                    // 새로 생성
+                    updateData.note_completed = updateData.note_completed || false;
+                    updateData.blog_completed = updateData.blog_completed || false;
+                    updateData.kakao_completed = updateData.kakao_completed || false;
+
+                    const { error } = await window.supabase
+                        .from('student_submissions')
+                        .insert(updateData);
+
+                    if (error) throw error;
+                }
+
+                // 로컬 데이터 업데이트 (재로드 없이)
+                allStudents.forEach(student => {
+                    if (student.id === userId) {
+                        student.courses.forEach(course => {
+                            course.lessons.forEach(lesson => {
+                                if (lesson.id === lessonId) {
+                                    if (type === 'note') lesson.noteCompleted = completed;
+                                    if (type === 'blog') lesson.blogCompleted = completed;
+                                    if (type === 'kakao') lesson.kakaoCompleted = completed;
+                                }
+                            });
+                        });
+                    }
+                });
+
+            } catch (error) {
+                console.error('Update assignment error:', error);
+                alert('과제 상태 업데이트에 실패했습니다.');
+            }
+        }
+
+        // 학생 검색/필터
+        function filterStudents() {
+            const searchText = document.getElementById('search-student').value.toLowerCase();
+            const courseFilter = document.getElementById('filter-course').value;
+
+            let filtered = allStudents.filter(student => {
+                const matchesSearch = !searchText || 
+                    student.name.toLowerCase().includes(searchText) ||
+                    student.email.toLowerCase().includes(searchText);
+
+                const matchesCourse = !courseFilter || 
+                    student.courses.some(c => c.id === courseFilter);
+
+                return matchesSearch && matchesCourse;
+            });
+
+            renderStudentList(filtered);
+        }
+
+        // 학생 정렬
+        function sortStudents() {
+            const sortBy = document.getElementById('sort-by').value;
+
+            allStudents.sort((a, b) => {
+                switch (sortBy) {
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'progress':
+                        return b.totalProgress - a.totalProgress;
+                    case 'assignment':
+                        return b.totalAssignmentRate - a.totalAssignmentRate;
+                    case 'recent':
+                        if (!a.lastActivity) return 1;
+                        if (!b.lastActivity) return -1;
+                        return b.lastActivity - a.lastActivity;
+                    default:
+                        return 0;
+                }
+            });
+
+            filterStudents();
+        }
+
+        // ========== 과제 탭 전환 ==========
+        // ========== 이미지 과제 채점 함수들 ==========
+        let currentSubmissionId = null;
+        let currentStudentImageUrl = null;
+
+        function closeGradingModal() {
+            document.getElementById('grading-modal').classList.add('hidden');
+            currentSubmissionId = null;
+        }
+
+        // 피드백 이미지 업로드
+        async function handleFeedbackImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                // 파일 확장자 추출
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                // 안전한 파일명 생성 (한글 제거)
+                const safeFileName = `feedback/${currentSubmissionId}_${Date.now()}.${fileExt}`;
+                
+                const { data, error } = await window.supabase.storage
+                    .from('submissions')
+                    .upload(safeFileName, file, {
+                        upsert: true
+                    });
+
+                if (error) {
+                    console.error('Storage 업로드 오류:', error);
+                    throw new Error(`Storage 오류: ${error.message}`);
+                }
+
+                const { data: urlData } = window.supabase.storage
+                    .from('submissions')
+                    .getPublicUrl(safeFileName);
+
+                if (!urlData || !urlData.publicUrl) {
+                    throw new Error('Public URL을 가져올 수 없습니다.');
+                }
+
+                document.getElementById('grading-feedback-url').value = urlData.publicUrl;
+                document.getElementById('grading-feedback-image').innerHTML = `<img src="${urlData.publicUrl}" class="w-full h-full object-contain">`;
+                alert('이미지가 업로드되었습니다.');
+                
+            } catch (error) {
+                console.error('피드백 이미지 업로드 오류:', error);
+                
+                // 상세 오류 메시지
+                let errorMsg = '이미지 업로드 중 오류가 발생했습니다.\n\n';
+                if (error.message.includes('Storage')) {
+                    errorMsg += 'Storage bucket "submissions"가 없거나 권한이 없습니다.\n';
+                    errorMsg += 'Supabase Storage에서 "submissions" bucket을 생성하고 공개로 설정해주세요.';
+                } else {
+                    errorMsg += error.message;
+                }
+                
+                alert(errorMsg);
+            }
+        }
+
+        // 이미지 크게 보기
+        function viewFullImage(typeOrUrl) {
+            let imageUrl = '';
+            if (typeOrUrl === 'student') {
+                imageUrl = currentStudentImageUrl;
+            } else if (typeOrUrl === 'feedback') {
+                imageUrl = document.getElementById('grading-feedback-url').value;
+            } else if (typeOrUrl && typeOrUrl.startsWith('http')) {
+                // 직접 URL이 전달된 경우
+                imageUrl = typeOrUrl;
+            }
+
+            if (!imageUrl) {
+                alert('표시할 이미지가 없습니다.');
+                return;
+            }
+
+            document.getElementById('image-viewer-img').src = imageUrl;
+            document.getElementById('image-viewer-modal').classList.remove('hidden');
+        }
+
+        function closeImageViewer() {
+            document.getElementById('image-viewer-modal').classList.add('hidden');
+        }
+
+        // 채점 저장
+        async function saveGrading() {
+            if (!currentSubmissionId) return;
+
+            const score = parseInt(document.getElementById('grading-score').value) || null;
+            const grade = document.getElementById('grading-grade').value || null;
+            const comment = document.getElementById('grading-comment').value || null;
+            const feedbackImageUrl = document.getElementById('grading-feedback-url').value || null;
+            const passedRadio = document.querySelector('input[name="grading-pass"]:checked');
+            const isPassed = passedRadio ? passedRadio.value === 'true' : null;
+
+            try {
+                // 기존 피드백 확인
+                const { data: existingFeedbacks } = await window.supabase
+                    .from('teacher_feedback')
+                    .select('id')
+                    .eq('submission_id', currentSubmissionId);
+                
+                const existingFeedback = existingFeedbacks?.[0];
+
+                const feedbackData = {
+                    submission_id: currentSubmissionId,
+                    teacher_id: currentUser.id,
+                    score: score,
+                    grade: grade,
+                    comment: comment,
+                    feedback_image_url: feedbackImageUrl,
+                    is_passed: isPassed,
+                    graded_at: new Date().toISOString()
+                };
+
+                if (existingFeedback) {
+                    // 업데이트
+                    const { error } = await window.supabase
+                        .from('teacher_feedback')
+                        .update(feedbackData)
+                        .eq('id', existingFeedback.id);
+                    if (error) throw error;
+                } else {
+                    // 새로 생성
+                    const { error } = await window.supabase
+                        .from('teacher_feedback')
+                        .insert(feedbackData);
+                    if (error) throw error;
+                }
+
+                // submission 상태 업데이트
+                const { error: statusError } = await window.supabase
+                    .from('student_submissions')
+                    .update({ status: 'graded' })
+                    .eq('id', currentSubmissionId);
+                if (statusError) throw statusError;
+
+                // 알림톡 발송 (비동기로 처리하여 실패해도 채점은 저장됨)
+                sendGradingNotification(currentSubmissionId, {
+                    score: score,
+                    grade: grade,
+                    comment: comment,
+                    feedbackImageUrl: feedbackImageUrl
+                }).catch(err => {
+                    console.error('알림톡 발송 실패:', err);
+                    // 알림톡 실패는 무시 (채점은 저장됨)
+                });
+
+                alert('채점이 저장되었습니다.');
+                closeGradingModal();
+                loadStudentAssignments(); // 학생 목록 새로고침
+
+            } catch (error) {
+                console.error('채점 저장 오류:', error);
+                alert('채점 저장 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 채점 완료 알림톡 발송
+        async function sendGradingNotification(submissionId, feedbackData) {
+            try {
+                // submission 정보 조회
+                const { data: submission, error: subError } = await window.supabase
+                    .from('student_submissions')
+                    .select('user_id, lesson_id')
+                    .eq('id', submissionId)
+                    .single();
+
+                if (subError) throw subError;
+
+                // 학생 프로필 조회
+                const { data: profile, error: profileError } = await window.supabase
+                    .from('profiles')
+                    .select('name, parent_phone, phone, student_phone, notification_enabled')
+                    .eq('id', submission.user_id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // 연락처 확인 (우선순위: parent_phone → phone → student_phone)
+                const recipientPhone = profile.parent_phone || profile.phone || profile.student_phone;
+                
+                if (!recipientPhone) {
+                    console.log('연락처가 없는 사용자입니다.');
+                    return;
+                }
+
+                // 알림 비활성화 시 종료
+                if (profile.notification_enabled === false) {
+                    console.log('알림이 비활성화된 사용자입니다.');
+                    return;
+                }
+
+                // 레슨 정보 조회
+                const { data: lesson, error: lessonError } = await window.supabase
+                    .from('lessons')
+                    .select('title, order_num')
+                    .eq('id', submission.lesson_id)
+                    .single();
+
+                if (lessonError) throw lessonError;
+
+                // 알림톡 발송 (도메인 없이 간단하게)
+                const { data, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
+                    body: {
+                        phone: recipientPhone,
+                        templateCode: 'grading_complete',
+                        templateParams: {
+                            '학생명': profile.name || '학생',
+                            '과제명': `${lesson.order_num}강`,
+                            '점수': feedbackData.score?.toString() || '0',
+                            '피드백': feedbackData.comment || '채점 완료'
+                        }
+                    }
+                });
+
+                if (error) {
+                    console.error('알림톡 발송 오류:', error);
+                } else {
+                    console.log('알림톡 발송 성공:', data);
+                }
+
+                // notification_logs에 기록
+                await window.supabase
+                    .from('notification_logs')
+                    .insert({
+                        user_id: submission.user_id,
+                        submission_id: submissionId,
+                        notification_type: 'grading_complete',
+                        recipient_phone: recipientPhone,
+                        status: error ? 'failed' : 'sent',
+                        error_message: error?.message || null
+                    });
+
+            } catch (error) {
+                console.error('알림 처리 오류:', error);
+                // 오류 발생해도 채점은 저장됨
+            }
+        }
+
+        // 로그아웃
+        async function handleSignOut() {
+            await signOut();
+        }
+
+        // 관리자 권한 확인
+        async function checkAdminAccess() {
+            currentUser = await getCurrentUser();
+            
+            if (!currentUser) {
+                window.location.href = 'auth.html';
+                return false;
+            }
+
+            // profiles 테이블의 role 컬럼으로 관리자 권한 확인
+            const adminCheck = await isAdmin();
+            if (!adminCheck) {
+                alert('관리자 권한이 없습니다.');
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            return true;
+        }
+
+        // ========== 강의 관리 함수들 ==========
+        
+        let selectedCourseId = null;
+        let categories = ['Business', 'English', 'Korean', 'Conversation'];
+
+        // 강의 목록 로드
+        async function loadCourses() {
+            try {
+                const { data: courses, error } = await window.supabase
+                    .from('courses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const tbody = document.getElementById('course-table-body');
+                
+                if (!courses || courses.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                등록된 강의가 없습니다. "새 강의 추가" 버튼을 클릭하여 강의를 추가하세요.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // 각 강의의 레슨 수 가져오기
+                const { data: lessons } = await window.supabase
+                    .from('lessons')
+                    .select('course_id');
+
+                const lessonCounts = {};
+                lessons?.forEach(l => {
+                    lessonCounts[l.course_id] = (lessonCounts[l.course_id] || 0) + 1;
+                });
+
+                tbody.innerHTML = courses.map(course => `
+                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5 transition">
+                        <td class="px-6 py-4 text-white">${course.title}</td>
+                        <td class="px-6 py-4 text-gray-400">${course.category || '-'}</td>
+                        <td class="px-6 py-4 text-white">₩${(course.price || 0).toLocaleString()}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded text-xs ${course.is_published ? 'bg-green-500 bg-opacity-20 text-green-400' : 'bg-gray-500 bg-opacity-20 text-gray-400'}">
+                                ${course.is_published ? '공개' : '비공개'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="selectCourse('${course.id}', '${course.title}')" 
+                                    class="px-3 py-1.5 bg-white bg-opacity-10 text-white rounded text-sm hover:bg-opacity-20 transition">
+                                영상 관리
+                            </button>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-3">
+                            <button onclick="editCourse('${course.id}')" class="text-gray-400 hover:text-white transition">수정</button>
+                            <button onclick="deleteCourse('${course.id}')" class="text-red-400 hover:text-red-300 transition">삭제</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Load courses error:', error);
+                document.getElementById('course-table-body').innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-red-400">
+                            강의 목록을 불러오는 중 오류가 발생했습니다.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 강의 선택 (영상 관리)
+        async function selectCourse(courseId, courseTitle) {
+            selectedCourseId = courseId;
+            document.getElementById('selected-course-title').textContent = courseTitle;
+            document.getElementById('lesson-list-section').classList.remove('hidden');
+            await loadLessons(courseId);
+        }
+
+        // 레슨 목록 로드
+        async function loadLessons(courseId) {
+            try {
+                const { data: lessons, error } = await window.supabase
+                    .from('lessons')
+                    .select('*')
+                    .eq('course_id', courseId)
+                    .order('order_num', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('lesson-list');
+
+                if (!lessons || lessons.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-500 py-8">
+                            등록된 영상이 없습니다. "+ 새 영상 추가" 버튼을 클릭하여 영상을 추가하세요.
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = lessons.map((lesson, index) => `
+                    <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-lg hover:bg-opacity-10 transition">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-bold text-gray-600">${String(index + 1).padStart(2, '0')}</span>
+                            <div>
+                                <p class="font-semibold text-white">${lesson.order_num}강</p>
+                                <p class="text-sm text-gray-500">
+                                    ${lesson.duration || 0}분
+                                    ${lesson.video_url ? '<span class="text-green-400 ml-2">✓ 영상 있음</span>' : '<span class="text-red-400 ml-2">✗ 영상 없음</span>'}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="editLesson('${lesson.id}')" class="text-gray-400 hover:text-white transition">수정</button>
+                            <button onclick="deleteLesson('${lesson.id}')" class="text-red-400 hover:text-red-300 transition">삭제</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Load lessons error:', error);
+                document.getElementById('lesson-list').innerHTML = `
+                    <div class="text-center text-red-400 py-8">레슨 목록을 불러오는 중 오류가 발생했습니다.</div>
+                `;
+            }
+        }
+
+        // 강의 모달 열기
+        function openCourseModal(courseId = null) {
+            document.getElementById('course-modal').classList.remove('hidden');
+            document.getElementById('course-modal-title').textContent = courseId ? '강의 수정' : '새 강의 추가';
+            document.getElementById('course-form').reset();
+            document.getElementById('course-id').value = courseId || '';
+            document.getElementById('thumbnail-preview').classList.add('hidden');
+            
+            // 카테고리 드롭다운 채우기
+            loadCategoryDropdown();
+            
+            if (courseId) {
+                loadCourseData(courseId);
+            }
+        }
+
+        // 강의 데이터 로드 (수정 시)
+        async function loadCourseData(courseId) {
+            try {
+                const { data: course, error } = await window.supabase
+                    .from('courses')
+                    .select('*')
+                    .eq('id', courseId)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('course-title').value = course.title || '';
+                document.getElementById('course-category-text').value = course.category || '';
+                document.getElementById('course-category').value = course.category || '';
+                document.getElementById('course-description').value = course.description || '';
+                document.getElementById('course-price').value = course.price || '';
+                document.getElementById('course-duration').value = course.duration || '';
+                document.getElementById('course-thumbnail').value = course.thumbnail_url || '';
+                document.getElementById('course-published').checked = course.is_published || false;
+
+                if (course.thumbnail_url) {
+                    document.getElementById('thumbnail-preview').classList.remove('hidden');
+                    document.getElementById('thumbnail-preview-img').src = course.thumbnail_url;
+                }
+            } catch (error) {
+                console.error('Load course data error:', error);
+                alert('강의 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 강의 모달 닫기
+        function closeCourseModal() {
+            document.getElementById('course-modal').classList.add('hidden');
+        }
+
+        // 강의 저장
+        document.getElementById('course-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const courseId = document.getElementById('course-id').value;
+            const courseData = {
+                title: document.getElementById('course-title').value,
+                category: document.getElementById('course-category-text').value || document.getElementById('course-category').value,
+                description: document.getElementById('course-description').value,
+                price: parseInt(document.getElementById('course-price').value) || 0,
+                duration: parseFloat(document.getElementById('course-duration').value) || 0,
+                thumbnail_url: document.getElementById('course-thumbnail').value,
+                is_published: document.getElementById('course-published').checked,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                if (courseId) {
+                    // 수정
+                    const { error } = await window.supabase
+                        .from('courses')
+                        .update(courseData)
+                        .eq('id', courseId);
+                    if (error) throw error;
+                } else {
+                    // 새로 생성
+                    courseData.created_at = new Date().toISOString();
+                    const { error } = await window.supabase
+                        .from('courses')
+                        .insert(courseData);
+                    if (error) throw error;
+                }
+
+                closeCourseModal();
+                loadCourses();
+                alert(courseId ? '강의가 수정되었습니다.' : '강의가 추가되었습니다.');
+            } catch (error) {
+                console.error('Save course error:', error);
+                alert('강의 저장 중 오류가 발생했습니다: ' + error.message);
+            }
+        });
+
+        // 강의 수정
+        function editCourse(courseId) {
+            openCourseModal(courseId);
+        }
+
+        // 강의 삭제
+        async function deleteCourse(courseId) {
+            if (!confirm('정말로 이 강의를 삭제하시겠습니까? 관련된 모든 영상도 함께 삭제됩니다.')) return;
+
+            try {
+                const { error } = await window.supabase
+                    .from('courses')
+                    .delete()
+                    .eq('id', courseId);
+
+                if (error) throw error;
+
+                loadCourses();
+                document.getElementById('lesson-list-section').classList.add('hidden');
+                alert('강의가 삭제되었습니다.');
+            } catch (error) {
+                console.error('Delete course error:', error);
+                alert('강의 삭제 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 레슨 모달 열기
+        function openLessonModal(lessonId = null) {
+            if (!selectedCourseId) {
+                alert('먼저 강의를 선택해주세요.');
+                return;
+            }
+            document.getElementById('lesson-modal').classList.remove('hidden');
+            document.getElementById('lesson-modal-title').textContent = lessonId ? '영상 수정' : '새 영상 추가';
+            document.getElementById('lesson-form').reset();
+            document.getElementById('lesson-id').value = lessonId || '';
+            
+            if (lessonId) {
+                loadLessonData(lessonId);
+            }
+        }
+
+        // 레슨 데이터 로드 (수정 시)
+        async function loadLessonData(lessonId) {
+            try {
+                const { data: lesson, error } = await window.supabase
+                    .from('lessons')
+                    .select('*')
+                    .eq('id', lessonId)
+                    .single();
+
+                if (error) throw error;
+
+                document.getElementById('lesson-title').value = lesson.title || '';
+                document.getElementById('lesson-description').value = lesson.description || '';
+                document.getElementById('lesson-video-url').value = lesson.video_url || '';
+                document.getElementById('lesson-order').value = lesson.order_num || 1;
+                document.getElementById('lesson-duration').value = lesson.duration || '';
+                document.getElementById('lesson-blog-link').value = lesson.blog_link || '';
+                document.getElementById('lesson-preview').checked = lesson.is_preview || false;
+                
+                // 기존 퀴즈 로드
+                await loadQuizzesForLesson(lessonId);
+            } catch (error) {
+                console.error('Load lesson data error:', error);
+                alert('영상 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 레슨 모달 닫기
+        function closeLessonModal() {
+            // 퀴즈 데이터 초기화
+            quizData = [];
+            document.getElementById('quiz-excel-file').value = '';
+            document.getElementById('quiz-preview-container').classList.add('hidden');
+            document.getElementById('lesson-modal').classList.add('hidden');
+        }
+
+        // 레슨 저장
+        document.getElementById('lesson-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const lessonId = document.getElementById('lesson-id').value;
+            const lessonData = {
+                course_id: selectedCourseId,
+                title: document.getElementById('lesson-title').value,
+                description: document.getElementById('lesson-description').value,
+                video_url: document.getElementById('lesson-video-url').value,
+                order_num: parseInt(document.getElementById('lesson-order').value) || 1,
+                duration: parseInt(document.getElementById('lesson-duration').value) || 0,
+                blog_link: document.getElementById('lesson-blog-link').value,
+                is_preview: document.getElementById('lesson-preview').checked,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                let savedLessonId = lessonId;
+                
+                if (lessonId) {
+                    // 수정
+                    const { error } = await window.supabase
+                        .from('lessons')
+                        .update(lessonData)
+                        .eq('id', lessonId);
+                    if (error) throw error;
+                } else {
+                    // 새로 생성
+                    lessonData.created_at = new Date().toISOString();
+                    const { data, error } = await window.supabase
+                        .from('lessons')
+                        .insert(lessonData)
+                        .select()
+                        .single();
+                    if (error) throw error;
+                    savedLessonId = data.id;
+                }
+
+                // 퀴즈 저장 (업로드된 퀴즈가 있는 경우)
+                if (quizData.length > 0) {
+                    await saveQuizzesForLesson(savedLessonId);
+                }
+
+                closeLessonModal();
+                loadLessons(selectedCourseId);
+                
+                const quizMsg = quizData.length > 0 ? ` (퀴즈 ${quizData.length}개 포함)` : '';
+                alert((lessonId ? '영상이 수정되었습니다.' : '영상이 추가되었습니다.') + quizMsg);
+            } catch (error) {
+                console.error('Save lesson error:', error);
+                alert('영상 저장 중 오류가 발생했습니다: ' + error.message);
+            }
+        });
+
+        // 레슨 수정
+        function editLesson(lessonId) {
+            openLessonModal(lessonId);
+        }
+
+        // 레슨 삭제
+        async function deleteLesson(lessonId) {
+            if (!confirm('정말로 이 영상을 삭제하시겠습니까?')) return;
+
+            try {
+                const { error } = await window.supabase
+                    .from('lessons')
+                    .delete()
+                    .eq('id', lessonId);
+
+                if (error) throw error;
+
+                loadLessons(selectedCourseId);
+                alert('영상이 삭제되었습니다.');
+            } catch (error) {
+                console.error('Delete lesson error:', error);
+                alert('영상 삭제 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 카테고리 모달 열기
+        function openCategoryModal() {
+            document.getElementById('category-modal').classList.remove('hidden');
+            renderCategoryList();
+        }
+
+        // 카테고리 모달 닫기
+        function closeCategoryModal() {
+            document.getElementById('category-modal').classList.add('hidden');
+        }
+
+        // 카테고리 목록 렌더링
+        function renderCategoryList() {
+            const container = document.getElementById('category-list');
+            container.innerHTML = categories.map(cat => `
+                <div class="flex items-center justify-between p-3 bg-white bg-opacity-5 rounded-lg">
+                    <span class="text-white">${cat}</span>
+                    <button onclick="removeCategory('${cat}')" class="text-red-400 hover:text-red-300 text-sm">삭제</button>
+                </div>
+            `).join('');
+        }
+
+        // 카테고리 추가
+        function addCategory() {
+            const input = document.getElementById('new-category-input');
+            const newCat = input.value.trim();
+            
+            if (!newCat) {
+                alert('카테고리 이름을 입력하세요.');
+                return;
+            }
+            
+            if (categories.includes(newCat)) {
+                alert('이미 존재하는 카테고리입니다.');
+                return;
+            }
+            
+            categories.push(newCat);
+            input.value = '';
+            renderCategoryList();
+            loadCategoryDropdown();
+        }
+
+        // 카테고리 삭제
+        function removeCategory(cat) {
+            categories = categories.filter(c => c !== cat);
+            renderCategoryList();
+            loadCategoryDropdown();
+        }
+
+        // 카테고리 드롭다운 로드
+        function loadCategoryDropdown() {
+            const select = document.getElementById('course-category');
+            select.innerHTML = '<option value="">카테고리 선택</option>' + 
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        // 썸네일 업로드 처리
+        async function handleThumbnailUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            try {
+                // Supabase Storage에 업로드
+                const fileName = `thumbnails/${Date.now()}_${file.name}`;
+                const { data, error } = await window.supabase.storage
+                    .from('course-thumbnails')
+                    .upload(fileName, file);
+
+                if (error) throw error;
+
+                // Public URL 가져오기
+                const { data: urlData } = window.supabase.storage
+                    .from('course-thumbnails')
+                    .getPublicUrl(fileName);
+
+                document.getElementById('course-thumbnail').value = urlData.publicUrl;
+                document.getElementById('thumbnail-preview').classList.remove('hidden');
+                document.getElementById('thumbnail-preview-img').src = urlData.publicUrl;
+                
+            } catch (error) {
+                console.error('Thumbnail upload error:', error);
+                alert('이미지 업로드 중 오류가 발생했습니다. URL을 직접 입력해주세요.');
+            }
+        }
+
+        // 페이지 초기화
+        async function init() {
+            const hasAccess = await checkAdminAccess();
+            if (!hasAccess) return;
+
+            // 기본 섹션 로드
+            loadStudentAssignments();
+        }
+
+        // 섹션 전환 시 데이터 로드
+        const originalShowSection = showSection;
+        showSection = function(section) {
+            originalShowSection(section);
+            if (section === 'courses') {
+                loadCourses();
+            }
+        };
+
+        // ========== 회원 관리 함수들 ==========
+        let allMembers = [];
+
+        async function loadMembers() {
+            try {
+                // 모든 회원 정보 로드
+                const { data: profiles, error: profileError } = await window.supabase
+                    .from('profiles')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (profileError) throw profileError;
+
+                // 결제 완료된 주문 로드
+                const { data: orders, error: orderError } = await window.supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'DONE');
+
+                if (orderError) throw orderError;
+
+                // 강의 정보 로드
+                const { data: courses, error: courseError } = await window.supabase
+                    .from('courses')
+                    .select('id, title, price');
+
+                if (courseError) throw courseError;
+
+                // 강의 맵 생성
+                const courseMap = new Map();
+                courses?.forEach(c => courseMap.set(c.id, c));
+
+                // 회원별 구매 정보 매핑
+                allMembers = (profiles || []).map(profile => {
+                    const memberOrders = (orders || []).filter(o => o.user_id === profile.id);
+                    const totalPaid = memberOrders.reduce((sum, o) => sum + (o.amount || 0), 0);
+                    const purchasedCourses = memberOrders.map(o => ({
+                        ...o,
+                        courseTitle: courseMap.get(o.course_id)?.title || o.order_name || '알 수 없음'
+                    }));
+
+                    return {
+                        ...profile,
+                        orders: purchasedCourses,
+                        totalPaid,
+                        courseCount: purchasedCourses.length
+                    };
+                });
+
+                // 통계 업데이트
+                updateMemberStats();
+                
+                // 테이블 렌더링
+                renderMembersTable(allMembers);
+
+            } catch (error) {
+                console.error('회원 로드 오류:', error);
+                document.getElementById('members-table-body').innerHTML = `
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-red-400">
+                        회원 데이터를 불러오는 중 오류가 발생했습니다.
+                    </td></tr>
+                `;
+            }
+        }
+
+        function updateMemberStats() {
+            const totalMembers = allMembers.length;
+            const activeMembers = allMembers.filter(m => m.courseCount > 0).length;
+            
+            // 이번 달 가입자
+            const thisMonth = new Date();
+            thisMonth.setDate(1);
+            thisMonth.setHours(0, 0, 0, 0);
+            const newMembers = allMembers.filter(m => new Date(m.created_at) >= thisMonth).length;
+            
+            // 총 결제 금액
+            const totalRevenue = allMembers.reduce((sum, m) => sum + m.totalPaid, 0);
+
+            document.getElementById('stat-total-members').textContent = totalMembers;
+            document.getElementById('stat-active-members').textContent = activeMembers;
+            document.getElementById('stat-new-members').textContent = newMembers;
+            document.getElementById('stat-total-revenue').textContent = `₩${totalRevenue.toLocaleString()}`;
+        }
+
+        function renderMembersTable(members) {
+            const tbody = document.getElementById('members-table-body');
+            
+            if (!members || members.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                        등록된 회원이 없습니다.
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = members.map(member => {
+                const joinDate = member.created_at ? new Date(member.created_at).toLocaleDateString('ko-KR') : '-';
+                const courseTitles = member.orders.map(o => o.courseTitle).join(', ') || '-';
+                
+                return `
+                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
+                        <td class="px-4 py-4">
+                            <p class="text-white font-medium">${member.name || '이름 없음'}</p>
+                            <p class="text-sm text-gray-500">${member.email || '-'}</p>
+                        </td>
+                        <td class="px-4 py-4 text-sm text-gray-300">
+                            ${member.phone || member.student_phone || '-'}
+                        </td>
+                        <td class="px-4 py-4">
+                            <p class="text-white">${member.courseCount}개</p>
+                            <p class="text-xs text-gray-500 truncate max-w-xs" title="${courseTitles}">${courseTitles}</p>
+                        </td>
+                        <td class="px-4 py-4 text-white">
+                            ₩${member.totalPaid.toLocaleString()}
+                        </td>
+                        <td class="px-4 py-4 text-sm text-gray-300">
+                            ${joinDate}
+                        </td>
+                        <td class="px-4 py-4">
+                            <button onclick="openMemberModal('${member.id}')" 
+                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                상세
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterMembers() {
+            const searchText = document.getElementById('search-member').value.toLowerCase();
+            
+            const filtered = allMembers.filter(member => {
+                const name = (member.name || '').toLowerCase();
+                const email = (member.email || '').toLowerCase();
+                const phone = (member.phone || member.student_phone || '').toLowerCase();
+                
+                return name.includes(searchText) || email.includes(searchText) || phone.includes(searchText);
+            });
+            
+            renderMembersTable(filtered);
+        }
+
+        function openMemberModal(memberId) {
+            const member = allMembers.find(m => m.id === memberId);
+            if (!member) return;
+
+            const joinDate = member.created_at ? new Date(member.created_at).toLocaleDateString('ko-KR') : '-';
+            
+            const content = `
+                <div class="space-y-6">
+                    <!-- 기본 정보 -->
+                    <div class="bg-white bg-opacity-5 rounded-xl p-4">
+                        <h4 class="text-sm text-gray-400 mb-3">기본 정보</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-xs text-gray-500">이름</p>
+                                <p class="text-white">${member.name || '-'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">이메일</p>
+                                <p class="text-white">${member.email || '-'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">전화번호</p>
+                                <p class="text-white">${member.phone || member.student_phone || '-'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">가입일</p>
+                                <p class="text-white">${joinDate}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">역할</p>
+                                <p class="text-white">${member.role === 'admin' ? '관리자' : '일반 회원'}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">총 결제 금액</p>
+                                <p class="text-green-400 font-bold">₩${member.totalPaid.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 수강 강의 -->
+                    <div class="bg-white bg-opacity-5 rounded-xl p-4">
+                        <h4 class="text-sm text-gray-400 mb-3">수강 강의 (${member.orders.length}개)</h4>
+                        ${member.orders.length > 0 ? `
+                            <div class="space-y-2">
+                                ${member.orders.map(order => `
+                                    <div class="flex items-center justify-between p-3 bg-white bg-opacity-5 rounded-lg">
+                                        <div>
+                                            <p class="text-white">${order.courseTitle}</p>
+                                            <p class="text-xs text-gray-500">${order.created_at ? new Date(order.created_at).toLocaleDateString('ko-KR') : ''} 구매</p>
+                                        </div>
+                                        <p class="text-green-400">₩${(order.amount || 0).toLocaleString()}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<p class="text-gray-500">수강 중인 강의가 없습니다.</p>'}
+                    </div>
+
+                    <!-- 보호자 정보 (있는 경우) -->
+                    ${member.parent_name || member.parent_phone ? `
+                        <div class="bg-white bg-opacity-5 rounded-xl p-4">
+                            <h4 class="text-sm text-gray-400 mb-3">보호자 정보</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-gray-500">보호자 이름</p>
+                                    <p class="text-white">${member.parent_name || '-'}</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">보호자 연락처</p>
+                                    <p class="text-white">${member.parent_phone || '-'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('member-detail-content').innerHTML = content;
+            document.getElementById('member-detail-modal').classList.remove('hidden');
+        }
+
+        function closeMemberModal() {
+            document.getElementById('member-detail-modal').classList.add('hidden');
+        }
+
+        // ========== 주문/배송 관리 함수들 ==========
+        let currentOrderFilter = 'need_action';
+        let allOrders = [];
+        let allOrdersRaw = []; // 전체 데이터 (통계용)
+
+        async function loadOrders(status = 'need_action') {
+            currentOrderFilter = status;
+            
+            // 필터 버튼 UI 업데이트
+            document.querySelectorAll('[id^="filter-orders-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-10', 'text-white');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`filter-orders-${status}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'bg-opacity-10', 'text-white');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            try {
+                // orders 테이블에서 결제 완료된 주문 로드
+                const { data, error } = await window.supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('status', 'DONE')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allOrdersRaw = data || [];
+                
+                // 필터링
+                let filteredOrders = allOrdersRaw;
+                if (status === 'need_action') {
+                    // 배송정보 미입력 + 배송준비중
+                    filteredOrders = allOrdersRaw.filter(o => 
+                        o.shipping_status === 'PENDING_ADDRESS' || o.shipping_status === 'PREPARING'
+                    );
+                } else if (status !== 'all') {
+                    filteredOrders = allOrdersRaw.filter(o => o.shipping_status === status);
+                }
+
+                allOrders = filteredOrders;
+                updateOrderStats();
+                renderOrdersTable(allOrders);
+
+            } catch (error) {
+                console.error('주문 로드 오류:', error);
+                document.getElementById('orders-table-body').innerHTML = `
+                    <tr><td colspan="8" class="px-4 py-8 text-center text-red-400">
+                        주문 데이터를 불러오는 중 오류가 발생했습니다.
+                    </td></tr>
+                `;
+            }
+        }
+
+        function updateOrderStats() {
+            // 전체 주문에서 각 상태별 카운트
+            const stats = {
+                PENDING_ADDRESS: 0,
+                PREPARING: 0,
+                SHIPPING: 0,
+                DELIVERED: 0
+            };
+
+            allOrdersRaw.forEach(order => {
+                const status = order.shipping_status || 'PENDING_ADDRESS';
+                if (stats[status] !== undefined) {
+                    stats[status]++;
+                }
+            });
+
+            document.getElementById('stat-pending-address').textContent = stats.PENDING_ADDRESS;
+            document.getElementById('stat-preparing').textContent = stats.PREPARING;
+            document.getElementById('stat-shipping').textContent = stats.SHIPPING;
+            document.getElementById('stat-delivered').textContent = stats.DELIVERED;
+        }
+
+        function renderOrdersTable(orders) {
+            const tbody = document.getElementById('orders-table-body');
+            
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                        주문 내역이 없습니다.
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                const orderDate = new Date(order.created_at).toLocaleDateString('ko-KR');
+                const orderId = order.id.substring(0, 12) + '...';
+                const productName = order.courses?.title || order.order_name || '-';
+                const amount = order.amount ? `₩${order.amount.toLocaleString()}` : '-';
+                const customerName = order.profiles?.name || order.customer_name || '-';
+                const customerEmail = order.profiles?.email || order.customer_email || '-';
+                const shippingAddress = order.shipping_address 
+                    ? `${order.shipping_address} ${order.shipping_address_detail || ''}<br><span class="text-gray-500">${order.shipping_name || ''} / ${order.shipping_phone || ''}</span>`
+                    : '-';
+                const trackingInfo = order.tracking_number 
+                    ? `${order.shipping_carrier || ''}<br>${order.tracking_number}`
+                    : '-';
+
+                return `
+                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
+                        <td class="px-4 py-4 text-sm text-gray-300">${orderDate}</td>
+                        <td class="px-4 py-4 text-sm text-gray-400">${orderId}</td>
+                        <td class="px-4 py-4">
+                            <p class="text-white">${productName}</p>
+                            <p class="text-sm text-gray-500">${amount}</p>
+                        </td>
+                        <td class="px-4 py-4">
+                            <p class="text-white">${customerName}</p>
+                            <p class="text-sm text-gray-500">${customerEmail}</p>
+                        </td>
+                        <td class="px-4 py-4">${getShippingStatusBadge(order.shipping_status)}</td>
+                        <td class="px-4 py-4 text-sm text-gray-300">${shippingAddress}</td>
+                        <td class="px-4 py-4 text-sm text-gray-300">${trackingInfo}</td>
+                        <td class="px-4 py-4">
+                            <button onclick="openOrderModal('${order.id}')" 
+                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
+                                수정
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getShippingStatusBadge(status) {
+            const badges = {
+                'PENDING_ADDRESS': '<span class="px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm">배송정보 미입력</span>',
+                'PREPARING': '<span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-sm">배송준비중</span>',
+                'SHIPPING': '<span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-sm">배송중</span>',
+                'DELIVERED': '<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm">배송완료</span>'
+            };
+            return badges[status] || badges['PENDING_ADDRESS'];
+        }
+
+        async function openOrderModal(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const modalHtml = `
+                <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+                    <div class="bg-gray-900 rounded-2xl max-w-lg w-full p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold text-white">📦 배송 정보 수정</h2>
+                            <button onclick="closeOrderModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">배송 상태</label>
+                                <select id="modal-shipping-status" class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
+                                    <option value="PENDING_ADDRESS" ${order.shipping_status === 'PENDING_ADDRESS' || !order.shipping_status ? 'selected' : ''}>배송정보 미입력</option>
+                                    <option value="PREPARING" ${order.shipping_status === 'PREPARING' ? 'selected' : ''}>배송준비중</option>
+                                    <option value="SHIPPING" ${order.shipping_status === 'SHIPPING' ? 'selected' : ''}>배송중</option>
+                                    <option value="DELIVERED" ${order.shipping_status === 'DELIVERED' ? 'selected' : ''}>배송완료</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">택배사</label>
+                                <input type="text" id="modal-carrier" value="${order.shipping_carrier || ''}" 
+                                       class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white" placeholder="예: CJ대한통운">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-1">송장번호</label>
+                                <input type="text" id="modal-tracking" value="${order.tracking_number || ''}" 
+                                       class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white" placeholder="송장번호 입력">
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3 mt-6">
+                            <button onclick="closeOrderModal()" 
+                                    class="flex-1 px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white">
+                                취소
+                            </button>
+                            <button onclick="saveOrderChanges('${orderId}')" 
+                                    class="flex-1 px-4 py-3 bg-white rounded-xl text-black font-semibold">
+                                저장
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeOrderModal() {
+            const modal = document.getElementById('order-modal');
+            if (modal) modal.remove();
+        }
+
+        async function saveOrderChanges(orderId) {
+            const shippingStatus = document.getElementById('modal-shipping-status').value;
+            const carrier = document.getElementById('modal-carrier').value;
+            const trackingNumber = document.getElementById('modal-tracking').value;
+
+            try {
+                const updateData = {
+                    shipping_status: shippingStatus,
+                    shipping_carrier: carrier,
+                    tracking_number: trackingNumber
+                };
+
+                if (shippingStatus === 'SHIPPING' && !updateData.shipped_at) {
+                    updateData.shipped_at = new Date().toISOString();
+                }
+                if (shippingStatus === 'DELIVERED') {
+                    updateData.delivered_at = new Date().toISOString();
+                }
+
+                const { error } = await window.supabase
+                    .from('orders')
+                    .update(updateData)
+                    .eq('id', orderId);
+
+                if (error) throw error;
+
+                alert('배송 정보가 저장되었습니다.');
+                closeOrderModal();
+                loadOrders(currentOrderFilter);
+
+            } catch (error) {
+                console.error('저장 오류:', error);
+                alert('저장 중 오류가 발생했습니다.');
+            }
+        }
+        // ========== 주문/배송 관리 함수 끝 ==========
+
+        // ========== 퀴즈 관리 함수 ==========
+        let quizData = []; // 업로드된 퀴즈 데이터 임시 저장
+
+        // 퀴즈 템플릿 다운로드
+        function downloadQuizTemplate() {
+            const template = [
+                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '정답', '해설'],
+                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', '1', 'Seoul is the capital city.'],
+                [2, 'OX', 'English is easy.', 'O', 'X', '', '', '2', 'It depends on the learner.'],
+                [3, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', 'go', 'Simple present tense']
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Quiz Template');
+            
+            // 컬럼 너비 설정
+            ws['!cols'] = [
+                { wch: 10 }, { wch: 12 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 30 }
+            ];
+
+            XLSX.writeFile(wb, 'quiz_template.xlsx');
+        }
+
+        // 엑셀 파일 업로드 처리
+        async function handleQuizExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                if (jsonData.length === 0) {
+                    alert('엑셀 파일에 데이터가 없습니다.');
+                    return;
+                }
+
+                // 데이터 검증 및 변환
+                quizData = jsonData.map((row, index) => {
+                    // 엑셀의 다양한 헤더 형식 처리
+                    const questionNumber = row['문제번호'] || row['번호'] || (index + 1);
+                    const questionType = row['문제유형'] || row['유형'] || '객관식';
+                    const question = row['질문'] || row['문제'] || '';
+                    const option1 = row['선택지1'] || row['보기1'] || '';
+                    const option2 = row['선택지2'] || row['보기2'] || '';
+                    const option3 = row['선택지3'] || row['보기3'] || '';
+                    const option4 = row['선택지4'] || row['보기4'] || '';
+                    const correctAnswer = String(row['정답'] || '').trim();
+                    const explanation = row['해설'] || '';
+
+                    if (!question) {
+                        throw new Error(`${questionNumber}번 문제의 질문이 비어있습니다.`);
+                    }
+
+                    if (!correctAnswer) {
+                        throw new Error(`${questionNumber}번 문제의 정답이 비어있습니다.`);
+                    }
+
+                    return {
+                        questionNumber: parseInt(questionNumber),
+                        questionType,
+                        question,
+                        option1,
+                        option2,
+                        option3,
+                        option4,
+                        correctAnswer,
+                        explanation
+                    };
+                });
+
+                // 퀴즈 미리보기 표시
+                displayQuizPreview();
+                
+                alert(`✅ ${quizData.length}개의 퀴즈가 업로드되었습니다!`);
+
+            } catch (error) {
+                console.error('엑셀 파싱 오류:', error);
+                alert(`엑셀 파일 처리 중 오류가 발생했습니다: ${error.message}`);
+                event.target.value = ''; // 파일 입력 초기화
+            }
+        }
+
+        // 퀴즈 미리보기 표시
+        function displayQuizPreview() {
+            const container = document.getElementById('quiz-preview-container');
+            const list = document.getElementById('quiz-preview-list');
+            const count = document.getElementById('quiz-count');
+
+            if (quizData.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            count.textContent = quizData.length;
+
+            list.innerHTML = quizData.map(quiz => `
+                <div class="bg-white bg-opacity-5 rounded p-3">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-xs font-semibold text-blue-400">${quiz.questionNumber}번</span>
+                                <span class="text-xs px-2 py-0.5 rounded ${
+                                    quiz.questionType === '객관식' ? 'bg-green-500 bg-opacity-20 text-green-400' :
+                                    quiz.questionType === 'OX' ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' :
+                                    'bg-purple-500 bg-opacity-20 text-purple-400'
+                                }">${quiz.questionType}</span>
+                            </div>
+                            <p class="text-sm text-white">${quiz.question}</p>
+                            ${quiz.option1 ? `<p class="text-xs text-gray-500 mt-1">① ${quiz.option1} ${quiz.option2 ? `② ${quiz.option2}` : ''} ${quiz.option3 ? `③ ${quiz.option3}` : ''} ${quiz.option4 ? `④ ${quiz.option4}` : ''}</p>` : ''}
+                            <p class="text-xs text-green-400 mt-1">정답: ${quiz.correctAnswer}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 퀴즈 데이터 초기화
+        function clearQuizData() {
+            if (!confirm('업로드된 퀴즈 데이터를 모두 삭제하시겠습니까?')) return;
+            
+            quizData = [];
+            document.getElementById('quiz-excel-file').value = '';
+            document.getElementById('quiz-preview-container').classList.add('hidden');
+        }
+
+        // 레슨 저장 시 퀴즈도 함께 저장 (기존 saveLesson 함수 수정 필요)
+        async function saveQuizzesForLesson(lessonId) {
+            if (quizData.length === 0) return;
+
+            try {
+                // 기존 퀴즈 삭제
+                const { error: deleteError } = await window.supabase
+                    .from('quizzes')
+                    .delete()
+                    .eq('lesson_id', lessonId);
+
+                if (deleteError) throw deleteError;
+
+                // 새 퀴즈 삽입
+                const quizzes = quizData.map(quiz => ({
+                    lesson_id: lessonId,
+                    question_number: quiz.questionNumber,
+                    question_type: quiz.questionType,
+                    question: quiz.question,
+                    option1: quiz.option1 || null,
+                    option2: quiz.option2 || null,
+                    option3: quiz.option3 || null,
+                    option4: quiz.option4 || null,
+                    correct_answer: quiz.correctAnswer,
+                    explanation: quiz.explanation || null
+                }));
+
+                const { error: insertError } = await window.supabase
+                    .from('quizzes')
+                    .insert(quizzes);
+
+                if (insertError) throw insertError;
+
+                console.log(`✅ ${quizzes.length}개의 퀴즈가 저장되었습니다.`);
+                
+                // 퀴즈 데이터 초기화
+                quizData = [];
+                document.getElementById('quiz-excel-file').value = '';
+                document.getElementById('quiz-preview-container').classList.add('hidden');
+
+            } catch (error) {
+                console.error('퀴즈 저장 오류:', error);
+                throw error; // 상위에서 처리하도록
+            }
+        }
+
+        // 레슨 수정 시 기존 퀴즈 로드
+        async function loadQuizzesForLesson(lessonId) {
+            try {
+                const { data: quizzes, error } = await window.supabase
+                    .from('quizzes')
+                    .select('*')
+                    .eq('lesson_id', lessonId)
+                    .order('question_number');
+
+                if (error) throw error;
+
+                if (quizzes && quizzes.length > 0) {
+                    quizData = quizzes.map(q => ({
+                        questionNumber: q.question_number,
+                        questionType: q.question_type,
+                        question: q.question,
+                        option1: q.option1 || '',
+                        option2: q.option2 || '',
+                        option3: q.option3 || '',
+                        option4: q.option4 || '',
+                        correctAnswer: q.correct_answer,
+                        explanation: q.explanation || ''
+                    }));
+
+                    displayQuizPreview();
+                }
+
+            } catch (error) {
+                console.error('퀴즈 로드 오류:', error);
+            }
+        }
+        // ========== 퀴즈 관리 함수 끝 ==========
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

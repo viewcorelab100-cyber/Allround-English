@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>레슨 — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Vimeo Player API -->
+    <script src="https://player.vimeo.com/api/player.js"></script>
+    <style>
+        body {
+            font-family: "aileron", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000000;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .video-container {
+            position: relative;
+            background: #111;
+        }
+
+        .video-container video,
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .lesson-nav-item {
+            transition: background-color 0.2s ease;
+        }
+
+        .lesson-nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .lesson-nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .lesson-nav-item.completed {
+            border-left: 3px solid #22c55e;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        /* QnA 플로팅 버튼 */
+        .fab-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+        }
+
+        .fab-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .fab-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .fab-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .fab-container.open .fab-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .fab-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        .fab-menu-item .fab-label {
+            background: white;
+            color: black;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .fab-menu-item .fab-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .fab-menu-item:hover .fab-icon {
+            transform: scale(1.1);
+        }
+
+        .fab-button .icon-open,
+        .fab-container.open .fab-button .icon-close {
+            display: block;
+        }
+
+        .fab-button .icon-close,
+        .fab-container.open .fab-button .icon-open {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 (간소화) -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-xl font-bold text-white tracking-wider">ALLROUND</a>
+            <div id="course-title" class="text-sm text-gray-400 hidden md:block"></div>
+            <div class="flex items-center space-x-4">
+                <a href="#" id="back-to-course" class="text-sm text-gray-400 hover:text-white">← 강의로 돌아가기</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="h-16"></div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto">
+        <!-- 상단: 영상 + 과제 섹션 -->
+        <div class="flex flex-col lg:flex-row">
+            
+            <!-- Video Section (좌측) -->
+            <div class="flex-1 lg:pr-0">
+                <!-- Video Player -->
+                <div class="video-container" id="video-container">
+                    <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                        영상을 불러오는 중...
+                    </div>
+                </div>
+                
+                <!-- Video Controls & Info -->
+                <div class="p-6 space-y-6">
+                    <!-- Progress Bar -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">시청 진도</span>
+                            <span id="progress-text" class="text-white">0%</span>
+                        </div>
+                        <div class="w-full h-1 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="progress-bar h-full bg-white rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lesson Info -->
+                    <div class="space-y-4">
+                        <h1 id="lesson-title" class="text-2xl md:text-3xl font-bold text-white"></h1>
+                        <p id="lesson-description" class="text-gray-400"></p>
+                    </div>
+                    
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between pt-4">
+                        <button id="prev-lesson" class="btn-hover-scale px-6 py-3 bg-transparent text-white font-semibold rounded-xl border-2 border-white border-opacity-20 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                            ← 이전 레슨
+                        </button>
+                        <button id="next-lesson" class="btn-hover-scale px-6 py-3 bg-white text-black font-semibold rounded-xl disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                            다음 레슨 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment Section (우측) - 90% 이상 수강 시 표시 -->
+            <div id="assignment-section" class="hidden w-full lg:w-80 bg-white bg-opacity-5 border-l border-white border-opacity-10 p-6">
+                <div class="space-y-6">
+                    <!-- QR 코드 및 블로그 링크 영역 (상단) -->
+                    <div class="p-4 rounded-xl bg-white bg-opacity-5 space-y-4">
+                        <div class="flex gap-4 items-start">
+                            <!-- QR 코드 (좌측) -->
+                            <div class="flex flex-col items-center space-y-2">
+                                <p class="text-sm text-gray-400 text-center">과제 제출용 QR</p>
+                                <div id="qr-code-container" class="w-28 h-28 bg-white rounded-lg flex items-center justify-center">
+                                    <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
+                                </div>
+                                <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-white underline hover:text-gray-300">링크로 열기</a>
+                            </div>
+                            
+                            <!-- 블로그 링크 (우측) -->
+                            <div id="blog-link-container" class="hidden flex-1 flex flex-col justify-center space-y-2">
+                                <p class="text-sm text-gray-400">📝 블로그 숙제</p>
+                                <a id="blog-link" href="#" target="_blank" class="text-sm text-blue-400 hover:text-blue-300 underline flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                    블로그 보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 체크박스 영역 -->
+                    <div class="space-y-4">
+                        <h2 class="text-lg font-bold text-white">📝 과제 제출</h2>
+                        <p class="text-sm text-gray-400">수강 완료! 아래 과제를 완료해주세요.</p>
+                        
+                        <div class="space-y-3">
+                            <!-- 체크박스 1: 노트 필기 -->
+                            <label class="flex items-start space-x-3 cursor-pointer group">
+                                <input type="checkbox" id="assignment-note" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                <div>
+                                    <span class="text-white text-sm group-hover:text-gray-300">노트 필기 완료 + 사진 전송</span>
+                                </div>
+                            </label>
+                            
+                            <!-- 체크박스 2: 블로그 숙제 -->
+                            <label class="flex items-start space-x-3 cursor-pointer group">
+                                <input type="checkbox" id="assignment-blog" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                <div>
+                                    <span class="text-white text-sm group-hover:text-gray-300">블로그 숙제 완료 + 사진 전송</span>
+                                </div>
+                            </label>
+                            
+                            <!-- 체크박스 3: 카톡 숙제 -->
+                            <label class="flex items-start space-x-3 cursor-pointer group">
+                                <input type="checkbox" id="assignment-kakao" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                <div>
+                                    <span class="text-white text-sm group-hover:text-gray-300">카톡으로 그 외 숙제 완료</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- 인증 제출 버튼 -->
+                        <button onclick="submitAssignment()" class="btn-hover-scale w-full px-6 py-3 bg-white text-black font-semibold rounded-xl mt-4">
+                            인증 제출하기
+                        </button>
+
+                        <!-- 저장 상태 표시 -->
+                        <div id="assignment-status" class="text-sm text-gray-400 text-center"></div>
+                    </div>
+                    
+                    <!-- 📷 이미지 과제 제출 섹션 (새로 추가) -->
+                    <div class="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-white">📷 과제 이미지 제출</h3>
+                            <span id="image-submission-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미제출</span>
+                        </div>
+                        <p class="text-sm text-gray-400">과제 사진을 업로드하면 선생님이 채점해드립니다.</p>
+                        
+                        <!-- 📱 핸드폰으로 제출하기 QR 코드 -->
+                        <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-sm text-white font-semibold mb-1">📱 핸드폰으로 제출하기</p>
+                                    <p class="text-xs text-gray-400">QR 스캔하면 핸드폰에서 이 페이지가 열립니다</p>
+                                </div>
+                                <div id="lesson-qr-code" class="w-20 h-20 bg-white rounded p-1 shadow-lg"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 이미지 미리보기 -->
+                        <div id="image-preview-container" class="hidden">
+                            <img id="image-preview" src="" alt="과제 미리보기" class="w-full max-h-48 object-contain rounded-lg border border-white/20">
+                            <button onclick="clearImagePreview()" class="mt-2 text-xs text-red-400 hover:text-red-300">이미지 삭제</button>
+                        </div>
+                        
+                        <!-- 이미지 선택 버튼 -->
+                        <div id="image-upload-area" class="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-white/40 transition-colors cursor-pointer" onclick="document.getElementById('image-file-input').click()">
+                            <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="text-sm text-gray-400">클릭하여 이미지 선택</p>
+                            <p class="text-xs text-gray-500 mt-1">JPG, PNG (최대 5MB)</p>
+                        </div>
+                        
+                        <!-- 제출 버튼 -->
+                        <button id="submit-image-btn" onclick="submitImageAssignment()" disabled
+                                class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors">
+                            이미지 과제 제출
+                        </button>
+                        
+                        <!-- 제출 내역 표시 -->
+                        <div id="submission-history" class="hidden space-y-2">
+                            <p class="text-sm text-gray-400 font-semibold">📋 제출 내역</p>
+                            <div id="submission-list" class="space-y-2 text-sm"></div>
+                        </div>
+                        
+                        <!-- 채점 결과 표시 -->
+                        <div id="grading-result" class="hidden p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-green-400 font-semibold">✅ 채점 완료</span>
+                                <span id="grading-score" class="text-white font-bold"></span>
+                            </div>
+                            <p id="grading-comment" class="text-sm text-gray-300"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- 🎉 코스 완료 & 리포트 섹션 (모든 레슨 완료 시에만 표시) -->
+                    <div id="course-complete-section" class="hidden mt-6 p-6 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 space-y-4">
+                        <div class="text-center space-y-2">
+                            <span class="text-4xl">🎉</span>
+                            <h3 class="text-xl font-bold text-white">축하합니다!</h3>
+                            <p class="text-gray-300">모든 강의를 완료했습니다!</p>
+                        </div>
+                        
+                        <div id="report-status" class="text-center text-sm text-gray-400"></div>
+                        
+                        <button id="view-report-btn" onclick="viewAndSendReport()" 
+                                class="btn-hover-scale w-full px-6 py-4 bg-white text-black font-bold rounded-xl flex items-center justify-center space-x-2">
+                            <span>📊</span>
+                            <span>리포트 확인하기</span>
+                        </button>
+                        
+                        <p class="text-xs text-gray-500 text-center">
+                            버튼 클릭 시 학습 리포트가 생성되고<br>학부모님께 자동으로 발송됩니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단: 커리큘럼 + 댓글 -->
+        <div class="flex flex-col lg:flex-row border-t border-white border-opacity-10">
+            <!-- 커리큘럼 섹션 (좌측) -->
+            <div class="w-full lg:w-80 bg-white bg-opacity-5 border-r border-white border-opacity-10">
+                <div class="p-4 border-b border-white border-opacity-10">
+                    <h3 class="font-semibold text-white">커리큘럼</h3>
+                </div>
+                <div id="lesson-list" class="divide-y divide-white divide-opacity-10 max-h-96 overflow-y-auto">
+                    <!-- 레슨 목록이 동적으로 로드됩니다 -->
+                </div>
+            </div>
+
+            <!-- 댓글 섹션 (우측) -->
+            <div class="flex-1 p-6">
+                <!-- Comments Section -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-bold text-white">댓글</h2>
+                    
+                    <!-- Comment Form -->
+                    <div id="comment-form-container" class="space-y-4">
+                        <textarea id="comment-input" 
+                                  class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white resize-none"
+                                  rows="3"
+                                  placeholder="댓글을 입력하세요..."></textarea>
+                        <div class="flex justify-end">
+                            <button onclick="submitComment()" 
+                                    class="btn-hover-scale px-6 py-2 bg-white text-black font-semibold rounded-lg text-sm">
+                                댓글 작성
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Comments List -->
+                    <div id="comments-list" class="space-y-4">
+                        <!-- 댓글이 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QnA 플로팅 액션 버튼 -->
+    <div class="fab-container" id="fab-container">
+        <!-- 메뉴 아이템들 -->
+        <div class="fab-menu">
+            <a href="#" onclick="openFaqModal(); return false;" class="fab-menu-item">
+                <span class="fab-label">자주 묻는 질문</span>
+                <span class="fab-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </span>
+            </a>
+            <a href="#" onclick="openQnaModal(); return false;" class="fab-menu-item">
+                <span class="fab-label">질문하기</span>
+                <span class="fab-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </span>
+            </a>
+            <a href="#" onclick="openQnaList(); return false;" class="fab-menu-item">
+                <span class="fab-label">Q&A 목록</span>
+                <span class="fab-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                </span>
+            </a>
+        </div>
+        
+        <!-- 메인 FAB 버튼 -->
+        <button class="fab-button" onclick="toggleFab()">
+            <span class="icon-open">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </span>
+            <span class="icon-close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </span>
+        </button>
+    </div>
+
+    <!-- FAQ 모달 -->
+    <div id="faq-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-white border-opacity-10">
+                <h3 class="text-xl font-bold text-white">❓ 자주 묻는 질문</h3>
+                <button onclick="closeFaqModal()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- FAQ 1 -->
+                <div class="faq-item rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full p-4 text-left flex justify-between items-center">
+                        <span class="font-semibold text-white">📦 교재 배송 언제?</span>
+                        <svg class="faq-arrow w-5 h-5 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4">
+                        <p class="text-gray-400 text-sm">수강 신청 후 영업일 기준 2~3일 이내에 발송됩니다. 배송 조회는 마이페이지에서 확인하실 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="faq-item rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full p-4 text-left flex justify-between items-center">
+                        <span class="font-semibold text-white">📅 수강 기간 언제 끝나나요?</span>
+                        <svg class="faq-arrow w-5 h-5 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4">
+                        <p class="text-gray-400 text-sm">수강 기간은 결제일로부터 90일입니다. 마이페이지에서 남은 수강 기간을 확인하실 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="faq-item rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full p-4 text-left flex justify-between items-center">
+                        <span class="font-semibold text-white">✍️ 영작 어떻게 제출해요?</span>
+                        <svg class="faq-arrow w-5 h-5 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4">
+                        <p class="text-gray-400 text-sm">수강 완료 후 우측에 나타나는 과제 제출 영역의 QR 코드를 통해 카카오톡 오픈채팅방으로 제출해주세요.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="faq-item rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full p-4 text-left flex justify-between items-center">
+                        <span class="font-semibold text-white">📤 숙제 어디로 보내나요?</span>
+                        <svg class="faq-arrow w-5 h-5 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4">
+                        <p class="text-gray-400 text-sm">각 레슨의 과제 제출 영역에 있는 QR 코드를 스캔하거나 링크를 클릭하여 카카오톡 오픈채팅방으로 보내주세요.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="faq-item rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                    <button onclick="toggleFaq(this)" class="w-full p-4 text-left flex justify-between items-center">
+                        <span class="font-semibold text-white">🔐 비밀번호 어떻게 바꾸나요?</span>
+                        <svg class="faq-arrow w-5 h-5 text-gray-400 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="faq-answer hidden px-4 pb-4">
+                        <p class="text-gray-400 text-sm">로그인 페이지에서 '비밀번호를 잊으셨나요?'를 클릭하시면 가입하신 이메일로 비밀번호 재설정 링크가 발송됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QnA 질문 모달 -->
+    <div id="qna-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-lg p-6 space-y-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">💬 질문하기</h3>
+                <button onclick="closeQnaModal()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">제목</label>
+                    <input type="text" id="qna-title" 
+                           class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                           placeholder="질문 제목을 입력하세요">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">내용</label>
+                    <textarea id="qna-content" rows="5"
+                              class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white resize-none"
+                              placeholder="궁금한 점을 자세히 작성해주세요"></textarea>
+                </div>
+                <p class="text-xs text-gray-500">* 현재 수강 중인 레슨에 대한 질문으로 등록됩니다.</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="closeQnaModal()" 
+                        class="flex-1 px-6 py-3 bg-transparent text-white font-semibold rounded-xl border border-white border-opacity-20 hover:bg-white hover:bg-opacity-10">
+                    취소
+                </button>
+                <button onclick="submitQna()" 
+                        class="flex-1 px-6 py-3 bg-white text-black font-semibold rounded-xl btn-hover-scale">
+                    질문 등록
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QnA 목록 모달 -->
+    <div id="qna-list-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-white border-opacity-10">
+                <h3 class="text-xl font-bold text-white">📋 Q&A 목록</h3>
+                <button onclick="closeQnaListModal()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="qna-list-content" class="flex-1 overflow-y-auto p-6">
+                <!-- Q&A 목록이 여기에 로드됩니다 -->
+                <p class="text-gray-500 text-center py-8">Q&A 목록을 불러오는 중...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 과제 제출 완료 모달 -->
+    <div id="assignment-complete-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md shadow-2xl">
+            <div class="p-8 text-center space-y-6">
+                <!-- 아이콘 -->
+                <div class="flex justify-center">
+                    <div class="w-20 h-20 rounded-full bg-white bg-opacity-10 flex items-center justify-center">
+                        <span id="modal-icon" class="text-5xl">🎉</span>
+                    </div>
+                </div>
+                
+                <!-- 메시지 -->
+                <div class="space-y-3">
+                    <h3 id="modal-title" class="text-2xl font-bold text-white">
+                        모든 과제를 완료했습니다!
+                    </h3>
+                    <p id="modal-message" class="text-gray-300">
+                        수고하셨습니다.
+                    </p>
+                </div>
+                
+                <!-- 확인 버튼 -->
+                <button onclick="closeAssignmentModal()" 
+                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl shadow-lg hover:bg-gray-100">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/assignments.js"></script>
+    <script src="js/grading.js"></script>
+    <script src="js/vimeo-custom-player.js"></script>
+    <script>
+        let currentLesson = null;
+        let currentCourse = null;
+        let courseLessons = [];
+        let currentUser = null;
+        let userProfile = null; // 사용자 프로필 (학부모 정보 포함)
+        let videoElement = null;
+        let vimeoPlayer = null;
+        let progressInterval = null;
+        let videoDuration = 0;
+        let maxWatchedTime = 0; // 최대 시청 시간 추적
+        let currentProgress = 0; // 현재 진도율
+
+        function getLessonId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        let customVimeoPlayer = null;
+
+        function initVideoPlayer(lesson) {
+            const container = document.getElementById('video-container');
+            
+            if (lesson.video_url) {
+                if (lesson.video_url.includes('youtube.com') || lesson.video_url.includes('youtu.be')) {
+                    const videoId = extractYouTubeId(lesson.video_url);
+                    container.innerHTML = `<div class="aspect-video"><iframe id="youtube-player" class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+                    // YouTube API 로드
+                    loadYouTubeAPI();
+                } else if (lesson.video_url.includes('vimeo.com')) {
+                    const vimeoId = extractVimeoId(lesson.video_url);
+                    // 커스텀 Vimeo 플레이어 사용
+                    container.innerHTML = '<div id="custom-vimeo-container"></div>';
+                    initCustomVimeoPlayer(vimeoId);
+                } else {
+                    container.innerHTML = `<div class="aspect-video"><video id="video-player" class="w-full h-full" controls><source src="${lesson.video_url}" type="video/mp4">브라우저가 비디오를 지원하지 않습니다.</video></div>`;
+                    videoElement = document.getElementById('video-player');
+                    setupNativeVideoTracking();
+                }
+            } else {
+                container.innerHTML = `<div class="aspect-video flex items-center justify-center text-gray-500 bg-black"><div class="text-center"><p class="text-xl mb-2">영상이 준비 중입니다</p><p class="text-sm">곧 업로드될 예정입니다.</p></div></div>`;
+            }
+        }
+
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function extractVimeoId(url) {
+            const regExp = /vimeo\.com\/(?:video\/)?(\d+)/;
+            const match = url.match(regExp);
+            return match ? match[1] : url.split('/').pop();
+        }
+
+        // 커스텀 Vimeo Player 초기화 및 진도 추적
+        function initCustomVimeoPlayer(vimeoId) {
+            customVimeoPlayer = new CustomVimeoPlayer('custom-vimeo-container', vimeoId);
+            
+            // 플레이어가 준비될 때까지 대기
+            const checkPlayer = setInterval(() => {
+                if (customVimeoPlayer.player && customVimeoPlayer.isReady) {
+                    clearInterval(checkPlayer);
+                    vimeoPlayer = customVimeoPlayer.player;
+                    setupVimeoProgressTracking();
+                }
+            }, 100);
+        }
+
+        // Vimeo 진도 추적 설정
+        function setupVimeoProgressTracking() {
+            if (!vimeoPlayer) return;
+
+            // 영상 길이 자동 감지
+            vimeoPlayer.getDuration().then(function(duration) {
+                videoDuration = duration;
+                console.log('Vimeo 영상 길이:', duration, '초');
+            });
+
+            // 마지막 시청 위치 불러오기
+            loadLastPositionForVimeo();
+
+            // 재생 시간 업데이트 이벤트
+            vimeoPlayer.on('timeupdate', function(data) {
+                const currentTime = data.seconds;
+                const duration = data.duration;
+                videoDuration = duration;
+
+                // 최대 시청 시간 업데이트
+                if (currentTime > maxWatchedTime) {
+                    maxWatchedTime = currentTime;
+                }
+
+                // UI 업데이트 (시청 진도 바)
+                const progress = (maxWatchedTime / duration) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+                
+                // 90% 이상이면 과제 섹션 표시
+                checkAndShowAssignment(Math.round(progress));
+            });
+
+            // 일시정지 시 진도 저장
+            vimeoPlayer.on('pause', function() {
+                saveVimeoProgress();
+            });
+
+            // 영상 종료 시 진도 저장
+            vimeoPlayer.on('ended', function() {
+                maxWatchedTime = videoDuration;
+                saveVimeoProgress();
+            });
+
+            // 주기적으로 진도 저장 (30초마다)
+            progressInterval = setInterval(() => {
+                saveVimeoProgress();
+            }, 30000);
+
+            // 페이지 나갈 때 진도 저장
+            window.addEventListener('beforeunload', saveVimeoProgress);
+        }
+
+        // 기존 initVimeoPlayer (하위 호환성)
+        function initVimeoPlayer() {
+            // 커스텀 플레이어로 대체됨
+        }
+
+        async function loadLastPositionForVimeo() {
+            const player = customVimeoPlayer?.player || vimeoPlayer;
+            if (!currentUser || !currentLesson || !player) return;
+            
+            const result = await getLessonProgress(currentUser.id, currentLesson.id);
+            if (result.success && result.data) {
+                if (result.data.last_position) {
+                    player.setCurrentTime(result.data.last_position);
+                }
+                if (result.data.watched_seconds) {
+                    maxWatchedTime = result.data.watched_seconds;
+                }
+                // 저장된 진도율 표시
+                if (result.data.progress_percent) {
+                    document.getElementById('progress-bar').style.width = `${result.data.progress_percent}%`;
+                    document.getElementById('progress-text').textContent = `${result.data.progress_percent}%`;
+                    // 90% 이상이면 과제 섹션 표시
+                    checkAndShowAssignment(result.data.progress_percent);
+                }
+            }
+        }
+
+        async function saveVimeoProgress() {
+            const player = customVimeoPlayer?.player || vimeoPlayer;
+            if (!player || !currentUser || !currentLesson) return;
+
+            try {
+                const currentTime = await player.getCurrentTime();
+                
+                const progressData = {
+                    watchedSeconds: maxWatchedTime,
+                    totalSeconds: videoDuration,
+                    lastPosition: currentTime
+                };
+
+                await updateLessonProgress(currentUser.id, currentLesson.id, progressData);
+            } catch (error) {
+                console.error('Vimeo 진도 저장 오류:', error);
+            }
+        }
+
+        // Native Video 추적 설정
+        function setupNativeVideoTracking() {
+            if (!videoElement) return;
+            
+            videoElement.addEventListener('loadedmetadata', function() {
+                videoDuration = videoElement.duration;
+                console.log('영상 길이:', videoDuration, '초');
+            });
+
+            if (currentUser) {
+                loadLastPositionForNative();
+            }
+
+            videoElement.addEventListener('timeupdate', function() {
+                const currentTime = videoElement.currentTime;
+                
+                if (currentTime > maxWatchedTime) {
+                    maxWatchedTime = currentTime;
+                }
+
+                const progress = (maxWatchedTime / videoElement.duration) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+                
+                // 90% 이상이면 과제 섹션 표시
+                checkAndShowAssignment(Math.round(progress));
+            });
+
+            videoElement.addEventListener('pause', saveNativeProgress);
+            videoElement.addEventListener('ended', function() {
+                maxWatchedTime = videoElement.duration;
+                saveNativeProgress();
+            });
+
+            progressInterval = setInterval(() => {
+                if (!videoElement.paused) saveNativeProgress();
+            }, 30000);
+
+            window.addEventListener('beforeunload', saveNativeProgress);
+        }
+
+        async function loadLastPositionForNative() {
+            if (!currentUser || !currentLesson || !videoElement) return;
+            
+            const result = await getLessonProgress(currentUser.id, currentLesson.id);
+            if (result.success && result.data) {
+                if (result.data.last_position) {
+                    videoElement.currentTime = result.data.last_position;
+                }
+                if (result.data.watched_seconds) {
+                    maxWatchedTime = result.data.watched_seconds;
+                }
+                if (result.data.progress_percent) {
+                    document.getElementById('progress-bar').style.width = `${result.data.progress_percent}%`;
+                    document.getElementById('progress-text').textContent = `${result.data.progress_percent}%`;
+                    // 90% 이상이면 과제 섹션 표시
+                    checkAndShowAssignment(result.data.progress_percent);
+                }
+            }
+        }
+
+        async function saveNativeProgress() {
+            if (!videoElement || !currentUser || !currentLesson) return;
+
+            const progressData = {
+                watchedSeconds: maxWatchedTime,
+                totalSeconds: videoElement.duration,
+                lastPosition: videoElement.currentTime
+            };
+
+            await updateLessonProgress(currentUser.id, currentLesson.id, progressData);
+        }
+
+        // YouTube API (기본 지원)
+        function loadYouTubeAPI() {
+            // YouTube iframe API는 복잡하므로 기본 iframe 유지
+            // 필요시 추후 구현
+        }
+
+        function renderLessonList(lessons, currentLessonId) {
+            const container = document.getElementById('lesson-list');
+            container.innerHTML = lessons.map((lesson, index) => {
+                const isActive = lesson.id === currentLessonId;
+                const durationText = lesson.duration ? `${lesson.duration}분` : '';
+                return `<a href="lesson.html?id=${lesson.id}" class="lesson-nav-item block p-4 ${isActive ? 'active' : ''}"><div class="flex items-center space-x-3"><span class="text-sm font-bold text-gray-600">${String(index + 1).padStart(2, '0')}</span><div class="flex-1 min-w-0"><h4 class="font-semibold text-sm text-white truncate">${lesson.title}</h4><p class="text-xs text-gray-500">${durationText}</p></div></div></a>`;
+            }).join('');
+        }
+
+        function setupNavigation(lessons, currentLessonId) {
+            const currentIndex = lessons.findIndex(l => l.id === currentLessonId);
+            const prevBtn = document.getElementById('prev-lesson');
+            const nextBtn = document.getElementById('next-lesson');
+            if (currentIndex > 0) { 
+                prevBtn.disabled = false; 
+                prevBtn.onclick = () => { 
+                    saveCurrentProgress();
+                    window.location.href = `lesson.html?id=${lessons[currentIndex - 1].id}`; 
+                }; 
+            }
+            if (currentIndex < lessons.length - 1) { 
+                nextBtn.disabled = false; 
+                nextBtn.onclick = () => { 
+                    saveCurrentProgress();
+                    window.location.href = `lesson.html?id=${lessons[currentIndex + 1].id}`; 
+                }; 
+            }
+        }
+
+        function saveCurrentProgress() {
+            if (customVimeoPlayer || vimeoPlayer) {
+                saveVimeoProgress();
+            } else if (videoElement) {
+                saveNativeProgress();
+            }
+        }
+
+        function renderComment(comment) {
+            const date = new Date(comment.created_at).toLocaleDateString('ko-KR');
+            return `<div class="p-4 rounded-xl bg-white bg-opacity-5 space-y-2"><div class="flex items-center justify-between"><span class="font-semibold text-white">${comment.user_name || '익명'}</span><span class="text-xs text-gray-500">${date}</span></div><p class="text-gray-300">${comment.content}</p></div>`;
+        }
+
+        async function loadComments() {
+            if (!currentLesson) return;
+            try {
+                const { data, error } = await window.supabase.from('comments').select('*, profiles(name)').eq('lesson_id', currentLesson.id).eq('is_approved', true).order('created_at', { ascending: false });
+                if (error) throw error;
+                const container = document.getElementById('comments-list');
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(comment => { comment.user_name = comment.profiles?.name || '익명'; return renderComment(comment); }).join('');
+                } else {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">아직 댓글이 없습니다.</p>';
+                }
+            } catch (error) { console.error('Load comments error:', error); }
+        }
+
+        async function submitComment() {
+            if (!currentUser) { if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) { window.location.href = 'auth.html'; } return; }
+            const input = document.getElementById('comment-input');
+            const content = input.value.trim();
+            if (!content) return;
+            try {
+                const { error } = await window.supabase.from('comments').insert({ lesson_id: currentLesson.id, user_id: currentUser.id, content: content, is_approved: true });
+                if (error) throw error;
+                input.value = '';
+                await loadComments();
+            } catch (error) { console.error('Submit comment error:', error); }
+        }
+
+        async function loadLesson() {
+            const lessonId = getLessonId();
+            if (!lessonId) { window.location.href = 'courses.html'; return; }
+            currentUser = await getCurrentUser();
+            const lessonResult = await getLessonById(lessonId);
+            if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
+            currentLesson = lessonResult.data;
+            
+            if (!currentLesson.is_preview && currentUser) {
+                const accessResult = await hasAccessToCourse(currentUser.id, currentLesson.course.id);
+                if (!accessResult.hasAccess) { 
+                    if (confirm('이 강의를 구매해야 시청할 수 있습니다. 강의 페이지로 이동하시겠습니까?')) { 
+                        window.location.href = `course-detail.html?id=${currentLesson.course.id}`; 
+                    } else { 
+                        window.location.href = 'courses.html'; 
+                    } 
+                    return; 
+                }
+            } else if (!currentLesson.is_preview && !currentUser) { 
+                if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) { 
+                    window.location.href = 'auth.html'; 
+                } else { 
+                    window.location.href = 'courses.html'; 
+                } 
+                return; 
+            }
+            
+            const courseResult = await getCourseById(currentLesson.course.id);
+            if (courseResult.success) { currentCourse = courseResult.data; courseLessons = currentCourse.lessons || []; }
+            
+            document.getElementById('course-title').textContent = currentCourse?.title || '';
+            document.getElementById('lesson-title').textContent = currentLesson.title;
+            document.getElementById('lesson-description').textContent = currentLesson.description || '';
+            document.getElementById('back-to-course').href = `course-detail.html?id=${currentLesson.course.id}`;
+            document.title = `${currentLesson.title} — ALLROUND`;
+            
+            // 블로그 링크 표시
+            if (currentLesson.blog_link) {
+                document.getElementById('blog-link').href = currentLesson.blog_link;
+                document.getElementById('blog-link-container').classList.remove('hidden');
+            } else {
+                document.getElementById('blog-link-container').classList.add('hidden');
+            }
+            
+            initVideoPlayer(currentLesson);
+            renderLessonList(courseLessons, currentLesson.id);
+            setupNavigation(courseLessons, currentLesson.id);
+            await loadComments();
+            
+            if (!currentUser) { 
+                document.getElementById('comment-form-container').innerHTML = `<p class="text-gray-500 text-center py-4">댓글을 작성하려면 <a href="auth.html" class="text-white underline">로그인</a>해주세요.</p>`; 
+            }
+        }
+
+        window.addEventListener('beforeunload', () => { 
+            if (progressInterval) clearInterval(progressInterval); 
+            saveCurrentProgress();
+        });
+
+        // 과제 섹션 표시/숨김 (90% 이상일 때만 표시)
+        function checkAndShowAssignment(progress) {
+            currentProgress = progress;
+            const assignmentSection = document.getElementById('assignment-section');
+            
+            if (progress >= 90 && currentUser) {
+                assignmentSection.classList.remove('hidden');
+                loadAssignmentStatus();
+            } else {
+                assignmentSection.classList.add('hidden');
+            }
+        }
+
+        // 과제 상태 불러오기
+        async function loadAssignmentStatus() {
+            if (!currentUser || !currentLesson) return;
+
+            const result = await getAssignment(currentUser.id, currentLesson.id);
+            if (result.success && result.data) {
+                document.getElementById('assignment-note').checked = result.data.note_completed || false;
+                document.getElementById('assignment-blog').checked = result.data.blog_completed || false;
+                document.getElementById('assignment-kakao').checked = result.data.kakao_completed || false;
+                updateAssignmentStatusDisplay(result.data);
+            }
+            
+            // 학부모 정보 로드
+            await loadUserProfile();
+            
+            // 코스 전체 완료 여부 체크
+            await checkCourseCompletion();
+        }
+        
+        // 사용자 프로필 로드 (학부모 정보 포함)
+        async function loadUserProfile() {
+            if (!currentUser) return;
+            
+            try {
+                const { data: profile, error } = await window.supabase
+                    .from('profiles')
+                    .select('name, parent_name, parent_phone, parent_notification_enabled')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) throw error;
+                userProfile = profile;
+            } catch (error) {
+                console.error('Load user profile error:', error);
+            }
+        }
+        
+        // 코스 전체 완료 여부 체크
+        async function checkCourseCompletion() {
+            if (!currentUser || !currentCourse || !courseLessons.length) return;
+            
+            const completeSection = document.getElementById('course-complete-section');
+            
+            try {
+                // 모든 레슨의 진도 가져오기
+                const lessonIds = courseLessons.map(l => l.id);
+                const { data: progressData, error } = await window.supabase
+                    .from('lesson_progress')
+                    .select('lesson_id, is_completed')
+                    .eq('user_id', currentUser.id)
+                    .in('lesson_id', lessonIds);
+                
+                if (error) throw error;
+                
+                // 완료된 레슨 수 계산
+                const completedLessons = progressData ? progressData.filter(p => p.is_completed).length : 0;
+                const totalLessons = courseLessons.length;
+                
+                // 모든 레슨이 완료되었는지 확인
+                if (completedLessons >= totalLessons) {
+                    completeSection.classList.remove('hidden');
+                    
+                    // 이미 리포트가 발송되었는지 확인
+                    const { data: existingReport } = await window.supabase
+                        .from('course_reports')
+                        .select('id, public_id')
+                        .eq('user_id', currentUser.id)
+                        .eq('course_id', currentCourse.id)
+                        .maybeSingle();
+                    
+                    if (existingReport) {
+                        // 이미 리포트가 있으면 버튼 텍스트 변경
+                        const btn = document.getElementById('view-report-btn');
+                        btn.innerHTML = '<span>📊</span><span>리포트 다시 보기</span>';
+                        document.getElementById('report-status').textContent = '✅ 리포트가 이미 발송되었습니다.';
+                    }
+                } else {
+                    completeSection.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Check course completion error:', error);
+            }
+        }
+
+        // 인증 제출하기 버튼 클릭 시 (과제만 저장, 알림은 리포트에서)
+        async function submitAssignment() {
+            if (!currentUser || !currentLesson) {
+                showAssignmentModal('⚠️', '로그인이 필요합니다.', '');
+                return;
+            }
+
+            const noteCheckbox = document.getElementById('assignment-note');
+            const blogCheckbox = document.getElementById('assignment-blog');
+            const kakaoCheckbox = document.getElementById('assignment-kakao');
+
+            // 최소 1개 이상 체크 확인
+            if (!noteCheckbox.checked && !blogCheckbox.checked && !kakaoCheckbox.checked) {
+                showAssignmentModal('📝', '최소 1개 이상의 과제를 완료해주세요.', '');
+                return;
+            }
+
+            const assignmentData = {
+                note_completed: noteCheckbox.checked,
+                blog_completed: blogCheckbox.checked,
+                kakao_completed: kakaoCheckbox.checked
+            };
+
+            const statusEl = document.getElementById('assignment-status');
+            statusEl.textContent = '제출 중...';
+            statusEl.className = 'text-sm text-yellow-400 text-center';
+
+            const result = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+            
+            if (result.success) {
+                updateAssignmentStatusDisplay(result.data);
+                
+                // 성공 메시지
+                const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
+                if (allCompleted) {
+                    showAssignmentModal('✅', '과제가 제출되었습니다!', '수고하셨습니다.');
+                } else {
+                    showAssignmentModal('✅', '과제가 제출되었습니다.', '');
+                }
+                
+                // 코스 완료 여부 다시 체크 (모든 레슨 완료 시 리포트 버튼 표시)
+                await checkCourseCompletion();
+            } else {
+                statusEl.textContent = '❌ 제출 실패. 다시 시도해주세요.';
+                statusEl.className = 'text-sm text-red-400 text-center';
+            }
+        }
+        
+        // 리포트 확인하기 버튼 클릭 시 (리포트 생성 + 알림 발송 + 페이지 이동)
+        async function viewAndSendReport() {
+            if (!currentUser || !currentCourse) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            
+            const btn = document.getElementById('view-report-btn');
+            const statusEl = document.getElementById('report-status');
+            
+            // 버튼 비활성화 및 로딩 상태 표시
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span><span>리포트 생성 중...</span>';
+            statusEl.textContent = '';
+            
+            try {
+                // 1. 리포트 생성
+                const reportResult = await generateCourseReport(currentUser.id, currentCourse.id);
+                
+                if (!reportResult.success) {
+                    throw new Error('리포트 생성 실패');
+                }
+                
+                const reportData = reportResult.data;
+                const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                const reportUrl = `${baseUrl}/report.html?pid=${reportData.public_id}`;
+                
+                // 2. 학부모 알림 발송 (처음 발송하는 경우에만)
+                if (userProfile && userProfile.parent_phone && userProfile.parent_notification_enabled) {
+                    btn.innerHTML = '<span>📤</span><span>학부모님께 발송 중...</span>';
+                    
+                    // 이미 알림을 발송했는지 확인 (parent_notifications 테이블)
+                    const { data: existingNotif } = await window.supabase
+                        .from('parent_notifications')
+                        .select('id')
+                        .eq('user_id', currentUser.id)
+                        .like('message', `%${currentCourse.title}%수료%`)
+                        .maybeSingle();
+                    
+                    if (!existingNotif) {
+                        // 알림 발송
+                        await sendCourseCompleteNotification(reportUrl);
+                        statusEl.textContent = '✅ 학부모님께 리포트가 발송되었습니다!';
+                    } else {
+                        statusEl.textContent = '✅ 리포트가 이미 발송되었습니다.';
+                    }
+                }
+                
+                // 3. 리포트 페이지로 이동
+                setTimeout(() => {
+                    window.location.href = reportUrl;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Report generation error:', error);
+                statusEl.textContent = '❌ 리포트 생성에 실패했습니다.';
+                btn.disabled = false;
+                btn.innerHTML = '<span>📊</span><span>리포트 확인하기</span>';
+            }
+        }
+        
+        // 코스 완료 알림 발송
+        async function sendCourseCompleteNotification(reportUrl) {
+            if (!currentUser || !currentCourse || !userProfile) {
+                return { success: false, error: 'Missing data' };
+            }
+            
+            try {
+                const studentName = userProfile?.name || '학생';
+                const courseTitle = currentCourse?.title || '과정';
+                
+                // SMS 메시지 생성
+                let message = `[올라운드영어] ${studentName} 학생이 "${courseTitle}" 과정을 수료했습니다! 🎉\n\n📊 학습 리포트 확인:\n${reportUrl}`;
+                
+                // 알림 로그 저장
+                const { data: logData, error: logError } = await window.supabase
+                    .from('parent_notifications')
+                    .insert({
+                        user_id: currentUser.id,
+                        lesson_id: currentLesson?.id || courseLessons[courseLessons.length - 1]?.id,
+                        parent_phone: userProfile.parent_phone,
+                        message: message,
+                        status: 'pending'
+                    })
+                    .select()
+                    .single();
+                
+                if (logError) throw logError;
+                
+                // 카카오 알림톡 발송 Edge Function 호출
+                const smsResult = await sendSmsViaEdgeFunction({
+                    phone: userProfile.parent_phone,
+                    reportUrl: reportUrl,
+                    notificationId: logData.id
+                });
+                
+                return { success: true, data: smsResult };
+            } catch (error) {
+                console.error('Send course complete notification error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // NHN 알림톡 발송 함수
+        async function sendSmsViaEdgeFunction(data) {
+            try {
+                // 템플릿 파라미터 추출
+                const studentName = userProfile?.name || '학생';
+                const courseTitle = currentCourse?.title || '과정';
+                
+                // 통계 데이터 가져오기 (리포트에서)
+                let progressPercent = '0';
+                let assignmentPercent = '0';
+                
+                if (currentCourse) {
+                    const reportResult = await generateCourseReport(currentUser.id, currentCourse.id);
+                    if (reportResult.success) {
+                        progressPercent = reportResult.data.total_progress.toString();
+                        assignmentPercent = reportResult.data.assignment_rate.toString();
+                    }
+                }
+                
+                // NHN 알림톡 발송 시도 (템플릿 사용)
+                const { data: result, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
+                    body: {
+                        phone: data.phone,
+                        templateCode: 'course_complete', // NHN에 등록한 템플릿 코드
+                        templateParams: {
+                            '학생명': studentName,
+                            '과정명': courseTitle,
+                            '진도율': progressPercent,
+                            '숙제완료율': assignmentPercent
+                        },
+                        notificationId: data.notificationId,
+                        fallbackMessage: `[올라운드영어] ${studentName}님, ${courseTitle} 과정을 완료하셨습니다! 진도율: ${progressPercent}%, 숙제완료율: ${assignmentPercent}%`
+                    }
+                });
+                
+                if (error) {
+                    console.warn('알림톡 발송 실패:', error);
+                    return { success: false, error: error.message };
+                }
+                
+                console.log('알림톡 발송 결과:', result);
+                return result || { success: false, error: '알 수 없는 오류' };
+            } catch (error) {
+                console.error('알림 발송 오류:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // 과제 제출 완료 모달 표시
+        function showAssignmentModal(icon, title, message) {
+            document.getElementById('modal-icon').textContent = icon;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('assignment-complete-modal').classList.remove('hidden');
+        }
+
+        // ========== 이미지 과제 제출 관련 함수 ==========
+        let selectedImageFile = null;
+
+        // 이미지 선택 처리
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 파일 크기 체크 (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('파일 크기는 5MB 이하여야 합니다.');
+                return;
+            }
+
+            // 이미지 타입 체크
+            if (!file.type.startsWith('image/')) {
+                alert('이미지 파일만 업로드 가능합니다.');
+                return;
+            }
+
+            selectedImageFile = file;
+
+            // 미리보기 표시
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview-container').classList.remove('hidden');
+                document.getElementById('image-upload-area').classList.add('hidden');
+                document.getElementById('submit-image-btn').disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 이미지 미리보기 삭제
+        function clearImagePreview() {
+            selectedImageFile = null;
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('image-upload-area').classList.remove('hidden');
+            document.getElementById('submit-image-btn').disabled = true;
+            document.getElementById('image-file-input').value = '';
+        }
+
+        // 이미지 과제 제출
+        async function submitImageAssignment() {
+            if (!currentUser) {
+                showAssignmentModal('⚠️', '로그인이 필요합니다.', '');
+                return;
+            }
+
+            if (!selectedImageFile) {
+                alert('이미지를 선택해주세요.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-image-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '업로드 중...';
+
+            try {
+                // grading.js의 함수 사용 (권장)
+                if (window.GradingUtils?.uploadSubmissionImage && window.GradingUtils?.submitAssignmentWithImage) {
+                    // 1. 이미지 업로드
+                    submitBtn.textContent = '이미지 업로드 중...';
+                    const uploadResult = await window.GradingUtils.uploadSubmissionImage(selectedImageFile);
+                    
+                    if (!uploadResult.success) {
+                        throw new Error(uploadResult.error || '이미지 업로드 실패');
+                    }
+
+                    // 2. 제출 정보 저장
+                    submitBtn.textContent = '제출 정보 저장 중...';
+                    const submissionResult = await window.GradingUtils.submitAssignmentWithImage({
+                        lessonId: currentLesson?.id || null,
+                        courseId: currentCourse?.id || null,
+                        title: currentLesson?.title ? `${currentLesson.title} 과제` : '과제 제출',
+                        imageUrl: uploadResult.url
+                    });
+
+                    if (!submissionResult.success) {
+                        throw new Error(submissionResult.error || '과제 제출 실패');
+                    }
+
+                    // 3. 성공 처리
+                    clearImagePreview();
+                    showAssignmentModal('✅', '과제가 제출되었습니다!', '선생님이 채점 후 알려드립니다.');
+                    
+                    // 제출 상태 업데이트
+                    updateSubmissionStatus();
+                    loadSubmissionHistory();
+
+                } else {
+                    // Fallback: grading.js가 로드되지 않은 경우 직접 처리
+                    // 1. Storage에 이미지 업로드
+                    const fileExt = selectedImageFile.name.split('.').pop();
+                    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+                    const { data: uploadData, error: uploadError } = await window.supabase.storage
+                        .from('submissions')
+                        .upload(fileName, selectedImageFile, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (uploadError) throw uploadError;
+
+                    // 2. 공개 URL 가져오기
+                    const { data: { publicUrl } } = window.supabase.storage
+                        .from('submissions')
+                        .getPublicUrl(fileName);
+
+                    // 3. student_submissions 테이블에 저장
+                    const { data, error } = await window.supabase
+                        .from('student_submissions')
+                        .insert({
+                            user_id: currentUser.id,
+                            lesson_id: currentLesson?.id || null,
+                            course_id: currentCourse?.id || null,
+                            title: currentLesson?.title ? `${currentLesson.title} 과제` : '과제 제출',
+                            image_url: publicUrl,
+                            status: 'submitted',
+                            submitted_at: new Date().toISOString()
+                        })
+                        .select()
+                        .single();
+
+                    if (error) throw error;
+
+                    // 4. 성공 처리
+                    clearImagePreview();
+                    showAssignmentModal('✅', '과제가 제출되었습니다!', '선생님이 채점 후 알려드립니다.');
+                    
+                    // 제출 상태 업데이트
+                    updateSubmissionStatus();
+                    loadSubmissionHistory();
+                }
+
+            } catch (error) {
+                console.error('Image submission error:', error);
+                showAssignmentModal('❌', '과제 제출 실패', error.message || '다시 시도해주세요.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '이미지 과제 제출';
+            }
+        }
+
+        // 제출 상태 업데이트
+        async function updateSubmissionStatus() {
+            if (!currentUser || !currentLesson) return;
+
+            try {
+                const { data: submissions } = await window.supabase
+                    .from('student_submissions')
+                    .select('*, teacher_feedback(*)')
+                    .eq('user_id', currentUser.id)
+                    .eq('lesson_id', currentLesson.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+
+                const statusEl = document.getElementById('image-submission-status');
+                const gradingResultEl = document.getElementById('grading-result');
+
+                if (submissions && submissions.length > 0) {
+                    const submission = submissions[0];
+                    const feedback = submission.teacher_feedback?.[0];
+
+                    // 상태 배지 업데이트
+                    const statusMap = {
+                        'pending': { text: '제출 대기', class: 'bg-yellow-500/20 text-yellow-400' },
+                        'submitted': { text: '채점 대기', class: 'bg-blue-500/20 text-blue-400' },
+                        'reviewing': { text: '검토 중', class: 'bg-purple-500/20 text-purple-400' },
+                        'graded': { text: '채점 완료', class: 'bg-green-500/20 text-green-400' },
+                        'returned': { text: '재제출 필요', class: 'bg-red-500/20 text-red-400' }
+                    };
+                    const status = statusMap[submission.status] || statusMap['pending'];
+                    statusEl.textContent = status.text;
+                    statusEl.className = `text-xs px-2 py-1 rounded-full ${status.class}`;
+
+                    // 채점 결과 표시
+                    if (feedback && submission.status === 'graded') {
+                        gradingResultEl.classList.remove('hidden');
+                        document.getElementById('grading-score').textContent = 
+                            feedback.score ? `${feedback.score}점` : (feedback.grade || '통과');
+                        document.getElementById('grading-comment').textContent = 
+                            feedback.comment || '잘 하셨습니다!';
+                    } else {
+                        gradingResultEl.classList.add('hidden');
+                    }
+                } else {
+                    statusEl.textContent = '미제출';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400';
+                    gradingResultEl.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Update submission status error:', error);
+            }
+        }
+
+        // 제출 내역 로드
+        async function loadSubmissionHistory() {
+            if (!currentUser) return;
+
+            try {
+                const { data: submissions } = await window.supabase
+                    .from('student_submissions')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                const historyEl = document.getElementById('submission-history');
+                const listEl = document.getElementById('submission-list');
+
+                if (submissions && submissions.length > 0) {
+                    historyEl.classList.remove('hidden');
+                    listEl.innerHTML = submissions.map(s => {
+                        const statusEmoji = {
+                            'pending': '⏳',
+                            'submitted': '📤',
+                            'reviewing': '👀',
+                            'graded': '✅',
+                            'returned': '🔄'
+                        };
+                        return `
+                            <div class="flex items-center justify-between p-2 rounded bg-white/5">
+                                <span class="text-gray-300">${s.title}</span>
+                                <span class="text-gray-400">${statusEmoji[s.status] || '📝'} ${new Date(s.created_at).toLocaleDateString('ko-KR')}</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    historyEl.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Load submission history error:', error);
+            }
+        }
+
+        // 페이지 로드 시 제출 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            // 기존 init 후에 제출 상태 로드
+            setTimeout(() => {
+                updateSubmissionStatus();
+                loadSubmissionHistory();
+            }, 1000);
+        });
+
+        // 과제 제출 완료 모달 닫기
+        function closeAssignmentModal() {
+            document.getElementById('assignment-complete-modal').classList.add('hidden');
+        }
+
+        // 과제 상태 표시 업데이트
+        function updateAssignmentStatusDisplay(data) {
+            const statusEl = document.getElementById('assignment-status');
+            const allCompleted = data.note_completed && data.blog_completed && data.kakao_completed;
+            const completedCount = [data.note_completed, data.blog_completed, data.kakao_completed].filter(Boolean).length;
+
+            if (allCompleted) {
+                statusEl.textContent = '✅ 모든 과제 완료!';
+                statusEl.className = 'text-sm text-green-400 text-center';
+            } else if (completedCount > 0) {
+                statusEl.textContent = `✓ ${completedCount}/3 완료`;
+                statusEl.className = 'text-sm text-gray-400 text-center';
+            } else {
+                statusEl.textContent = '';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadLesson);
+
+        // ========== QR 코드 생성 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 현재 페이지 URL로 QR 코드 생성 (과제 제출용 파라미터 추가)
+            setTimeout(() => {
+                const qrContainer = document.getElementById('lesson-qr-code');
+                if (qrContainer && window.QRCode) {
+                    // 현재 URL에 directSubmit=true 파라미터 추가
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('directSubmit', 'true');
+                    
+                    new QRCode(qrContainer, {
+                        text: url.toString(),
+                        width: 80,
+                        height: 80,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            }, 500);
+            
+            // URL에 directSubmit 파라미터가 있으면 과제 섹션 강제 표시
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('directSubmit') === 'true') {
+                setTimeout(() => {
+                    const assignmentSection = document.getElementById('assignment-section');
+                    if (assignmentSection) {
+                        assignmentSection.classList.remove('hidden');
+                        // 이미지 제출 섹션으로 스크롤
+                        const imageSection = document.querySelector('.bg-gradient-to-br.from-blue-500\\/10');
+                        if (imageSection) {
+                            imageSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }, 1000);
+            }
+        });
+
+        // ========== QnA 플로팅 버튼 관련 함수 ==========
+        
+        // FAQ 모달
+        function openFaqModal() {
+            document.getElementById('faq-modal').classList.remove('hidden');
+            document.getElementById('fab-container').classList.remove('open');
+        }
+
+        function closeFaqModal() {
+            document.getElementById('faq-modal').classList.add('hidden');
+        }
+
+        function toggleFaq(button) {
+            const answer = button.nextElementSibling;
+            const arrow = button.querySelector('.faq-arrow');
+            
+            answer.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+
+        function toggleFab() {
+            const container = document.getElementById('fab-container');
+            container.classList.toggle('open');
+        }
+
+        // FAB 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('fab-container');
+            if (!container.contains(e.target) && container.classList.contains('open')) {
+                container.classList.remove('open');
+            }
+        });
+
+        function openQnaModal() {
+            if (!currentUser) {
+                if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) {
+                    window.location.href = 'auth.html';
+                }
+                return;
+            }
+            document.getElementById('qna-modal').classList.remove('hidden');
+            document.getElementById('fab-container').classList.remove('open');
+        }
+
+        function closeQnaModal() {
+            document.getElementById('qna-modal').classList.add('hidden');
+            document.getElementById('qna-title').value = '';
+            document.getElementById('qna-content').value = '';
+        }
+
+        async function submitQna() {
+            const title = document.getElementById('qna-title').value.trim();
+            const content = document.getElementById('qna-content').value.trim();
+
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+
+            try {
+                const { error } = await window.supabase.from('qna').insert({
+                    user_id: currentUser.id,
+                    lesson_id: currentLesson?.id || null,
+                    course_id: currentCourse?.id || null,
+                    title: title,
+                    content: content,
+                    is_answered: false,
+                    created_at: new Date().toISOString()
+                });
+
+                if (error) throw error;
+
+                alert('질문이 등록되었습니다. 답변이 등록되면 알려드릴게요!');
+                closeQnaModal();
+            } catch (error) {
+                console.error('QnA 등록 오류:', error);
+                alert('질문 등록에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        function openQnaList() {
+            document.getElementById('qna-list-modal').classList.remove('hidden');
+            document.getElementById('fab-container').classList.remove('open');
+            loadQnaList();
+        }
+
+        function closeQnaListModal() {
+            document.getElementById('qna-list-modal').classList.add('hidden');
+        }
+
+        async function loadQnaList() {
+            const container = document.getElementById('qna-list-content');
+            container.innerHTML = '<p class="text-gray-500 text-center py-8">Q&A 목록을 불러오는 중...</p>';
+
+            try {
+                // 현재 강의 또는 레슨의 Q&A 불러오기
+                let query = window.supabase
+                    .from('qna')
+                    .select('*, profiles(name)')
+                    .order('created_at', { ascending: false });
+
+                if (currentCourse?.id) {
+                    query = query.eq('course_id', currentCourse.id);
+                }
+
+                const { data, error } = await query.limit(20);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-8">등록된 Q&A가 없습니다.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(qna => {
+                    const date = new Date(qna.created_at).toLocaleDateString('ko-KR');
+                    const userName = qna.profiles?.name || '익명';
+                    const statusBadge = qna.is_answered 
+                        ? '<span class="text-xs bg-green-500 bg-opacity-20 text-green-400 px-2 py-1 rounded">답변완료</span>'
+                        : '<span class="text-xs bg-yellow-500 bg-opacity-20 text-yellow-400 px-2 py-1 rounded">답변대기</span>';
+                    
+                    return `
+                        <div class="p-4 rounded-xl bg-white bg-opacity-5 space-y-3 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-white">${qna.title}</span>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-gray-400 text-sm line-clamp-2">${qna.content}</p>
+                            <div class="flex items-center justify-between text-xs text-gray-500">
+                                <span>${userName}</span>
+                                <span>${date}</span>
+                            </div>
+                            ${qna.answer ? `
+                                <div class="mt-3 p-3 rounded-lg bg-white bg-opacity-5 border-l-2 border-white border-opacity-30">
+                                    <p class="text-xs text-gray-400 mb-1">💬 답변</p>
+                                    <p class="text-gray-300 text-sm">${qna.answer}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Q&A 목록 로드 오류:', error);
+                container.innerHTML = '<p class="text-red-400 text-center py-8">Q&A 목록을 불러오는데 실패했습니다.</p>';
+            }
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeFaqModal();
+                closeQnaModal();
+                closeQnaListModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Our Services - The Spectrum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site-auth.js"></script>
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #111;
+            color: white;
+            overflow: hidden;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .scene-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #111;
+        }
+
+        /* 1. 배경 이미지 (흑백 처리) */
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) brightness(0.4) contrast(1.1);
+            transition: transform 0.8s ease, filter 0.5s ease;
+            z-index: 1;
+        }
+
+        /* 필름 노이즈 */
+        .film-grain {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            opacity: 0.15;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+        }
+
+        /* 2. 컬러 그라데이션 스팟 (Overlay) */
+        /* 사진 속 사물 위치에 맞춰서 그라데이션 원을 배치 */
+        .color-spot {
+            position: absolute;
+            inset: 0; /* 전체 화면 덮음 */
+            z-index: 10;
+            pointer-events: none; /* 클릭 통과 */
+            mix-blend-mode: overlay; /* 흑백 사진 위에 색상을 입힘 */
+            opacity: 0.8;
+            transition: clip-path 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+        }
+
+        /* 
+           좌표 설정 (사진: https://picsum.photos/id/201/1920/1080 기준)
+           - Secret (좌측 나무결): 20% 70%
+           - Academy (중앙 안경): 48% 52%
+           - Online (우측 배경): 80% 30%
+        */
+
+        .spot-secret {
+            background: radial-gradient(circle at 20% 70%, #FFBC96, #ff9a9e);
+            clip-path: circle(8% at 20% 70%); /* 기본 크기 */
+        }
+
+        .spot-academy {
+            background: radial-gradient(circle at 48% 52%, #89A6C6, #a18cd1);
+            clip-path: circle(8% at 48% 52%);
+        }
+
+        .spot-online {
+            background: radial-gradient(circle at 80% 30%, #FFE6C7, #84fab0);
+            clip-path: circle(10% at 80% 30%);
+        }
+
+
+        /* 3. 트리거 (실제 클릭 영역) */
+        /* 스팟 위치와 동일하게 잡아줌 */
+        .trigger {
+            position: absolute;
+            z-index: 20;
+            border-radius: 50%;
+            cursor: pointer;
+            /* background: rgba(255,0,0,0.2); 디버깅용 */
+        }
+        
+        /* 사진 속 사물 위치에 맞게 트리거 배치 */
+        .trigger-secret { top: 62%; left: 12%; width: 16%; height: 16%; }
+        .trigger-academy { top: 44%; left: 40%; width: 16%; height: 16%; }
+        .trigger-online { top: 20%; left: 70%; width: 20%; height: 20%; }
+
+
+        /* 4. 정보 카드 */
+        .info-card {
+            position: absolute;
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-left: 2px solid white;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+            width: 300px;
+        }
+
+        /* 정보 카드 위치 */
+        .info-secret { top: 55%; left: 25%; border-color: #FFBC96; }
+        .info-academy { top: 65%; left: 50%; transform: translate(-50%, 20px); border-color: #89A6C6; }
+        .info-online { top: 45%; right: 15%; border-color: #FFE6C7; }
+
+
+        /* --- 인터랙션 로직 --- */
+        
+        /* Secret 호버 */
+        .trigger-secret:hover ~ .spot-secret {
+            clip-path: circle(12% at 20% 70%); /* 커짐 */
+            opacity: 1; /* 더 선명하게 */
+        }
+        .trigger-secret:hover ~ .info-secret {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Academy 호버 */
+        .trigger-academy:hover ~ .spot-academy {
+            clip-path: circle(12% at 48% 52%);
+            opacity: 1;
+        }
+        .trigger-academy:hover ~ .info-academy {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        /* Online 호버 */
+        .trigger-online:hover ~ .spot-online {
+            clip-path: circle(15% at 80% 30%);
+            opacity: 1;
+        }
+        .trigger-online:hover ~ .info-online {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 하나라도 호버 시 배경 어둡게 */
+        .scene-container:has(.trigger:hover) .bg-image {
+            filter: grayscale(100%) brightness(0.2);
+            transform: scale(1.02);
+        }
+        
+        /* 호버 안된 다른 스팟 흐리게 */
+        .scene-container:has(.trigger:hover) .color-spot {
+            opacity: 0.2;
+        }
+        /* 호버 된 스팟은 다시 선명하게 (위의 규칙 덮어쓰기 위해 !important 사용 가능하나, 구체성으로 해결) */
+        .trigger-secret:hover ~ .spot-secret { opacity: 1; mix-blend-mode: hard-light; } /* 색상을 더 쨍하게 */
+        .trigger-academy:hover ~ .spot-academy { opacity: 1; mix-blend-mode: hard-light; }
+        .trigger-online:hover ~ .spot-online { opacity: 1; mix-blend-mode: hard-light; }
+
+
+        /* 텍스트 스타일 */
+        .service-label { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
+        .service-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1; }
+        .service-desc { font-size: 0.9rem; font-weight: 300; color: #ddd; line-height: 1.5; }
+
+        /* 사용자 사진 커스텀 가이드 (주석) */
+        /* 
+           사진을 바꾸려면 .bg-image의 src를 변경하세요.
+           사물 위치가 바뀌면 .spot-*, .trigger-* 의 top/left % 값을 조정하세요.
+        */
+        
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .bg-image { object-position: 60% center; }
+            
+            /* 모바일 위치 조정 예시 */
+            .spot-secret { background: radial-gradient(circle at 20% 70%, #FFBC96, #ff9a9e); clip-path: circle(12% at 20% 70%); }
+            .trigger-secret { top: 62%; left: 10%; width: 20%; height: 15%; }
+            .info-secret { top: 50%; left: 10%; width: 80%; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="scene-container">
+        
+        <!-- 타이틀 -->
+        <div class="absolute top-10 left-0 right-0 text-center z-50 pointer-events-none mix-blend-difference text-white">
+            <h2 class="text-xs font-light tracking-[0.5em] opacity-80 mb-2 uppercase">Our Services</h2>
+            <h1 class="text-4xl md:text-5xl font-serif">The Spectrum</h1>
+        </div>
+
+        <!-- 1. 배경 이미지 (사용자 사진으로 교체 가능) -->
+        <img src="https://picsum.photos/id/201/1920/1080" alt="Background" class="bg-image">
+        
+        <!-- 2. 필름 노이즈 -->
+        <div class="film-grain"></div>
+
+        <!-- 3. 트리거 (가장 앞에 위치) -->
+        <a href="/secret" class="trigger trigger-secret"></a>
+        <a href="/academy" class="trigger trigger-academy"></a>
+        <a href="/online" class="trigger trigger-online"></a>
+
+        <!-- 4. 컬러 스팟 (그라데이션 색상) -->
+        <!-- 원래 사진이 아니라, 그라데이션 레이어를 clip-path로 보여줌 -->
+        <div class="color-spot spot-secret"></div>
+        <div class="color-spot spot-academy"></div>
+        <div class="color-spot spot-online"></div>
+
+        <!-- 5. 정보 카드 -->
+        <div class="info-card info-secret">
+            <span class="service-label" style="color: #FFBC96;">For Celebrities</span>
+            <h3 class="service-title">Secret Class</h3>
+            <p class="service-desc">렌즈 너머에 숨겨진<br>당신만의 특별한 이야기</p>
+        </div>
+
+        <div class="info-card info-academy">
+            <span class="service-label" style="color: #89A6C6;">The Community</span>
+            <h3 class="service-title">Academy</h3>
+            <p class="service-desc">기록하고, 공유하며<br>함께 성장하는 배움의 장</p>
+        </div>
+
+        <div class="info-card info-online">
+            <span class="service-label" style="color: #FFE6C7;">Infinite Wave</span>
+            <h3 class="service-title">Online Class</h3>
+            <p class="service-desc">디지털 세상으로 확장되는<br>무한한 가능성</p>
+        </div>
+
+        <div class="absolute bottom-8 left-0 right-0 text-center z-40 text-white/40 text-[10px] tracking-[0.3em] animate-pulse pointer-events-none">
+            HOVER THE OBJECTS
+        </div>
+    </div>
+
+</body>
+</html>

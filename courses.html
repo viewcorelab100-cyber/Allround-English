@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Courses — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <style>
+        body {
+            font-family: "aileron", sans-serif;
+            background-color: #000000;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .course-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- 모바일: 햄버거 메뉴 -->
+                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                </button>
+                <div class="hidden md:block md:w-32"></div>
+                
+                <!-- 로고 -->
+                <a href="index.html" class="text-xl md:text-2xl font-bold text-white tracking-wider">ALLROUND</a>
+                
+                <!-- Auth 버튼 영역 -->
+                <div class="w-auto md:w-32 flex justify-end">
+                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4">
+                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm">Login</a>
+                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm hidden sm:inline">Sign Up</a>
+                    </div>
+                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm hidden sm:inline">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="board.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="h-36"></div>
+
+    <main class="main-content">
+
+    <!-- Hero Section -->
+    <section class="py-12 md:py-20 px-4 md:px-6">
+        <div class="max-w-5xl mx-auto text-center space-y-6 md:space-y-8">
+            <div>
+                <span class="text-xs md:text-sm font-semibold text-white">Online Courses</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight text-white">
+                Learn at Your Own Pace
+            </h2>
+            <p class="text-base md:text-xl lg:text-2xl text-gray-400 max-w-3xl mx-auto px-4">
+                전문가가 설계한 커리큘럼으로 체계적인 영어 학습을 시작하세요.
+            </p>
+        </div>
+    </section>
+
+    <!-- Courses Grid -->
+    <section class="py-12 md:py-20 px-4 md:px-6">
+        <div class="max-w-6xl mx-auto">
+            <div id="courses-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                <!-- 강의 카드들이 동적으로 로드됩니다 -->
+                <div class="text-center text-gray-500 col-span-full py-12 md:py-20">
+                    강의를 불러오는 중...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="text-2xl font-bold text-white tracking-wider">ALLROUND</div>
+                <div class="text-sm text-gray-400">
+                    © 2024 ALLROUND. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    </main>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script>
+        // 강의 카드 렌더링
+        function renderCourseCard(course) {
+            // 시간 표시 포맷팅
+            const totalMinutes = course.totalDuration || 0;
+            let durationText = '';
+            if (totalMinutes >= 60) {
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                durationText = mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
+            } else {
+                durationText = `${totalMinutes}분`;
+            }
+            
+            return `
+                <div class="course-card rounded-2xl overflow-hidden bg-white bg-opacity-5">
+                    <div class="h-48 bg-cover bg-center" style="background-image: url('${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}'); background-color: #111;">
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-gray-400">${course.category || 'General'}</span>
+                            <span class="text-xs text-gray-500">${durationText}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">${course.title}</h3>
+                        <p class="text-sm text-gray-400 line-clamp-2">${course.description || ''}</p>
+                        <div class="flex items-center justify-between pt-4">
+                            <span class="text-2xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</span>
+                            <a href="course-detail.html?id=${course.id}" 
+                               class="btn-hover-scale px-6 py-2 bg-white text-black font-semibold rounded-lg text-sm">
+                                자세히 보기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 강의 목록 로드
+        async function loadCourses() {
+            const grid = document.getElementById('courses-grid');
+            
+            const result = await getAllCourses();
+            
+            if (result.success && result.data.length > 0) {
+                grid.innerHTML = result.data.map(renderCourseCard).join('');
+            } else {
+                grid.innerHTML = `
+                    <div class="text-center text-gray-500 col-span-full py-20">
+                        <p class="text-xl mb-4">아직 등록된 강의가 없습니다.</p>
+                        <p class="text-sm">곧 새로운 강의가 업로드될 예정입니다.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 페이지 로드 시 강의 목록 불러오기
+        document.addEventListener('DOMContentLoaded', loadCourses);
+    </script>
+    
+    <!-- 모바일 메뉴 토글 스크립트 -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

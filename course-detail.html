@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>강의 상세 — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="js/site-auth.js"></script>
+    <!-- 토스페이먼츠 SDK -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <style>
+        body {
+            font-family: "aileron", sans-serif;
+            background-color: #000000;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .lesson-item {
+            transition: background-color 0.2s ease;
+        }
+
+        .lesson-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 -->
+            <div class="flex justify-between items-center mb-4">
+                <!-- 모바일: 햄버거 메뉴 -->
+                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                </button>
+                <div class="hidden md:block md:w-32"></div>
+                
+                <!-- 로고 -->
+                <a href="index.html" class="text-xl md:text-2xl font-bold text-white tracking-wider">ALLROUND</a>
+                
+                <!-- Auth 버튼 영역 -->
+                <div class="w-auto md:w-32 flex justify-end">
+                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4">
+                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm">Login</a>
+                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm hidden sm:inline">Sign Up</a>
+                    </div>
+                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm hidden sm:inline">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="board.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="h-36"></div>
+
+    <main class="main-content">
+
+    <!-- Course Detail -->
+    <section id="course-content" class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center text-gray-500 py-20">
+                강의 정보를 불러오는 중...
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="text-2xl font-bold text-white tracking-wider">ALLROUND</div>
+                <div class="text-sm text-gray-400">
+                    © 2024 ALLROUND. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    </main>
+
+    <!-- 커스텀 모달 -->
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md p-8 space-y-6">
+            <h3 id="modal-title" class="text-2xl font-bold text-white text-center"></h3>
+            <p id="modal-message" class="text-gray-300 text-center"></p>
+            <div id="modal-buttons" class="flex gap-4">
+                <button onclick="closeModal()" class="btn-hover-scale flex-1 px-8 py-4 bg-white text-black font-semibold rounded-xl">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스페이먼츠 결제 모달 -->
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-lg my-8">
+            <!-- 헤더 -->
+            <div class="p-6 border-b border-white border-opacity-10">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white">결제하기</h3>
+                    <button onclick="closePaymentModal()" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 주문 정보 -->
+            <div class="p-6 border-b border-white border-opacity-10">
+                <div class="space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">상품명</span>
+                        <span id="payment-product-name" class="text-white"></span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold">
+                        <span class="text-white">결제 금액</span>
+                        <span id="payment-amount" class="text-white"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 결제 수단 선택 영역 -->
+            <div class="p-6">
+                <div id="payment-method" class="rounded-xl overflow-hidden bg-white min-h-[200px]"></div>
+            </div>
+            
+            <!-- 약관 동의 영역 -->
+            <div class="px-6 pb-6">
+                <div id="agreement" class="rounded-xl overflow-hidden bg-white"></div>
+            </div>
+            
+            <!-- 결제 버튼 -->
+            <div class="p-6 border-t border-white border-opacity-10">
+                <button id="payment-button" onclick="requestTossPayment()" disabled
+                    class="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-colors disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
+                    결제하기
+                </button>
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    결제 진행 시 토스페이먼츠의 이용약관에 동의하게 됩니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/progress.js"></script>
+    <script>
+        function showModal(title, message, callback) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            if (callback) window.modalCallback = callback;
+        }
+
+        function closeModal(confirmed = false) {
+            document.getElementById('custom-modal').classList.add('hidden');
+            if (confirmed && window.modalCallback) { window.modalCallback(); window.modalCallback = null; }
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-buttons').innerHTML = `
+                <button onclick="closeModal(false)" class="btn-hover-scale flex-1 px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white">취소</button>
+                <button onclick="closeModal(true)" class="btn-hover-scale flex-1 px-8 py-4 bg-white text-black font-semibold rounded-xl">확인</button>
+            `;
+            window.modalCallback = onConfirm;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    
+        let currentCourse = null;
+        let hasAccess = false;
+
+        function getCourseId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function renderLessons(lessons, hasAccess) {
+            if (!lessons || lessons.length === 0) return '<p class="text-gray-500 text-center py-8">아직 등록된 레슨이 없습니다.</p>';
+            return lessons.map((lesson, index) => {
+                const isLocked = !hasAccess;
+                return `
+                    <div class="lesson-item flex items-center justify-between p-4 rounded-xl ${isLocked ? 'opacity-50' : ''}">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl font-bold text-gray-600">${String(index + 1).padStart(2, '0')}</span>
+                            <div><h4 class="font-semibold text-white">${lesson.title}</h4><p class="text-sm text-gray-500">${lesson.duration || 0}분</p></div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            ${isLocked ? '<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>' : `<a href="lesson.html?id=${lesson.id}" class="btn-hover-scale px-4 py-2 bg-white text-black font-semibold rounded-lg text-sm">수강하기</a>`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCourseDetail(course, hasAccess, progress) {
+            // 총 시간 포맷팅
+            const totalMinutes = course.totalDuration || 0;
+            let totalDurationText = '';
+            if (totalMinutes >= 60) {
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                totalDurationText = mins > 0 ? `${hours}시간 ${mins}분` : `${hours}시간`;
+            } else {
+                totalDurationText = `${totalMinutes}분`;
+            }
+            
+            const contentDiv = document.getElementById('course-content');
+            contentDiv.innerHTML = `
+                <div class="max-w-5xl mx-auto space-y-12">
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <div class="rounded-2xl overflow-hidden h-80 bg-cover bg-center" style="background-image: url('${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}'); background-color: #111;"></div>
+                        <div class="space-y-6">
+                            <div><span class="text-sm font-semibold text-gray-400">${course.category || 'General'}</span></div>
+                            <h1 class="text-4xl md:text-5xl font-bold text-white">${course.title}</h1>
+                            <p class="text-lg text-gray-400">${course.description || ''}</p>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500"><span>${course.lessons?.length || 0}개 레슨</span><span>${totalDurationText}</span></div>
+                            ${hasAccess ? `
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm"><span class="text-gray-400">수강 진도</span><span class="text-white">${progress?.progress || 0}%</span></div>
+                                    <div class="w-full h-2 bg-white bg-opacity-10 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width: ${progress?.progress || 0}%"></div></div>
+                                    <p class="text-xs text-gray-500">${progress?.completedLessons || 0}/${progress?.totalLessons || 0} 레슨 완료</p>
+                                </div>
+                            ` : `
+                                <div class="space-y-4">
+                                    <div class="text-3xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</div>
+                                    <button onclick="handlePurchase()" class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">수강 신청하기</button>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                    <div class="space-y-6"><h2 class="text-2xl font-bold text-white">커리큘럼</h2><div class="space-y-2">${renderLessons(course.lessons, hasAccess)}</div></div>
+                    ${course.long_description ? `<div class="space-y-6"><h2 class="text-2xl font-bold text-white">강의 소개</h2><div class="prose prose-invert max-w-none text-gray-400">${course.long_description}</div></div>` : ''}
+                </div>
+            `;
+            document.title = `${course.title} — ALLROUND`;
+        }
+
+        async function handlePurchase() {
+            const user = await getCurrentUser();
+            if (!user) { 
+                showModal('로그인 필요', '로그인이 필요한 서비스입니다.', () => { 
+                    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href); 
+                }); 
+                return; 
+            }
+            // 토스페이먼츠 결제 페이지로 이동 (주문 생성은 payment.js에서 처리)
+            window.location.href = `payment.html?courseId=${currentCourse.id}`;
+        }
+
+        async function loadCourseDetail() {
+            const courseId = getCourseId();
+            if (!courseId) { window.location.href = 'courses.html'; return; }
+            const courseResult = await getCourseById(courseId);
+            if (!courseResult.success) { document.getElementById('course-content').innerHTML = `<div class="text-center text-gray-500 py-20"><p class="text-xl mb-4">강의를 찾을 수 없습니다.</p><a href="courses.html" class="text-white underline">강의 목록으로 돌아가기</a></div>`; return; }
+            currentCourse = courseResult.data;
+            const user = await getCurrentUser();
+            let progress = null;
+            if (user) {
+                const accessResult = await hasAccessToCourse(user.id, courseId);
+                hasAccess = accessResult.hasAccess;
+                if (hasAccess) { const progressResult = await getCourseProgress(user.id, courseId); progress = progressResult.data; }
+            }
+            renderCourseDetail(currentCourse, hasAccess, progress);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCourseDetail);
+    </script>
+    
+    <!-- 모바일 메뉴 토글 스크립트 -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

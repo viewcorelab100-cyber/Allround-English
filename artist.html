@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Allround — Artist Line</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site-auth.js"></script>
+    <style>
+        /* 메인 컨텐츠 */
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        /* ========== 기본 스타일 ========== */
+        body {
+            font-family: "aileron", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000;
+        }
+
+        * {
+            letter-spacing: 0.02em;
+        }
+
+        h1, h2, h3 {
+            letter-spacing: 0.03em;
+        }
+
+        /* 상단바 제외한 본문 영문 폰트 */
+        #mainContent {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        /* 상단바는 aileron 유지 */
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+
+        /* 이미지 흑백 필터 */
+        .img-bw {
+            filter: grayscale(100%);
+            transition: filter 0.8s ease;
+        }
+
+        .img-bw:hover,
+        .img-bw.color-active {
+            filter: grayscale(0%);
+        }
+
+        /* 스크롤 애니메이션 */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 패럴랙스 이미지 */
+        .parallax-img {
+            will-change: transform;
+        }
+
+        /* 네비게이션 링크 호버 */
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        /* 헤더 숨김/표시 애니메이션 */
+        .header-hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        
+        .header-visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    
+    <!-- ========== MAIN CONTENT ========== -->
+    <div id="mainContent" class="main-content visible">
+
+        <!-- 상단 네비게이션 바 -->
+        <header class="fixed top-0 left-0 right-0 z-50 bg-black transition-all duration-300 header-hidden" id="main-header">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+                <!-- 로고 라인 -->
+                <div class="flex justify-between items-center mb-4">
+                    <!-- 모바일: 햄버거 메뉴 -->
+                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    </button>
+                    <div class="hidden md:block md:w-32"></div>
+                    
+                    <!-- 로고 -->
+                    <a href="index.html" class="text-xl md:text-2xl font-bold text-white tracking-wider">ALLROUND</a>
+                    
+                    <!-- Auth 버튼 영역 -->
+                    <div class="w-auto md:w-32 flex justify-end">
+                        <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4">
+                            <a href="auth.html" class="nav-link text-white text-xs md:text-sm">Login</a>
+                            <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm hidden sm:inline">Sign Up</a>
+                        </div>
+                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm hidden sm:inline">Logout</button>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- 구분선 -->
+                <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+                
+                <!-- 데스크톱 네비게이션 -->
+                <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                    <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                    <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                    <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                    <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                    <a href="courses.html" class="nav-link text-white">강의</a>
+                    <a href="board.html" class="nav-link text-white">게시판</a>
+                </nav>
+            </div>
+            
+            <!-- 모바일 메뉴 (토글) -->
+            <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+                <nav class="px-4 py-6 space-y-4">
+                    <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                    <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                    <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                    <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                    <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                    <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Hero Section - Corner Layout Style -->
+        <section class="relative min-h-screen bg-black overflow-hidden" id="hero-section">
+            <!-- 왼쪽 상단: SILENCE -->
+            <div class="absolute top-16 left-8 md:top-20 md:left-16 lg:top-24 lg:left-20">
+                <p class="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">SILENCE</p>
+            </div>
+            
+            <!-- 중앙: speaks (이탤릭) -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <p class="text-base md:text-lg lg:text-xl italic text-gray-500 tracking-[0.25em]">speaks</p>
+            </div>
+            
+            <!-- 중앙 대각선 선 -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-45 w-px h-32 md:h-40 lg:h-48 bg-white/20"></div>
+            
+            <!-- 오른쪽 하단: TRUST -->
+            <div class="absolute bottom-16 right-8 md:bottom-20 md:right-16 lg:bottom-24 lg:right-20">
+                <p class="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">TRUST</p>
+            </div>
+        </section>
+
+        <!-- Image Section with Text Overlay -->
+        <section class="relative img-section">
+            <div class="relative">
+                <!-- 이미지 -->
+                <img src="m.png" alt="Artist" class="w-full h-auto object-cover img-bw">
+                
+                <!-- 텍스트 오버레이 -->
+                <div class="absolute inset-0 flex items-end">
+                    <div class="max-w-7xl mx-auto w-full px-6 pb-16 md:pb-24">
+                        <div class="max-w-md scroll-reveal">
+                            <p class="text-sm text-gray-400 mb-4">01</p>
+                            <h2 class="text-3xl md:text-4xl leading-tight mb-6 text-white font-semibold">
+                                Confidential<br>by Design
+                            </h2>
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                우리는 신뢰를 위해 레퍼런스를 거래하지 않습니다.<br>
+                                아티스트와 직접 소통하며, 모든 참여는 '홍보보다 기밀'을 우선합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full Width Image + Text Overlay -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1920&q=80" 
+                 alt="Stage" class="absolute inset-0 w-full h-full object-cover img-bw opacity-50">
+            
+            <div class="relative z-10 text-center scroll-reveal">
+                <h2 class="text-[10vw] md:text-[8vw] lg:text-[6vw] leading-[0.95] text-white font-bold">
+                    CRITICAL<br>MOMENTS
+                </h2>
+                <p class="mt-8 text-lg text-gray-300">Real Practice for Real Pressure</p>
+            </div>
+        </section>
+
+        <!-- Image Grid Section 2 - 불규칙 그리드 -->
+        <section class="py-20 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- 왼쪽 상단 작은 이미지 -->
+                    <div class="col-span-6 md:col-span-4 scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&q=80" 
+                             alt="Mic" class="w-full h-64 object-cover img-bw">
+                        <p class="mt-4 text-sm text-gray-500">Live Interview</p>
+                    </div>
+                    
+                    <!-- 오른쪽 큰 이미지 -->
+                    <div class="col-span-6 md:col-span-8 scroll-reveal" style="transition-delay: 0.1s;">
+                        <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?w=1200&q=80" 
+                             alt="Award" class="w-full h-96 object-cover img-bw">
+                        <p class="mt-4 text-sm text-gray-500">Award Ceremony Speech</p>
+                    </div>
+                    
+                    <!-- 하단 왼쪽 큰 이미지 -->
+                    <div class="col-span-12 md:col-span-7 scroll-reveal" style="transition-delay: 0.2s;">
+                        <img src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1200&q=80" 
+                             alt="Press" class="w-full h-80 object-cover img-bw">
+                        <p class="mt-4 text-sm text-gray-500">World Tour Press Conference</p>
+                    </div>
+                    
+                    <!-- 하단 오른쪽 작은 이미지 -->
+                    <div class="col-span-12 md:col-span-5 scroll-reveal" style="transition-delay: 0.3s;">
+                        <img src="https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=600&q=80" 
+                             alt="Documentary" class="w-full h-80 object-cover img-bw">
+                        <p class="mt-4 text-sm text-gray-500">Long-term Documentary</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Principles Section -->
+        <section class="py-32 px-6">
+            <div class="max-w-5xl mx-auto">
+                <div class="grid grid-cols-12 gap-8 items-center">
+                    <!-- 이미지 -->
+                    <div class="col-span-12 md:col-span-5 scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1571266028243-d220e7a45d59?w=800&q=80" 
+                             alt="Artist Portrait" class="w-full h-[60vh] object-cover img-bw">
+                    </div>
+                    
+                    <!-- 텍스트 -->
+                    <div class="col-span-12 md:col-span-7 scroll-reveal" style="transition-delay: 0.2s;">
+                        <p class="text-sm text-gray-500 mb-6">02</p>
+                        <h2 class="text-4xl md:text-5xl leading-tight mb-10 font-semibold">
+                            Principles<br>That Never Shift
+                        </h2>
+                        
+                        <div class="space-y-4 text-gray-400">
+                            <p>• Confidentiality above all</p>
+                            <p>• Context-specific, never formulaic</p>
+                            <p>• Precision under time pressure</p>
+                            <p>• Integrity in protecting image</p>
+                            <p>• Consistency across platforms</p>
+                        </div>
+                        
+                        <p class="mt-10 text-sm text-gray-500 leading-relaxed">
+                            원칙은 변하지 않습니다.<br>
+                            맥락에 맞게, 압박 속에서도 정밀하게, 이미지를 진정성 있게 보호합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full Width Typography -->
+        <section class="py-32 px-6 text-center">
+            <h2 class="text-[8vw] md:text-[6vw] lg:text-[5vw] leading-[0.95] scroll-reveal font-semibold">
+                From Silence<br>to Trust
+            </h2>
+            <p class="mt-12 text-gray-500 max-w-xl mx-auto scroll-reveal" style="transition-delay: 0.2s;">
+                신뢰는 누구와 일했는지를 보여주는 것으로 쌓이지 않습니다.<br>
+                함께하는 이들을 지켜내는 것으로 쌓입니다.
+            </p>
+        </section>
+
+        <!-- Final Image + CTA -->
+        <section class="relative h-screen flex items-center justify-center overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=1920&q=80" 
+                 alt="Concert Crowd" class="absolute inset-0 w-full h-full object-cover img-bw opacity-30">
+            
+            <div class="relative z-10 text-center scroll-reveal">
+                <h2 class="text-[14vw] md:text-[10vw] lg:text-[8vw] leading-[0.85] text-white font-bold">
+                    PROTECTED.<br>ALWAYS.
+                </h2>
+                
+                <div class="mt-16 flex flex-wrap gap-4 justify-center">
+                    <a href="mailto:contact@allround.com" 
+                       class="px-8 py-4 bg-white text-black font-semibold hover:bg-gray-200 transition rounded-xl">
+                        Contact
+                    </a>
+                    <a href="#" 
+                       class="px-8 py-4 border-2 border-white text-white font-semibold hover:bg-white hover:text-black transition rounded-xl">
+                        비공개 문의
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-16 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+                <div class="max-w-5xl mx-auto text-center space-y-6">
+                    <div class="text-sm text-gray-500 space-y-3">
+                        <p>본 서비스는 아티스트를 위한 기밀 유지 기반 영어 커뮤니케이션 트레이닝입니다.</p>
+                        <p>모든 프로그램은 스케줄과 이벤트 특성에 맞춰 맞춤형으로 진행됩니다.</p>
+                    </div>
+                    
+                    <div class="pt-8">
+                        <p class="text-2xl font-bold text-white tracking-wider">ALLROUND</p>
+                    </div>
+                    
+                    <div class="text-xs text-gray-600 pt-4">
+                        <p>&copy; 2025 Allround. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div><!-- End of main-content -->
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // 스크롤 애니메이션
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 스크롤 시 이미지 컬러 활성화
+        const imgObserverOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const imgObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('color-active');
+                } else {
+                    entry.target.classList.remove('color-active');
+                }
+            });
+        }, imgObserverOptions);
+
+        document.querySelectorAll('.img-bw').forEach(img => {
+            imgObserver.observe(img);
+        });
+
+        // 스크롤 시 헤더 표시
+        const header = document.getElementById('main-header');
+        const heroSection = document.getElementById('hero-section');
+        
+        window.addEventListener('scroll', () => {
+            const heroHeight = heroSection.offsetHeight;
+            const scrollPosition = window.scrollY;
+            
+            if (scrollPosition > heroHeight - 100) {
+                header.classList.remove('header-hidden');
+                header.classList.add('header-visible');
+            } else {
+                header.classList.remove('header-visible');
+                header.classList.add('header-hidden');
+            }
+        });
+        
+        // 모바일 메뉴 토글
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
