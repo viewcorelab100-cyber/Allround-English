@@ -32,6 +32,11 @@
             display: none !important;
         }
         
+        /* 기존 퀴즈 버튼 섹션 숨기기 (카드로 대체) */
+        #quiz-button-section {
+            display: none !important;
+        }
+        
         /* 상단바는 aileron 유지 */
         header, header * {
             font-family: "aileron", sans-serif;
@@ -283,11 +288,11 @@
                                 <span id="image-submission-status" class="text-xs text-white">미제출</span>
                             </div>
                             
-                            <!-- 카드 5: 코스 완료 & 리포트 (모든 레슨 완료 시에만 표시) -->
-                            <div id="course-complete-card" class="hidden aspect-square p-4 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:from-yellow-500/30 hover:to-orange-500/30 transition-colors" onclick="openReportModal()">
-                                <span class="text-3xl">🎉</span>
-                                <p class="text-xs text-gray-400">수료 완료!</p>
-                                <p class="text-xs text-white">리포트 보기</p>
+                            <!-- 카드 5: 퀴즈 -->
+                            <div id="quiz-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openQuizModal()">
+                                <span class="text-3xl">📝</span>
+                                <p class="text-xs text-gray-600">퀴즈</p>
+                                <p class="text-xs font-semibold">풀어보기</p>
                             </div>
                         </div>
                         
@@ -1139,7 +1144,7 @@
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
             const assignmentSection = document.getElementById('assignment-section');
-            const quizButtonSection = document.getElementById('quiz-button-section');
+            const quizCard = document.getElementById('quiz-card');
             
             if (progress >= 90 && currentUser) {
                 assignmentSection.classList.remove('hidden');
@@ -1147,11 +1152,11 @@
                 
                 // 퀴즈도 90% 이상일 때 표시
                 if (quizzes.length > 0) {
-                    quizButtonSection.classList.remove('hidden');
+                    quizCard.classList.remove('hidden');
                 }
             } else {
                 assignmentSection.classList.add('hidden');
-                quizButtonSection.classList.add('hidden');
+                quizCard.classList.add('hidden');
             }
         }
 
@@ -1948,7 +1953,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    document.getElementById('quiz-button-section').classList.add('hidden');
+                    document.getElementById('quiz-card').classList.add('hidden');
                     return;
                 }
 
@@ -1956,8 +1961,8 @@
                 userAnswers = {};
                 renderQuizzes();
                 
-                // 퀴즈 버튼 섹션 표시
-                document.getElementById('quiz-button-section').classList.remove('hidden');
+                // 퀴즈 카드 표시
+                document.getElementById('quiz-card').classList.remove('hidden');
 
             } catch (error) {
                 console.error('퀴즈 로드 오류:', error);
