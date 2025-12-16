@@ -1,7 +1,8 @@
 # ============================================
 # 🔐 보안 및 환경 변수 (절대 커밋 금지!)
 # ============================================
-js/supabase-config.js
+# ⚠️ 테스트 배포용: supabase-config.js 포함 (프로덕션에서는 제외!)
+# js/supabase-config.js
 .env
 .env.local
 .env.production
