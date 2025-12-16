@@ -238,54 +238,20 @@
                         </button>
                     </div>
 
-                    <!-- Quiz Section (90% 이상 수강 시 표시) -->
-                    <div id="quiz-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
-                        <div class="space-y-6">
-                            <div class="flex items-center justify-between">
-                                <h2 class="text-2xl font-bold text-white">📝 퀴즈</h2>
-                                <div id="quiz-score" class="hidden text-sm px-4 py-2 rounded-lg bg-white bg-opacity-10">
-                                    <span class="text-white">점수: </span>
-                                    <span id="quiz-score-text" class="text-green-400 font-bold"></span>
-                                </div>
-                            </div>
-                            
-                            <p class="text-gray-400">강의 내용을 얼마나 이해하셨는지 확인해보세요!</p>
-                            
-                            <!-- Quiz Container -->
-                            <div id="quiz-container" class="space-y-6">
-                                <!-- 퀴즈 로딩 중 -->
-                                <div class="text-center py-8 text-gray-500">
-                                    퀴즈를 불러오는 중...
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div id="quiz-submit-container" class="hidden flex justify-center pt-4">
-                                <button onclick="submitQuiz()" class="px-8 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition">
-                                    제출하기
-                                </button>
-                            </div>
-
-                            <!-- Result Container -->
-                            <div id="quiz-result-container" class="hidden p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
-                                <div class="text-center">
-                                    <p class="text-3xl font-bold text-white mb-2" id="final-score"></p>
-                                    <p class="text-gray-400" id="result-message"></p>
-                                </div>
-                                <button onclick="retryQuiz()" class="w-full py-3 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
-                                    다시 풀기
-                                </button>
-                            </div>
-                        </div>
+                    <!-- Quiz Button (90% 이상 수강 시 표시) -->
+                    <div id="quiz-button-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
+                        <button onclick="openQuizModal()" class="w-full px-8 py-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold rounded-xl hover:from-purple-600 hover:to-blue-600 transition flex items-center justify-center space-x-3">
+                            <span class="text-2xl">📝</span>
+                            <span>퀴즈 풀기</span>
+                        </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Assignment Section (우측) - 90% 이상 수강 시 표시 -->
-            <div id="assignment-section" class="hidden w-full lg:w-80 bg-white bg-opacity-5 border-l border-white border-opacity-10 p-6">
-                <div class="space-y-6">
-                    <!-- QR 코드 및 블로그 링크 영역 (상단) -->
-                    <div class="p-4 rounded-xl bg-white bg-opacity-5 space-y-4">
+                    <!-- Assignment Section - 90% 이상 수강 시 표시 (영상 하단으로 이동) -->
+                    <div id="assignment-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
+                        <h2 class="text-2xl font-bold text-white mb-6">📝 과제 제출</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- QR 코드 및 블로그 링크 카드 -->
+                            <div class="p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
                         <div class="flex gap-4 items-start">
                             <!-- QR 코드 (좌측) -->
                             <div class="flex flex-col items-center space-y-2">
@@ -311,56 +277,56 @@
                         </div>
                     </div>
 
-                    <!-- 체크박스 영역 -->
-                    <div class="space-y-4">
-                        <h2 class="text-lg font-bold text-white">📝 과제 제출</h2>
-                        <p class="text-sm text-gray-400">수강 완료! 아래 과제를 완료해주세요.</p>
+                            <!-- 체크박스 카드 -->
+                            <div class="p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
+                                <h3 class="text-lg font-bold text-white">✅ 과제 체크리스트</h3>
+                                <p class="text-sm text-gray-400">수강 완료! 아래 과제를 완료해주세요.</p>
                         
-                        <div class="space-y-3">
-                            <!-- 체크박스 1: 노트 필기 -->
-                            <label class="flex items-start space-x-3 cursor-pointer group">
-                                <input type="checkbox" id="assignment-note" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <div>
-                                    <span class="text-white text-sm group-hover:text-gray-300">노트 필기 완료 + 사진 전송</span>
+                                <div class="space-y-3">
+                                    <!-- 체크박스 1: 노트 필기 -->
+                                    <label class="flex items-start space-x-3 cursor-pointer group">
+                                        <input type="checkbox" id="assignment-note" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                        <div>
+                                            <span class="text-white text-sm group-hover:text-gray-300">노트 필기 완료 + 사진 전송</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- 체크박스 2: 블로그 숙제 -->
+                                    <label class="flex items-start space-x-3 cursor-pointer group">
+                                        <input type="checkbox" id="assignment-blog" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                        <div>
+                                            <span class="text-white text-sm group-hover:text-gray-300">블로그 숙제 완료 + 사진 전송</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- 체크박스 3: 카톡 숙제 -->
+                                    <label class="flex items-start space-x-3 cursor-pointer group">
+                                        <input type="checkbox" id="assignment-kakao" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                                        <div>
+                                            <span class="text-white text-sm group-hover:text-gray-300">카톡으로 그 외 숙제 완료</span>
+                                        </div>
+                                    </label>
                                 </div>
-                            </label>
-                            
-                            <!-- 체크박스 2: 블로그 숙제 -->
-                            <label class="flex items-start space-x-3 cursor-pointer group">
-                                <input type="checkbox" id="assignment-blog" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <div>
-                                    <span class="text-white text-sm group-hover:text-gray-300">블로그 숙제 완료 + 사진 전송</span>
-                                </div>
-                            </label>
-                            
-                            <!-- 체크박스 3: 카톡 숙제 -->
-                            <label class="flex items-start space-x-3 cursor-pointer group">
-                                <input type="checkbox" id="assignment-kakao" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <div>
-                                    <span class="text-white text-sm group-hover:text-gray-300">카톡으로 그 외 숙제 완료</span>
-                                </div>
-                            </label>
-                        </div>
 
-                        <!-- 인증 제출 버튼 -->
-                        <button onclick="submitAssignment()" class="btn-hover-scale w-full px-6 py-3 bg-white text-black font-semibold rounded-xl mt-4">
-                            인증 제출하기
-                        </button>
+                                <!-- 인증 제출 버튼 -->
+                                <button onclick="submitAssignment()" class="btn-hover-scale w-full px-6 py-3 bg-white text-black font-semibold rounded-xl mt-4">
+                                    인증 제출하기
+                                </button>
 
-                        <!-- 저장 상태 표시 -->
-                        <div id="assignment-status" class="text-sm text-gray-400 text-center"></div>
-                    </div>
+                                <!-- 저장 상태 표시 -->
+                                <div id="assignment-status" class="text-sm text-gray-400 text-center"></div>
+                            </div>
                     
-                    <!-- 📷 이미지 과제 제출 섹션 (새로 추가) -->
-                    <div class="p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-white">📷 과제 이미지 제출</h3>
-                            <span id="image-submission-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미제출</span>
-                        </div>
-                        <p class="text-sm text-gray-400">과제 사진을 업로드하면 선생님이 채점해드립니다.</p>
-                        
-                        <!-- 📱 핸드폰으로 제출하기 QR 코드 -->
-                        <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                            <!-- 📷 이미지 과제 제출 카드 -->
+                            <div class="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 space-y-4 lg:col-span-2">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-bold text-white">📷 과제 이미지 제출</h3>
+                                    <span id="image-submission-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미제출</span>
+                                </div>
+                                <p class="text-sm text-gray-400">과제 사진을 업로드하면 선생님이 채점해드립니다.</p>
+                                
+                                <!-- 📱 핸드폰으로 제출하기 QR 코드 -->
+                                <div class="bg-white/5 rounded-lg p-3 border border-white/10">
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">
                                     <p class="text-sm text-white font-semibold mb-1">📱 핸드폰으로 제출하기</p>
@@ -392,35 +358,37 @@
                             이미지 과제 제출
                         </button>
                         
-                        <!-- 채점 결과 표시 -->
-                        <div id="grading-result" class="hidden p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-green-400 font-semibold">✅ 채점 완료</span>
-                                <span id="grading-score" class="text-white font-bold"></span>
+                                <!-- 채점 결과 표시 -->
+                                <div id="grading-result" class="hidden p-4 rounded-lg bg-green-500/10 border border-green-500/30 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-green-400 font-semibold">✅ 채점 완료</span>
+                                        <span id="grading-score" class="text-white font-bold"></span>
+                                    </div>
+                                    <p id="grading-comment" class="text-sm text-gray-300"></p>
+                                </div>
                             </div>
-                            <p id="grading-comment" class="text-sm text-gray-300"></p>
-                        </div>
-                    </div>
-                    
-                    <!-- 🎉 코스 완료 & 리포트 섹션 (모든 레슨 완료 시에만 표시) -->
-                    <div id="course-complete-section" class="hidden mt-6 p-6 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 space-y-4">
-                        <div class="text-center space-y-2">
-                            <span class="text-4xl">🎉</span>
-                            <h3 class="text-xl font-bold text-white">축하합니다!</h3>
-                            <p class="text-gray-300">모든 강의를 완료했습니다!</p>
                         </div>
                         
-                        <div id="report-status" class="text-center text-sm text-gray-400"></div>
-                        
-                        <button id="view-report-btn" onclick="viewAndSendReport()" 
-                                class="btn-hover-scale w-full px-6 py-4 bg-white text-black font-bold rounded-xl flex items-center justify-center space-x-2">
-                            <span>📊</span>
-                            <span>리포트 확인하기</span>
-                        </button>
-                        
-                        <p class="text-xs text-gray-500 text-center">
-                            버튼 클릭 시 학습 리포트가 생성되고<br>학부모님께 자동으로 발송됩니다.
-                        </p>
+                        <!-- 🎉 코스 완료 & 리포트 섹션 (모든 레슨 완료 시에만 표시) -->
+                        <div id="course-complete-section" class="hidden mt-6 p-6 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 space-y-4">
+                            <div class="text-center space-y-2">
+                                <span class="text-4xl">🎉</span>
+                                <h3 class="text-xl font-bold text-white">축하합니다!</h3>
+                                <p class="text-gray-300">모든 강의를 완료했습니다!</p>
+                            </div>
+                            
+                            <div id="report-status" class="text-center text-sm text-gray-400"></div>
+                            
+                            <button id="view-report-btn" onclick="viewAndSendReport()" 
+                                    class="btn-hover-scale w-full px-6 py-4 bg-white text-black font-bold rounded-xl flex items-center justify-center space-x-2">
+                                <span>📊</span>
+                                <span>리포트 확인하기</span>
+                            </button>
+                            
+                            <p class="text-xs text-gray-500 text-center">
+                                버튼 클릭 시 학습 리포트가 생성되고<br>학부모님께 자동으로 발송됩니다.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -522,6 +490,62 @@
                 </svg>
             </span>
         </button>
+    </div>
+
+    <!-- 퀴즈 모달 -->
+    <div id="quiz-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-neutral-900 border border-white border-opacity-20 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+            <!-- 모달 헤더 -->
+            <div class="flex justify-between items-center p-6 border-b border-white border-opacity-10">
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">📝</span>
+                    <h3 class="text-2xl font-bold text-white">퀴즈</h3>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="quiz-score" class="hidden text-sm px-4 py-2 rounded-lg bg-white bg-opacity-10">
+                        <span class="text-white">점수: </span>
+                        <span id="quiz-score-text" class="text-green-400 font-bold"></span>
+                    </div>
+                    <button onclick="closeQuizModal()" class="text-gray-400 hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 모달 바디 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <p class="text-gray-400 mb-6">강의 내용을 얼마나 이해하셨는지 확인해보세요!</p>
+                
+                <!-- Quiz Container -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- 퀴즈 로딩 중 -->
+                    <div class="text-center py-8 text-gray-500">
+                        퀴즈를 불러오는 중...
+                    </div>
+                </div>
+
+                <!-- Result Container -->
+                <div id="quiz-result-container" class="hidden p-6 rounded-xl bg-white bg-opacity-5 space-y-4">
+                    <div class="text-center">
+                        <p class="text-3xl font-bold text-white mb-2" id="final-score"></p>
+                        <p class="text-gray-400" id="result-message"></p>
+                    </div>
+                    <button onclick="retryQuiz()" class="w-full py-3 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
+                        다시 풀기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 모달 푸터 -->
+            <div id="quiz-submit-container" class="hidden p-6 border-t border-white border-opacity-10">
+                <button onclick="submitQuiz()" class="w-full px-8 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition">
+                    제출하기
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- FAQ 모달 -->
@@ -1090,7 +1114,7 @@
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
             const assignmentSection = document.getElementById('assignment-section');
-            const quizSection = document.getElementById('quiz-section');
+            const quizButtonSection = document.getElementById('quiz-button-section');
             
             if (progress >= 90 && currentUser) {
                 assignmentSection.classList.remove('hidden');
@@ -1098,11 +1122,11 @@
                 
                 // 퀴즈도 90% 이상일 때 표시
                 if (quizzes.length > 0) {
-                    quizSection.classList.remove('hidden');
+                    quizButtonSection.classList.remove('hidden');
                 }
             } else {
                 assignmentSection.classList.add('hidden');
-                quizSection.classList.add('hidden');
+                quizButtonSection.classList.add('hidden');
             }
         }
 
@@ -1668,6 +1692,20 @@
         // ========== QnA 플로팅 버튼 관련 함수 ==========
         
         // FAQ 모달
+        // 퀴즈 모달 열기/닫기
+        function openQuizModal() {
+            const modal = document.getElementById('quiz-modal');
+            modal.classList.remove('hidden');
+            // 퀴즈 로드
+            if (quizzes && quizzes.length > 0 && !isQuizSubmitted) {
+                renderQuiz();
+            }
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quiz-modal').classList.add('hidden');
+        }
+
         function openFaqModal() {
             document.getElementById('faq-modal').classList.remove('hidden');
             document.getElementById('fab-container').classList.remove('open');
@@ -1838,7 +1876,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    document.getElementById('quiz-section').classList.add('hidden');
+                    document.getElementById('quiz-button-section').classList.add('hidden');
                     return;
                 }
 
@@ -1846,8 +1884,8 @@
                 userAnswers = {};
                 renderQuizzes();
                 
-                // 퀴즈 섹션 표시
-                document.getElementById('quiz-section').classList.remove('hidden');
+                // 퀴즈 버튼 섹션 표시
+                document.getElementById('quiz-button-section').classList.remove('hidden');
 
             } catch (error) {
                 console.error('퀴즈 로드 오류:', error);

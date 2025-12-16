@@ -12,6 +12,7 @@
     
     // 인증이 필요없는 페이지 목록
     const PUBLIC_PAGES = [
+        'site-login.html',
         '/site-login.html',
         '/site-login'
     ];
@@ -68,7 +69,7 @@
     // 로그인 페이지로 리다이렉트
     function redirectToLogin() {
         const currentUrl = encodeURIComponent(window.location.href);
-        window.location.href = `/site-login.html?redirect=${currentUrl}`;
+        window.location.href = `site-login.html?redirect=${currentUrl}`;
     }
     
     // 페이지 로드 시 인증 확인

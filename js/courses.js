@@ -238,13 +238,10 @@ async function generateCourseReport(userId, courseId) {
         const completedAssignments = assignmentData ? assignmentData.filter(a => a.status === 'submitted' || a.status === 'graded').length : 0;
         const assignmentRate = totalLessons > 0 ? Math.round((completedAssignments / totalLessons) * 100) : 0;
         
-        // 6. public_id 생성 (외부 공유용)
-        const publicId = `report_${userId}_${courseId}_${Date.now()}`;
-        
-        // 7. 기존 리포트 확인 (있으면 업데이트, 없으면 생성)
+        // 6. 기존 리포트 확인 (있으면 업데이트, 없으면 생성)
         const { data: existingReport } = await window.supabase
             .from('course_reports')
-            .select('id')
+            .select('id, public_id')
             .eq('user_id', userId)
             .eq('course_id', courseId)
             .maybeSingle();
@@ -259,9 +256,13 @@ async function generateCourseReport(userId, courseId) {
             total_progress: totalProgress,
             average_watch_rate: averageWatchRate,
             assignment_rate: assignmentRate,
-            public_id: publicId,
             updated_at: new Date().toISOString()
         };
+        
+        // public_id는 새로 생성할 때만 추가 (기존 리포트는 유지)
+        if (!existingReport) {
+            reportData.public_id = crypto.randomUUID();
+        }
         
         let result;
         if (existingReport) {

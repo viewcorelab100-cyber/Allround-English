@@ -286,9 +286,9 @@
                                        class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                             </div>
                             <div>
-                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분) <span class="text-xs text-gray-500">- 자동 계산됨</span></label>
-                                <input type="number" id="lesson-duration" min="0" readonly
-                                       class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-gray-400 placeholder-gray-500 focus:outline-none cursor-not-allowed">
+                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분) <span class="text-xs text-green-400">✓ 자동 계산됨</span></label>
+                                <input type="number" id="lesson-duration" min="0"
+                                       class="w-full px-4 py-3 bg-green-500/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 border border-green-500/20">
                             </div>
                         </div>
                         <div>
@@ -2013,6 +2013,7 @@
         }
 
         // 레슨 모달 열기
+        let videoUrlListenerAttached = false;
         function openLessonModal(lessonId = null) {
             if (!selectedCourseId) {
                 alert('먼저 강의를 선택해주세요.');
@@ -2022,6 +2023,33 @@
             document.getElementById('lesson-modal-title').textContent = lessonId ? '영상 수정' : '새 영상 추가';
             document.getElementById('lesson-form').reset();
             document.getElementById('lesson-id').value = lessonId || '';
+            
+            // Vimeo URL 자동 길이 계산 이벤트 리스너 등록 (한 번만)
+            if (!videoUrlListenerAttached) {
+                const videoUrlInput = document.getElementById('lesson-video-url');
+                if (videoUrlInput) {
+                    videoUrlInput.addEventListener('blur', async function() {
+                        const videoUrl = this.value.trim();
+                        const durationInput = document.getElementById('lesson-duration');
+                        
+                        if (videoUrl && videoUrl.includes('vimeo.com')) {
+                            // 로딩 표시
+                            durationInput.value = '';
+                            durationInput.placeholder = '계산 중...';
+                            
+                            const duration = await fetchVimeoDuration(videoUrl);
+                            
+                            if (duration) {
+                                durationInput.value = duration;
+                                durationInput.placeholder = '';
+                            } else {
+                                durationInput.placeholder = '자동 계산 실패';
+                            }
+                        }
+                    });
+                    videoUrlListenerAttached = true;
+                }
+            }
             
             if (lessonId) {
                 loadLessonData(lessonId);
@@ -2066,42 +2094,24 @@
 
         // Vimeo 영상 길이 자동 가져오기
         async function fetchVimeoDuration(videoUrl) {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2068',message:'fetchVimeoDuration called',data:{videoUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3,H4'})}).catch(()=>{});
-            // #endregion
             try {
                 const vimeoId = extractVimeoId(videoUrl);
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2073',message:'extractVimeoId result',data:{vimeoId},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
-                // #endregion
                 if (!vimeoId) return null;
 
                 // Vimeo oEmbed API 사용
                 const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vimeoId}`);
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2079',message:'Vimeo API response',data:{ok:response.ok,status:response.status},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
-                // #endregion
                 if (!response.ok) return null;
 
                 const data = await response.json();
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2084',message:'Vimeo API data',data:{duration:data.duration,hasData:!!data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
-                // #endregion
                 
                 // duration은 초 단위로 반환되므로 분으로 변환
                 if (data.duration) {
                     const minutes = Math.ceil(data.duration / 60);
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2091',message:'Duration calculated',data:{seconds:data.duration,minutes},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
-                    // #endregion
                     return minutes;
                 }
                 
                 return null;
             } catch (error) {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2099',message:'fetchVimeoDuration error',data:{error:error.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
-                // #endregion
                 console.error('Vimeo duration fetch error:', error);
                 return null;
             }
@@ -2114,43 +2124,6 @@
             const match = url.match(regExp);
             return match ? match[1] : null;
         }
-
-        // Vimeo URL 입력 시 자동으로 영상 길이 가져오기
-        const videoUrlInput = document.getElementById('lesson-video-url');
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2147',message:'Event listener registration',data:{elementExists:!!videoUrlInput},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
-        videoUrlInput?.addEventListener('blur', async function() {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2151',message:'Blur event triggered',data:{rawValue:this.value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
-            // #endregion
-            const videoUrl = this.value.trim();
-            const durationInput = document.getElementById('lesson-duration');
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2156',message:'Video URL check',data:{videoUrl,isVimeo:videoUrl.includes('vimeo.com'),durationInputExists:!!durationInput},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H4'})}).catch(()=>{});
-            // #endregion
-            
-            if (videoUrl && videoUrl.includes('vimeo.com')) {
-                // 로딩 표시
-                durationInput.value = '';
-                durationInput.placeholder = '계산 중...';
-                
-                const duration = await fetchVimeoDuration(videoUrl);
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2167',message:'Duration received',data:{duration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
-                // #endregion
-                
-                if (duration) {
-                    durationInput.value = duration;
-                    durationInput.placeholder = '';
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2175',message:'Duration set to input',data:{setDuration:duration,inputValue:durationInput.value},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
-                    // #endregion
-                } else {
-                    durationInput.placeholder = '자동 계산 실패';
-                }
-            }
-        });
 
         // 레슨 저장
         document.getElementById('lesson-form')?.addEventListener('submit', async (e) => {
