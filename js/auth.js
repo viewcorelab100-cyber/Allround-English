@@ -346,6 +346,11 @@ async function isAdmin() {
     const user = await getCurrentUser();
     if (!user) return false;
     
+    // ✅ 특정 이메일은 무조건 관리자로 인식
+    if (user.email === 'admin@allround.com') {
+        return true;
+    }
+    
     const profile = await getUserProfile(user.id);
     return profile.success && profile.data.role === 'admin';
 }
