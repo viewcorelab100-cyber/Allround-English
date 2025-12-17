@@ -215,30 +215,14 @@ async function signUp(email, password, userData) {
 // 로그인
 async function signIn(email, password) {
     try {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:216',message:'SignIn called',data:{email,hasSupabase:!!window.supabase,hasAuth:!!window.supabase?.auth,hasSignInMethod:typeof window.supabase?.auth?.signInWithPassword === 'function'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
-        
         // window.supabase가 초기화되지 않았으면 에러
         if (!window.supabase) {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:220',message:'Window.supabase not initialized',data:{windowKeys:Object.keys(window).filter(k=>k.includes('supabase'))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-            // #endregion
             throw new Error('서비스 초기화 중입니다. 잠시 후 다시 시도해주세요.');
         }
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:222',message:'Before signInWithPassword',data:{authExists:!!window.supabase.auth,methodType:typeof window.supabase.auth.signInWithPassword},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
-        
         const { data, error } = await window.supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:228',message:'After signInWithPassword',data:{hasData:!!data,hasError:!!error,errorMsg:error?.message},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         
         if (error) throw error;
         

@@ -2319,6 +2319,10 @@
 
         async function loadMembers() {
             try {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2320',message:'loadMembers called',data:{timestamp:new Date().toISOString()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                
                 // 모든 회원 정보 로드
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
@@ -2332,6 +2336,10 @@
                     .from('orders')
                     .select('*')
                     .eq('status', 'DONE');
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2336',message:'Orders query result',data:{hasError:!!orderError,errorMsg:orderError?.message,ordersCount:orders?.length || 0,allStatuses:orders?.map(o=>o.status),recentOrders:orders?.slice(0,3).map(o=>({id:o.id,status:o.status,amount:o.amount,created:o.created_at}))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
+                // #endregion
 
                 if (orderError) throw orderError;
 
@@ -2562,12 +2570,20 @@
             }
 
             try {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2573',message:'loadOrders called',data:{filterStatus:status},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                
                 // orders 테이블에서 결제 완료된 주문 로드
                 const { data, error } = await window.supabase
                     .from('orders')
                     .select('*')
                     .eq('status', 'DONE')
                     .order('created_at', { ascending: false });
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2580',message:'Orders loaded',data:{hasError:!!error,errorMsg:error?.message,ordersCount:data?.length || 0,todayOrders:data?.filter(o=>new Date(o.created_at).toDateString()===new Date().toDateString()).length,allStatuses:data?.map(o=>o.status),recentOrders:data?.slice(0,5).map(o=>({id:o.id,status:o.status,amount:o.amount,created_at:o.created_at,user_id:o.user_id}))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,C'})}).catch(()=>{});
+                // #endregion
 
                 if (error) throw error;
 

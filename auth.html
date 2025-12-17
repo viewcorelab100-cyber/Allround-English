@@ -12,14 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-    <script>
-        // #region agent log
-        (function(){
-            var cdnLoaded = typeof supabase !== 'undefined';
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.html:14',message:'CDN check',data:{cdnLoaded:cdnLoaded,supabaseType:typeof supabase,hasCreateClient:typeof supabase?.createClient},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-        })();
-        // #endregion
-    </script>
     <script src="js/site-auth.js"></script>
     <!-- 다음 우편번호 서비스 -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -301,12 +293,7 @@
         </div>
     </div>
 
-    <script src="js/supabase-config.js" onerror="fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.html:296',message:'Script load error',data:{script:'supabase-config.js',error:'404 or load failed'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});"></script>
-    <script>
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.html:297',message:'After supabase-config load',data:{windowSupabaseExists:!!window.supabase,currentPath:window.location.href,protocol:window.location.protocol},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
-    </script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
     <script>
         // 커스텀 모달 함수
