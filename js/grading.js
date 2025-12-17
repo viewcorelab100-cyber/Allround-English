@@ -3,8 +3,18 @@
 // 이미지 업로드 함수
 async function uploadSubmissionImage(file) {
     try {
+        // #region agent log
+        // 가설 C: grading.js에서 currentUser 참조
+        const supabaseSession = window.supabase ? await window.supabase.auth.getSession() : null;
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'grading.js:4',message:'uploadSubmissionImage 시작',data:{windowCurrentUserExists:!!window.currentUser,windowCurrentUserId:window.currentUser?.id,supabaseSessionExists:!!supabaseSession?.data?.session,fileName:file?.name,fileSize:file?.size},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
+        
         const currentUser = window.currentUser;
         if (!currentUser) {
+            // #region agent log
+            // 가설 C: grading.js에서 currentUser가 null
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'grading.js:7',message:'grading.js - currentUser null',data:{windowCurrentUser:window.currentUser,typeofWindowCurrentUser:typeof window.currentUser},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
             throw new Error('로그인이 필요합니다.');
         }
 

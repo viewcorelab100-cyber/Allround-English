@@ -1113,6 +1113,12 @@
             const lessonId = getLessonId();
             if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
+            
+            // #region agent log
+            // 가설 B: loadLesson 후 currentUser 상태
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1115',message:'loadLesson - currentUser 설정됨',data:{currentUserSet:!!currentUser,currentUserId:currentUser?.id,currentUserEmail:currentUser?.email},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+            
             const lessonResult = await getLessonById(lessonId);
             if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
@@ -1619,7 +1625,17 @@
 
         // 이미지 과제 제출
         async function submitImageAssignment() {
+            // #region agent log
+            // 가설 A,D: currentUser 상태 확인
+            const supabaseSession = window.supabase ? await window.supabase.auth.getSession() : null;
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1621',message:'submitImageAssignment 시작',data:{currentUser:currentUser,currentUserExists:!!currentUser,currentUserId:currentUser?.id,supabaseSessionExists:!!supabaseSession?.data?.session,supabaseUserId:supabaseSession?.data?.session?.user?.id,selectedImageFilesLength:selectedImageFiles.length,windowCurrentUserType:typeof window.currentUser},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
+            // #endregion
+            
             if (!currentUser) {
+                // #region agent log
+                // 가설 A: currentUser가 null일 때
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1623',message:'currentUser가 null - 로그인 필요 오류',data:{currentUser:currentUser,windowKeys:Object.keys(window).filter(k=>k.includes('user')||k.includes('User')||k.includes('auth'))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
                 showAssignmentModal('⚠️', '로그인이 필요합니다.', '');
                 return;
             }
