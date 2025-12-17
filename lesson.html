@@ -756,6 +756,7 @@
     <script src="js/progress.js"></script>
     <script src="js/assignments.js"></script>
     <script src="js/grading.js"></script>
+    <script src="js/grade-system.js"></script>
     <script src="js/vimeo-custom-player.js"></script>
     <script>
         let currentLesson = null;
@@ -2185,9 +2186,16 @@
                 `;
             }).join('');
 
+            // 등급 정보 가져오기
+            const gradeInfo = getGradeInfo(score);
+            
             // 점수 표시
             document.getElementById('quiz-score').classList.remove('hidden');
-            document.getElementById('quiz-score-text').textContent = `${correctCount}/${quizzes.length} (${score}점)`;
+            document.getElementById('quiz-score-text').innerHTML = `
+                <span class="text-white">${correctCount}/${quizzes.length}</span>
+                <span class="mx-2">•</span>
+                <span class="${gradeInfo.textColor} font-bold">${score}점 (${gradeInfo.grade})</span>
+            `;
 
             // 결과 컨테이너 표시
             document.getElementById('quiz-submit-container').classList.add('hidden');
@@ -2196,17 +2204,21 @@
             const finalScore = document.getElementById('final-score');
             const resultMessage = document.getElementById('result-message');
             
-            finalScore.textContent = `${score}점`;
+            // 등급 정보로 메시지 표시
+            finalScore.innerHTML = `
+                <div class="flex items-center justify-center space-x-3">
+                    <span class="text-4xl">${gradeInfo.emoji}</span>
+                    <span class="text-5xl font-bold">${score}점</span>
+                    <span class="text-3xl ${gradeInfo.textColor} font-bold">${gradeInfo.grade}</span>
+                </div>
+            `;
             
-            if (score >= 90) {
-                resultMessage.textContent = '🎉 완벽합니다! 강의 내용을 완전히 이해하셨네요!';
-            } else if (score >= 70) {
-                resultMessage.textContent = '👍 잘했어요! 조금만 더 복습하면 완벽해요!';
-            } else if (score >= 50) {
-                resultMessage.textContent = '💪 괜찮아요! 강의를 다시 한 번 복습해보세요!';
-            } else {
-                resultMessage.textContent = '📚 조금 더 공부가 필요해요. 강의를 다시 들어보세요!';
-            }
+            resultMessage.innerHTML = `
+                <div class="space-y-3">
+                    <p class="text-xl ${gradeInfo.textColor} font-bold">${gradeInfo.message}</p>
+                    <p class="text-sm text-gray-400">${gradeInfo.description}</p>
+                </div>
+            `;
         }
 
         // 퀴즈 다시 풀기
