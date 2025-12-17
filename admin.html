@@ -599,7 +599,7 @@
                                                oninput="autoSelectGrade(this.value)">
                                     </div>
                                     <div>
-                                        <label class="block text-sm text-gray-400 mb-2">등급 <span class="text-xs">(자동 선택됨)</span></label>
+                                        <label class="block text-sm text-gray-400 mb-2">등급</label>
                                         <select id="grading-grade" 
                                                 class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white text-center text-2xl font-bold focus:outline-none cursor-pointer"
                                                 style="color: white;">
@@ -2353,12 +2353,32 @@
             const file = input.files[0];
             if (!file) return;
 
+            console.log('[DEBUG] 🔵 Thumbnail upload started:', {
+                fileName: file.name,
+                fileSize: file.size,
+                fileType: file.type
+            });
+
             try {
                 // Supabase Storage에 업로드
                 const fileName = `thumbnails/${Date.now()}_${file.name}`;
+                console.log('[DEBUG] 🟡 Uploading to bucket:', {
+                    bucket: 'course-thumbnails',
+                    path: fileName
+                });
+
                 const { data, error } = await window.supabase.storage
                     .from('course-thumbnails')
                     .upload(fileName, file);
+
+                console.log('[DEBUG] 🟢 Upload result:', {
+                    data,
+                    error: error ? {
+                        message: error.message,
+                        statusCode: error.statusCode,
+                        error: error.error
+                    } : null
+                });
 
                 if (error) throw error;
 
@@ -2367,13 +2387,34 @@
                     .from('course-thumbnails')
                     .getPublicUrl(fileName);
 
+                console.log('[DEBUG] 🟢 Public URL:', urlData.publicUrl);
+
                 document.getElementById('course-thumbnail').value = urlData.publicUrl;
                 document.getElementById('thumbnail-preview').classList.remove('hidden');
                 document.getElementById('thumbnail-preview-img').src = urlData.publicUrl;
                 
+                alert('썸네일이 성공적으로 업로드되었습니다!');
+                
             } catch (error) {
-                console.error('Thumbnail upload error:', error);
-                alert('이미지 업로드 중 오류가 발생했습니다. URL을 직접 입력해주세요.');
+                console.error('[DEBUG] 🔴 Thumbnail upload error:', {
+                    message: error.message,
+                    statusCode: error.statusCode,
+                    error: error.error,
+                    stack: error.stack
+                });
+                
+                // 자세한 에러 메시지
+                let errorMsg = '이미지 업로드 중 오류가 발생했습니다.\n';
+                if (error.statusCode === 404) {
+                    errorMsg += '\n❌ Storage bucket이 존재하지 않습니다.\nSupabase에서 "course-thumbnails" bucket을 생성해주세요.';
+                } else if (error.statusCode === 401 || error.statusCode === 403) {
+                    errorMsg += '\n❌ 권한이 없습니다.\nStorage bucket의 권한 설정을 확인해주세요.';
+                } else {
+                    errorMsg += `\n오류: ${error.message || '알 수 없는 오류'}`;
+                    errorMsg += '\n\nURL을 직접 입력해주세요.';
+                }
+                
+                alert(errorMsg);
             }
         }
 
