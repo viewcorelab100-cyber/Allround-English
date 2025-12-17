@@ -1439,20 +1439,24 @@
                     // 피드백 이미지 표시 (여러 장 처리)
                     if (feedback.feedback_image_url) {
                         const feedbackUrls = feedback.feedback_image_url.split(',').map(u => u.trim()).filter(u => u);
-                        const container = document.getElementById('grading-feedback-image');
+                        const previewContainer = document.getElementById('feedback-images-preview');
+                        const uploadArea = document.getElementById('feedback-upload-area');
+                        const actionBtns = document.getElementById('feedback-action-btns');
                         
-                        if (feedbackUrls.length === 1) {
-                            // 1장: 크게 표시
-                            container.innerHTML = `<img src="${feedbackUrls[0]}" class="w-full h-full object-contain">`;
-                        } else {
-                            // 여러 장: 그리드 표시
+                        if (feedbackUrls.length > 0) {
+                            // 업로드 영역 숨기고 미리보기 표시
+                            uploadArea.classList.add('hidden');
+                            previewContainer.classList.remove('hidden');
+                            actionBtns.classList.remove('hidden');
+                            
+                            // 이미지 미리보기 렌더링
                             const imagesHtml = feedbackUrls.map((url, idx) => `
-                                <div class="relative">
-                                    <img src="${url}" class="w-full h-full object-cover rounded">
+                                <div class="relative aspect-square bg-neutral-700 rounded-lg overflow-hidden">
+                                    <img src="${url}" class="w-full h-full object-cover">
                                     <span class="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded">${idx+1}</span>
                                 </div>
                             `).join('');
-                            container.innerHTML = `<div class="grid grid-cols-2 gap-2 h-full p-2">${imagesHtml}</div>`;
+                            previewContainer.innerHTML = imagesHtml;
                         }
                     }
                 } else {
@@ -1461,7 +1465,17 @@
                     document.getElementById('grading-comment').value = '';
                     document.getElementById('grading-feedback-url').value = '';
                     document.querySelectorAll('input[name="grading-pass"]').forEach(r => r.checked = false);
-                    document.getElementById('grading-feedback-image').innerHTML = `<span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(여러 장 선택 가능)</span></span>`;
+                    
+                    // 피드백 이미지 영역 초기화
+                    const uploadArea = document.getElementById('feedback-upload-area');
+                    const previewContainer = document.getElementById('feedback-images-preview');
+                    const actionBtns = document.getElementById('feedback-action-btns');
+                    if (uploadArea) uploadArea.classList.remove('hidden');
+                    if (previewContainer) {
+                        previewContainer.classList.add('hidden');
+                        previewContainer.innerHTML = '';
+                    }
+                    if (actionBtns) actionBtns.classList.add('hidden');
                 }
 
             } catch (error) {

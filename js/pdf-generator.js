@@ -327,6 +327,10 @@ async function uploadGradingPDF(imageBlob, fileName) {
     try {
         const filePath = `grading-reports/${fileName}`;
         
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:330',message:'BEFORE storage upload',data:{filePath,blobSize:imageBlob.size},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+        
         const { data, error } = await window.supabase.storage
             .from('submissions')
             .upload(filePath, imageBlob, {
@@ -335,6 +339,10 @@ async function uploadGradingPDF(imageBlob, fileName) {
                 upsert: true
             });
 
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:343',message:'AFTER storage upload',data:{hasError:!!error,error:error?{message:error.message,statusCode:error.statusCode}:null,data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+
         if (error) throw error;
 
         // 공개 URL 생성
@@ -342,8 +350,16 @@ async function uploadGradingPDF(imageBlob, fileName) {
             .from('submissions')
             .getPublicUrl(filePath);
 
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:354',message:'publicUrl generated',data:{publicUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+
         return publicUrl;
     } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:360',message:'uploadGradingPDF ERROR',data:{error:{message:error.message,stack:error.stack}},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+        
         console.error('Image upload error:', error);
         throw error;
     }
@@ -356,19 +372,39 @@ async function uploadGradingPDF(imageBlob, fileName) {
  */
 async function createAndUploadGradingPDF(gradingData) {
     try {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:357',message:'createAndUploadGradingPDF START',data:{gradingData},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
+
         // 이미지 생성
         const imageBlob = await generateGradingPDF(gradingData);
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:363',message:'generateGradingPDF complete',data:{blobSize:imageBlob?.size,blobType:imageBlob?.type},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
         
         // 파일명 생성 (한글/특수문자 제거)
         const timestamp = Date.now();
         const safeName = (gradingData.studentName || 'student').replace(/[^a-zA-Z0-9]/g, '');
         const fileName = `grading_${safeName}_${timestamp}.png`;
         
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:372',message:'BEFORE uploadGradingPDF',data:{fileName},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+        
         // 업로드
         const imageUrl = await uploadGradingPDF(imageBlob, fileName);
         
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:380',message:'uploadGradingPDF complete',data:{imageUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+        // #endregion
+        
         return imageUrl;
     } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'pdf-generator.js:386',message:'createAndUploadGradingPDF ERROR',data:{error:{message:error.message,stack:error.stack}},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2'})}).catch(()=>{});
+        // #endregion
+        
         console.error('Create and upload image error:', error);
         throw error;
     }
