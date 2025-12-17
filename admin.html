@@ -2202,14 +2202,15 @@
                 // 알림톡 요청 페이로드 준비
                 const requestPayload = {
                     phone: recipientPhone,
-                    templateCode: 'grading_complete',
+                    templateCode: 'grading_complete_UVO7vbQr0', // 카카오 템플릿 코드 사용
                     submissionId: submissionId,
-                    pdfUrl: pdfUrl, // PDF 다운로드 링크
+                    pdfUrl: pdfUrl, // PDF 다운로드 링크 (버튼용)
                     templateParams: {
                         '학생명': profile.name || '학생',
                         '과제명': `${lesson.order_num}강`,
                         '점수': feedbackData.score?.toString() || '0',
-                        '피드백': feedbackData.comment || '채점 완료'
+                        '피드백': feedbackData.comment || '채점 완료',
+                        'PDF링크': pdfUrl || '' // 본문에도 포함 (현재 템플릿 요구사항)
                     }
                 };
 
