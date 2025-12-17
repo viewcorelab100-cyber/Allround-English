@@ -2052,6 +2052,12 @@
                 updated_at: new Date().toISOString()
             };
 
+            console.log('[DEBUG] 🔵 Saving course:', {
+                title: courseData.title,
+                is_published: courseData.is_published,
+                checkboxChecked: document.getElementById('course-published').checked
+            });
+
             try {
                 if (courseId) {
                     // 수정
