@@ -74,6 +74,9 @@
             border-radius: 3px;
         }
     </style>
+    <!-- html2canvas for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="js/pdf-generator.js"></script>
 </head>
 <body class="bg-black text-white min-h-screen">
     
@@ -2034,14 +2037,15 @@
                     .eq('id', currentSubmissionId);
                 if (statusError) throw statusError;
 
-                // 알림톡 발송 (비동기로 처리하여 실패해도 채점은 저장됨)
-                sendGradingNotification(currentSubmissionId, {
+                // 채점 결과 PDF 생성 및 알림톡 발송 (비동기)
+                generateAndSendNotification(currentSubmissionId, {
                     score: score,
                     grade: grade,
                     comment: comment,
-                    feedbackImageUrl: feedbackImageUrl
+                    feedbackImageUrl: feedbackImageUrl,
+                    isPassed: isPassed
                 }).catch(err => {
-                    console.error('알림톡 발송 실패:', err);
+                    console.error('PDF 생성 또는 알림톡 발송 실패:', err);
                     // 알림톡 실패는 무시 (채점은 저장됨)
                 });
 
@@ -2055,8 +2059,70 @@
             }
         }
 
+        // 채점 결과 PDF 생성 및 알림톡 발송
+        async function generateAndSendNotification(submissionId, feedbackData) {
+            try {
+                console.log('📄 채점 결과 PDF 생성 시작...', submissionId);
+
+                // submission 정보 조회
+                const { data: submission, error: subError } = await window.supabase
+                    .from('student_submissions')
+                    .select('user_id, lesson_id, image_url, created_at')
+                    .eq('id', submissionId)
+                    .single();
+
+                if (subError) throw subError;
+
+                // 학생 프로필 조회
+                const { data: profile, error: profileError } = await window.supabase
+                    .from('profiles')
+                    .select('name, email, parent_phone, phone, student_phone, notification_enabled')
+                    .eq('id', submission.user_id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                // 레슨 정보 조회
+                const { data: lesson, error: lessonError } = await window.supabase
+                    .from('lessons')
+                    .select('title, order_num')
+                    .eq('id', submission.lesson_id)
+                    .single();
+
+                if (lessonError) throw lessonError;
+
+                // PDF 생성 데이터 준비
+                const pdfData = {
+                    studentName: profile.name || '학생',
+                    studentEmail: profile.email || '',
+                    assignmentTitle: `${lesson.order_num}강 - ${lesson.title}`,
+                    score: feedbackData.score,
+                    grade: feedbackData.grade,
+                    comment: feedbackData.comment,
+                    isPassed: feedbackData.isPassed !== false, // null이면 true로 처리
+                    imageUrl: submission.image_url ? submission.image_url.split(',')[0] : null, // 첫 번째 이미지
+                    gradingImageUrl: feedbackData.feedbackImageUrl ? feedbackData.feedbackImageUrl.split(',')[0] : null,
+                    submittedAt: submission.created_at
+                };
+
+                console.log('📄 PDF 데이터 준비:', pdfData);
+
+                // PDF(이미지) 생성 및 업로드
+                const pdfUrl = await window.PDFGenerator.createAndUploadGradingPDF(pdfData);
+                
+                console.log('✅ PDF 생성 완료:', pdfUrl);
+
+                // 알림톡 발송
+                await sendGradingNotification(submissionId, feedbackData, pdfUrl);
+
+            } catch (error) {
+                console.error('❌ PDF 생성 또는 알림톡 발송 오류:', error);
+                throw error;
+            }
+        }
+
         // 채점 완료 알림톡 발송
-        async function sendGradingNotification(submissionId, feedbackData) {
+        async function sendGradingNotification(submissionId, feedbackData, pdfUrl) {
             try {
                 // #region agent log
                 fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2059',message:'sendGradingNotification called',data:{submissionId,feedbackData},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2'})}).catch(()=>{});
@@ -2124,6 +2190,7 @@
                     phone: recipientPhone,
                     templateCode: 'grading_complete',
                     submissionId: submissionId,
+                    pdfUrl: pdfUrl, // PDF 다운로드 링크
                     templateParams: {
                         '학생명': profile.name || '학생',
                         '과제명': `${lesson.order_num}강`,

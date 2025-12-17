@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const { phone, templateCode, templateParams, submissionId } = await req.json()
+    const { phone, templateCode, templateParams, submissionId, pdfUrl } = await req.json()
 
-    console.log('📱 알림톡 발송 요청:', { phone, templateCode, submissionId })
+    console.log('📱 알림톡 발송 요청:', { phone, templateCode, submissionId, pdfUrl })
 
     // 환경 변수 확인
     const NHN_APP_KEY = Deno.env.get('NHN_APP_KEY')
@@ -41,8 +41,8 @@ serve(async (req) => {
     // 전화번호 포맷팅 (하이픈 제거)
     const formattedPhone = phone.replace(/[^0-9]/g, '')
 
-    // 마이페이지 링크 생성 (제출 상세로 이동)
-    const detailUrl = `${SITE_URL}/mypage.html?submission=${submissionId}`
+    // 버튼 링크 결정: PDF URL 우선, 없으면 마이페이지
+    const buttonUrl = pdfUrl || `${SITE_URL}/mypage.html?submission=${submissionId}`
 
     // NHN API 요청 페이로드
     const nhnPayload = {
@@ -57,8 +57,8 @@ serve(async (req) => {
               ordering: 1,
               type: 'WL', // Web Link
               name: '채점 결과 확인',
-              linkMo: detailUrl,
-              linkPc: detailUrl
+              linkMo: buttonUrl,
+              linkPc: buttonUrl
             }
           ]
         }
@@ -68,7 +68,8 @@ serve(async (req) => {
     console.log('📤 NHN API 호출:', { 
       recipientNo: formattedPhone, 
       templateCode,
-      buttonUrl: detailUrl 
+      buttonUrl: buttonUrl,
+      isPdfLink: !!pdfUrl
     })
 
     // NHN API 호출
