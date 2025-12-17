@@ -719,10 +719,15 @@
                     <!-- 선택된 이미지들이 여기 표시됩니다 -->
                 </div>
                 
-                <!-- 다시 선택 버튼 -->
-                <button id="reselect-image-btn" onclick="clearImagePreview()" class="hidden w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors text-sm">
-                    ✕ 다시 선택하기
-                </button>
+                <!-- 사진 추가/전체 삭제 버튼 -->
+                <div id="image-action-btns" class="hidden flex gap-2">
+                    <button onclick="document.getElementById('image-file-input').click()" class="flex-1 px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm">
+                        + 사진 추가
+                    </button>
+                    <button onclick="clearImagePreview()" class="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors text-sm">
+                        ✕ 전체 삭제
+                    </button>
+                </div>
                 
                 <!-- 제출 버튼 -->
                 <button id="submit-image-btn" onclick="submitImageAssignment()" disabled
@@ -1565,12 +1570,11 @@
             if (files.length === 0) return;
 
             const previewContainer = document.getElementById('selected-images-preview');
-            previewContainer.innerHTML = '';
             previewContainer.classList.remove('hidden');
-            selectedImageFiles = [];
 
             // 로딩 표시
             document.getElementById('submit-image-btn').disabled = true;
+            const currentCount = selectedImageFiles.length;
             document.getElementById('submit-image-btn').textContent = '이미지 처리 중...';
 
             for (const file of files) {
@@ -1583,15 +1587,23 @@
                 try {
                     // 자동 압축 및 WebP 변환
                     const compressedFile = await compressAndConvertImage(file);
+                    
+                    // 배열에 추가하고 인덱스 저장
+                    const fileIndex = selectedImageFiles.length;
                     selectedImageFiles.push(compressedFile);
 
-                    // 미리보기 생성
+                    // 미리보기 생성 (삭제 버튼 포함)
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const previewDiv = document.createElement('div');
                         previewDiv.className = 'relative aspect-square rounded-lg overflow-hidden border border-white/20';
+                        previewDiv.dataset.index = fileIndex;
                         previewDiv.innerHTML = `
                             <img src="${e.target.result}" class="w-full h-full object-cover">
+                            <button onclick="removeImage(${fileIndex})" 
+                                    class="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors">
+                                ✕
+                            </button>
                             <div class="absolute bottom-0 left-0 right-0 bg-black/70 p-1">
                                 <p class="text-[10px] text-white text-center truncate">${file.name}</p>
                                 <p class="text-[9px] text-green-400 text-center">${(compressedFile.size / 1024).toFixed(0)}KB</p>
@@ -1606,20 +1618,71 @@
                 }
             }
 
+            // 파일 input 초기화 (같은 파일 다시 선택 가능하도록)
+            event.target.value = '';
+
             // 제출 버튼 활성화
             document.getElementById('submit-image-btn').disabled = false;
             document.getElementById('submit-image-btn').textContent = `${selectedImageFiles.length}장 제출하기`;
             document.getElementById('image-upload-area').classList.add('hidden');
-            document.getElementById('reselect-image-btn').classList.remove('hidden');
+            document.getElementById('image-action-btns').classList.remove('hidden');
+        }
+
+        // 개별 이미지 삭제
+        function removeImage(index) {
+            // 배열에서 제거
+            selectedImageFiles.splice(index, 1);
+
+            // 미리보기 다시 렌더링
+            renderImagePreviews();
+
+            // 모든 이미지가 삭제되면 초기 상태로
+            if (selectedImageFiles.length === 0) {
+                clearImagePreview();
+            }
+        }
+
+        // 이미지 미리보기 다시 렌더링
+        function renderImagePreviews() {
+            const previewContainer = document.getElementById('selected-images-preview');
+            previewContainer.innerHTML = '';
+
+            selectedImageFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative aspect-square rounded-lg overflow-hidden border border-white/20';
+                    previewDiv.dataset.index = index;
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover">
+                        <button onclick="removeImage(${index})" 
+                                class="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors">
+                            ✕
+                        </button>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/70 p-1">
+                            <p class="text-[10px] text-white text-center truncate">${file.name}</p>
+                            <p class="text-[9px] text-green-400 text-center">${(file.size / 1024).toFixed(0)}KB</p>
+                        </div>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // 제출 버튼 텍스트 업데이트
+            document.getElementById('submit-image-btn').textContent = `${selectedImageFiles.length}장 제출하기`;
         }
 
         // 이미지 미리보기 삭제
         function clearImagePreview() {
+            if (selectedImageFiles.length > 0 && !confirm('모든 선택된 이미지를 삭제하시겠습니까?')) {
+                return;
+            }
             selectedImageFiles = [];
             document.getElementById('selected-images-preview').innerHTML = '';
             document.getElementById('selected-images-preview').classList.add('hidden');
             document.getElementById('image-upload-area').classList.remove('hidden');
-            document.getElementById('reselect-image-btn').classList.add('hidden');
+            document.getElementById('image-action-btns').classList.add('hidden');
             document.getElementById('submit-image-btn').disabled = true;
             document.getElementById('submit-image-btn').textContent = '이미지 과제 제출';
             document.getElementById('image-file-input').value = '';
