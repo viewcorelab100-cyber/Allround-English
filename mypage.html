@@ -555,9 +555,22 @@
         async function loadMyCourses() {
             const container = document.getElementById('my-courses');
             
+            // #region agent log
+            console.log('[DEBUG] 🔵 loadMyCourses called, user:', currentUser?.id);
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:558',message:'loadMyCourses called',data:{currentUserId: currentUser?.id},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,D'})}).catch(()=>{});
+            // #endregion
             const purchasesResult = await getUserPurchasedCourses(currentUser.id);
             
-            if (!purchasesResult.success || purchasesResult.data.length === 0) {
+            // #region agent log
+            console.log('[DEBUG] 🟢 getUserPurchasedCourses result:', purchasesResult);
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:560',message:'getUserPurchasedCourses result',data:{success: purchasesResult.success, dataLength: purchasesResult.data?.length, error: purchasesResult.error, hasData: !!purchasesResult.data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D,E'})}).catch(()=>{});
+            // #endregion
+            
+            // #region agent log
+            const checkCondition = !purchasesResult.success || purchasesResult.data.length === 0;
+            console.log('[DEBUG] 🟡 Empty check:', {condition: checkCondition, success: purchasesResult.success, dataLength: purchasesResult.data.length});
+            // #endregion
+            if (checkCondition) {
                 container.innerHTML = `
                     <div class="text-center text-gray-500 col-span-full py-20 space-y-4">
                         <p class="text-xl">아직 수강 중인 강의가 없습니다.</p>
@@ -566,18 +579,34 @@
                         </a>
                     </div>
                 `;
+                console.log('[DEBUG] 🔴 Showing empty state');
                 return;
             }
 
+            // #region agent log
+            console.log('[DEBUG] 🟡 Fetching progress for courses...');
+            // #endregion
             // 각 강의의 진도 정보 가져오기
             const progressPromises = purchasesResult.data.map(p => 
                 getCourseProgress(currentUser.id, p.course.id)
             );
             const progressResults = await Promise.all(progressPromises);
 
-            container.innerHTML = purchasesResult.data.map((purchase, index) => 
+            // #region agent log
+            console.log('[DEBUG] 🟢 Progress results:', progressResults);
+            console.log('[DEBUG] 🟡 Rendering courses...');
+            // #endregion
+            const htmlContent = purchasesResult.data.map((purchase, index) => 
                 renderMyCourseCard(purchase, progressResults[index].data)
             ).join('');
+            // #region agent log
+            console.log('[DEBUG] 🟡 Generated HTML length:', htmlContent.length);
+            console.log('[DEBUG] 🟡 Generated HTML preview:', htmlContent.substring(0, 500));
+            // #endregion
+            container.innerHTML = htmlContent;
+            // #region agent log
+            console.log('[DEBUG] 🟢 Rendering complete, container.children.length:', container.children.length);
+            // #endregion
         }
 
         // 프로필 정보 로드
