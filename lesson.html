@@ -615,7 +615,7 @@
     </div>
 
     <!-- 과제 제출 완료 모달 -->
-    <div id="assignment-complete-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
+    <div id="assignment-complete-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[300] hidden flex items-center justify-center p-6">
         <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md shadow-2xl">
             <div class="p-8 text-center space-y-6">
                 <!-- 아이콘 -->
@@ -1683,10 +1683,13 @@
 
         // 이미지 미리보기 삭제
         function clearImagePreview(skipConfirm = false) {
+            console.log('🗑️ [clearImagePreview] skipConfirm:', skipConfirm, 'selectedImageFiles.length:', selectedImageFiles.length);
             // skipConfirm이 false이고 파일이 있으면 확인 다이얼로그 표시
             if (!skipConfirm && selectedImageFiles.length > 0 && !confirm('모든 선택된 이미지를 삭제하시겠습니까?')) {
+                console.log('🗑️ [clearImagePreview] 사용자가 삭제 취소');
                 return;
             }
+            console.log('🗑️ [clearImagePreview] 파일 목록 초기화');
             selectedImageFiles = [];
             document.getElementById('selected-images-preview').innerHTML = '';
             document.getElementById('selected-images-preview').classList.add('hidden');
@@ -1699,22 +1702,23 @@
 
         // 이미지 과제 제출
         async function submitImageAssignment() {
+            console.log('🚀 [제출 시작] selectedImageFiles.length:', selectedImageFiles.length);
+            console.log('🚀 [제출 시작] selectedImageFiles:', selectedImageFiles);
+            
             // #region agent log
-            // 가설 H2, H3, H4: 모든 필수 정보 확인
+            // 가설 H9, H10: 제출 시작 시 파일 상태 확인
             const supabaseSession = window.supabase ? await window.supabase.auth.getSession() : null;
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1692',message:'submitImageAssignment 시작',data:{currentUserExists:!!currentUser,currentUserId:currentUser?.id,windowCurrentUserExists:!!window.currentUser,windowCurrentLessonExists:!!window.currentLesson,windowCurrentLessonId:window.currentLesson?.id,selectedImageFilesLength:selectedImageFiles.length,firstFileType:selectedImageFiles[0]?.type},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3,H4'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1700',message:'submitImageAssignment 시작',data:{selectedImageFilesLength:selectedImageFiles.length,currentUserExists:!!currentUser,windowCurrentUserExists:!!window.currentUser,windowCurrentLessonExists:!!window.currentLesson},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H9,H10'})}).catch(()=>{});
             // #endregion
             
             if (!currentUser) {
-                // #region agent log
-                // 가설 A: currentUser가 null일 때
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1623',message:'currentUser가 null - 로그인 필요 오류',data:{currentUser:currentUser,windowKeys:Object.keys(window).filter(k=>k.includes('user')||k.includes('User')||k.includes('auth'))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
+                console.error('❌ currentUser가 null');
                 showAssignmentModal('⚠️', '로그인이 필요합니다.', '');
                 return;
             }
 
             if (selectedImageFiles.length === 0) {
+                console.error('❌ selectedImageFiles가 비어있음');
                 alert('이미지를 선택해주세요.');
                 return;
             }
@@ -1734,9 +1738,12 @@
                     // grading.js의 함수 사용 (권장)
                     if (window.GradingUtils?.uploadSubmissionImage) {
                         const uploadResult = await window.GradingUtils.uploadSubmissionImage(file);
+                        console.log(`📤 [업로드 ${i+1}/${selectedImageFiles.length}] 결과:`, uploadResult);
                         if (!uploadResult.success) {
+                            console.error('❌ [업로드 실패]', uploadResult.error);
                             throw new Error(uploadResult.error || '이미지 업로드 실패');
                         }
+                        console.log('✅ [업로드 성공] URL:', uploadResult.url);
                         imageUrls.push(uploadResult.url);
                     } else {
                         // Fallback: 직접 업로드
@@ -1762,19 +1769,26 @@
 
                 // 제출 정보 저장
                 submitBtn.textContent = '제출 정보 저장 중...';
+                console.log('💾 [DB 저장] imageUrls:', imageUrls);
                 if (window.GradingUtils?.submitAssignmentWithImage) {
                     // 첫 번째 이미지 URL로 제출 (기존 호환성)
                     // 추가 이미지는 콤마로 구분하여 저장
-                    const submissionResult = await window.GradingUtils.submitAssignmentWithImage({
+                    const submissionData = {
                         lessonId: currentLesson?.id || null,
                         courseId: currentCourse?.id || null,
                         title: currentLesson?.title ? `${currentLesson.title} 과제` : '과제 제출',
                         imageUrl: imageUrls.join(',') // 여러 URL을 콤마로 구분
-                    });
+                    };
+                    console.log('💾 [DB 저장] submissionData:', submissionData);
+                    
+                    const submissionResult = await window.GradingUtils.submitAssignmentWithImage(submissionData);
+                    console.log('💾 [DB 저장] 결과:', submissionResult);
 
                     if (!submissionResult.success) {
+                        console.error('❌ [DB 저장 실패]', submissionResult.error);
                         throw new Error(submissionResult.error || '과제 제출 실패');
                     }
+                    console.log('✅ [DB 저장 성공]');
                 } else {
                     // Fallback: 직접 저장
                     const { data, error } = await window.supabase
@@ -1796,8 +1810,18 @@
 
                 // 성공 처리
                 const submittedCount = selectedImageFiles.length;
-                clearImagePreview(true); // 확인 다이얼로그 스킵
-                showAssignmentModal('✅', `과제 ${submittedCount}장이 제출되었습니다!`, '선생님이 채점 후 알려드립니다.');
+                console.log('✅ [제출 성공] 제출된 파일 수:', submittedCount);
+                
+                // 1. 이미지 제출 모달 닫기
+                closeImageSubmitModal();
+                
+                // 2. 이미지 미리보기 초기화 (확인 다이얼로그 스킵)
+                clearImagePreview(true);
+                
+                // 3. 잠시 후 성공 모달 표시 (모달 닫힘 애니메이션 후)
+                setTimeout(() => {
+                    showAssignmentModal('✅', `과제 ${submittedCount}장이 제출되었습니다!`, '선생님이 채점 후 알려드립니다.');
+                }, 200);
                 
                 // 제출 상태 업데이트
                 updateSubmissionStatus();
