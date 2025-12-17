@@ -2319,10 +2319,6 @@
 
         async function loadMembers() {
             try {
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2320',message:'loadMembers called',data:{timestamp:new Date().toISOString()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-                
                 // 모든 회원 정보 로드
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
@@ -2331,17 +2327,13 @@
 
                 if (profileError) throw profileError;
 
-                // 결제 완료된 주문 로드
-                const { data: orders, error: orderError } = await window.supabase
-                    .from('orders')
+                // 결제 완료된 구매 내역 로드 (purchases 테이블 사용)
+                const { data: purchases, error: purchaseError } = await window.supabase
+                    .from('purchases')
                     .select('*')
-                    .eq('status', 'DONE');
+                    .eq('status', 'completed');
 
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2336',message:'Orders query result',data:{hasError:!!orderError,errorMsg:orderError?.message,ordersCount:orders?.length || 0,allStatuses:orders?.map(o=>o.status),recentOrders:orders?.slice(0,3).map(o=>({id:o.id,status:o.status,amount:o.amount,created:o.created_at}))},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
-                // #endregion
-
-                if (orderError) throw orderError;
+                if (purchaseError) throw purchaseError;
 
                 // 강의 정보 로드
                 const { data: courses, error: courseError } = await window.supabase
@@ -2356,11 +2348,11 @@
 
                 // 회원별 구매 정보 매핑
                 allMembers = (profiles || []).map(profile => {
-                    const memberOrders = (orders || []).filter(o => o.user_id === profile.id);
-                    const totalPaid = memberOrders.reduce((sum, o) => sum + (o.amount || 0), 0);
-                    const purchasedCourses = memberOrders.map(o => ({
-                        ...o,
-                        courseTitle: courseMap.get(o.course_id)?.title || o.order_name || '알 수 없음'
+                    const memberPurchases = (purchases || []).filter(p => p.user_id === profile.id);
+                    const totalPaid = memberPurchases.reduce((sum, p) => sum + (p.amount || 0), 0);
+                    const purchasedCourses = memberPurchases.map(p => ({
+                        ...p,
+                        courseTitle: courseMap.get(p.course_id)?.title || '알 수 없음'
                     }));
 
                     return {
