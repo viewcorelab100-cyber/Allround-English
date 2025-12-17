@@ -23,6 +23,7 @@ async function uploadSubmissionImage(file) {
         const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
         
         // Storage에 업로드
+        console.log('📤 [grading.js] 업로드 시작 - 버킷: assignment-images, 파일명:', fileName);
         const { data, error } = await window.supabase.storage
             .from('assignment-images')
             .upload(fileName, file, {
@@ -30,12 +31,32 @@ async function uploadSubmissionImage(file) {
                 upsert: false
             });
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ [grading.js] Storage 업로드 실패:', error);
+            console.error('❌ [grading.js] 에러 코드:', error.statusCode);
+            console.error('❌ [grading.js] 에러 메시지:', error.message);
+            throw error;
+        }
+
+        console.log('✅ [grading.js] Storage 업로드 성공:', data);
 
         // Public URL 생성
         const { data: { publicUrl } } = window.supabase.storage
             .from('assignment-images')
             .getPublicUrl(fileName);
+
+        console.log('🔗 [grading.js] Public URL 생성됨:', publicUrl);
+        
+        // URL 테스트 (실제 접근 가능한지 확인)
+        try {
+            const testResponse = await fetch(publicUrl, { method: 'HEAD' });
+            console.log('🧪 [grading.js] URL 접근 테스트:', testResponse.status, testResponse.statusText);
+            if (!testResponse.ok) {
+                console.warn('⚠️ [grading.js] URL은 생성됐지만 접근 불가!', testResponse.status);
+            }
+        } catch (testError) {
+            console.error('❌ [grading.js] URL 접근 테스트 실패:', testError);
+        }
 
         return { success: true, url: publicUrl, path: fileName };
     } catch (error) {

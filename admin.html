@@ -880,11 +880,18 @@
                 
                 // 디버깅: 최근 10개 제출물의 image_url 확인
                 console.log('📊 [관리자] 전체 제출물 수:', allSubmissions.length);
+                const withImages = allSubmissions.filter(s => s.image_url);
+                console.log('📊 [관리자] 이미지 있는 제출물:', withImages.length);
+                if (withImages.length > 0) {
+                    console.log('📊 [관리자] 첫 번째 image_url (전체):', withImages[0].image_url);
+                    console.log('📊 [관리자] image_url 길이:', withImages[0].image_url?.length);
+                    console.log('📊 [관리자] 콤마 포함 여부:', withImages[0].image_url?.includes(','));
+                }
                 console.log('📊 [관리자] 최근 10개 제출물:', allSubmissions.slice(0, 10).map(s => ({
                     id: s.id,
                     student: s.studentEmail,
                     lesson: s.lessonTitle,
-                    image_url: s.image_url,
+                    image_url_preview: s.image_url?.substring(0, 100) + (s.image_url?.length > 100 ? '...' : ''),
                     has_image: !!s.image_url,
                     status: s.status
                 })));
@@ -953,7 +960,13 @@
             const withImages = submissions.filter(s => s.image_url);
             console.log('🎨 [관리자] 이미지가 있는 제출물:', withImages.length);
             if (withImages.length > 0) {
-                console.log('🎨 [관리자] 첫 번째 이미지 URL:', withImages[0].image_url);
+                console.log('🎨 [관리자] 첫 번째 제출물의 image_url:', withImages[0].image_url);
+                console.log('🎨 [관리자] 첫 번째 제출물 전체:', {
+                    id: withImages[0].id,
+                    student: withImages[0].studentEmail,
+                    image_url_length: withImages[0].image_url?.length,
+                    image_url_first_100: withImages[0].image_url?.substring(0, 100)
+                });
             }
 
             tbody.innerHTML = submissions.map(sub => {
@@ -964,10 +977,41 @@
                 const checkBlog = sub.blog_completed ? '✅' : '⬜';
                 const checkKakao = sub.kakao_completed ? '✅' : '⬜';
 
-                // 이미지 미리보기
-                const imagePreview = sub.image_url 
-                    ? `<img src="${sub.image_url}" class="w-12 h-12 object-cover rounded cursor-pointer" onclick="viewFullImage('${sub.image_url}')">`
-                    : '<span class="text-gray-500 text-sm">없음</span>';
+                // 이미지 미리보기 (여러 URL이 있으면 첫 번째 + 개수 표시)
+                let imagePreview = '<span class="text-gray-500 text-sm">없음</span>';
+                if (sub.image_url) {
+                    const imageUrls = sub.image_url.split(',').map(url => url.trim()).filter(url => url);
+                    const firstImageUrl = imageUrls[0];
+                    const imageCount = imageUrls.length;
+                    
+                    // 디버깅: URL 확인
+                    if (sub.studentEmail === 'viewcorelab100@gmail.com') {
+                        console.log('🖼️ [테이블] 학생:', sub.studentEmail);
+                        console.log('🖼️ [테이블] image_url 원본:', sub.image_url);
+                        console.log('🖼️ [테이블] 파싱된 URLs:', imageUrls);
+                        console.log('🖼️ [테이블] 첫 번째 URL:', firstImageUrl);
+                    }
+                    
+                    // 여러 장이면 개수 표시
+                    const countBadge = imageCount > 1 ? `<span class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">${imageCount}</span>` : '';
+                    
+                    // HTML 특수 문자 이스케이프
+                    const escapedUrl = firstImageUrl.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    const escapedId = sub.id.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    const escapedName = (sub.studentName || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    const escapedEmail = (sub.studentEmail || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    const escapedLesson = `${sub.lessonOrder}강 ${sub.lessonTitle}`.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    
+                    imagePreview = `
+                        <div class="relative inline-block">
+                            <img src="${escapedUrl}" 
+                                 class="w-12 h-12 object-cover rounded cursor-pointer border border-white/10" 
+                                 onclick="openGradingModalDirect('${escapedId}', '${escapedName}', '${escapedEmail}', '${escapedLesson}')" 
+                                 onerror="console.error('❌ 이미지 로드 실패:', '${escapedUrl}'); this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<span class=&quot;text-red-400 text-xs&quot;>❌ 로드 실패</span>';"
+                                 title="클릭하여 ${imageCount}장 모두 보기">
+                            ${countBadge}
+                        </div>`;
+                }
 
                 // 상태 뱃지
                 let statusBadge = '';
@@ -1302,15 +1346,44 @@
                 
                 if (error) throw error;
 
-                currentStudentImageUrl = sub.image_url;
+                // 여러 이미지 URL 처리
+                const imageUrls = sub.image_url ? sub.image_url.split(',').map(url => url.trim()).filter(url => url) : [];
+                currentStudentImageUrl = imageUrls.length > 0 ? imageUrls[0] : null;
+                
+                console.log('🖼️ [채점 모달] 원본 image_url:', sub.image_url);
+                console.log('🖼️ [채점 모달] 파싱된 이미지 개수:', imageUrls.length);
+                console.log('🖼️ [채점 모달] 이미지 URLs:', imageUrls);
+                
                 document.getElementById('grading-submitted-at').textContent = sub.submitted_at 
                     ? `Submitted: ${new Date(sub.submitted_at).toLocaleString('ko-KR')}` 
                     : '';
 
-                // 학생 이미지
+                // 학생 이미지 (모든 이미지를 갤러리로 표시)
                 const studentImageContainer = document.getElementById('grading-student-image');
-                if (sub.image_url) {
-                    studentImageContainer.innerHTML = `<img src="${sub.image_url}" class="w-full h-full object-contain">`;
+                if (imageUrls.length > 0) {
+                    if (imageUrls.length === 1) {
+                        // 1장: 크게 표시
+                        studentImageContainer.innerHTML = `
+                            <img src="${imageUrls[0]}" 
+                                 class="w-full h-full object-contain cursor-pointer" 
+                                 onclick="viewFullImage('${imageUrls[0]}')"
+                                 onerror="this.onerror=null; this.alt='❌ 이미지 로드 실패';">`;
+                    } else {
+                        // 2장 이상: 그리드로 표시
+                        const imagesHtml = imageUrls.map((url, idx) => `
+                            <div class="relative group cursor-pointer" onclick="viewFullImage('${url}')">
+                                <img src="${url}" 
+                                     class="w-full h-full object-cover rounded border border-white/20 hover:border-white/60 transition"
+                                     onerror="this.onerror=null; this.alt='❌ ${idx+1}';">
+                                <span class="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded">${idx+1}</span>
+                            </div>
+                        `).join('');
+                        
+                        studentImageContainer.innerHTML = `
+                            <div class="grid grid-cols-2 gap-2 h-full p-2">
+                                ${imagesHtml}
+                            </div>`;
+                    }
                 } else {
                     studentImageContainer.innerHTML = `<span class="text-gray-500">이미지 없음</span>`;
                 }
