@@ -877,6 +877,17 @@
                         feedback: feedback
                     };
                 });
+                
+                // 디버깅: 최근 10개 제출물의 image_url 확인
+                console.log('📊 [관리자] 전체 제출물 수:', allSubmissions.length);
+                console.log('📊 [관리자] 최근 10개 제출물:', allSubmissions.slice(0, 10).map(s => ({
+                    id: s.id,
+                    student: s.studentEmail,
+                    lesson: s.lessonTitle,
+                    image_url: s.image_url,
+                    has_image: !!s.image_url,
+                    status: s.status
+                })));
 
                 // 통계 업데이트
                 updateAssignmentStats();
@@ -935,6 +946,14 @@
             if (!submissions || submissions.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">제출된 과제가 없습니다.</td></tr>';
                 return;
+            }
+            
+            // 디버깅: 렌더링할 제출물 확인
+            console.log('🎨 [관리자] 렌더링할 제출물 수:', submissions.length);
+            const withImages = submissions.filter(s => s.image_url);
+            console.log('🎨 [관리자] 이미지가 있는 제출물:', withImages.length);
+            if (withImages.length > 0) {
+                console.log('🎨 [관리자] 첫 번째 이미지 URL:', withImages[0].image_url);
             }
 
             tbody.innerHTML = submissions.map(sub => {

@@ -1730,6 +1730,10 @@
             try {
                 const imageUrls = [];
                 
+                // GradingUtils 로드 확인
+                console.log('🔧 [체크] window.GradingUtils 존재:', !!window.GradingUtils);
+                console.log('🔧 [체크] uploadSubmissionImage 함수:', typeof window.GradingUtils?.uploadSubmissionImage);
+                
                 // 각 이미지를 순차적으로 업로드
                 for (let i = 0; i < selectedImageFiles.length; i++) {
                     const file = selectedImageFiles[i];
@@ -1737,6 +1741,7 @@
 
                     // grading.js의 함수 사용 (권장)
                     if (window.GradingUtils?.uploadSubmissionImage) {
+                        console.log(`📤 [GradingUtils 경로] 파일 ${i+1} 업로드 시작`);
                         const uploadResult = await window.GradingUtils.uploadSubmissionImage(file);
                         console.log(`📤 [업로드 ${i+1}/${selectedImageFiles.length}] 결과:`, uploadResult);
                         if (!uploadResult.success) {
@@ -1747,22 +1752,27 @@
                         imageUrls.push(uploadResult.url);
                     } else {
                         // Fallback: 직접 업로드
+                        console.log('⚠️ [Fallback] GradingUtils 없음, 직접 업로드');
                         const fileExt = file.name.split('.').pop();
                         const fileName = `${currentUser.id}/${Date.now()}_${i}.${fileExt}`;
 
                         const { data: uploadData, error: uploadError } = await window.supabase.storage
-                            .from('submissions')
+                            .from('assignment-images')  // 수정: submissions → assignment-images
                             .upload(fileName, file, {
                                 cacheControl: '3600',
                                 upsert: false
                             });
 
-                        if (uploadError) throw uploadError;
+                        if (uploadError) {
+                            console.error('❌ [Fallback] 업로드 실패:', uploadError);
+                            throw uploadError;
+                        }
 
                         const { data: { publicUrl } } = window.supabase.storage
-                            .from('submissions')
+                            .from('assignment-images')  // 수정: submissions → assignment-images
                             .getPublicUrl(fileName);
 
+                        console.log('✅ [Fallback] 업로드 성공:', publicUrl);
                         imageUrls.push(publicUrl);
                     }
                 }
