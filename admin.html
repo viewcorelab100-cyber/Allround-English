@@ -319,16 +319,27 @@
                                 <div id="quiz-time-settings" class="hidden pl-8 space-y-3">
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-sm text-gray-400 mb-2">퀴즈 팝업 시간 (분)</label>
-                                            <input type="number" id="quiz-popup-time" min="0" step="0.5" value="5"
-                                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
-                                                   placeholder="5">
-                                            <p class="text-xs text-gray-500 mt-1">영상 시작 후 몇 분에 퀴즈 팝업이 나올지 설정</p>
+                                            <label class="block text-sm text-gray-400 mb-2">퀴즈 팝업 시간</label>
+                                            <div class="flex gap-2 items-center">
+                                                <div class="flex-1">
+                                                    <input type="number" id="quiz-popup-minutes" min="0" max="999" value="5"
+                                                           class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30"
+                                                           placeholder="0">
+                                                    <p class="text-xs text-gray-500 mt-1">분</p>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <input type="number" id="quiz-popup-seconds" min="0" max="59" value="0"
+                                                           class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30"
+                                                           placeholder="0">
+                                                    <p class="text-xs text-gray-500 mt-1">초</p>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-2">영상 시작 후 퀴즈 팝업이 나올 시간 설정</p>
                                         </div>
                                         <div>
                                             <label class="block text-sm text-gray-400 mb-2">퀴즈 표시 방식</label>
                                             <select id="quiz-display-mode"
-                                                    class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none cursor-pointer">
+                                                    class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 cursor-pointer">
                                                 <option value="submit-only">제출만 (정답 표시 안함)</option>
                                                 <option value="instant-feedback">즉시 피드백 (정답 표시)</option>
                                             </select>
@@ -2155,6 +2166,26 @@
                 document.getElementById('lesson-blog-link').value = lesson.blog_link || '';
                 document.getElementById('lesson-preview').checked = lesson.is_preview || false;
                 
+                // 퀴즈 설정 로드
+                const quizEnabled = lesson.quiz_enabled || false;
+                document.getElementById('quiz-enabled').checked = quizEnabled;
+                
+                // 퀴즈 팝업 시간을 분/초로 분리
+                const totalMinutes = lesson.quiz_popup_time || 5;
+                const minutes = Math.floor(totalMinutes);
+                const seconds = Math.round((totalMinutes - minutes) * 60);
+                document.getElementById('quiz-popup-minutes').value = minutes;
+                document.getElementById('quiz-popup-seconds').value = seconds;
+                
+                document.getElementById('quiz-display-mode').value = lesson.quiz_display_mode || 'submit-only';
+                
+                // 퀴즈 시간 설정 표시/숨김
+                if (quizEnabled) {
+                    document.getElementById('quiz-time-settings').classList.remove('hidden');
+                } else {
+                    document.getElementById('quiz-time-settings').classList.add('hidden');
+                }
+                
                 // 기존 퀴즈 로드
                 await loadQuizzesForLesson(lessonId);
             } catch (error) {
@@ -2210,6 +2241,12 @@
             e.preventDefault();
             
             const lessonId = document.getElementById('lesson-id').value;
+            
+            // 퀴즈 팝업 시간 계산 (분 + 초/60)
+            const quizMinutes = parseInt(document.getElementById('quiz-popup-minutes').value) || 0;
+            const quizSeconds = parseInt(document.getElementById('quiz-popup-seconds').value) || 0;
+            const quizPopupTime = quizMinutes + (quizSeconds / 60);
+            
             const lessonData = {
                 course_id: selectedCourseId,
                 title: document.getElementById('lesson-title').value,
@@ -2219,6 +2256,9 @@
                 duration: parseInt(document.getElementById('lesson-duration').value) || 0,
                 blog_link: document.getElementById('lesson-blog-link').value,
                 is_preview: document.getElementById('lesson-preview').checked,
+                quiz_enabled: document.getElementById('quiz-enabled').checked,
+                quiz_popup_time: quizPopupTime,
+                quiz_display_mode: document.getElementById('quiz-display-mode').value,
                 updated_at: new Date().toISOString()
             };
 
