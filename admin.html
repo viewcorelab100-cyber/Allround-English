@@ -339,9 +339,10 @@
                                         <div>
                                             <label class="block text-sm text-gray-400 mb-2">퀴즈 표시 방식</label>
                                             <select id="quiz-display-mode"
-                                                    class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 cursor-pointer">
-                                                <option value="submit-only">제출만 (정답 표시 안함)</option>
-                                                <option value="instant-feedback">즉시 피드백 (정답 표시)</option>
+                                                    class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 cursor-pointer"
+                                                    style="color-scheme: dark;">
+                                                <option value="submit-only" class="bg-gray-900 text-white">제출만 (정답 표시 안함)</option>
+                                                <option value="instant-feedback" class="bg-gray-900 text-white">즉시 피드백 (정답 표시)</option>
                                             </select>
                                         </div>
                                     </div>
@@ -2859,11 +2860,11 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm text-gray-400 mb-1">배송 상태</label>
-                                <select id="modal-shipping-status" class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
-                                    <option value="PENDING_ADDRESS" ${order.shipping_status === 'PENDING_ADDRESS' || !order.shipping_status ? 'selected' : ''}>배송정보 미입력</option>
-                                    <option value="PREPARING" ${order.shipping_status === 'PREPARING' ? 'selected' : ''}>배송준비중</option>
-                                    <option value="SHIPPING" ${order.shipping_status === 'SHIPPING' ? 'selected' : ''}>배송중</option>
-                                    <option value="DELIVERED" ${order.shipping_status === 'DELIVERED' ? 'selected' : ''}>배송완료</option>
+                                <select id="modal-shipping-status" class="w-full px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 cursor-pointer" style="color-scheme: dark;">
+                                    <option value="PENDING_ADDRESS" ${order.shipping_status === 'PENDING_ADDRESS' || !order.shipping_status ? 'selected' : ''} class="bg-gray-900 text-white">배송정보 미입력</option>
+                                    <option value="PREPARING" ${order.shipping_status === 'PREPARING' ? 'selected' : ''} class="bg-gray-900 text-white">배송준비중</option>
+                                    <option value="SHIPPING" ${order.shipping_status === 'SHIPPING' ? 'selected' : ''} class="bg-gray-900 text-white">배송중</option>
+                                    <option value="DELIVERED" ${order.shipping_status === 'DELIVERED' ? 'selected' : ''} class="bg-gray-900 text-white">배송완료</option>
                                 </select>
                             </div>
                             
