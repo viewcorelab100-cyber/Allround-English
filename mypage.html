@@ -305,7 +305,7 @@
         // 탭 전환
         function showTab(tab) {
             // 모든 콘텐츠와 탭 숨기기
-            ['courses', 'orders', 'profile'].forEach(t => {
+            ['courses', 'orders', 'profile', 'devices'].forEach(t => {
                 document.getElementById(`content-${t}`).classList.add('hidden');
                 document.getElementById(`tab-${t}`).classList.remove('active');
                 document.getElementById(`tab-${t}`).classList.add('text-gray-400');
@@ -319,6 +319,11 @@
             // 주문 탭 선택 시 데이터 로드
             if (tab === 'orders') {
                 loadMyOrders();
+            }
+            
+            // 기기 탭 선택 시 데이터 로드
+            if (tab === 'devices') {
+                loadDevices();
             }
         }
 
@@ -725,6 +730,164 @@
         // 로그아웃
         async function handleSignOut() {
             await signOut();
+        }
+
+        // ========== 기기 관리 ==========
+        
+        // 기기 목록 불러오기
+        async function loadDevices() {
+            try {
+                const user = await getCurrentUser();
+                if (!user) return;
+
+                // 현재 기기 정보 표시
+                const currentDeviceInfo = `${getDeviceInfo()}`;
+                document.getElementById('current-device-info').textContent = currentDeviceInfo;
+
+                // DB에서 활성 세션 목록 가져오기
+                const { data: profile, error } = await window.supabase
+                    .from('profiles')
+                    .select('active_sessions')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) throw error;
+
+                const activeSessions = profile.active_sessions || [];
+                const localSessionId = localStorage.getItem('allround_session_id');
+
+                if (activeSessions.length === 0) {
+                    document.getElementById('devices-list').innerHTML = `
+                        <div class="text-center text-gray-500 py-12">
+                            등록된 기기가 없습니다.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 세션 목록 렌더링
+                const devicesHtml = activeSessions
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .map((session, index) => {
+                        const isCurrentDevice = session.session_id === localSessionId;
+                        const createdDate = new Date(session.created_at);
+                        const timeAgo = getTimeAgo(createdDate);
+
+                        return `
+                            <div class="p-4 bg-white bg-opacity-5 rounded-xl border ${isCurrentDevice ? 'border-green-500 border-opacity-50' : 'border-white border-opacity-10'}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <span class="text-white font-semibold">${session.device_info}</span>
+                                            ${isCurrentDevice ? '<span class="text-xs px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded-full">현재 기기</span>' : ''}
+                                        </div>
+                                        <p class="text-sm text-gray-400">로그인: ${timeAgo}</p>
+                                    </div>
+                                    ${!isCurrentDevice ? `
+                                        <button onclick="logoutDevice('${session.session_id}')" 
+                                                class="px-4 py-2 text-sm text-red-400 hover:text-red-300 border border-red-400 rounded-lg hover:bg-red-500 hover:bg-opacity-10 transition-colors">
+                                            로그아웃
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                document.getElementById('devices-list').innerHTML = devicesHtml;
+            } catch (error) {
+                console.error('Load devices error:', error);
+                document.getElementById('devices-list').innerHTML = `
+                    <div class="text-center text-red-400 py-12">
+                        기기 정보를 불러오는 중 오류가 발생했습니다.
+                    </div>
+                `;
+            }
+        }
+
+        // 기기 로그아웃
+        async function logoutDevice(sessionId) {
+            if (!confirm('이 기기를 로그아웃하시겠습니까?')) return;
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) return;
+
+                // 현재 활성 세션 목록 가져오기
+                const { data: profile, error: fetchError } = await window.supabase
+                    .from('profiles')
+                    .select('active_sessions')
+                    .eq('id', user.id)
+                    .single();
+
+                if (fetchError) throw fetchError;
+
+                let activeSessions = profile.active_sessions || [];
+
+                // 해당 세션 제거
+                activeSessions = activeSessions.filter(s => s.session_id !== sessionId);
+
+                // DB 업데이트
+                const { error: updateError } = await window.supabase
+                    .from('profiles')
+                    .update({ active_sessions: activeSessions })
+                    .eq('id', user.id);
+
+                if (updateError) throw updateError;
+
+                // 목록 새로고침
+                loadDevices();
+                alert('해당 기기가 로그아웃되었습니다.');
+            } catch (error) {
+                console.error('Logout device error:', error);
+                alert('기기 로그아웃 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 시간 경과 표시
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return '방금 전';
+            if (minutes < 60) return `${minutes}분 전`;
+            if (hours < 24) return `${hours}시간 전`;
+            if (days < 30) return `${days}일 전`;
+            return date.toLocaleDateString('ko-KR');
+        }
+
+        // 기기 정보 가져오기 (auth.js와 동일)
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let deviceType = 'Desktop';
+            let browser = 'Unknown';
+            
+            if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) {
+                if (/iPad/.test(ua)) {
+                    deviceType = 'iPad';
+                } else if (/iPhone/.test(ua)) {
+                    deviceType = 'iPhone';
+                } else if (/Android/.test(ua)) {
+                    deviceType = 'Android';
+                } else {
+                    deviceType = 'Mobile';
+                }
+            }
+            
+            if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
+                browser = 'Chrome';
+            } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+                browser = 'Safari';
+            } else if (/Firefox/.test(ua)) {
+                browser = 'Firefox';
+            } else if (/Edge|Edg/.test(ua)) {
+                browser = 'Edge';
+            }
+            
+            return `${deviceType} (${browser})`;
         }
 
         // 커스텀 알림
