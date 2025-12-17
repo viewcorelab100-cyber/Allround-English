@@ -2058,12 +2058,20 @@
         // 채점 완료 알림톡 발송
         async function sendGradingNotification(submissionId, feedbackData) {
             try {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2059',message:'sendGradingNotification called',data:{submissionId,feedbackData},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2'})}).catch(()=>{});
+                // #endregion
+
                 // submission 정보 조회
                 const { data: submission, error: subError } = await window.supabase
                     .from('student_submissions')
                     .select('user_id, lesson_id')
                     .eq('id', submissionId)
                     .single();
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2068',message:'submission data loaded',data:{hasError:!!subError,submission},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+                // #endregion
 
                 if (subError) throw subError;
 
@@ -2074,10 +2082,18 @@
                     .eq('id', submission.user_id)
                     .single();
 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2077',message:'profile data loaded',data:{hasError:!!profileError,profile},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2'})}).catch(()=>{});
+                // #endregion
+
                 if (profileError) throw profileError;
 
                 // 연락처 확인 (우선순위: parent_phone → phone → student_phone)
                 const recipientPhone = profile.parent_phone || profile.phone || profile.student_phone;
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2080',message:'recipientPhone calculated',data:{recipientPhone,notification_enabled:profile.notification_enabled},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+                // #endregion
                 
                 if (!recipientPhone) {
                     console.log('연락처가 없는 사용자입니다.');
@@ -2097,21 +2113,36 @@
                     .eq('id', submission.lesson_id)
                     .single();
 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2100',message:'lesson data loaded',data:{hasError:!!lessonError,lesson},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+                // #endregion
+
                 if (lessonError) throw lessonError;
+
+                // 알림톡 요청 페이로드 준비
+                const requestPayload = {
+                    phone: recipientPhone,
+                    templateCode: 'grading_complete',
+                    templateParams: {
+                        '학생명': profile.name || '학생',
+                        '과제명': `${lesson.order_num}강`,
+                        '점수': feedbackData.score?.toString() || '0',
+                        '피드백': feedbackData.comment || '채점 완료'
+                    }
+                };
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2103',message:'BEFORE Edge Function call',data:{requestPayload},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H4,H5'})}).catch(()=>{});
+                // #endregion
 
                 // 알림톡 발송 (도메인 없이 간단하게)
                 const { data, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
-                    body: {
-                        phone: recipientPhone,
-                        templateCode: 'grading_complete',
-                        templateParams: {
-                            '학생명': profile.name || '학생',
-                            '과제명': `${lesson.order_num}강`,
-                            '점수': feedbackData.score?.toString() || '0',
-                            '피드백': feedbackData.comment || '채점 완료'
-                        }
-                    }
+                    body: requestPayload
                 });
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2116',message:'AFTER Edge Function call',data:{hasError:!!error,error:error?{message:error.message,stack:error.stack}:null,data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4,H5'})}).catch(()=>{});
+                // #endregion
 
                 if (error) {
                     console.error('알림톡 발송 오류:', error);
@@ -2119,19 +2150,34 @@
                     console.log('알림톡 발송 성공:', data);
                 }
 
+                // notification_logs 삽입 데이터 준비
+                const logData = {
+                    user_id: submission.user_id,
+                    submission_id: submissionId,
+                    notification_type: 'grading_complete',
+                    recipient_phone: recipientPhone,
+                    status: error ? 'failed' : 'sent',
+                    error_message: error?.message || null
+                };
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2123',message:'BEFORE notification_logs insert',data:{logData},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+                // #endregion
+
                 // notification_logs에 기록
-                await window.supabase
+                const logResult = await window.supabase
                     .from('notification_logs')
-                    .insert({
-                        user_id: submission.user_id,
-                        submission_id: submissionId,
-                        notification_type: 'grading_complete',
-                        recipient_phone: recipientPhone,
-                        status: error ? 'failed' : 'sent',
-                        error_message: error?.message || null
-                    });
+                    .insert(logData);
+
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2132',message:'AFTER notification_logs insert',data:{hasError:!!logResult.error,error:logResult.error?{message:logResult.error.message,code:logResult.error.code}:null},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+                // #endregion
 
             } catch (error) {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2135',message:'CATCH block - sendGradingNotification error',data:{error:{message:error.message,stack:error.stack}},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1,H2,H3,H4,H5'})}).catch(()=>{});
+                // #endregion
+
                 console.error('알림 처리 오류:', error);
                 // 오류 발생해도 채점은 저장됨
             }
