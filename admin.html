@@ -2035,17 +2035,15 @@
                 if (statusError) throw statusError;
 
                 // 알림톡 발송 (비동기로 처리하여 실패해도 채점은 저장됨)
-                // TODO: 알림톡 Edge Function 구현 필요
-                // sendGradingNotification(currentSubmissionId, {
-                //     score: score,
-                //     grade: grade,
-                //     comment: comment,
-                //     feedbackImageUrl: feedbackImageUrl
-                // }).catch(err => {
-                //     console.error('알림톡 발송 실패:', err);
-                //     // 알림톡 실패는 무시 (채점은 저장됨)
-                // });
-                console.log('알림톡 발송 비활성화 (Edge Function 미구현)');
+                sendGradingNotification(currentSubmissionId, {
+                    score: score,
+                    grade: grade,
+                    comment: comment,
+                    feedbackImageUrl: feedbackImageUrl
+                }).catch(err => {
+                    console.error('알림톡 발송 실패:', err);
+                    // 알림톡 실패는 무시 (채점은 저장됨)
+                });
 
                 alert('채점이 저장되었습니다.');
                 closeGradingModal();
@@ -2125,6 +2123,7 @@
                 const requestPayload = {
                     phone: recipientPhone,
                     templateCode: 'grading_complete',
+                    submissionId: submissionId,
                     templateParams: {
                         '학생명': profile.name || '학생',
                         '과제명': `${lesson.order_num}강`,
