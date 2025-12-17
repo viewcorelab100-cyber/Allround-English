@@ -670,12 +670,31 @@
                                 <!-- 선생님 피드백 이미지 -->
                                 <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-3">
                                     <p class="text-center text-sm text-gray-400">TEACHER'S FEEDBACK</p>
-                                    <div id="grading-feedback-image" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-600 hover:border-gray-400 transition"
+                                    
+                                    <!-- 업로드 영역 -->
+                                    <div id="feedback-upload-area" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-600 hover:border-gray-400 transition"
                                          onclick="document.getElementById('feedback-image-input').click()">
-                                        <span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(여러 장 선택 가능)</span></span>
+                                        <span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(여러 장 선택 가능, 자동 압축)</span></span>
                                     </div>
+                                    
+                                    <!-- 선택된 이미지 미리보기 -->
+                                    <div id="feedback-images-preview" class="hidden grid grid-cols-2 gap-2">
+                                        <!-- 선택된 이미지들이 여기 표시됩니다 -->
+                                    </div>
+                                    
                                     <input type="file" id="feedback-image-input" accept="image/*" multiple class="hidden" onchange="handleFeedbackImageUpload(this)">
                                     <input type="hidden" id="grading-feedback-url">
+                                    
+                                    <!-- 사진 추가/전체 삭제 버튼 -->
+                                    <div id="feedback-action-btns" class="hidden flex gap-2">
+                                        <button onclick="document.getElementById('feedback-image-input').click()" class="flex-1 px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm">
+                                            + 사진 추가
+                                        </button>
+                                        <button onclick="clearFeedbackImages()" class="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors text-sm">
+                                            ✕ 전체 삭제
+                                        </button>
+                                    </div>
+                                    
                                     <button onclick="viewFeedbackImages()" class="w-full py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
                                         🔍 크게 보기
                                     </button>
@@ -1603,6 +1622,9 @@
         function closeGradingModal() {
             document.getElementById('grading-modal').classList.add('hidden');
             currentSubmissionId = null;
+            // 피드백 이미지 초기화
+            feedbackImageFiles = [];
+            clearFeedbackImages();
         }
 
         // 점수 입력 시 자동으로 등급 선택
@@ -1651,80 +1673,172 @@
         }
 
         // 피드백 이미지 업로드 (여러 장 가능)
+        // 이미지 압축 함수 (admin용)
+        async function compressFeedbackImage(file, maxSizeMB = 2, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        const maxDimension = 2000;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = (height / width) * maxDimension;
+                                width = maxDimension;
+                            } else {
+                                width = (width / height) * maxDimension;
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        canvas.toBlob(
+                            (blob) => {
+                                if (blob) {
+                                    if (blob.size > maxSizeMB * 1024 * 1024 && quality > 0.3) {
+                                        compressFeedbackImage(file, maxSizeMB, quality - 0.1).then(resolve).catch(reject);
+                                    } else {
+                                        const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), {
+                                            type: 'image/webp',
+                                            lastModified: Date.now()
+                                        });
+                                        resolve(compressedFile);
+                                    }
+                                } else {
+                                    reject(new Error('이미지 압축 실패'));
+                                }
+                            },
+                            'image/webp',
+                            quality
+                        );
+                    };
+                    img.onerror = () => reject(new Error('이미지 로드 실패'));
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject(new Error('파일 읽기 실패'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        let feedbackImageFiles = []; // 압축된 파일들 저장
+
         async function handleFeedbackImageUpload(input) {
             const files = Array.from(input.files);
             if (files.length === 0) return;
 
-            try {
-                const uploadedUrls = [];
-                
-                // 각 파일을 순차적으로 업로드
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const fileExt = file.name.split('.').pop().toLowerCase();
-                    const safeFileName = `feedback/${currentSubmissionId}_${Date.now()}_${i}.${fileExt}`;
-                    
-                    const { data, error } = await window.supabase.storage
-                        .from('submissions')
-                        .upload(safeFileName, file, {
-                            upsert: true
-                        });
+            const previewContainer = document.getElementById('feedback-images-preview');
+            previewContainer.classList.remove('hidden');
 
-                    if (error) {
-                        console.error('Storage 업로드 오류:', error);
-                        throw new Error(`Storage 오류: ${error.message}`);
-                    }
+            // 로딩 표시
+            const uploadArea = document.getElementById('feedback-upload-area');
+            uploadArea.innerHTML = '<span class="text-white">이미지 처리 중...</span>';
 
-                    const { data: urlData } = window.supabase.storage
-                        .from('submissions')
-                        .getPublicUrl(safeFileName);
-
-                    if (!urlData || !urlData.publicUrl) {
-                        throw new Error('Public URL을 가져올 수 없습니다.');
-                    }
-                    
-                    uploadedUrls.push(urlData.publicUrl);
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+                    continue;
                 }
 
-                // 여러 URL을 콤마로 구분하여 저장
-                const allUrls = document.getElementById('grading-feedback-url').value;
-                const existingUrls = allUrls ? allUrls.split(',').map(u => u.trim()).filter(u => u) : [];
-                const combinedUrls = [...existingUrls, ...uploadedUrls].join(',');
-                
-                document.getElementById('grading-feedback-url').value = combinedUrls;
-                
-                // 미리보기 표시 (그리드 형식)
-                const container = document.getElementById('grading-feedback-image');
-                if (uploadedUrls.length === 1 && existingUrls.length === 0) {
-                    // 1장만: 크게 표시
-                    container.innerHTML = `<img src="${uploadedUrls[0]}" class="w-full h-full object-contain">`;
-                } else {
-                    // 여러 장: 그리드 표시
-                    const allImages = [...existingUrls, ...uploadedUrls];
-                    const imagesHtml = allImages.map((url, idx) => `
-                        <div class="relative">
-                            <img src="${url}" class="w-full h-full object-cover rounded">
-                            <span class="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded">${idx+1}</span>
-                        </div>
-                    `).join('');
-                    container.innerHTML = `<div class="grid grid-cols-2 gap-2 h-full p-2">${imagesHtml}</div>`;
+                try {
+                    // 자동 압축 및 WebP 변환
+                    const compressedFile = await compressFeedbackImage(file);
+                    const fileIndex = feedbackImageFiles.length;
+                    feedbackImageFiles.push(compressedFile);
+
+                    // 미리보기 생성
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'relative aspect-square rounded-lg overflow-hidden border border-white/20';
+                        previewDiv.dataset.index = fileIndex;
+                        previewDiv.innerHTML = `
+                            <img src="${e.target.result}" class="w-full h-full object-cover">
+                            <button onclick="removeFeedbackImage(${fileIndex})" 
+                                    class="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors">
+                                ✕
+                            </button>
+                            <div class="absolute bottom-0 left-0 right-0 bg-black/70 p-1">
+                                <p class="text-[10px] text-white text-center truncate">${file.name}</p>
+                                <p class="text-[9px] text-green-400 text-center">${(compressedFile.size / 1024).toFixed(0)}KB</p>
+                            </div>
+                        `;
+                        previewContainer.appendChild(previewDiv);
+                    };
+                    reader.readAsDataURL(compressedFile);
+                } catch (error) {
+                    console.error('이미지 처리 오류:', error);
+                    alert(`${file.name} 처리 중 오류가 발생했습니다.`);
                 }
-                
-                alert(`${uploadedUrls.length}장의 이미지가 업로드되었습니다.`);
-                
-            } catch (error) {
-                console.error('피드백 이미지 업로드 오류:', error);
-                
-                let errorMsg = '이미지 업로드 중 오류가 발생했습니다.\n\n';
-                if (error.message.includes('Storage')) {
-                    errorMsg += 'Storage bucket "submissions"가 없거나 권한이 없습니다.\n';
-                    errorMsg += 'Supabase Storage에서 "submissions" bucket을 생성하고 공개로 설정해주세요.';
-                } else {
-                    errorMsg += error.message;
-                }
-                
-                alert(errorMsg);
             }
+
+            // input 초기화
+            input.value = '';
+
+            // UI 업데이트
+            uploadArea.classList.add('hidden');
+            document.getElementById('feedback-action-btns').classList.remove('hidden');
+        }
+
+        // 개별 피드백 이미지 삭제
+        function removeFeedbackImage(index) {
+            feedbackImageFiles.splice(index, 1);
+            renderFeedbackImagePreviews();
+
+            if (feedbackImageFiles.length === 0) {
+                clearFeedbackImages();
+            }
+        }
+
+        // 피드백 이미지 미리보기 재렌더링
+        function renderFeedbackImagePreviews() {
+            const previewContainer = document.getElementById('feedback-images-preview');
+            previewContainer.innerHTML = '';
+
+            feedbackImageFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative aspect-square rounded-lg overflow-hidden border border-white/20';
+                    previewDiv.dataset.index = index;
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover">
+                        <button onclick="removeFeedbackImage(${index})" 
+                                class="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white text-sm font-bold transition-colors">
+                            ✕
+                        </button>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/70 p-1">
+                            <p class="text-[10px] text-white text-center truncate">${file.name}</p>
+                            <p class="text-[9px] text-green-400 text-center">${(file.size / 1024).toFixed(0)}KB</p>
+                        </div>
+                    `;
+                    previewContainer.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 피드백 이미지 전체 삭제
+        function clearFeedbackImages() {
+            if (feedbackImageFiles.length > 0 && !confirm('모든 선택된 이미지를 삭제하시겠습니까?')) {
+                return;
+            }
+            feedbackImageFiles = [];
+            document.getElementById('feedback-images-preview').innerHTML = '';
+            document.getElementById('feedback-images-preview').classList.add('hidden');
+            document.getElementById('feedback-upload-area').classList.remove('hidden');
+            document.getElementById('feedback-upload-area').innerHTML = '<span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(여러 장 선택 가능, 자동 압축)</span></span>';
+            document.getElementById('feedback-action-btns').classList.add('hidden');
+            document.getElementById('feedback-image-input').value = '';
+            document.getElementById('grading-feedback-url').value = '';
         }
 
         // 갤러리 관련 변수
@@ -1838,11 +1952,47 @@
             const score = parseInt(document.getElementById('grading-score').value) || null;
             const grade = document.getElementById('grading-grade').value || null;
             const comment = document.getElementById('grading-comment').value || null;
-            const feedbackImageUrl = document.getElementById('grading-feedback-url').value || null;
             const passedRadio = document.querySelector('input[name="grading-pass"]:checked');
             const isPassed = passedRadio ? passedRadio.value === 'true' : null;
 
             try {
+                let feedbackImageUrl = null;
+
+                // 피드백 이미지 업로드
+                if (feedbackImageFiles.length > 0) {
+                    const uploadedUrls = [];
+                    
+                    for (let i = 0; i < feedbackImageFiles.length; i++) {
+                        const file = feedbackImageFiles[i];
+                        const fileExt = file.name.split('.').pop().toLowerCase();
+                        const safeFileName = `feedback/${currentSubmissionId}_${Date.now()}_${i}.${fileExt}`;
+                        
+                        const { data, error } = await window.supabase.storage
+                            .from('submissions')
+                            .upload(safeFileName, file, {
+                                upsert: true
+                            });
+
+                        if (error) {
+                            console.error('Storage 업로드 오류:', error);
+                            throw new Error(`이미지 업로드 실패: ${error.message}`);
+                        }
+
+                        const { data: urlData } = window.supabase.storage
+                            .from('submissions')
+                            .getPublicUrl(safeFileName);
+
+                        if (!urlData || !urlData.publicUrl) {
+                            throw new Error('Public URL을 가져올 수 없습니다.');
+                        }
+                        
+                        uploadedUrls.push(urlData.publicUrl);
+                    }
+
+                    // 여러 URL을 콤마로 구분
+                    feedbackImageUrl = uploadedUrls.join(',');
+                }
+
                 // 기존 피드백 확인
                 const { data: existingFeedbacks } = await window.supabase
                     .from('teacher_feedback')
