@@ -41,29 +41,18 @@ serve(async (req) => {
     // 전화번호 포맷팅 (하이픈 제거)
     const formattedPhone = phone.replace(/[^0-9]/g, '')
 
-    // 버튼 링크 결정: PDF URL 우선, 없으면 마이페이지
-    const buttonUrl = pdfUrl || `${SITE_URL}/mypage.html?submission=${submissionId}`
-
     console.log('📋 템플릿 파라미터:', templateParams)
-    console.log('🔗 버튼 URL:', buttonUrl)
+    console.log('🔗 PDF URL:', pdfUrl)
 
-    // NHN API 요청 페이로드
+    // NHN API 요청 페이로드 (버튼 제거)
     const nhnPayload = {
       plusFriendId: NHN_SENDER_KEY,
       templateCode: templateCode,  // NHN에 등록된 템플릿 코드 그대로 사용
       recipientList: [
         {
           recipientNo: formattedPhone,
-          templateParameter: templateParams,
-          buttons: [
-            {
-              ordering: 1,
-              type: 'WL', // Web Link
-              name: '채점결과 확인',
-              linkMo: buttonUrl,
-              linkPc: buttonUrl
-            }
-          ]
+          templateParameter: templateParams
+          // 버튼 제거 - 템플릿 본문에 PDF링크 변수만 사용
         }
       ]
     }
