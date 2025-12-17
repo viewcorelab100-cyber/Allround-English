@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const { phone, templateCode, templateParams, submissionId, pdfUrl } = await req.json()
 
-    console.log('📱 알림톡 발송 요청:', { phone, templateCode, submissionId, pdfUrl })
+    console.log('📱 알림톡 발송 요청:', { phone, templateCode, submissionId, pdfUrl, templateParams })
 
     // 환경 변수 확인
     const NHN_APP_KEY = Deno.env.get('NHN_APP_KEY')
@@ -44,10 +44,13 @@ serve(async (req) => {
     // 버튼 링크 결정: PDF URL 우선, 없으면 마이페이지
     const buttonUrl = pdfUrl || `${SITE_URL}/mypage.html?submission=${submissionId}`
 
+    console.log('📋 템플릿 파라미터:', templateParams)
+    console.log('🔗 버튼 URL:', buttonUrl)
+
     // NHN API 요청 페이로드
     const nhnPayload = {
       plusFriendId: NHN_SENDER_KEY,
-      templateCode: templateCode,
+      templateCode: templateCode,  // NHN에 등록된 템플릿 코드 그대로 사용
       recipientList: [
         {
           recipientNo: formattedPhone,
@@ -56,7 +59,7 @@ serve(async (req) => {
             {
               ordering: 1,
               type: 'WL', // Web Link
-              name: '채점 결과 확인',
+              name: '채점결과 확인',
               linkMo: buttonUrl,
               linkPc: buttonUrl
             }
@@ -64,6 +67,8 @@ serve(async (req) => {
         }
       ]
     }
+
+    console.log('📤 NHN API 요청 페이로드:', JSON.stringify(nhnPayload, null, 2))
 
     console.log('📤 NHN API 호출:', { 
       recipientNo: formattedPhone, 
