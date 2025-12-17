@@ -717,6 +717,11 @@
                     <!-- 선택된 이미지들이 여기 표시됩니다 -->
                 </div>
                 
+                <!-- 다시 선택 버튼 -->
+                <button id="reselect-image-btn" onclick="clearImagePreview()" class="hidden w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors text-sm">
+                    ✕ 다시 선택하기
+                </button>
+                
                 <!-- 제출 버튼 -->
                 <button id="submit-image-btn" onclick="submitImageAssignment()" disabled
                         class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors">
@@ -1595,6 +1600,7 @@
             document.getElementById('submit-image-btn').disabled = false;
             document.getElementById('submit-image-btn').textContent = `${selectedImageFiles.length}장 제출하기`;
             document.getElementById('image-upload-area').classList.add('hidden');
+            document.getElementById('reselect-image-btn').classList.remove('hidden');
         }
 
         // 이미지 미리보기 삭제
@@ -1603,8 +1609,9 @@
             document.getElementById('selected-images-preview').innerHTML = '';
             document.getElementById('selected-images-preview').classList.add('hidden');
             document.getElementById('image-upload-area').classList.remove('hidden');
+            document.getElementById('reselect-image-btn').classList.add('hidden');
             document.getElementById('submit-image-btn').disabled = true;
-            document.getElementById('submit-image-btn').textContent = '제출하기';
+            document.getElementById('submit-image-btn').textContent = '이미지 과제 제출';
             document.getElementById('image-file-input').value = '';
         }
 
