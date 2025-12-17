@@ -50,7 +50,15 @@ async function submitAssignmentWithImage(submissionData) {
         const currentUser = window.currentUser;
         const currentLesson = window.currentLesson;
         
+        // #region agent log
+        // 가설 H2, H3: window 전역 변수 확인
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'grading.js:48',message:'submitAssignmentWithImage 호출',data:{currentUserExists:!!currentUser,currentUserId:currentUser?.id,currentLessonExists:!!currentLesson,currentLessonId:currentLesson?.id,submissionDataImageUrl:submissionData?.imageUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3'})}).catch(()=>{});
+        // #endregion
+        
         if (!currentUser || !currentLesson) {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'grading.js:54',message:'필수 정보 없음 오류',data:{currentUserExists:!!currentUser,currentLessonExists:!!currentLesson},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+            // #endregion
             throw new Error('필수 정보가 없습니다.');
         }
 

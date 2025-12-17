@@ -1131,6 +1131,14 @@
             if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
             
+            // window.currentLesson에도 설정 (grading.js 등에서 참조)
+            window.currentLesson = currentLesson;
+            
+            // #region agent log
+            // 가설 H3, H5: currentLesson 설정 확인
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1130',message:'loadLesson - currentLesson 설정됨',data:{currentLessonSet:!!currentLesson,currentLessonId:currentLesson?.id,windowCurrentLessonSet:!!window.currentLesson},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3,H5'})}).catch(()=>{});
+            // #endregion
+            
             if (!currentLesson.is_preview && currentUser) {
                 const accessResult = await hasAccessToCourse(currentUser.id, currentLesson.course.id);
                 if (!accessResult.hasAccess) { 
@@ -1691,9 +1699,9 @@
         // 이미지 과제 제출
         async function submitImageAssignment() {
             // #region agent log
-            // 가설 A,D: currentUser 상태 확인
+            // 가설 H2, H3, H4: 모든 필수 정보 확인
             const supabaseSession = window.supabase ? await window.supabase.auth.getSession() : null;
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1621',message:'submitImageAssignment 시작',data:{currentUser:currentUser,currentUserExists:!!currentUser,currentUserId:currentUser?.id,supabaseSessionExists:!!supabaseSession?.data?.session,supabaseUserId:supabaseSession?.data?.session?.user?.id,selectedImageFilesLength:selectedImageFiles.length,windowCurrentUserType:typeof window.currentUser},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1692',message:'submitImageAssignment 시작',data:{currentUserExists:!!currentUser,currentUserId:currentUser?.id,windowCurrentUserExists:!!window.currentUser,windowCurrentLessonExists:!!window.currentLesson,windowCurrentLessonId:window.currentLesson?.id,selectedImageFilesLength:selectedImageFiles.length,firstFileType:selectedImageFiles[0]?.type},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H3,H4'})}).catch(()=>{});
             // #endregion
             
             if (!currentUser) {
@@ -1976,11 +1984,16 @@
         // FAQ 모달
         // 퀴즈 모달 열기/닫기
         function openQuizModal() {
+            // #region agent log
+            // 가설 H1: renderQuiz → renderQuizzes 함수명 수정
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1978',message:'openQuizModal 호출',data:{quizzesLength:quizzes?.length,isQuizSubmitted:isQuizSubmitted},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+            // #endregion
+            
             const modal = document.getElementById('quiz-modal');
             modal.classList.remove('hidden');
             // 퀴즈 로드
             if (quizzes && quizzes.length > 0 && !isQuizSubmitted) {
-                renderQuiz();
+                renderQuizzes(); // 수정: renderQuiz → renderQuizzes
             }
         }
 
