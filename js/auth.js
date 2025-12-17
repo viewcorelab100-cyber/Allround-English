@@ -1,22 +1,89 @@
 // 인증 관련 함수들
 
-// ========== 세션 관리 (중복 로그인 방지) ==========
+// ========== 세션 관리 (최대 3대 기기) ==========
+
+const MAX_DEVICES = 3;
 
 // 랜덤 세션 ID 생성
 function generateSessionId() {
     return 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
 }
 
-// 세션 ID를 DB와 localStorage에 저장
+// 기기 정보 수집
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let deviceType = 'Desktop';
+    let browser = 'Unknown';
+    
+    // 기기 타입 감지
+    if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) {
+        if (/iPad/.test(ua)) {
+            deviceType = 'iPad';
+        } else if (/iPhone/.test(ua)) {
+            deviceType = 'iPhone';
+        } else if (/Android/.test(ua)) {
+            deviceType = 'Android';
+        } else {
+            deviceType = 'Mobile';
+        }
+    }
+    
+    // 브라우저 감지
+    if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
+        browser = 'Chrome';
+    } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+        browser = 'Safari';
+    } else if (/Firefox/.test(ua)) {
+        browser = 'Firefox';
+    } else if (/Edge|Edg/.test(ua)) {
+        browser = 'Edge';
+    }
+    
+    return `${deviceType} (${browser})`;
+}
+
+// 세션 ID를 DB와 localStorage에 저장 (최대 3대)
 async function saveSessionId(userId, sessionId) {
     try {
         if (!window.supabase) {
             return { success: false, error: '서비스 초기화 중입니다.' };
         }
+        
+        // 현재 활성 세션 목록 가져오기
+        const { data: profile, error: fetchError } = await window.supabase
+            .from('profiles')
+            .select('active_sessions')
+            .eq('id', userId)
+            .single();
+        
+        if (fetchError) throw fetchError;
+        
+        let activeSessions = profile.active_sessions || [];
+        
+        // 새 세션 정보
+        const newSession = {
+            session_id: sessionId,
+            created_at: new Date().toISOString(),
+            device_info: getDeviceInfo()
+        };
+        
+        // 기존 세션에서 현재 세션 ID 제거 (재로그인 시)
+        activeSessions = activeSessions.filter(s => s.session_id !== sessionId);
+        
+        // 최대 개수 초과 시 가장 오래된 세션 제거
+        if (activeSessions.length >= MAX_DEVICES) {
+            // created_at 기준 정렬 (오래된 순)
+            activeSessions.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            activeSessions = activeSessions.slice(-(MAX_DEVICES - 1)); // 가장 오래된 것 제거
+        }
+        
+        // 새 세션 추가
+        activeSessions.push(newSession);
+        
         // DB에 저장
         const { error } = await window.supabase
             .from('profiles')
-            .update({ last_session_id: sessionId })
+            .update({ active_sessions: activeSessions })
             .eq('id', userId);
         
         if (error) throw error;
@@ -24,14 +91,14 @@ async function saveSessionId(userId, sessionId) {
         // localStorage에 저장
         localStorage.setItem('allround_session_id', sessionId);
         
-        return { success: true };
+        return { success: true, deviceCount: activeSessions.length };
     } catch (error) {
         console.error('Save session ID error:', error);
         return { success: false, error: error.message };
     }
 }
 
-// 세션 유효성 검증
+// 세션 유효성 검증 (active_sessions 배열 확인)
 async function validateSession() {
     try {
         // window.supabase가 초기화되지 않았으면 유효한 것으로 처리
@@ -50,19 +117,23 @@ async function validateSession() {
             return { valid: true };
         }
         
-        // DB에서 최신 세션 ID 가져오기
+        // DB에서 활성 세션 목록 가져오기
         const { data: profile, error } = await window.supabase
             .from('profiles')
-            .select('last_session_id')
+            .select('active_sessions')
             .eq('id', user.id)
             .single();
         
         if (error) throw error;
         
-        // 세션 ID 비교
-        if (profile.last_session_id && profile.last_session_id !== localSessionId) {
-            // 다른 기기에서 로그인됨
-            return { valid: false, reason: 'another_device' };
+        const activeSessions = profile.active_sessions || [];
+        
+        // 현재 세션 ID가 활성 세션 목록에 있는지 확인
+        const isActiveSession = activeSessions.some(s => s.session_id === localSessionId);
+        
+        if (!isActiveSession && activeSessions.length > 0) {
+            // 현재 세션이 목록에 없음 (다른 기기에서 로그인하여 밀려남)
+            return { valid: false, reason: 'session_expired', deviceCount: activeSessions.length };
         }
         
         return { valid: true };
@@ -72,8 +143,8 @@ async function validateSession() {
     }
 }
 
-// 강제 로그아웃 (다른 기기에서 로그인 시)
-async function forceLogout(message = '다른 기기에서 로그인되어 현재 세션이 종료됩니다.') {
+// 강제 로그아웃 (세션이 만료되었을 때)
+async function forceLogout(message = '최대 3대까지만 동시 접속이 가능합니다.\n다른 기기에서 로그인하여 현재 세션이 종료되었습니다.') {
     // localStorage 정리
     localStorage.removeItem('allround_session_id');
     
@@ -94,8 +165,8 @@ async function checkSessionOnPageLoad() {
     const result = await validateSession();
     
     if (!result.valid) {
-        if (result.reason === 'another_device') {
-            await forceLogout('다른 기기에서 로그인되어 현재 세션이 종료됩니다.');
+        if (result.reason === 'session_expired') {
+            await forceLogout(`최대 ${MAX_DEVICES}대까지만 동시 접속이 가능합니다.\n다른 기기에서 로그인하여 현재 세션이 종료되었습니다.`);
         }
     }
 }
@@ -112,9 +183,9 @@ function startSessionMonitor(intervalMs = 30000) {
     // 주기적으로 세션 검증
     sessionCheckInterval = setInterval(async () => {
         const result = await validateSession();
-        if (!result.valid && result.reason === 'another_device') {
+        if (!result.valid && result.reason === 'session_expired') {
             clearInterval(sessionCheckInterval);
-            await forceLogout('다른 기기에서 로그인되어 현재 세션이 종료됩니다.');
+            await forceLogout(`최대 ${MAX_DEVICES}대까지만 동시 접속이 가능합니다.\n다른 기기에서 로그인하여 현재 세션이 종료되었습니다.`);
         }
     }, intervalMs);
 }
@@ -160,6 +231,13 @@ async function signUp(email, password, userData) {
             // 잠시 대기 (trigger가 프로필 생성할 시간)
             await new Promise(resolve => setTimeout(resolve, 1500));
             
+            // 첫 번째 세션 생성
+            const firstSession = [{
+                session_id: sessionId,
+                created_at: new Date().toISOString(),
+                device_info: getDeviceInfo()
+            }];
+            
             // 추가 정보 업데이트
             const { error: updateError } = await window.supabase.from('profiles').update({
                 phone: userData.phone,
@@ -167,7 +245,7 @@ async function signUp(email, password, userData) {
                 address: userData.address,
                 guardian_name: userData.guardian_name,
                 guardian_phone: userData.guardian_phone,
-                last_session_id: sessionId
+                active_sessions: firstSession
             }).eq('id', data.user.id);
             
             if (updateError) {
@@ -180,7 +258,7 @@ async function signUp(email, password, userData) {
                     address: userData.address,
                     guardian_name: userData.guardian_name,
                     guardian_phone: userData.guardian_phone,
-                    last_session_id: sessionId
+                    active_sessions: firstSession
                 }).eq('id', data.user.id);
                 
                 if (retryError) {
@@ -262,14 +340,31 @@ async function signOut() {
             throw new Error('서비스 초기화 중입니다.');
         }
         
-        // 세션 ID 정리
+        // 현재 세션 ID를 활성 세션 목록에서 제거
         const user = await getCurrentUser();
         if (user) {
-            // DB에서 세션 ID 제거 (선택적)
-            await window.supabase
-                .from('profiles')
-                .update({ last_session_id: null })
-                .eq('id', user.id);
+            const localSessionId = localStorage.getItem('allround_session_id');
+            
+            if (localSessionId) {
+                // 현재 활성 세션 목록 가져오기
+                const { data: profile } = await window.supabase
+                    .from('profiles')
+                    .select('active_sessions')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (profile) {
+                    let activeSessions = profile.active_sessions || [];
+                    // 현재 세션만 제거
+                    activeSessions = activeSessions.filter(s => s.session_id !== localSessionId);
+                    
+                    // DB 업데이트
+                    await window.supabase
+                        .from('profiles')
+                        .update({ active_sessions: activeSessions })
+                        .eq('id', user.id);
+                }
+            }
         }
         
         // localStorage 정리
