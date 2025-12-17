@@ -1114,9 +1114,12 @@
             if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
             
+            // window.currentUser에도 설정 (grading.js 등에서 참조)
+            window.currentUser = currentUser;
+            
             // #region agent log
             // 가설 B: loadLesson 후 currentUser 상태
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1115',message:'loadLesson - currentUser 설정됨',data:{currentUserSet:!!currentUser,currentUserId:currentUser?.id,currentUserEmail:currentUser?.email},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1115',message:'loadLesson - currentUser 설정됨',data:{currentUserSet:!!currentUser,currentUserId:currentUser?.id,currentUserEmail:currentUser?.email,windowCurrentUserSet:!!window.currentUser},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
             // #endregion
             
             const lessonResult = await getLessonById(lessonId);
@@ -1242,8 +1245,6 @@
         async function checkCourseCompletion() {
             if (!currentUser || !currentCourse || !courseLessons.length) return;
             
-            const completeCard = document.getElementById('course-complete-card');
-            
             try {
                 // 모든 레슨의 진도 가져오기
                 const lessonIds = courseLessons.map(l => l.id);
@@ -1261,7 +1262,7 @@
                 
                 // 모든 레슨이 완료되었는지 확인
                 if (completedLessons >= totalLessons) {
-                    completeCard.classList.remove('hidden');
+                    // 리포트는 모달로만 표시 (카드는 제거됨)
                     
                     // 이미 리포트가 발송되었는지 확인
                     const { data: existingReport } = await window.supabase
@@ -1278,8 +1279,9 @@
                         const statusEl = document.getElementById('report-status');
                         if (statusEl) statusEl.textContent = '✅ 리포트가 이미 발송되었습니다.';
                     }
-                } else {
-                    completeCard.classList.add('hidden');
+                    
+                    // 완강 시 리포트 모달 자동 표시 (선택사항)
+                    // openReportModal();
                 }
             } catch (error) {
                 console.error('Check course completion error:', error);
@@ -2080,6 +2082,7 @@
         // ========== 퀴즈 관련 함수 ==========
         let quizzes = [];
         let userAnswers = {};
+        let isQuizSubmitted = false;
 
         // 퀴즈 로드
         async function loadQuizzes(lessonId) {

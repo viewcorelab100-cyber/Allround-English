@@ -59,16 +59,20 @@ async function saveSessionId(userId, sessionId) {
         if (fetchError) throw fetchError;
         
         let activeSessions = profile.active_sessions || [];
+        const currentDeviceInfo = getDeviceInfo();
         
         // 새 세션 정보
         const newSession = {
             session_id: sessionId,
             created_at: new Date().toISOString(),
-            device_info: getDeviceInfo()
+            device_info: currentDeviceInfo,
+            last_activity: new Date().toISOString()
         };
         
-        // 기존 세션에서 현재 세션 ID 제거 (재로그인 시)
-        activeSessions = activeSessions.filter(s => s.session_id !== sessionId);
+        // 같은 기기의 기존 세션 제거 (중복 방지)
+        activeSessions = activeSessions.filter(s => 
+            s.session_id !== sessionId && s.device_info !== currentDeviceInfo
+        );
         
         // 최대 개수 초과 시 가장 오래된 세션 제거
         if (activeSessions.length >= MAX_DEVICES) {
