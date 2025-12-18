@@ -43,7 +43,7 @@ serve(async (req) => {
     console.log('📤 NHN 요청:', JSON.stringify(nhnPayload))
 
     const response = await fetch(
-      `https://api-alimtalk.cloud.nhn.com/alimtalk/v2.2/appkeys/${NHN_APP_KEY}/messages`,
+      `https://api-alimtalk.cloud.toast.com/alimtalk/v2.2/appkeys/${NHN_APP_KEY}/messages`,
       {
         method: 'POST',
         headers: {
