@@ -41,3 +41,4 @@ DELETE FROM student_submissions
 WHERE created_at > NOW() - INTERVAL '1 day';
 */
 
+

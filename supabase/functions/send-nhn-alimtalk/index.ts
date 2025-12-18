@@ -57,14 +57,17 @@ serve(async (req) => {
       ]
     }
 
-    console.log('📤 NHN API 요청 페이로드:', JSON.stringify(nhnPayload, null, 2))
-
-    console.log('📤 NHN API 호출:', { 
-      recipientNo: formattedPhone, 
-      templateCode,
-      buttonUrl: buttonUrl,
-      isPdfLink: !!pdfUrl
+    console.log('🔑 [H1] NHN 환경 변수:', { 
+      APP_KEY: NHN_APP_KEY?.substring(0, 8) + '...',
+      SECRET_KEY: NHN_SECRET_KEY?.substring(0, 8) + '...',
+      SENDER_KEY_FULL: NHN_SENDER_KEY,
+      SENDER_KEY_LENGTH: NHN_SENDER_KEY?.length || 0
     })
+    
+    console.log('📤 [H2,H3] NHN API 요청 페이로드 (전체):', JSON.stringify(nhnPayload, null, 2))
+    
+    console.log('📋 [H4] 템플릿 파라미터 키 목록:', Object.keys(templateParams))
+    console.log('📋 [H4] 템플릿 파라미터 값:', templateParams)
 
     // NHN API 호출
     const nhnResponse = await fetch(
@@ -81,13 +84,29 @@ serve(async (req) => {
 
     const nhnResult = await nhnResponse.json()
 
-    console.log('📥 NHN API 응답:', { 
-      status: nhnResponse.status, 
-      result: nhnResult 
+    console.log('📥 [H5] NHN API 응답 상태:', { 
+      status: nhnResponse.status,
+      statusText: nhnResponse.statusText,
+      ok: nhnResponse.ok
+    })
+    
+    console.log('📥 [H5] NHN API 응답 본문 (전체):', JSON.stringify(nhnResult, null, 2))
+    
+    console.log('📥 [H5] NHN API 응답 헤더:', {
+      resultCode: nhnResult?.header?.resultCode,
+      resultMessage: nhnResult?.header?.resultMessage,
+      isSuccessful: nhnResult?.header?.isSuccessful
     })
 
-    if (!nhnResponse.ok) {
-      throw new Error(`NHN API 오류: ${JSON.stringify(nhnResult)}`)
+    if (!nhnResponse.ok || nhnResult?.header?.resultCode !== 0) {
+      const errorDetail = {
+        status: nhnResponse.status,
+        resultCode: nhnResult?.header?.resultCode,
+        resultMessage: nhnResult?.header?.resultMessage,
+        fullResponse: nhnResult
+      }
+      console.error('❌ [H5] NHN API 오류 상세:', JSON.stringify(errorDetail, null, 2))
+      throw new Error(`NHN API 오류: ${JSON.stringify(errorDetail)}`)
     }
 
     // Supabase에 로그 저장

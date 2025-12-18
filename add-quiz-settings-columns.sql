@@ -36,3 +36,4 @@ WHERE quiz_enabled = true
 ORDER BY created_at DESC
 LIMIT 10;
 
+

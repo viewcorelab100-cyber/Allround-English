@@ -92,3 +92,4 @@ WHERE name = 'assignment-images';
 -- ⚠️ 만약 public 컬럼이 false이면:
 -- Supabase Dashboard → Storage → assignment-images → Settings → Public bucket 체크!
 
+

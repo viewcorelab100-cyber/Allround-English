@@ -72,3 +72,4 @@ WHERE schemaname = 'storage'
     AND policyname LIKE '%thumbnail%'
 ORDER BY policyname;
 
+

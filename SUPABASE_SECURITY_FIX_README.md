@@ -224,3 +224,4 @@ ALTER FUNCTION function_name() RESET search_path;
 **버전**: 1.0  
 **상태**: Production Ready (정책 수정 후)
 
+

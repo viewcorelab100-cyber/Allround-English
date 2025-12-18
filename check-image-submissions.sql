@@ -61,3 +61,4 @@ WHERE (ss.image_url IS NULL OR ss.image_url = '')
 ORDER BY ss.created_at DESC
 LIMIT 5;
 
+
