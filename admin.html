@@ -487,11 +487,35 @@
                     강의 분석
                 </h1>
 
+                <!-- 기간 필터 -->
+                <div class="mb-6 flex flex-wrap gap-2">
+                    <button onclick="filterAnalyticsByPeriod('all')" id="filter-period-all" 
+                            class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm">
+                        전체 기간
+                    </button>
+                    <button onclick="filterAnalyticsByPeriod('7')" id="filter-period-7" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
+                        최근 7일
+                    </button>
+                    <button onclick="filterAnalyticsByPeriod('30')" id="filter-period-30" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
+                        최근 30일
+                    </button>
+                    <button onclick="filterAnalyticsByPeriod('90')" id="filter-period-90" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
+                        최근 90일
+                    </button>
+                    <button onclick="filterAnalyticsByPeriod('365')" id="filter-period-365" 
+                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
+                        올해
+                    </button>
+                </div>
+
                 <!-- 강의별 매출 및 클릭율 -->
                 <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
                     <div class="p-6 border-b border-white border-opacity-10">
                         <h2 class="text-lg font-bold text-white">강의별 성과 분석</h2>
-                        <p class="text-sm text-gray-400 mt-1">각 강의의 매출과 조회수를 확인하세요</p>
+                        <p class="text-sm text-gray-400 mt-1" id="analytics-period-info">전체 기간 데이터</p>
                     </div>
                     
                     <table class="w-full">
@@ -3061,10 +3085,47 @@
             document.getElementById('stat-total-revenue').textContent = `₩${totalRevenue.toLocaleString()}`;
         }
 
+        // 전역 변수: 현재 선택된 기간
+        let currentAnalyticsPeriod = 'all';
+
+        // 기간 필터 변경
+        function filterAnalyticsByPeriod(period) {
+            currentAnalyticsPeriod = period;
+            
+            // 버튼 스타일 업데이트
+            document.querySelectorAll('[id^="filter-period-"]').forEach(btn => {
+                btn.classList.remove('bg-white', 'bg-opacity-10', 'text-white');
+                btn.classList.add('text-gray-400', 'hover:bg-white', 'hover:bg-opacity-5');
+            });
+            document.getElementById(`filter-period-${period}`).classList.remove('text-gray-400', 'hover:bg-white', 'hover:bg-opacity-5');
+            document.getElementById(`filter-period-${period}`).classList.add('bg-white', 'bg-opacity-10', 'text-white');
+            
+            // 기간 정보 업데이트
+            const periodText = {
+                'all': '전체 기간',
+                '7': '최근 7일',
+                '30': '최근 30일',
+                '90': '최근 90일',
+                '365': '올해'
+            };
+            document.getElementById('analytics-period-info').textContent = `${periodText[period]} 데이터`;
+            
+            // 데이터 다시 로드
+            loadAnalytics();
+        }
+
         // 강의 분석 데이터 로드
         async function loadAnalytics() {
             try {
-                console.log('📊 분석 데이터 로드 시작');
+                console.log('📊 분석 데이터 로드 시작 - 기간:', currentAnalyticsPeriod);
+
+                // 기간 필터 계산
+                let startDate = null;
+                if (currentAnalyticsPeriod !== 'all') {
+                    startDate = new Date();
+                    startDate.setDate(startDate.getDate() - parseInt(currentAnalyticsPeriod));
+                    startDate.setHours(0, 0, 0, 0);
+                }
 
                 // 강의 목록 로드
                 const { data: courses, error: courseError } = await window.supabase
@@ -3075,26 +3136,40 @@
                 console.log('✅ 강의 로드:', { count: courses?.length, error: courseError });
                 if (courseError) throw courseError;
 
-                // 강의별 매출 데이터 (purchases 테이블에서 집계)
-                const { data: purchases, error: purchaseError } = await window.supabase
+                // 강의별 매출 데이터 (purchases 테이블에서 집계, 기간 필터 적용)
+                let purchasesQuery = window.supabase
                     .from('purchases')
-                    .select('course_id, amount')
+                    .select('course_id, amount, purchased_at')
                     .eq('status', 'completed');
 
-                console.log('✅ 매출 데이터 로드:', { count: purchases?.length, error: purchaseError });
+                if (startDate) {
+                    purchasesQuery = purchasesQuery.gte('purchased_at', startDate.toISOString());
+                }
+
+                const { data: purchases, error: purchaseError } = await purchasesQuery;
+
+                console.log('✅ 매출 데이터 로드:', { count: purchases?.length, error: purchaseError, startDate: startDate?.toISOString() });
                 if (purchaseError) throw purchaseError;
 
-                // 강의별 조회수 데이터 (video_progress 테이블에서 고유 사용자 수 집계)
+                // 강의별 조회수 데이터 (video_progress 테이블에서 고유 사용자 수 집계, 기간 필터 적용)
                 console.log('🔍 video_progress 테이블 조회 시도...');
-                const { data: progressData, error: progressError } = await window.supabase
+                
+                let progressQuery = window.supabase
                     .from('video_progress')
-                    .select('user_id, lesson_id');
+                    .select('user_id, lesson_id, updated_at');
+
+                if (startDate) {
+                    progressQuery = progressQuery.gte('updated_at', startDate.toISOString());
+                }
+
+                const { data: progressData, error: progressError } = await progressQuery;
 
                 console.log('📊 video_progress 결과:', { 
                     count: progressData?.length, 
                     error: progressError,
                     errorMessage: progressError?.message,
-                    errorCode: progressError?.code
+                    errorCode: progressError?.code,
+                    startDate: startDate?.toISOString()
                 });
                 
                 if (progressError) {
@@ -3141,11 +3216,17 @@
                     sales.revenue += purchase.amount || 0;
                 });
 
-                // 강의별 진도율 계산
-                const { data: enrollments, error: enrollmentError } = await window.supabase
+                // 강의별 진도율 계산 (기간 필터 적용)
+                let enrollmentsQuery = window.supabase
                     .from('purchases')
-                    .select('user_id, course_id')
+                    .select('user_id, course_id, purchased_at')
                     .eq('status', 'completed');
+
+                if (startDate) {
+                    enrollmentsQuery = enrollmentsQuery.gte('purchased_at', startDate.toISOString());
+                }
+
+                const { data: enrollments, error: enrollmentError } = await enrollmentsQuery;
 
                 console.log('✅ 수강생 데이터 로드:', { count: enrollments?.length, error: enrollmentError });
                 if (enrollmentError) throw enrollmentError;
