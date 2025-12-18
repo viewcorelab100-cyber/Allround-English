@@ -154,6 +154,9 @@
                 <button onclick="showTab('devices')" id="tab-devices" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
                     📱 내 기기
                 </button>
+                <button onclick="showTab('coupons')" id="tab-coupons" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
+                    🎟️ 쿠폰
+                </button>
             </div>
 
             <!-- Tab Content: Courses -->
@@ -278,6 +281,48 @@
                 </div>
             </div>
 
+            <!-- Tab Content: Coupons -->
+            <div id="content-coupons" class="hidden space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">내 쿠폰</h2>
+                    <p class="text-sm text-gray-400">사용 가능한 쿠폰과 사용 내역을 확인할 수 있습니다.</p>
+                </div>
+
+                <!-- 쿠폰 입력 -->
+                <div class="bg-white bg-opacity-5 rounded-xl p-6 border border-white border-opacity-10">
+                    <h3 class="text-lg font-semibold text-white mb-4">쿠폰 등록</h3>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <input type="text" id="coupon-code-input" 
+                               placeholder="쿠폰 코드를 입력하세요" 
+                               class="flex-1 px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30">
+                        <button onclick="registerCoupon()" 
+                                class="px-6 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors whitespace-nowrap">
+                            등록하기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 사용 가능한 쿠폰 -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">사용 가능한 쿠폰</h3>
+                    <div id="available-coupons" class="space-y-4">
+                        <div class="text-center text-gray-500 py-12">
+                            쿠폰을 불러오는 중...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 사용 완료 / 만료된 쿠폰 -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-400 mb-4">사용 완료 / 만료</h3>
+                    <div id="used-coupons" class="space-y-4">
+                        <div class="text-center text-gray-500 py-12">
+                            사용 내역이 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -305,7 +350,7 @@
         // 탭 전환
         function showTab(tab) {
             // 모든 콘텐츠와 탭 숨기기
-            ['courses', 'orders', 'profile', 'devices'].forEach(t => {
+            ['courses', 'orders', 'profile', 'devices', 'coupons'].forEach(t => {
                 document.getElementById(`content-${t}`).classList.add('hidden');
                 document.getElementById(`tab-${t}`).classList.remove('active');
                 document.getElementById(`tab-${t}`).classList.add('text-gray-400');
@@ -324,6 +369,11 @@
             // 기기 탭 선택 시 데이터 로드
             if (tab === 'devices') {
                 loadDevices();
+            }
+            
+            // 쿠폰 탭 선택 시 데이터 로드
+            if (tab === 'coupons') {
+                loadCoupons();
             }
         }
 
@@ -904,6 +954,219 @@
             }
         }
 
+        // ========== 쿠폰 관리 ==========
+        
+        // 쿠폰 목록 불러오기
+        async function loadCoupons() {
+            try {
+                const user = await getCurrentUser();
+                if (!user) return;
+
+                const { data: userCoupons, error } = await window.supabase
+                    .from('user_coupons')
+                    .select(`
+                        *,
+                        coupons (
+                            code,
+                            name,
+                            description,
+                            discount_type,
+                            discount_value,
+                            min_purchase_amount,
+                            max_discount_amount
+                        ),
+                        courses (
+                            title
+                        )
+                    `)
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // 사용 가능한 쿠폰과 사용 완료/만료된 쿠폰 분리
+                const now = new Date();
+                const available = userCoupons.filter(c => !c.is_used && new Date(c.expires_at) > now);
+                const unavailable = userCoupons.filter(c => c.is_used || new Date(c.expires_at) <= now);
+
+                renderAvailableCoupons(available);
+                renderUsedCoupons(unavailable);
+
+            } catch (error) {
+                console.error('Load coupons error:', error);
+                document.getElementById('available-coupons').innerHTML = `
+                    <div class="text-center text-red-400 py-12">
+                        쿠폰을 불러오는 중 오류가 발생했습니다.
+                    </div>
+                `;
+            }
+        }
+
+        // 사용 가능한 쿠폰 렌더링
+        function renderAvailableCoupons(coupons) {
+            const container = document.getElementById('available-coupons');
+            
+            if (!coupons || coupons.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-12">
+                        <p class="text-lg mb-2">🎟️</p>
+                        <p>사용 가능한 쿠폰이 없습니다.</p>
+                        <p class="text-sm mt-2">강의를 완강하면 자동으로 쿠폰이 발급됩니다!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = coupons.map(coupon => {
+                const expiresAt = new Date(coupon.expires_at);
+                const daysLeft = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
+                const discountText = coupon.coupons.discount_type === 'percentage' 
+                    ? `${coupon.coupons.discount_value}% 할인`
+                    : `${coupon.coupons.discount_value.toLocaleString()}원 할인`;
+
+                return `
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="relative z-10">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h4 class="text-xl font-bold text-white mb-1">${coupon.coupons.name}</h4>
+                                    <p class="text-sm text-white text-opacity-90 mb-2">${coupon.coupons.description || ''}</p>
+                                    ${coupon.courses ? `<p class="text-xs text-white text-opacity-75">📚 ${coupon.courses.title} 완강 보상</p>` : ''}
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-white">${discountText}</p>
+                                </div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-3 mb-3">
+                                <p class="text-xs text-white text-opacity-80 mb-1">쿠폰 코드</p>
+                                <p class="text-lg font-mono font-bold text-white tracking-wider">${coupon.coupons.code}</p>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-white text-opacity-90">
+                                <span>
+                                    ${coupon.coupons.min_purchase_amount > 0 
+                                        ? `최소 구매금액 ${coupon.coupons.min_purchase_amount.toLocaleString()}원` 
+                                        : '제한 없음'
+                                    }
+                                </span>
+                                <span class="${daysLeft <= 2 ? 'text-red-200 font-bold' : ''}">
+                                    ${daysLeft}일 남음
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 사용 완료/만료된 쿠폰 렌더링
+        function renderUsedCoupons(coupons) {
+            const container = document.getElementById('used-coupons');
+            
+            if (!coupons || coupons.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 py-12">
+                        사용 내역이 없습니다.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = coupons.map(coupon => {
+                const isExpired = new Date(coupon.expires_at) <= new Date();
+                const status = coupon.is_used ? '사용 완료' : '기간 만료';
+                const statusColor = coupon.is_used ? 'text-green-400' : 'text-gray-500';
+                const discountText = coupon.coupons.discount_type === 'percentage' 
+                    ? `${coupon.coupons.discount_value}%`
+                    : `${coupon.coupons.discount_value.toLocaleString()}원`;
+
+                return `
+                    <div class="bg-white bg-opacity-5 rounded-xl p-4 border border-white border-opacity-10 opacity-60">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <h4 class="text-base font-semibold text-white mb-1">${coupon.coupons.name}</h4>
+                                <p class="text-sm text-gray-400">${discountText} 할인</p>
+                                ${coupon.is_used && coupon.used_at 
+                                    ? `<p class="text-xs text-gray-500 mt-1">사용일: ${new Date(coupon.used_at).toLocaleDateString('ko-KR')}</p>`
+                                    : `<p class="text-xs text-gray-500 mt-1">만료일: ${new Date(coupon.expires_at).toLocaleDateString('ko-KR')}</p>`
+                                }
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm font-semibold ${statusColor}">${status}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 쿠폰 등록 (쿠폰 코드 입력)
+        async function registerCoupon() {
+            const input = document.getElementById('coupon-code-input');
+            const code = input.value.trim().toUpperCase();
+
+            if (!code) {
+                alert('쿠폰 코드를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    alert('로그인이 필요합니다.');
+                    return;
+                }
+
+                // 쿠폰 코드로 쿠폰 찾기
+                const { data: coupon, error: couponError } = await window.supabase
+                    .from('coupons')
+                    .select('*')
+                    .eq('code', code)
+                    .eq('is_active', true)
+                    .single();
+
+                if (couponError || !coupon) {
+                    alert('유효하지 않은 쿠폰 코드입니다.');
+                    return;
+                }
+
+                // 이미 등록된 쿠폰인지 확인
+                const { data: existing } = await window.supabase
+                    .from('user_coupons')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('coupon_id', coupon.id)
+                    .maybeSingle();
+
+                if (existing) {
+                    alert('이미 등록된 쿠폰입니다.');
+                    return;
+                }
+
+                // 쿠폰 발급
+                const expiresAt = new Date();
+                expiresAt.setDate(expiresAt.getDate() + coupon.valid_days);
+
+                const { error: insertError } = await window.supabase
+                    .from('user_coupons')
+                    .insert({
+                        user_id: user.id,
+                        coupon_id: coupon.id,
+                        expires_at: expiresAt.toISOString()
+                    });
+
+                if (insertError) throw insertError;
+
+                alert('쿠폰이 등록되었습니다!');
+                input.value = '';
+                loadCoupons(); // 목록 새로고침
+
+            } catch (error) {
+                console.error('Register coupon error:', error);
+                alert('쿠폰 등록 중 오류가 발생했습니다.');
+            }
+        }
+
         // 페이지 로드
         async function init() {
             currentUser = await getCurrentUser();
@@ -922,10 +1185,18 @@
                 adminLink.classList.remove('hidden');
             }
             
-            await Promise.all([
-                loadMyCourses(),
-                loadProfile()
-            ]);
+            // URL 파라미터에서 탭 확인
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            
+            if (tab && ['courses', 'orders', 'profile', 'devices', 'coupons'].includes(tab)) {
+                showTab(tab);
+            } else {
+                await Promise.all([
+                    loadMyCourses(),
+                    loadProfile()
+                ]);
+            }
         }
 
         // 배송 정보 폼 토글

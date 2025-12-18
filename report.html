@@ -153,7 +153,46 @@
                 </div>
             </div>
 
-            <!-- 5. 하단 버튼 -->
+            <!-- 5. 완강 보상: 쿠폰 발급 -->
+            <div id="coupon-section" class="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl p-8 text-center space-y-4">
+                <div class="text-4xl mb-2">🎁</div>
+                <h3 class="text-2xl font-bold text-white">완강 축하 쿠폰!</h3>
+                <p class="text-white text-opacity-90">
+                    다음 강의 구매 시 사용할 수 있는<br>
+                    <span class="text-xl font-bold">15% 할인 쿠폰</span>을 드립니다!
+                </p>
+                <div class="bg-white bg-opacity-20 rounded-xl p-4 inline-block">
+                    <p class="text-sm text-white text-opacity-80 mb-1">쿠폰 코드</p>
+                    <p class="text-2xl font-bold text-white tracking-wider" id="coupon-code">발급 중...</p>
+                </div>
+                <p class="text-sm text-white text-opacity-80">
+                    📅 발급일로부터 <span class="font-bold">7일간</span> 유효합니다<br>
+                    💳 마이페이지 > 쿠폰 탭에서 확인 가능
+                </p>
+                <button onclick="goToMyPageCoupons()" class="inline-flex items-center space-x-2 px-6 py-3 bg-white text-orange-500 font-semibold rounded-xl btn-hover-scale mt-2">
+                    <span>내 쿠폰 확인하기</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 6. 추천 강의 -->
+            <div class="space-y-6">
+                <div class="text-center space-y-2">
+                    <h3 class="text-2xl font-bold text-white">다음 강의를 추천합니다</h3>
+                    <p class="text-gray-400">현재 수강한 강의와 연관된 추천 강의입니다</p>
+                </div>
+                
+                <div id="recommended-courses" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 추천 강의 카드가 여기에 동적으로 생성됩니다 -->
+                    <div class="text-center text-gray-500 py-12 col-span-full">
+                        추천 강의를 불러오는 중...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. 하단 버튼 -->
             <div class="pt-8 text-center space-y-4">
                 <button onclick="window.print()" class="btn-hover-scale inline-flex items-center space-x-2 px-8 py-3 bg-white text-black font-semibold rounded-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

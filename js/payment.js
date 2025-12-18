@@ -8,6 +8,7 @@ let tossPayment = null;
 let currentOrder = null;
 let currentCourse = null;
 let selectedPaymentMethod = 'CARD'; // 기본값: 카드/간편결제
+let appliedCouponData = null; // 적용된 쿠폰 정보
 
 // 결제 수단 선택
 function selectPaymentMethod(method) {
@@ -204,18 +205,27 @@ async function requestPayment() {
         // 선택된 결제 수단 확인
         const method = selectedPaymentMethod || 'CARD';
         
+        // 최종 결제 금액 (쿠폰 적용된 금액)
+        const finalAmount = currentOrder.finalAmount || currentOrder.amount;
+        
+        // 쿠폰 정보를 URL 파라미터로 전달
+        let successUrl = `${window.location.origin}/payment-success.html`;
+        if (appliedCouponData) {
+            successUrl += `?couponId=${appliedCouponData.id}`;
+        }
+        
         // 기본 결제 요청 파라미터
         const paymentParams = {
             method: method,
             amount: {
                 currency: 'KRW',
-                value: currentOrder.amount
+                value: finalAmount
             },
             orderId: currentOrder.id,
             orderName: currentOrder.order_name,
             customerName: customerName,
             customerEmail: customerEmail,
-            successUrl: `${window.location.origin}/payment-success.html`,
+            successUrl: successUrl,
             failUrl: `${window.location.origin}/payment-fail.html`
         };
         
@@ -384,6 +394,139 @@ function showErrorState() {
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('payment-content').classList.add('hidden');
     document.getElementById('error-state').classList.remove('hidden');
+}
+
+// ========== 쿠폰 관리 ==========
+
+// 쿠폰 적용
+async function applyCoupon() {
+    const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
+    
+    if (!couponCode) {
+        showCouponMessage('쿠폰 코드를 입력해주세요.', false);
+        return;
+    }
+    
+    try {
+        const user = await getCurrentUser();
+        if (!user) {
+            showCouponMessage('로그인이 필요합니다.', false);
+            return;
+        }
+        
+        // 쿠폰 코드로 사용 가능한 쿠폰 찾기
+        const { data: userCoupons, error } = await window.supabase
+            .from('user_coupons')
+            .select(`
+                *,
+                coupons (
+                    code,
+                    name,
+                    discount_type,
+                    discount_value,
+                    min_purchase_amount,
+                    max_discount_amount
+                )
+            `)
+            .eq('user_id', user.id)
+            .eq('is_used', false)
+            .gt('expires_at', new Date().toISOString());
+        
+        if (error) throw error;
+        
+        // 입력한 코드와 일치하는 쿠폰 찾기
+        const matchedCoupon = userCoupons?.find(uc => 
+            uc.coupons.code.toUpperCase() === couponCode
+        );
+        
+        if (!matchedCoupon) {
+            showCouponMessage('유효하지 않거나 사용할 수 없는 쿠폰입니다.', false);
+            return;
+        }
+        
+        // 최소 구매 금액 확인
+        if (matchedCoupon.coupons.min_purchase_amount > currentOrder.amount) {
+            showCouponMessage(
+                `이 쿠폰은 ₩${matchedCoupon.coupons.min_purchase_amount.toLocaleString()} 이상 구매 시 사용 가능합니다.`,
+                false
+            );
+            return;
+        }
+        
+        // 쿠폰 적용
+        appliedCouponData = matchedCoupon;
+        updatePaymentAmount();
+        
+        // UI 업데이트
+        document.getElementById('applied-coupon-name').textContent = matchedCoupon.coupons.name;
+        document.getElementById('applied-coupon').classList.remove('hidden');
+        document.getElementById('coupon-code').value = '';
+        showCouponMessage('쿠폰이 적용되었습니다!', true);
+        
+    } catch (error) {
+        console.error('Apply coupon error:', error);
+        showCouponMessage('쿠폰 적용 중 오류가 발생했습니다.', false);
+    }
+}
+
+// 쿠폰 제거
+function removeCoupon() {
+    appliedCouponData = null;
+    updatePaymentAmount();
+    
+    // UI 업데이트
+    document.getElementById('applied-coupon').classList.add('hidden');
+    document.getElementById('coupon-message').classList.add('hidden');
+}
+
+// 결제 금액 업데이트 (쿠폰 적용 반영)
+function updatePaymentAmount() {
+    let finalAmount = currentOrder.amount;
+    let discountAmount = 0;
+    
+    if (appliedCouponData) {
+        const coupon = appliedCouponData.coupons;
+        
+        if (coupon.discount_type === 'percentage') {
+            // 퍼센트 할인
+            discountAmount = Math.floor(currentOrder.amount * (coupon.discount_value / 100));
+            
+            // 최대 할인 금액 적용
+            if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
+                discountAmount = coupon.max_discount_amount;
+            }
+        } else {
+            // 고정 금액 할인
+            discountAmount = coupon.discount_value;
+        }
+        
+        finalAmount = currentOrder.amount - discountAmount;
+        
+        // 음수 방지
+        if (finalAmount < 0) finalAmount = 0;
+    }
+    
+    // UI 업데이트
+    document.getElementById('discount-amount').textContent = 
+        discountAmount > 0 ? `-₩${discountAmount.toLocaleString()}` : '₩0';
+    document.getElementById('total-price').textContent = `₩${finalAmount.toLocaleString()}`;
+    
+    // currentOrder 금액도 업데이트 (결제 시 사용)
+    currentOrder.finalAmount = finalAmount;
+    currentOrder.discountAmount = discountAmount;
+}
+
+// 쿠폰 메시지 표시
+function showCouponMessage(message, isSuccess) {
+    const messageEl = document.getElementById('coupon-message');
+    messageEl.textContent = message;
+    messageEl.classList.remove('hidden', 'text-red-400', 'text-green-400');
+    messageEl.classList.add(isSuccess ? 'text-green-400' : 'text-red-400');
+    
+    // 3초 후 자동 숨김
+    setTimeout(() => {
+        messageEl.classList.add('hidden');
+    }, 3000);
 }
 
 // 페이지 로드 시 초기화
