@@ -38,11 +38,45 @@ serve(async (req) => {
       )
     }
 
+    // 전화번호 유효성 검사
+    if (!phone || typeof phone !== 'string' || phone.trim() === '') {
+      console.error('❌ [H6] 전화번호가 없거나 유효하지 않음:', phone)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: '유효하지 않은 전화번호입니다.',
+          phone: phone
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
     // 전화번호 포맷팅 (하이픈 제거)
     const formattedPhone = phone.replace(/[^0-9]/g, '')
+    
+    // 전화번호 길이 검사 (최소 10자리)
+    if (formattedPhone.length < 10) {
+      console.error('❌ [H6] 전화번호가 너무 짧음:', { original: phone, formatted: formattedPhone, length: formattedPhone.length })
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: '전화번호는 최소 10자리 이상이어야 합니다.',
+          phone: phone,
+          formattedPhone: formattedPhone
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
 
     console.log('📋 템플릿 파라미터:', templateParams)
     console.log('🔗 PDF URL:', pdfUrl)
+    console.log('📞 [H6] 전화번호 검증 완료:', { original: phone, formatted: formattedPhone, length: formattedPhone.length })
 
     // NHN API 요청 페이로드 (버튼 제거)
     // v2.2 API에서는 plusFriendId가 아닌 senderKey 사용!

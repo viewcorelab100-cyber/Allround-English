@@ -8,10 +8,11 @@ function loadGlobalFooter() {
     // Create footer element
     const footer = document.createElement('footer');
     footer.id = 'allround-footer';
-    // Removed pb-10 and adjusted overflow to allow descenders to be visible if needed, 
-    // but typically we want it flush with bottom.
-    // Added flex-col to organize layout better.
-    footer.className = 'bg-black text-white pt-20 border-t border-white/10 mt-auto flex flex-col justify-between overflow-hidden relative';
+    // Added clear-both to ensure footer is below all floated/flexed content
+    // Added left-0 right-0 to ensure full width even with sidebars
+    footer.className = 'bg-black text-white pt-20 border-t border-white/10 w-full flex flex-col justify-between overflow-hidden relative clear-both';
+    // Inline style to ensure full width positioning
+    footer.style.cssText = 'position: relative; left: 0; right: 0; width: 100vw; margin-left: 0;';
     
     // Footer HTML Content
     footer.innerHTML = `
@@ -29,8 +30,8 @@ function loadGlobalFooter() {
                             <div class="text-xs text-gray-500 space-y-1 font-light">
                                 <p>대표자: 배은영 | 개인정보보호책임자: 배은영</p>
                                 <p>사업자등록번호: 721-18-02487</p>
-                                <p>통신판매업신고: 2024-서울강남-0000호</p>
-                                <p>주소: 서울특별시 강남구 테헤란로86길 15, 3층 3138호<br>(대치동, 동구빌딩)</p>
+                                <p>통신판매업신고: 2025-서울강남-0000호</p>
+                                <p>주소: 서울 강남구 대치동 943-29 3층 3138호</p>
                                 <p class="pt-2">Email: contact@allround.co.kr</p>
                             </div>
                         </div>
@@ -83,8 +84,6 @@ function loadGlobalFooter() {
         </div>
 
         <!-- Huge Brand Name (At the very bottom, flush) -->
-        <!-- Adjusted line-height to 0.75 and removed negative margin to fix clipping -->
-        <!-- Added transform translate-y to fine-tune position -->
         <div class="w-full overflow-hidden leading-none select-none pointer-events-none mt-auto">
             <h2 class="font-['Playfair_Display'] text-[18vw] font-bold tracking-tighter text-white text-center opacity-100 whitespace-nowrap translate-y-[2%]" style="line-height: 0.8;">
                 ALLROUND
@@ -96,12 +95,24 @@ function loadGlobalFooter() {
     const existingFooters = document.querySelectorAll('footer');
     existingFooters.forEach(f => f.remove());
 
-    // Append to correct location
-    const mainElement = document.querySelector('main');
-    if (mainElement && mainElement.parentNode) {
-         mainElement.parentNode.insertBefore(footer, mainElement.nextSibling);
-    } else {
-        document.body.appendChild(footer);
+    // Always append to body to ensure full width (especially for admin pages with sidebars)
+    document.body.appendChild(footer);
+    
+    // Special handling for admin page with sidebar
+    // Check if there's a sidebar (admin page)
+    const sidebar = document.querySelector('aside.fixed');
+    if (sidebar) {
+        // For admin pages, ensure footer spans full width by breaking out of flex container
+        footer.style.position = 'relative';
+        footer.style.marginLeft = '0';
+        footer.style.width = '100vw';
+        // Also need to ensure the parent flex container allows this
+        const flexParent = document.querySelector('body > div.flex');
+        if (flexParent) {
+            // Make body use flex column to stack header, content, and footer
+            document.body.style.display = 'flex';
+            document.body.style.flexDirection = 'column';
+        }
     }
 }
 
