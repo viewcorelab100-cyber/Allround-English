@@ -2172,11 +2172,21 @@
                 const recipientPhone = profile.parent_phone || profile.phone || profile.student_phone;
                 
                 // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2080',message:'recipientPhone calculated',data:{recipientPhone,notification_enabled:profile.notification_enabled},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'admin.html:2080',message:'recipientPhone calculated',data:{recipientPhone,parent_phone:profile.parent_phone,phone:profile.phone,student_phone:profile.student_phone,notification_enabled:profile.notification_enabled},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2,H6'})}).catch(()=>{});
                 // #endregion
                 
-                if (!recipientPhone) {
-                    console.log('연락처가 없는 사용자입니다.');
+                // 전화번호 유효성 검사 강화
+                if (!recipientPhone || recipientPhone.trim() === '') {
+                    console.log('❌ 연락처가 없는 사용자입니다.');
+                    alert('학생의 연락처 정보가 없어 알림톡을 발송할 수 없습니다.');
+                    return;
+                }
+                
+                // 전화번호 형식 확인 (숫자만 추출 후 최소 10자리)
+                const cleanPhone = recipientPhone.replace(/[^0-9]/g, '');
+                if (cleanPhone.length < 10) {
+                    console.log('❌ 유효하지 않은 전화번호:', recipientPhone);
+                    alert('유효하지 않은 전화번호입니다: ' + recipientPhone);
                     return;
                 }
 
