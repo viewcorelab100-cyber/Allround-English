@@ -349,17 +349,39 @@
 
         // 탭 전환
         function showTab(tab) {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:showTab:entry',message:'showTab called',data:{tab,availableTabs:['courses','orders','profile','devices','coupons']},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C2'})}).catch(()=>{});
+            // #endregion
+            
             // 모든 콘텐츠와 탭 숨기기
             ['courses', 'orders', 'profile', 'devices', 'coupons'].forEach(t => {
-                document.getElementById(`content-${t}`).classList.add('hidden');
-                document.getElementById(`tab-${t}`).classList.remove('active');
-                document.getElementById(`tab-${t}`).classList.add('text-gray-400');
+                const contentEl = document.getElementById(`content-${t}`);
+                const tabEl = document.getElementById(`tab-${t}`);
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:showTab:elements',message:'Tab elements check',data:{tabName:t,contentExists:!!contentEl,tabExists:!!tabEl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C1'})}).catch(()=>{});
+                // #endregion
+                
+                if (contentEl) contentEl.classList.add('hidden');
+                if (tabEl) {
+                    tabEl.classList.remove('active');
+                    tabEl.classList.add('text-gray-400');
+                }
             });
 
             // 선택된 탭 표시
-            document.getElementById(`content-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`tab-${tab}`).classList.remove('text-gray-400');
+            const selectedContent = document.getElementById(`content-${tab}`);
+            const selectedTab = document.getElementById(`tab-${tab}`);
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:showTab:selected',message:'Selected tab elements',data:{tab,selectedContentExists:!!selectedContent,selectedTabExists:!!selectedTab},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C1'})}).catch(()=>{});
+            // #endregion
+            
+            if (selectedContent) selectedContent.classList.remove('hidden');
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.classList.remove('text-gray-400');
+            }
 
             // 주문 탭 선택 시 데이터 로드
             if (tab === 'orders') {
@@ -373,6 +395,9 @@
             
             // 쿠폰 탭 선택 시 데이터 로드
             if (tab === 'coupons') {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:showTab:coupons',message:'Loading coupons',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C3'})}).catch(()=>{});
+                // #endregion
                 loadCoupons();
             }
         }
@@ -931,8 +956,17 @@
         
         // 쿠폰 목록 불러오기
         async function loadCoupons() {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:loadCoupons:entry',message:'loadCoupons called',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C3'})}).catch(()=>{});
+            // #endregion
+            
             try {
                 const user = await getCurrentUser();
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:loadCoupons:user',message:'Current user',data:{userExists:!!user,userId:user?.id},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C3,C4'})}).catch(()=>{});
+                // #endregion
+                
                 if (!user) return;
 
                 const { data: userCoupons, error } = await window.supabase
@@ -955,6 +989,10 @@
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:loadCoupons:query',message:'Coupon query result',data:{hasError:!!error,errorCode:error?.code,errorMessage:error?.message,dataLength:userCoupons?.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C4'})}).catch(()=>{});
+                // #endregion
+
                 if (error) throw error;
 
                 // 사용 가능한 쿠폰과 사용 완료/만료된 쿠폰 분리
@@ -962,10 +1000,18 @@
                 const available = userCoupons.filter(c => !c.is_used && new Date(c.expires_at) > now);
                 const unavailable = userCoupons.filter(c => c.is_used || new Date(c.expires_at) <= now);
 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:loadCoupons:filter',message:'Coupon filtering',data:{totalCoupons:userCoupons?.length,availableCount:available.length,unavailableCount:unavailable.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C5'})}).catch(()=>{});
+                // #endregion
+
                 renderAvailableCoupons(available);
                 renderUsedCoupons(unavailable);
 
             } catch (error) {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:loadCoupons:error',message:'Load coupons error',data:{errorMessage:error.message,errorStack:error.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C4'})}).catch(()=>{});
+                // #endregion
+                
                 console.error('Load coupons error:', error);
                 document.getElementById('available-coupons').innerHTML = `
                     <div class="text-center text-red-400 py-12">
@@ -1161,6 +1207,10 @@
             // URL 파라미터에서 탭 확인
             const params = new URLSearchParams(window.location.search);
             const tab = params.get('tab');
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:init:urlparam',message:'URL tab parameter',data:{tab,isValid:tab && ['courses','orders','profile','devices','coupons'].includes(tab)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C2'})}).catch(()=>{});
+            // #endregion
             
             if (tab && ['courses', 'orders', 'profile', 'devices', 'coupons'].includes(tab)) {
                 showTab(tab);

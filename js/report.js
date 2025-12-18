@@ -1,11 +1,22 @@
 // report.js - 학습 리포트 로직
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'report.js:DOMContentLoaded',message:'Report page loaded',data:{url:window.location.href},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+    
     const params = new URLSearchParams(window.location.search);
     const reportId = params.get('id');       // 내부 관리용 ID
     const publicId = params.get('pid');      // 외부 공유용 ID (Public ID)
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'report.js:params',message:'Report params',data:{reportId,publicId,hasReportId:!!reportId,hasPublicId:!!publicId},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+    // #endregion
+
     if (!reportId && !publicId) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'report.js:noparams',message:'No report params - showing error',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+        // #endregion
         showError();
         return;
     }
