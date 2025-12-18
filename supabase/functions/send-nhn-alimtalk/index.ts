@@ -45,14 +45,14 @@ serve(async (req) => {
     console.log('🔗 PDF URL:', pdfUrl)
 
     // NHN API 요청 페이로드 (버튼 제거)
+    // v2.2 API에서는 plusFriendId가 아닌 senderKey 사용!
     const nhnPayload = {
-      plusFriendId: NHN_SENDER_KEY,
-      templateCode: templateCode,  // NHN에 등록된 템플릿 코드 그대로 사용
+      senderKey: NHN_SENDER_KEY,  // v2.2 필드명
+      templateCode: templateCode,
       recipientList: [
         {
           recipientNo: formattedPhone,
           templateParameter: templateParams
-          // 버튼 제거 - 템플릿 본문에 PDF링크 변수만 사용
         }
       ]
     }
