@@ -2200,20 +2200,17 @@
                 if (lessonError) throw lessonError;
 
                 // 알림톡 요청 페이로드 준비
-                // PDF URL을 15자 이내로 매우 짧게 만들기
-                const shortPdfUrl = pdfUrl ? '마이페이지 확인' : '마이페이지 확인';
-                
                 const requestPayload = {
                     phone: recipientPhone,
-                    templateCode: 'grading_complete_UVO7vbQr0', // 카카오 템플릿 코드 사용
+                    templateCode: 'grading_complete_UVO7vbQr0',
                     submissionId: submissionId,
-                    pdfUrl: null, // 버튼 제거
+                    pdfUrl: null,
                     templateParams: {
                         '학생명': profile.name || '학생',
                         '과제명': `${lesson.order_num}강`,
                         '점수': feedbackData.score?.toString() || '0',
                         '피드백': feedbackData.comment || '채점 완료',
-                        'PDF링크': shortPdfUrl // 15자 이내 (버튼 없음)
+                        'PDF링크': '-' // 1자 (최소)
                     }
                 };
 
@@ -3682,5 +3679,6 @@
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
+    <script src="js/footer.js"></script>
 </body>
 </html>
