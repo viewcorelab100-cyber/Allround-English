@@ -2200,9 +2200,10 @@
                 if (lessonError) throw lessonError;
 
                 // 알림톡 요청 페이로드 준비
+                // NHN 템플릿 코드 사용 (카카오 템플릿 코드 아님!)
                 const requestPayload = {
                     phone: recipientPhone,
-                    templateCode: 'grading_complete_UVO7vbQr0',
+                    templateCode: 'grading_complete',  // NHN 템플릿 코드
                     submissionId: submissionId,
                     pdfUrl: null,
                     templateParams: {
@@ -2210,7 +2211,7 @@
                         '과제명': `${lesson.order_num}강`,
                         '점수': feedbackData.score?.toString() || '0',
                         '피드백': feedbackData.comment || '채점 완료',
-                        'PDF링크': '-' // 1자 (최소)
+                        'PDF링크': '-'
                     }
                 };
 
