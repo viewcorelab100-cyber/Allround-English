@@ -79,10 +79,6 @@ async function getCourseById(courseId) {
 // 사용자의 구매한 강의 목록 가져오기
 async function getUserPurchasedCourses(userId) {
     try {
-        // #region agent log
-        console.log('[DEBUG] 🔵 Querying purchases for user:', userId);
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'courses.js:82',message:'Query purchases table',data:{userId, status: 'completed'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,C,D'})}).catch(()=>{});
-        // #endregion
         const { data, error } = await window.supabase
             .from('purchases')
             .select(`
@@ -92,19 +88,11 @@ async function getUserPurchasedCourses(userId) {
             .eq('user_id', userId)
             .eq('status', 'completed');
         
-        // #region agent log
-        console.log('[DEBUG] 🟢 Purchases query result:', {error, dataLength: data?.length, data});
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'courses.js:91',message:'Query purchases result',data:{error: error ? {code: error.code, message: error.message, details: error.details} : null, dataLength: data?.length, hasData: !!data, firstItem: data?.[0] ? {id: data[0].id, user_id: data[0].user_id, course_id: data[0].course_id, status: data[0].status, hasCourse: !!data[0].course} : null},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D,E'})}).catch(()=>{});
-        // #endregion
         if (error) throw error;
         
         return { success: true, data };
     } catch (error) {
         console.error('Get purchased courses error:', error);
-        // #region agent log
-        console.log('[DEBUG] 🔴 Query exception:', error);
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'courses.js:96',message:'Query purchases exception',data:{errorMessage: error.message, errorStack: error.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         return { success: false, error: error.message };
     }
 }
