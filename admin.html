@@ -103,6 +103,9 @@
                 <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-6 py-3 text-white text-sm">
                     강의 관리
                 </a>
+                <a href="#analytics" onclick="showSection('analytics')" id="nav-analytics" class="sidebar-link block px-6 py-3 text-white text-sm">
+                    강의 분석
+                </a>
                 <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-6 py-3 text-white text-sm">
                     회원 관리
                 </a>
@@ -470,6 +473,41 @@
                         <tbody id="members-table-body">
                             <tr>
                                 <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    데이터를 불러오는 중...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 강의 분석 섹션 -->
+            <section id="section-analytics" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-8">
+                    강의 분석
+                </h1>
+
+                <!-- 강의별 매출 및 클릭율 -->
+                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
+                    <div class="p-6 border-b border-white border-opacity-10">
+                        <h2 class="text-lg font-bold text-white">강의별 성과 분석</h2>
+                        <p class="text-sm text-gray-400 mt-1">각 강의의 매출과 조회수를 확인하세요</p>
+                    </div>
+                    
+                    <table class="w-full">
+                        <thead class="bg-white bg-opacity-5">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">강의명</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">판매 건수</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">총 매출</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">총 조회수</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">전환율</th>
+                                <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">평균 진도율</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analytics-table-body">
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                                     데이터를 불러오는 중...
                                 </td>
                             </tr>
@@ -847,6 +885,8 @@
                 loadOrders('need_action');
             } else if (section === 'members') {
                 loadMembers();
+            } else if (section === 'analytics') {
+                loadAnalytics();
             }
         }
 
@@ -3019,6 +3059,165 @@
             document.getElementById('stat-active-members').textContent = activeMembers;
             document.getElementById('stat-new-members').textContent = newMembers;
             document.getElementById('stat-total-revenue').textContent = `₩${totalRevenue.toLocaleString()}`;
+        }
+
+        // 강의 분석 데이터 로드
+        async function loadAnalytics() {
+            try {
+                // 강의 목록 로드
+                const { data: courses, error: courseError } = await window.supabase
+                    .from('courses')
+                    .select('id, title, price')
+                    .order('created_at', { ascending: false });
+
+                if (courseError) throw courseError;
+
+                // 강의별 매출 데이터 (purchases 테이블에서 집계)
+                const { data: purchases, error: purchaseError } = await window.supabase
+                    .from('purchases')
+                    .select('course_id, amount')
+                    .eq('status', 'completed');
+
+                if (purchaseError) throw purchaseError;
+
+                // 강의별 조회수 데이터 (video_progress 테이블에서 고유 사용자 수 집계)
+                const { data: progressData, error: progressError } = await window.supabase
+                    .from('video_progress')
+                    .select('user_id, lesson_id');
+
+                if (progressError) throw progressError;
+
+                // 레슨과 강의 매핑
+                const { data: lessons, error: lessonError } = await window.supabase
+                    .from('lessons')
+                    .select('id, course_id');
+
+                if (lessonError) throw lessonError;
+
+                // 레슨 ID -> 강의 ID 맵 생성
+                const lessonToCourseMap = new Map();
+                lessons?.forEach(lesson => {
+                    lessonToCourseMap.set(lesson.id, lesson.course_id);
+                });
+
+                // 강의별 고유 조회자 수 계산
+                const courseViewsMap = new Map();
+                progressData?.forEach(progress => {
+                    const courseId = lessonToCourseMap.get(progress.lesson_id);
+                    if (courseId) {
+                        if (!courseViewsMap.has(courseId)) {
+                            courseViewsMap.set(courseId, new Set());
+                        }
+                        courseViewsMap.get(courseId).add(progress.user_id);
+                    }
+                });
+
+                // 강의별 판매 건수 및 매출 집계
+                const courseSalesMap = new Map();
+                purchases?.forEach(purchase => {
+                    if (!courseSalesMap.has(purchase.course_id)) {
+                        courseSalesMap.set(purchase.course_id, { count: 0, revenue: 0 });
+                    }
+                    const sales = courseSalesMap.get(purchase.course_id);
+                    sales.count++;
+                    sales.revenue += purchase.amount || 0;
+                });
+
+                // 강의별 진도율 계산
+                const { data: enrollments, error: enrollmentError } = await window.supabase
+                    .from('purchases')
+                    .select('user_id, course_id')
+                    .eq('status', 'completed');
+
+                if (enrollmentError) throw enrollmentError;
+
+                const courseProgressMap = new Map();
+                
+                // 각 강의별 평균 진도율 계산
+                for (const course of (courses || [])) {
+                    const courseEnrollments = enrollments?.filter(e => e.course_id === course.id) || [];
+                    
+                    if (courseEnrollments.length > 0) {
+                        const courseLessons = lessons?.filter(l => l.course_id === course.id) || [];
+                        const totalLessons = courseLessons.length;
+
+                        if (totalLessons > 0) {
+                            let totalProgress = 0;
+                            
+                            for (const enrollment of courseEnrollments) {
+                                const completedLessons = progressData?.filter(p => 
+                                    p.user_id === enrollment.user_id && 
+                                    lessonToCourseMap.get(p.lesson_id) === course.id
+                                ).length || 0;
+                                
+                                totalProgress += (completedLessons / totalLessons) * 100;
+                            }
+                            
+                            courseProgressMap.set(course.id, totalProgress / courseEnrollments.length);
+                        }
+                    }
+                }
+
+                // 테이블 렌더링
+                renderAnalyticsTable(courses, courseSalesMap, courseViewsMap, courseProgressMap);
+
+            } catch (error) {
+                console.error('분석 데이터 로드 오류:', error);
+                document.getElementById('analytics-table-body').innerHTML = `
+                    <tr><td colspan="6" class="px-6 py-12 text-center text-red-400">
+                        분석 데이터를 불러오는 중 오류가 발생했습니다.
+                    </td></tr>
+                `;
+            }
+        }
+
+        function renderAnalyticsTable(courses, salesMap, viewsMap, progressMap) {
+            const tbody = document.getElementById('analytics-table-body');
+            
+            if (!courses || courses.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        등록된 강의가 없습니다.
+                    </td></tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = courses.map(course => {
+                const sales = salesMap.get(course.id) || { count: 0, revenue: 0 };
+                const views = viewsMap.get(course.id)?.size || 0;
+                const conversionRate = views > 0 ? ((sales.count / views) * 100).toFixed(1) : '0.0';
+                const avgProgress = progressMap.get(course.id)?.toFixed(1) || '0.0';
+                
+                return `
+                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-white">${course.title}</div>
+                            <div class="text-sm text-gray-400">₩${(course.price || 0).toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-white">${sales.count}건</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-green-400 font-semibold">₩${sales.revenue.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-blue-400">${views}명</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-purple-400">${conversionRate}%</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-white bg-opacity-10 rounded-full h-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full" style="width: ${avgProgress}%"></div>
+                                </div>
+                                <span class="text-sm text-yellow-400">${avgProgress}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function renderMembersTable(members) {
