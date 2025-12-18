@@ -3064,12 +3064,15 @@
         // 강의 분석 데이터 로드
         async function loadAnalytics() {
             try {
+                console.log('📊 분석 데이터 로드 시작');
+
                 // 강의 목록 로드
                 const { data: courses, error: courseError } = await window.supabase
                     .from('courses')
                     .select('id, title, price')
                     .order('created_at', { ascending: false });
 
+                console.log('✅ 강의 로드:', { count: courses?.length, error: courseError });
                 if (courseError) throw courseError;
 
                 // 강의별 매출 데이터 (purchases 테이블에서 집계)
@@ -3078,20 +3081,33 @@
                     .select('course_id, amount')
                     .eq('status', 'completed');
 
+                console.log('✅ 매출 데이터 로드:', { count: purchases?.length, error: purchaseError });
                 if (purchaseError) throw purchaseError;
 
                 // 강의별 조회수 데이터 (video_progress 테이블에서 고유 사용자 수 집계)
+                console.log('🔍 video_progress 테이블 조회 시도...');
                 const { data: progressData, error: progressError } = await window.supabase
                     .from('video_progress')
                     .select('user_id, lesson_id');
 
-                if (progressError) throw progressError;
+                console.log('📊 video_progress 결과:', { 
+                    count: progressData?.length, 
+                    error: progressError,
+                    errorMessage: progressError?.message,
+                    errorCode: progressError?.code
+                });
+                
+                if (progressError) {
+                    console.warn('⚠️ video_progress 테이블 조회 실패, 조회수 0으로 처리');
+                    // 에러를 던지지 않고 빈 배열로 처리
+                }
 
                 // 레슨과 강의 매핑
                 const { data: lessons, error: lessonError } = await window.supabase
                     .from('lessons')
                     .select('id, course_id');
 
+                console.log('✅ 레슨 로드:', { count: lessons?.length, error: lessonError });
                 if (lessonError) throw lessonError;
 
                 // 레슨 ID -> 강의 ID 맵 생성
@@ -3100,17 +3116,19 @@
                     lessonToCourseMap.set(lesson.id, lesson.course_id);
                 });
 
-                // 강의별 고유 조회자 수 계산
+                // 강의별 고유 조회자 수 계산 (progressData가 있을 때만)
                 const courseViewsMap = new Map();
-                progressData?.forEach(progress => {
-                    const courseId = lessonToCourseMap.get(progress.lesson_id);
-                    if (courseId) {
-                        if (!courseViewsMap.has(courseId)) {
-                            courseViewsMap.set(courseId, new Set());
+                if (progressData && !progressError) {
+                    progressData.forEach(progress => {
+                        const courseId = lessonToCourseMap.get(progress.lesson_id);
+                        if (courseId) {
+                            if (!courseViewsMap.has(courseId)) {
+                                courseViewsMap.set(courseId, new Set());
+                            }
+                            courseViewsMap.get(courseId).add(progress.user_id);
                         }
-                        courseViewsMap.get(courseId).add(progress.user_id);
-                    }
-                });
+                    });
+                }
 
                 // 강의별 판매 건수 및 매출 집계
                 const courseSalesMap = new Map();
@@ -3129,34 +3147,44 @@
                     .select('user_id, course_id')
                     .eq('status', 'completed');
 
+                console.log('✅ 수강생 데이터 로드:', { count: enrollments?.length, error: enrollmentError });
                 if (enrollmentError) throw enrollmentError;
 
                 const courseProgressMap = new Map();
                 
-                // 각 강의별 평균 진도율 계산
-                for (const course of (courses || [])) {
-                    const courseEnrollments = enrollments?.filter(e => e.course_id === course.id) || [];
-                    
-                    if (courseEnrollments.length > 0) {
-                        const courseLessons = lessons?.filter(l => l.course_id === course.id) || [];
-                        const totalLessons = courseLessons.length;
+                // 각 강의별 평균 진도율 계산 (progressData가 있을 때만)
+                if (progressData && !progressError) {
+                    for (const course of (courses || [])) {
+                        const courseEnrollments = enrollments?.filter(e => e.course_id === course.id) || [];
+                        
+                        if (courseEnrollments.length > 0) {
+                            const courseLessons = lessons?.filter(l => l.course_id === course.id) || [];
+                            const totalLessons = courseLessons.length;
 
-                        if (totalLessons > 0) {
-                            let totalProgress = 0;
-                            
-                            for (const enrollment of courseEnrollments) {
-                                const completedLessons = progressData?.filter(p => 
-                                    p.user_id === enrollment.user_id && 
-                                    lessonToCourseMap.get(p.lesson_id) === course.id
-                                ).length || 0;
+                            if (totalLessons > 0) {
+                                let totalProgress = 0;
                                 
-                                totalProgress += (completedLessons / totalLessons) * 100;
+                                for (const enrollment of courseEnrollments) {
+                                    const completedLessons = progressData.filter(p => 
+                                        p.user_id === enrollment.user_id && 
+                                        lessonToCourseMap.get(p.lesson_id) === course.id
+                                    ).length || 0;
+                                    
+                                    totalProgress += (completedLessons / totalLessons) * 100;
+                                }
+                                
+                                courseProgressMap.set(course.id, totalProgress / courseEnrollments.length);
                             }
-                            
-                            courseProgressMap.set(course.id, totalProgress / courseEnrollments.length);
                         }
                     }
                 }
+
+                console.log('✅ 분석 데이터 준비 완료:', {
+                    강의수: courses?.length,
+                    매출건수: purchases?.length,
+                    조회데이터: progressData?.length || 0,
+                    진도율계산: courseProgressMap.size
+                });
 
                 // 테이블 렌더링
                 renderAnalyticsTable(courses, courseSalesMap, courseViewsMap, courseProgressMap);
