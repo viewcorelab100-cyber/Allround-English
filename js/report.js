@@ -167,10 +167,12 @@ async function issueCoupon(userId, courseId) {
                 .eq('id', data)
                 .single();
 
-            if (couponData && couponData.coupons) {
-                document.getElementById('coupon-code').textContent = couponData.coupons.code;
+            if (couponData) {
+                // 고유 쿠폰 코드 표시 (custom_code 우선, 없으면 기본 코드)
+                const displayCode = couponData.custom_code || couponData.coupons?.code || 'COMPLETE-ERR';
+                document.getElementById('coupon-code').textContent = displayCode;
             } else {
-                document.getElementById('coupon-code').textContent = 'COMPLETION15';
+                document.getElementById('coupon-code').textContent = '발급 오류';
             }
         } else {
             // 이미 발급된 쿠폰인 경우
