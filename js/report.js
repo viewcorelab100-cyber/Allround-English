@@ -192,12 +192,16 @@ async function loadRecommendedCourses(currentCourseId) {
     const container = document.getElementById('recommended-courses');
     
     try {
+        console.log('[추천 강의] 시작, currentCourseId:', currentCourseId);
+        
         // 현재 강의와 같은 카테고리의 다른 강의 가져오기
         const { data: currentCourse } = await window.supabase
             .from('courses')
             .select('categories')
             .eq('id', currentCourseId)
             .single();
+        
+        console.log('[추천 강의] 현재 강의:', currentCourse);
 
         if (!currentCourse || !currentCourse.categories) {
             container.innerHTML = '<p class="text-gray-500 text-center col-span-full">추천 강의가 없습니다.</p>';
@@ -206,6 +210,7 @@ async function loadRecommendedCourses(currentCourseId) {
 
         // 현재 사용자 가져오기
         const user = window.currentUser || (await window.supabase.auth.getUser()).data.user;
+        console.log('[추천 강의] 현재 사용자:', user?.id);
         
         // 사용자가 이미 구매한 강의 목록 가져오기
         let purchasedCourseIds = [currentCourseId]; // 현재 강의는 제외
@@ -214,38 +219,68 @@ async function loadRecommendedCourses(currentCourseId) {
                 .from('purchases')
                 .select('course_id')
                 .eq('user_id', user.id);
+            console.log('[추천 강의] 구매한 강의 목록:', purchases);
             if (purchases && purchases.length > 0) {
                 purchasedCourseIds = [...purchasedCourseIds, ...purchases.map(p => p.course_id)];
             }
         }
+        console.log('[추천 강의] 제외할 강의 IDs:', purchasedCourseIds);
 
         // 1단계: 같은 카테고리의 안 들은 강의 추천
-        let { data: courses, error } = await window.supabase
+        let query = window.supabase
             .from('courses')
             .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
-            .eq('is_published', true)
-            .not('id', 'in', `(${purchasedCourseIds.join(',')})`)
+            .eq('is_published', true);
+        
+        // 구매한 강의 제외 (배열이 비어있지 않을 때만)
+        if (purchasedCourseIds.length > 0) {
+            query = query.not('id', 'in', `(${purchasedCourseIds.join(',')})`);
+        }
+        
+        query = query
             .contains('categories', currentCourse.categories)
             .order('created_at', { ascending: false })
             .limit(2);
+        
+        let { data: courses, error } = await query;
+        
+        console.log('[추천 강의] 1단계 (같은 카테고리) 쿼리 결과:', { courses, error });
 
-        if (error) throw error;
+        if (error) {
+            console.error('[추천 강의] 1단계 에러:', error);
+            throw error;
+        }
 
         // 2단계: 같은 카테고리에 추천할 강의가 없으면 다른 카테고리 추천
         if (!courses || courses.length === 0) {
-            const { data: otherCourses, error: otherError } = await window.supabase
+            console.log('[추천 강의] 2단계 시작 (다른 카테고리)');
+            
+            let query2 = window.supabase
                 .from('courses')
                 .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
-                .eq('is_published', true)
-                .not('id', 'in', `(${purchasedCourseIds.join(',')})`)
+                .eq('is_published', true);
+            
+            if (purchasedCourseIds.length > 0) {
+                query2 = query2.not('id', 'in', `(${purchasedCourseIds.join(',')})`);
+            }
+            
+            const { data: otherCourses, error: otherError } = await query2
                 .order('created_at', { ascending: false })
                 .limit(2);
 
-            if (otherError) throw otherError;
+            console.log('[추천 강의] 2단계 쿼리 결과:', { otherCourses, otherError });
+
+            if (otherError) {
+                console.error('[추천 강의] 2단계 에러:', otherError);
+                throw otherError;
+            }
             courses = otherCourses;
         }
 
+        console.log('[추천 강의] 최종 추천 강의:', courses);
+
         if (!courses || courses.length === 0) {
+            console.warn('[추천 강의] 추천할 강의가 없습니다.');
             container.innerHTML = '<p class="text-gray-500 text-center col-span-full">추천 강의가 없습니다.</p>';
             return;
         }
@@ -280,7 +315,13 @@ async function loadRecommendedCourses(currentCourseId) {
         `).join('');
 
     } catch (error) {
-        console.error('Load recommended courses error:', error);
+        console.error('[추천 강의] 에러 발생:', error);
+        console.error('[추천 강의] 에러 상세:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        });
         container.innerHTML = '<p class="text-red-400 text-center col-span-full">추천 강의를 불러오는 중 오류가 발생했습니다.</p>';
     }
 }
