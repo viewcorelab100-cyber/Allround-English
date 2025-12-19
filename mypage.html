@@ -155,7 +155,7 @@
                     📱 내 기기
                 </button>
                 <button onclick="showTab('coupons')" id="tab-coupons" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
-                    🎟️ 쿠폰
+                    쿠폰
                 </button>
             </div>
 
@@ -426,9 +426,9 @@
             const badges = {
                 'PENDING_ADDRESS': '<span class="px-3 py-1 rounded-full text-xs bg-yellow-500 bg-opacity-20 text-yellow-400">⏳ 배송정보 미완료</span>',
                 'PREPARING': '<span class="px-3 py-1 rounded-full text-xs bg-blue-500 bg-opacity-20 text-blue-400">📋 배송준비중</span>',
-                'SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-purple-500 bg-opacity-20 text-purple-400">🚚 배송중</span>',
-                'DELIVERED': '<span class="px-3 py-1 rounded-full text-xs bg-green-500 bg-opacity-20 text-green-400">✅ 배송완료</span>',
-                'NO_SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-gray-500 bg-opacity-20 text-gray-400">📱 배송없음</span>'
+                'SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-purple-500 bg-opacity-20 text-purple-400">배송중</span>',
+                'DELIVERED': '<span class="px-3 py-1 rounded-full text-xs bg-green-500 bg-opacity-20 text-green-400">배송완료</span>',
+                'NO_SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-gray-500 bg-opacity-20 text-gray-400">배송없음</span>'
             };
             return badges[status] || badges['PENDING_ADDRESS'];
         }
@@ -944,6 +944,10 @@
             try {
                 const user = await getCurrentUser();
                 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:945',message:'마이페이지 loadCoupons 시작',data:{userId:user?.id,userEmail:user?.email},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H3'})}).catch(()=>{});
+                // #endregion
+                
                 if (!user) return;
 
                 const { data: userCoupons, error } = await window.supabase
@@ -966,12 +970,20 @@
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:971',message:'마이페이지 쿠폰 조회 결과 (필터 전)',data:{error:error?.message,totalCount:userCoupons?.length,allCoupons:userCoupons?.map(uc=>({id:uc.id,couponId:uc.coupon_id,code:uc.coupons?.code,isUsed:uc.is_used,expiresAt:uc.expires_at}))},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1,H2'})}).catch(()=>{});
+                // #endregion
+
                 if (error) throw error;
 
                 // 사용 가능한 쿠폰과 사용 완료/만료된 쿠폰 분리
                 const now = new Date();
                 const available = userCoupons.filter(c => !c.is_used && new Date(c.expires_at) > now);
                 const unavailable = userCoupons.filter(c => c.is_used || new Date(c.expires_at) <= now);
+                
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:983',message:'마이페이지 쿠폰 필터 결과',data:{nowTime:now.toISOString(),availableCount:available.length,unavailableCount:unavailable.length,availableCodes:available.map(c=>c.coupons?.code)},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1'})}).catch(()=>{});
+                // #endregion
 
                 renderAvailableCoupons(available);
                 renderUsedCoupons(unavailable);
@@ -993,7 +1005,6 @@
             if (!coupons || coupons.length === 0) {
                 container.innerHTML = `
                     <div class="text-center text-gray-500 py-12">
-                        <p class="text-lg mb-2">🎟️</p>
                         <p>사용 가능한 쿠폰이 없습니다.</p>
                         <p class="text-sm mt-2">강의를 완강하면 자동으로 쿠폰이 발급됩니다!</p>
                     </div>
@@ -1016,7 +1027,7 @@
                                 <div class="flex-1">
                                     <h4 class="text-xl font-bold text-white mb-1">${coupon.coupons.name}</h4>
                                     <p class="text-sm text-white text-opacity-90 mb-2">${coupon.coupons.description || ''}</p>
-                                    ${coupon.courses ? `<p class="text-xs text-white text-opacity-75">📚 ${coupon.courses.title} 완강 보상</p>` : ''}
+                                    ${coupon.courses ? `<p class="text-xs text-white text-opacity-75">${coupon.courses.title} 완강 보상</p>` : ''}
                                 </div>
                                 <div class="text-right">
                                     <p class="text-2xl font-bold text-white">${discountText}</p>
@@ -1266,7 +1277,7 @@
 
                 if (error) throw error;
 
-                alert('✅ 배송 정보가 저장되었습니다!');
+                alert('배송 정보가 저장되었습니다!');
                 
                 // 페이지 새로고침
                 loadMyOrders();

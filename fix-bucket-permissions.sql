@@ -93,3 +93,5 @@ WHERE name = 'assignment-images';
 -- Supabase Dashboard → Storage → assignment-images → Settings → Public bucket 체크!
 
 
+
+

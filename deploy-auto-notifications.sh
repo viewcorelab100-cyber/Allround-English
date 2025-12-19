@@ -67,3 +67,5 @@ echo ""
 echo "✅ 배포 스크립트 실행 완료!"
 echo "📖 자세한 설정 방법은 docs/AUTO_NOTIFICATION_SETUP.md를 참고하세요."
 
+
+

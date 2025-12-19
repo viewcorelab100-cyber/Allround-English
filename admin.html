@@ -294,7 +294,7 @@
                                        class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                             </div>
                             <div>
-                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분) <span class="text-xs text-green-400">✓ 자동 계산됨</span></label>
+                                <label class="block text-sm text-gray-400 mb-2">영상 길이 (분) <span class="text-xs text-green-400">(자동 계산됨)</span></label>
                                 <input type="number" id="lesson-duration" min="0"
                                        class="w-full px-4 py-3 bg-green-500/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 border border-green-500/20">
                             </div>
@@ -978,15 +978,15 @@
                 });
                 
                 // 디버깅: 최근 10개 제출물의 image_url 확인
-                console.log('📊 [관리자] 전체 제출물 수:', allSubmissions.length);
+                console.log('[관리자] 전체 제출물 수:', allSubmissions.length);
                 const withImages = allSubmissions.filter(s => s.image_url);
-                console.log('📊 [관리자] 이미지 있는 제출물:', withImages.length);
+                console.log('[관리자] 이미지 있는 제출물:', withImages.length);
                 if (withImages.length > 0) {
-                    console.log('📊 [관리자] 첫 번째 image_url (전체):', withImages[0].image_url);
-                    console.log('📊 [관리자] image_url 길이:', withImages[0].image_url?.length);
-                    console.log('📊 [관리자] 콤마 포함 여부:', withImages[0].image_url?.includes(','));
+                    console.log('[관리자] 첫 번째 image_url (전체):', withImages[0].image_url);
+                    console.log('[관리자] image_url 길이:', withImages[0].image_url?.length);
+                    console.log('[관리자] 콤마 포함 여부:', withImages[0].image_url?.includes(','));
                 }
-                console.log('📊 [관리자] 최근 10개 제출물:', allSubmissions.slice(0, 10).map(s => ({
+                console.log('[관리자] 최근 10개 제출물:', allSubmissions.slice(0, 10).map(s => ({
                     id: s.id,
                     student: s.studentEmail,
                     lesson: s.lessonTitle,
@@ -1072,9 +1072,9 @@
                 const submittedDate = sub.updated_at ? new Date(sub.updated_at).toLocaleDateString('ko-KR') : '-';
                 
                 // 체크리스트 상태 (읽기 전용)
-                const checkNote = sub.note_completed ? '✅' : '⬜';
-                const checkBlog = sub.blog_completed ? '✅' : '⬜';
-                const checkKakao = sub.kakao_completed ? '✅' : '⬜';
+                const checkNote = sub.note_completed ? 'O' : 'X';
+                const checkBlog = sub.blog_completed ? 'O' : 'X';
+                const checkKakao = sub.kakao_completed ? 'O' : 'X';
 
                 // 이미지 미리보기 (여러 URL이 있으면 첫 번째 + 개수 표시)
                 let imagePreview = '<span class="text-gray-500 text-sm">없음</span>';
@@ -1085,10 +1085,10 @@
                     
                     // 디버깅: URL 확인
                     if (sub.studentEmail === 'viewcorelab100@gmail.com') {
-                        console.log('🖼️ [테이블] 학생:', sub.studentEmail);
-                        console.log('🖼️ [테이블] image_url 원본:', sub.image_url);
-                        console.log('🖼️ [테이블] 파싱된 URLs:', imageUrls);
-                        console.log('🖼️ [테이블] 첫 번째 URL:', firstImageUrl);
+                        console.log('[테이블] 학생:', sub.studentEmail);
+                        console.log('[테이블] image_url 원본:', sub.image_url);
+                        console.log('[테이블] 파싱된 URLs:', imageUrls);
+                        console.log('[테이블] 첫 번째 URL:', firstImageUrl);
                     }
                     
                     // 여러 장이면 개수 표시
@@ -1449,9 +1449,9 @@
                 const imageUrls = sub.image_url ? sub.image_url.split(',').map(url => url.trim()).filter(url => url) : [];
                 currentStudentImageUrl = imageUrls.length > 0 ? imageUrls[0] : null;
                 
-                console.log('🖼️ [채점 모달] 원본 image_url:', sub.image_url);
-                console.log('🖼️ [채점 모달] 파싱된 이미지 개수:', imageUrls.length);
-                console.log('🖼️ [채점 모달] 이미지 URLs:', imageUrls);
+                console.log('[채점 모달] 원본 image_url:', sub.image_url);
+                console.log('[채점 모달] 파싱된 이미지 개수:', imageUrls.length);
+                console.log('[채점 모달] 이미지 URLs:', imageUrls);
                 
                 document.getElementById('grading-submitted-at').textContent = sub.submitted_at 
                     ? `Submitted: ${new Date(sub.submitted_at).toLocaleString('ko-KR')}` 
@@ -2188,7 +2188,7 @@
                 // PDF(이미지) 생성 및 업로드
                 const pdfUrl = await window.PDFGenerator.createAndUploadGradingPDF(pdfData);
                 
-                console.log('✅ PDF 생성 완료:', pdfUrl);
+                console.log('[SUCCESS] PDF 생성 완료:', pdfUrl);
 
                 // 알림톡 발송
                 await sendGradingNotification(submissionId, feedbackData, pdfUrl);
@@ -2412,7 +2412,7 @@
                                 <p class="font-semibold text-white">${lesson.order_num}강</p>
                                 <p class="text-sm text-gray-500">
                                     ${lesson.duration || 0}분
-                                    ${lesson.video_url ? '<span class="text-green-400 ml-2">✓ 영상 있음</span>' : '<span class="text-red-400 ml-2">✗ 영상 없음</span>'}
+                                    ${lesson.video_url ? '<span class="text-green-400 ml-2">(영상 있음)</span>' : '<span class="text-red-400 ml-2">(영상 없음)</span>'}
                                 </p>
                             </div>
                         </div>
@@ -2512,7 +2512,7 @@
 
                 if (updateError) throw updateError;
 
-                console.log(`✅ 강의 총 시간 자동 업데이트: ${totalHours}시간`);
+                console.log(`[SUCCESS] 강의 총 시간 자동 업데이트: ${totalHours}시간`);
 
             } catch (error) {
                 console.error('Update course duration error:', error);
@@ -3117,7 +3117,7 @@
         // 강의 분석 데이터 로드
         async function loadAnalytics() {
             try {
-                console.log('📊 분석 데이터 로드 시작 - 기간:', currentAnalyticsPeriod);
+                console.log('[분석] 데이터 로드 시작 - 기간:', currentAnalyticsPeriod);
 
                 // 기간 필터 계산
                 let startDate = null;
@@ -3133,7 +3133,7 @@
                     .select('id, title, price')
                     .order('created_at', { ascending: false });
 
-                console.log('✅ 강의 로드:', { count: courses?.length, error: courseError });
+                console.log('[SUCCESS] 강의 로드:', { count: courses?.length, error: courseError });
                 if (courseError) throw courseError;
 
                 // 강의별 매출 데이터 (purchases 테이블에서 집계, 기간 필터 적용)
@@ -3148,7 +3148,7 @@
 
                 const { data: purchases, error: purchaseError } = await purchasesQuery;
 
-                console.log('✅ 매출 데이터 로드:', { count: purchases?.length, error: purchaseError, startDate: startDate?.toISOString() });
+                console.log('[SUCCESS] 매출 데이터 로드:', { count: purchases?.length, error: purchaseError, startDate: startDate?.toISOString() });
                 if (purchaseError) throw purchaseError;
 
                 // 강의별 조회수 데이터 (video_progress 테이블에서 고유 사용자 수 집계, 기간 필터 적용)
@@ -3164,7 +3164,7 @@
 
                 const { data: progressData, error: progressError } = await progressQuery;
 
-                console.log('📊 video_progress 결과:', { 
+                console.log('[분석] video_progress 결과:', { 
                     count: progressData?.length, 
                     error: progressError,
                     errorMessage: progressError?.message,
@@ -3173,7 +3173,7 @@
                 });
                 
                 if (progressError) {
-                    console.warn('⚠️ video_progress 테이블 조회 실패, 조회수 0으로 처리');
+                    console.warn('[WARNING] video_progress 테이블 조회 실패, 조회수 0으로 처리');
                     // 에러를 던지지 않고 빈 배열로 처리
                 }
 
@@ -3182,7 +3182,7 @@
                     .from('lessons')
                     .select('id, course_id');
 
-                console.log('✅ 레슨 로드:', { count: lessons?.length, error: lessonError });
+                console.log('[SUCCESS] 레슨 로드:', { count: lessons?.length, error: lessonError });
                 if (lessonError) throw lessonError;
 
                 // 레슨 ID -> 강의 ID 맵 생성
@@ -3228,7 +3228,7 @@
 
                 const { data: enrollments, error: enrollmentError } = await enrollmentsQuery;
 
-                console.log('✅ 수강생 데이터 로드:', { count: enrollments?.length, error: enrollmentError });
+                console.log('[SUCCESS] 수강생 데이터 로드:', { count: enrollments?.length, error: enrollmentError });
                 if (enrollmentError) throw enrollmentError;
 
                 const courseProgressMap = new Map();
@@ -3260,7 +3260,7 @@
                     }
                 }
 
-                console.log('✅ 분석 데이터 준비 완료:', {
+                console.log('[SUCCESS] 분석 데이터 준비 완료:', {
                     강의수: courses?.length,
                     매출건수: purchases?.length,
                     조회데이터: progressData?.length || 0,
@@ -3734,7 +3734,7 @@
                 { wch: 20 },  // 선택지2
                 { wch: 20 },  // 선택지3
                 { wch: 20 },  // 선택지4
-                { wch: 20 },  // 선택지5 ✨ 추가
+                { wch: 20 },  // 선택지5 추가
                 { wch: 10 },  // 정답
                 { wch: 35 }   // 해설
             ];
@@ -3797,7 +3797,7 @@
                 // 퀴즈 미리보기 표시
                 displayQuizPreview();
                 
-                alert(`✅ ${quizData.length}개의 퀴즈가 업로드되었습니다!`);
+                alert(`${quizData.length}개의 퀴즈가 업로드되었습니다!`);
 
             } catch (error) {
                 console.error('엑셀 파싱 오류:', error);
@@ -3884,7 +3884,7 @@
 
                 if (insertError) throw insertError;
 
-                console.log(`✅ ${quizzes.length}개의 퀴즈가 저장되었습니다.`);
+                console.log(`[SUCCESS] ${quizzes.length}개의 퀴즈가 저장되었습니다.`);
                 
                 // 퀴즈 데이터 초기화
                 quizData = [];

@@ -35,3 +35,5 @@ CREATE INDEX IF NOT EXISTS idx_profiles_active_sessions
 ON profiles USING gin(active_sessions);
 
 
+
+

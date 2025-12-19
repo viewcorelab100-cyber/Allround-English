@@ -23,6 +23,7 @@
 - **댓글 관리**: 댓글 승인/삭제
 - **시간표 관리**: 이벤트/일정 추가/수정
 - **대시보드**: 주요 통계 및 최근 활동
+- **자동 알림톡**: 과제 미제출/장기 미수강 자동 알림
 
 ## 🎨 디자인 특징
 
@@ -99,21 +100,31 @@ const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
 
 ```
 올라운드영어/
-├── index.html              # 메인 페이지
-├── auth.html               # 로그인/회원가입
-├── courses.html            # 강의 목록
-├── course-detail.html      # 강의 상세
-├── lesson.html             # 레슨 플레이어
-├── mypage.html             # 마이페이지
-├── admin.html              # 관리자 페이지
-├── firstee.html            # Firstee 브랜드 페이지
-├── supabase-schema.sql     # 데이터베이스 스키마
+├── index.html                          # 메인 페이지
+├── auth.html                           # 로그인/회원가입
+├── courses.html                        # 강의 목록
+├── course-detail.html                  # 강의 상세
+├── lesson.html                         # 레슨 플레이어
+├── mypage.html                         # 마이페이지
+├── admin.html                          # 관리자 페이지
+├── firstee.html                        # Firstee 브랜드 페이지
+├── supabase-schema.sql                 # 데이터베이스 스키마
+├── setup-auto-notifications.sql        # 자동 알림 스키마 및 스케줄
+├── nhn-alimtalk-templates.txt          # 알림톡 템플릿 예시
+├── deploy-auto-notifications.sh        # 자동 알림 배포 스크립트
 ├── js/
-│   ├── supabase-config.js  # Supabase 설정
-│   ├── auth.js             # 인증 함수
-│   ├── courses.js          # 강의 함수
-│   └── progress.js         # 진도 관리 함수
-└── README.md               # 이 파일
+│   ├── supabase-config.js              # Supabase 설정
+│   ├── auth.js                         # 인증 함수
+│   ├── courses.js                      # 강의 함수
+│   ├── progress.js                     # 진도 관리 함수
+│   └── footer.js                       # 글로벌 푸터
+├── supabase/
+│   └── functions/
+│       ├── send-nhn-alimtalk/          # 알림톡 발송 함수
+│       └── auto-send-notifications/    # 자동 알림 함수
+├── docs/
+│   └── AUTO_NOTIFICATION_SETUP.md      # 자동 알림 설정 가이드
+└── README.md                           # 이 파일
 ```
 
 ## 🗄 데이터베이스 구조
@@ -126,6 +137,7 @@ const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
 - **lesson_progress**: 레슨 진도 (시청 위치, 완료 여부)
 - **comments**: 댓글
 - **schedules**: 시간표/일정
+- **notification_log**: 알림톡 발송 로그
 
 ## 🚀 배포
 
@@ -163,6 +175,51 @@ vercel
 ### "Invalid login credentials"
 - 이메일/비밀번호 오류
 - **해결**: 정보 확인 또는 비밀번호 재설정
+
+## 📱 자동 알림톡 시스템
+
+### 📋 개요
+학습 독려를 위한 자동 알림톡 발송 시스템이 구현되어 있습니다.
+
+### 🔔 자동 발송 조건
+1. **과제 미제출 알림**: 강의 시청 후 24시간 내에 과제를 제출하지 않은 경우
+2. **장기 미수강 알림**: 7일 동안 강의를 수강하지 않은 경우
+
+### 📂 관련 파일
+- `supabase/functions/auto-send-notifications/index.ts` - 자동 알림 Edge Function
+- `setup-auto-notifications.sql` - 데이터베이스 스키마 및 스케줄링
+- `nhn-alimtalk-templates.txt` - NHN Cloud 템플릿 예시
+- `docs/AUTO_NOTIFICATION_SETUP.md` - 상세 설정 가이드
+- `deploy-auto-notifications.sh` - 배포 스크립트
+
+### ⚙️ 설정 방법
+```bash
+# 1. Edge Function 배포
+./deploy-auto-notifications.sh
+
+# 2. 데이터베이스 설정
+# Supabase Dashboard → SQL Editor에서 setup-auto-notifications.sql 실행
+
+# 3. NHN Cloud 템플릿 등록
+# nhn-alimtalk-templates.txt 참고하여 템플릿 등록
+```
+
+자세한 설정 방법은 [AUTO_NOTIFICATION_SETUP.md](docs/AUTO_NOTIFICATION_SETUP.md)를 참고하세요.
+
+### 📊 모니터링
+```sql
+-- 오늘 발송된 알림톡 확인
+SELECT * FROM notification_log 
+WHERE created_at >= CURRENT_DATE 
+ORDER BY created_at DESC;
+
+-- 발송 통계
+SELECT type, COUNT(*), 
+       SUM(CASE WHEN success THEN 1 ELSE 0 END) as success_count
+FROM notification_log 
+WHERE created_at >= CURRENT_DATE 
+GROUP BY type;
+```
 
 ## 📞 문의
 
