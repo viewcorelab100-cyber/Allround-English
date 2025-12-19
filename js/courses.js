@@ -168,7 +168,7 @@ async function generateCourseReport(userId, courseId) {
     try {
         // 1. 사용자 정보 가져오기
         const { data: userData, error: userError } = await window.supabase
-            .from('users')
+            .from('profiles')
             .select('name, email')
             .eq('id', userId)
             .single();
