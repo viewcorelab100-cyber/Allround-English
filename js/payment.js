@@ -208,10 +208,17 @@ async function requestPayment() {
         // 최종 결제 금액 (쿠폰 적용된 금액)
         const finalAmount = currentOrder.finalAmount || currentOrder.amount;
         
-        // 쿠폰 정보를 URL 파라미터로 전달
-        let successUrl = `${window.location.origin}/payment-success.html`;
+        // 쿠폰 정보를 URL 파라미터로 전달 (캐시 무효화 포함)
+        let successUrl = `${window.location.origin}/payment-success.html?_t=${Date.now()}`;
         if (appliedCouponData) {
-            successUrl += `?couponId=${appliedCouponData.id}`;
+            successUrl += `&couponId=${appliedCouponData.id}`;
+            console.log('💳 [결제 요청] 쿠폰 적용:', {
+                couponId: appliedCouponData.id,
+                code: appliedCouponData.custom_code || appliedCouponData.coupons?.code,
+                originalAmount: currentOrder.amount,
+                discountAmount: currentOrder.discountAmount,
+                finalAmount: finalAmount
+            });
         }
         
         // 기본 결제 요청 파라미터
