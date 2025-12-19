@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS user_coupons (
     issued_at TIMESTAMPTZ DEFAULT NOW(), -- 발급 시간
     expires_at TIMESTAMPTZ NOT NULL, -- 만료 시간
     used_at TIMESTAMPTZ, -- 사용 시간
-    order_id UUID REFERENCES orders(id) ON DELETE SET NULL, -- 사용한 주문 ID
+    order_id TEXT REFERENCES orders(id) ON DELETE SET NULL, -- 사용한 주문 ID (orders.id는 TEXT 타입)
     is_used BOOLEAN DEFAULT FALSE, -- 사용 여부
     created_at TIMESTAMPTZ DEFAULT NOW(),
     
@@ -138,7 +138,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 8. 쿠폰 사용 함수
 CREATE OR REPLACE FUNCTION use_coupon(
     p_user_coupon_id UUID,
-    p_order_id UUID
+    p_order_id TEXT
 )
 RETURNS BOOLEAN AS $$
 DECLARE
@@ -202,4 +202,5 @@ COMMENT ON TABLE coupons IS '쿠폰 마스터 테이블';
 COMMENT ON TABLE user_coupons IS '사용자별 발급된 쿠폰 테이블';
 COMMENT ON FUNCTION issue_completion_coupon IS '완강 시 자동으로 쿠폰 발급';
 COMMENT ON FUNCTION use_coupon IS '쿠폰 사용 처리';
+
 
