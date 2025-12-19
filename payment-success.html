@@ -574,6 +574,19 @@
                 }
                 
                 // 구매 기록 생성 (purchases 테이블)
+                const purchaseData = {
+                    user_id: user.id,
+                    course_id: order.course_id,
+                    order_id: orderId,
+                    payment_key: paymentKey,
+                    status: 'completed',
+                    payment_method: 'tosspayments',
+                    amount: parseInt(amount),
+                    purchased_at: new Date().toISOString()
+                };
+                
+                console.log('[DEBUG] 📦 구매 기록 생성:', purchaseData);
+                
                 const { error: purchaseError } = await window.supabase
                     .from('purchases')
                     .insert(purchaseData);
