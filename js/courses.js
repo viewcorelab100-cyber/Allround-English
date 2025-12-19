@@ -292,6 +292,12 @@ async function generateCourseReport(userId, courseId) {
         return { success: true, data: result };
     } catch (error) {
         console.error('Generate report error:', error);
+        console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            details: error.details,
+            hint: error.hint
+        });
         return { success: false, error: error.message };
     }
 }
