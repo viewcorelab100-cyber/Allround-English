@@ -1,22 +1,18 @@
-// 채점 관???�틸리티 ?�수
+// 채점 관련 유틸리티 함수
 
-// ?��?지 ?�로???�수
+// 이미지 업로드 함수
 async function uploadSubmissionImage(file) {
     try {
-        // 가??H2, H4: ?�일�??�용???�보 ?�인
-        const supabaseSession = window.supabase ? await window.supabase.auth.getSession() : null;
-        
         const currentUser = window.currentUser;
         if (!currentUser) {
-            // 가??H2: grading.js?�서 currentUser가 null
-            throw new Error('로그?�이 ?�요?�니??');
+            throw new Error('로그인이 필요합니다.');
         }
 
-        // ?�일 ?�장??추출
+        // 파일 확장자 추출
         const fileExt = file.name.split('.').pop();
         const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
         
-        // Storage???�로??        console.log('?�� [grading.js] ?�로???�작 - 버킷: assignment-images, ?�일�?', fileName);
+        // Storage에 업로드
         const { data, error } = await window.supabase.storage
             .from('assignment-images')
             .upload(fileName, file, {
@@ -25,32 +21,15 @@ async function uploadSubmissionImage(file) {
             });
 
         if (error) {
-            console.error('??[grading.js] Storage ?�로???�패:', error);
-            console.error('??[grading.js] ?�러 코드:', error.statusCode);
-            console.error('??[grading.js] ?�러 메시지:', error.message);
+            console.error('[grading.js] Storage 업로드 실패:', error);
             throw error;
         }
 
-        console.log('??[grading.js] Storage ?�로???�공:', data);
-
-        // Public URL ?�성
+        // Public URL 생성
         const { data: { publicUrl } } = window.supabase.storage
             .from('assignment-images')
             .getPublicUrl(fileName);
-
-        console.log('?�� [grading.js] Public URL ?�성??', publicUrl);
         
-        // URL ?�스??(?�제 ?�근 가?�한지 ?�인)
-        try {
-            const testResponse = await fetch(publicUrl, { method: 'HEAD' });
-            console.log('?�� [grading.js] URL ?�근 ?�스??', testResponse.status, testResponse.statusText);
-            if (!testResponse.ok) {
-                console.warn('?�️ [grading.js] URL?� ?�성?��?�??�근 불�?!', testResponse.status);
-            }
-        } catch (testError) {
-            console.error('??[grading.js] URL ?�근 ?�스???�패:', testError);
-        }
-
         return { success: true, url: publicUrl, path: fileName };
     } catch (error) {
         console.error('Image upload error:', error);
@@ -58,19 +37,18 @@ async function uploadSubmissionImage(file) {
     }
 }
 
-// 과제 ?�출 (?��?지 ?�함)
+// 과제 제출 (이미지 포함)
 async function submitAssignmentWithImage(submissionData) {
     try {
         const currentUser = window.currentUser;
         const currentLesson = window.currentLesson;
         
-        // 가??H2, H3: window ?�역 변???�인
-        
         if (!currentUser || !currentLesson) {
-            throw new Error('?�수 ?�보가 ?�습?�다.');
+            throw new Error('필수 정보가 없습니다.');
         }
 
-        // student_submissions ?�이블에 ?�??        const { data, error } = await window.supabase
+        // student_submissions 테이블에 삽입
+        const { data, error } = await window.supabase
             .from('student_submissions')
             .insert({
                 user_id: currentUser.id,
