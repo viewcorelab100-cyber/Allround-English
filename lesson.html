@@ -257,9 +257,45 @@
                     <div id="assignment-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
                         <h2 class="text-xl font-bold text-white mb-4">📝 과제 제출</h2>
                         
-                        <!-- 정사각형 카드 그리드 (가로 배치) - 동적 렌더링 -->
-                        <div id="assignment-cards-container" class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <!-- 카드들이 동적으로 생성됩니다 -->
+                        <!-- 정사각형 카드 그리드 (가로 배치) -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            
+                            <!-- 카드 1: QR 코드 제출 -->
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
+                                <div id="qr-code-container" class="w-16 h-16 bg-black rounded-lg flex items-center justify-center">
+                                    <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
+                                </div>
+                                <p class="text-xs text-gray-600">카톡 제출</p>
+                                <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">열기 →</a>
+                            </div>
+                            
+                            <!-- 카드 2: 블로그 숙제 -->
+                            <div id="blog-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
+                                <span class="text-3xl">📝</span>
+                                <p class="text-xs text-gray-600">블로그 숙제</p>
+                                <a id="blog-link" href="#" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">보기 →</a>
+                            </div>
+                            
+                            <!-- 카드 3: 체크리스트 -->
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openChecklistModal()">
+                                <span class="text-3xl">✅</span>
+                                <p class="text-xs text-gray-600">체크리스트</p>
+                                <p id="checklist-status" class="text-xs text-black font-semibold">0/3 완료</p>
+                            </div>
+                            
+                            <!-- 카드 4: 이미지 제출 -->
+                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openImageSubmitModal()">
+                                <span class="text-3xl">📷</span>
+                                <p class="text-xs text-gray-600">사진 제출</p>
+                                <span id="image-submission-status" class="text-xs text-black font-semibold">미제출</span>
+                            </div>
+                            
+                            <!-- 카드 5: 퀴즈 -->
+                            <div id="quiz-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openQuizModal()">
+                                <span class="text-3xl">📝</span>
+                                <p class="text-xs text-gray-600">퀴즈</p>
+                                <p class="text-xs font-semibold">풀어보기</p>
+                            </div>
                         </div>
                         
                         <!-- 채점 결과 표시 (이미지 제출 후) -->
@@ -618,17 +654,17 @@
                 </div>
                 <p class="text-sm text-gray-400">수강 완료! 아래 과제를 완료해주세요.</p>
                 
-                <div id="checklist-items" class="space-y-3">
+                <div class="space-y-3">
                     <label class="flex items-start space-x-3 cursor-pointer group">
-                        <input type="checkbox" id="assignment-note" onchange="renderAssignmentCards()" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                        <input type="checkbox" id="assignment-note" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
                         <span class="text-white text-sm group-hover:text-gray-300">노트 필기 완료 + 사진 전송</span>
                     </label>
                     <label class="flex items-start space-x-3 cursor-pointer group">
-                        <input type="checkbox" id="assignment-blog" onchange="renderAssignmentCards()" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                        <input type="checkbox" id="assignment-blog" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
                         <span class="text-white text-sm group-hover:text-gray-300">블로그 숙제 완료 + 사진 전송</span>
                     </label>
                     <label class="flex items-start space-x-3 cursor-pointer group">
-                        <input type="checkbox" id="assignment-kakao" onchange="renderAssignmentCards()" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
+                        <input type="checkbox" id="assignment-kakao" class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-transparent text-white focus:ring-white focus:ring-offset-0 cursor-pointer">
                         <span class="text-white text-sm group-hover:text-gray-300">카톡으로 그 외 숙제 완료</span>
                     </label>
                 </div>
@@ -746,15 +782,6 @@
         let currentUser = null;
         let userProfile = null; // 사용자 프로필 (학부모 정보 포함)
         let videoElement = null;
-        
-        // 과제 진행 상태 추적
-        let assignmentProgress = {
-            quiz: { completed: false, exists: false },
-            kakao: { completed: false, exists: true },
-            blog: { completed: false, exists: false },
-            image: { completed: false, exists: true },
-            checklist: { completed: false, exists: true }
-        };
         let vimeoPlayer = null;
         let progressInterval = null;
         let videoDuration = 0;
@@ -1181,184 +1208,22 @@
         }
 
         // 과제 상태 불러오기
-        // 과제 카드 렌더링 함수
-        function renderAssignmentCards() {
-            const container = document.getElementById('assignment-cards-container');
-            if (!container) return;
-            
-            // 순서 정의: 퀴즈 → 카톡 → 블로그 → 사진 → 체크리스트
-            const assignmentOrder = [
-                { 
-                    key: 'quiz', 
-                    icon: '📝', 
-                    label: '퀴즈', 
-                    action: 'openQuizModal()',
-                    getStatus: () => isQuizSubmitted ? '✅ 완료' : '풀어보기'
-                },
-                { 
-                    key: 'kakao', 
-                    icon: '💬', 
-                    label: '카톡 제출',
-                    action: null, // 링크로 처리
-                    getStatus: () => assignmentProgress.kakao.completed ? '✅ 완료' : '열기 →',
-                    isKakao: true
-                },
-                { 
-                    key: 'blog', 
-                    icon: '📝', 
-                    label: '블로그 숙제',
-                    action: null, // 링크로 처리
-                    getStatus: () => assignmentProgress.blog.completed ? '✅ 완료' : '보기 →',
-                    isBlog: true
-                },
-                { 
-                    key: 'image', 
-                    icon: '📷', 
-                    label: '사진 제출',
-                    action: 'openImageSubmitModal()',
-                    getStatus: () => assignmentProgress.image.completed ? '✅ 완료' : '미제출'
-                },
-                { 
-                    key: 'checklist', 
-                    icon: '✅', 
-                    label: '체크리스트',
-                    action: 'openChecklistModal()',
-                    getStatus: () => {
-                        const checked = document.querySelectorAll('#checklist-items input:checked').length;
-                        const total = 3;
-                        if (checked === total) return '✅ 완료';
-                        return `${checked}/${total} 완료`;
-                    }
-                }
-            ];
-            
-            // 존재하는 과제만 필터링
-            const availableAssignments = assignmentOrder.filter(a => assignmentProgress[a.key].exists);
-            
-            // 카드 생성
-            let cardsHTML = '';
-            availableAssignments.forEach((assignment, index) => {
-                const isCompleted = assignmentProgress[assignment.key].completed;
-                const isLocked = index > 0 && !assignmentProgress[availableAssignments[index - 1].key].completed;
-                
-                // 잠금 상태 스타일
-                const lockStyles = isLocked ? 
-                    'opacity-30 cursor-not-allowed pointer-events-none' : 
-                    (assignment.action ? 'cursor-pointer hover:bg-gray-100' : '');
-                
-                // 완료 표시
-                const completionBadge = isCompleted ? 
-                    '<div class="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"><span class="text-white text-xs">✓</span></div>' : 
-                    '';
-                
-                // 잠금 표시
-                const lockBadge = isLocked ? 
-                    '<div class="absolute top-2 right-2 w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center"><span class="text-white text-xs">🔒</span></div>' : 
-                    '';
-                
-                // 카톡 특별 처리 (QR 코드)
-                if (assignment.isKakao) {
-                    cardsHTML += `
-                        <div class="relative aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg transition-all ${lockStyles}">
-                            ${completionBadge}${lockBadge}
-                            <div class="w-16 h-16 bg-black rounded-lg flex items-center justify-center">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
-                            </div>
-                            <p class="text-xs text-gray-600">${assignment.label}</p>
-                            ${!isLocked ? `<a href="https://open.kakao.com/o/allround" target="_blank" onclick="markKakaoCompleted()" class="text-xs text-black font-semibold hover:text-gray-600">${assignment.getStatus()}</a>` : `<span class="text-xs text-gray-400">잠금</span>`}
-                        </div>
-                    `;
-                }
-                // 블로그 특별 처리
-                else if (assignment.isBlog) {
-                    const blogUrl = currentLesson?.blog_link || '#';
-                    cardsHTML += `
-                        <div class="relative aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg transition-all ${lockStyles}">
-                            ${completionBadge}${lockBadge}
-                            <span class="text-3xl">${assignment.icon}</span>
-                            <p class="text-xs text-gray-600">${assignment.label}</p>
-                            ${!isLocked ? `<a href="${blogUrl}" target="_blank" onclick="markBlogCompleted()" class="text-xs text-black font-semibold hover:text-gray-600">${assignment.getStatus()}</a>` : `<span class="text-xs text-gray-400">잠금</span>`}
-                        </div>
-                    `;
-                }
-                // 일반 과제
-                else {
-                    cardsHTML += `
-                        <div class="relative aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg transition-all ${lockStyles}" ${assignment.action && !isLocked ? `onclick="${assignment.action}"` : ''}>
-                            ${completionBadge}${lockBadge}
-                            <span class="text-3xl">${assignment.icon}</span>
-                            <p class="text-xs text-gray-600">${assignment.label}</p>
-                            <p class="text-xs text-black font-semibold">${isLocked ? '잠금' : assignment.getStatus()}</p>
-                        </div>
-                    `;
-                }
-            });
-            
-            container.innerHTML = cardsHTML;
-        }
-        
-        // 카톡 제출 완료 표시
-        function markKakaoCompleted() {
-            assignmentProgress.kakao.completed = true;
-            renderAssignmentCards();
-        }
-        
-        // 블로그 제출 완료 표시
-        function markBlogCompleted() {
-            assignmentProgress.blog.completed = true;
-            renderAssignmentCards();
-        }
-        
         async function loadAssignmentStatus() {
             if (!currentUser || !currentLesson) return;
 
-            // 퀴즈 존재 여부 확인
-            assignmentProgress.quiz.exists = quizzes && quizzes.length > 0;
-            assignmentProgress.quiz.completed = isQuizSubmitted;
-            
-            // 블로그 링크 존재 여부 확인
-            assignmentProgress.blog.exists = currentLesson?.blog_link && currentLesson.blog_link.trim() !== '';
-            
-            // 데이터베이스에서 과제 상태 로드
             const result = await getAssignment(currentUser.id, currentLesson.id);
             if (result.success && result.data) {
-                // 체크리스트는 별도로 관리 (모달 내에서)
                 document.getElementById('assignment-note').checked = result.data.note_completed || false;
                 document.getElementById('assignment-blog').checked = result.data.blog_completed || false;
                 document.getElementById('assignment-kakao').checked = result.data.kakao_completed || false;
-                
-                // 이미지 제출 상태 확인
-                await checkImageSubmissionStatus();
+                updateAssignmentStatusDisplay(result.data);
             }
-            
-            // 과제 카드 렌더링
-            renderAssignmentCards();
             
             // 학부모 정보 로드
             await loadUserProfile();
             
             // 코스 전체 완료 여부 체크
             await checkCourseCompletion();
-        }
-        
-        // 이미지 제출 상태 확인
-        async function checkImageSubmissionStatus() {
-            if (!currentUser || !currentLesson) return;
-            
-            try {
-                const { data, error } = await window.supabase
-                    .from('student_submissions')
-                    .select('id, image_url')
-                    .eq('user_id', currentUser.id)
-                    .eq('lesson_id', currentLesson.id)
-                    .maybeSingle();
-                
-                if (!error && data && data.image_url) {
-                    assignmentProgress.image.completed = true;
-                }
-            } catch (error) {
-                console.error('이미지 제출 상태 확인 오류:', error);
-            }
         }
         
         // 사용자 프로필 로드 (학부모 정보 포함)
@@ -1381,29 +1246,16 @@
         
         // 코스 전체 완료 여부 체크
         async function checkCourseCompletion() {
-            console.log('[완강 체크] 시작', { 
-                hasUser: !!currentUser, 
-                hasCourse: !!currentCourse, 
-                lessonsCount: courseLessons.length 
-            });
-            
-            if (!currentUser || !currentCourse || !courseLessons.length) {
-                console.log('[완강 체크] 조건 미충족, 종료');
-                return;
-            }
+            if (!currentUser || !currentCourse || !courseLessons.length) return;
             
             try {
                 // 모든 레슨의 진도 가져오기
                 const lessonIds = courseLessons.map(l => l.id);
-                console.log('[완강 체크] 레슨 IDs:', lessonIds);
-                
                 const { data: progressData, error } = await window.supabase
                     .from('lesson_progress')
                     .select('lesson_id, is_completed')
                     .eq('user_id', currentUser.id)
                     .in('lesson_id', lessonIds);
-                
-                console.log('[완강 체크] 진도 데이터:', progressData);
                 
                 if (error) throw error;
                 
@@ -1411,11 +1263,8 @@
                 const completedLessons = progressData ? progressData.filter(p => p.is_completed).length : 0;
                 const totalLessons = courseLessons.length;
                 
-                console.log('[완강 체크] 완료 현황:', { completedLessons, totalLessons, isComplete: completedLessons >= totalLessons });
-                
                 // 모든 레슨이 완료되었는지 확인
                 if (completedLessons >= totalLessons) {
-                    console.log('[완강 체크] ✅ 모든 레슨 완료! 모달 표시');
                     // 리포트는 모달로만 표시 (카드는 제거됨)
                     
                     // 이미 리포트가 발송되었는지 확인
@@ -1435,14 +1284,10 @@
                     }
                     
                     // 완강 시 리포트 모달 자동 표시
-                    console.log('[완강 체크] openReportModal() 호출 직전');
                     openReportModal();
-                    console.log('[완강 체크] openReportModal() 호출 완료');
-                } else {
-                    console.log('[완강 체크] ❌ 아직 완료 안 됨');
                 }
             } catch (error) {
-                console.error('[완강 체크] 에러 발생:', error);
+                console.error('Check course completion error:', error);
             }
         }
 
@@ -1478,14 +1323,11 @@
             if (result.success) {
                 updateAssignmentStatusDisplay(result.data);
                 
-                // 체크리스트 완료 상태 업데이트
+                // 성공 메시지
                 const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
                 if (allCompleted) {
-                    assignmentProgress.checklist.completed = true;
-                    renderAssignmentCards();
                     showAssignmentModal('✅', '과제가 제출되었습니다!', '수고하셨습니다.');
                 } else {
-                    renderAssignmentCards(); // 부분 완료도 카드 상태 업데이트
                     showAssignmentModal('✅', '과제가 제출되었습니다.', '');
                 }
                 
@@ -1973,12 +1815,10 @@
                 
                 // 3. 잠시 후 성공 모달 표시 (모달 닫힘 애니메이션 후)
                 setTimeout(() => {
-                    showAssignmentModal('✅', `과제 ${submittedCount}장이 제출되었습니다!', '선생님이 채점 후 알려드립니다.');
+                    showAssignmentModal('✅', `과제 ${submittedCount}장이 제출되었습니다!`, '선생님이 채점 후 알려드립니다.');
                 }, 200);
                 
                 // 제출 상태 업데이트
-                assignmentProgress.image.completed = true;
-                renderAssignmentCards();
                 updateSubmissionStatus();
 
             } catch (error) {
@@ -2063,7 +1903,6 @@
         }
         function closeChecklistModal() {
             document.getElementById('checklist-modal').classList.add('hidden');
-            renderAssignmentCards(); // 모달 닫을 때 카드 상태 업데이트
         }
 
         // 이미지 제출 모달 열기/닫기
@@ -2540,11 +2379,6 @@
                     .insert(responses);
 
                 if (error) throw error;
-                
-                // 퀴즈 완료 상태 업데이트
-                isQuizSubmitted = true;
-                assignmentProgress.quiz.completed = true;
-                renderAssignmentCards();
 
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
