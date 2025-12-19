@@ -362,7 +362,7 @@
                 <!-- 공지사항 섹션 -->
                 <div class="bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden">
                     <div class="p-4 border-b border-white border-opacity-10">
-                        <h3 class="font-semibold text-white">📢 선생님 공지사항</h3>
+                        <h3 class="font-semibold text-white">선생님 공지사항</h3>
                     </div>
                     <div id="teacher-notice" class="p-4 text-gray-300 text-sm max-h-48 overflow-y-auto">
                         <div id="notice-content" class="space-y-2">
@@ -374,7 +374,7 @@
                 <!-- 과제 섹션 (90% 이상 수강 시 표시) -->
                 <div id="assignment-section-sidebar" class="hidden bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden flex-1" style="min-height: 300px;">
                     <div class="p-4 border-b border-white border-opacity-10">
-                        <h3 class="font-semibold text-white">📝 과제 제출</h3>
+                        <h3 class="font-semibold text-white">과제 제출</h3>
                     </div>
                     <div class="p-4 overflow-y-auto" style="max-height: 400px;">
                         <!-- 순차적 잠금 해제 방식 (세로 배치) -->
@@ -386,7 +386,7 @@
                                 <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl hidden items-center justify-center">
                                     <span class="text-2xl font-bold">LOCK</span>
                                 </div>
-                                <div class="flex-shrink-0 text-2xl">📝</div>
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold">Q</div>
                                 <div class="flex-1">
                                     <p class="text-sm font-bold text-gray-800">퀴즈</p>
                                     <p class="text-xs text-gray-400">풀어보기</p>
@@ -399,7 +399,7 @@
                                 <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
                                     <span class="text-2xl font-bold">LOCK</span>
                                 </div>
-                                <div class="flex-shrink-0 text-2xl">💬</div>
+                                <div class="flex-shrink-0 w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center text-black font-bold">K</div>
                                 <div class="flex-1">
                                     <p class="text-sm font-bold text-gray-800">카톡 제출</p>
                                     <a id="kakao-link-sidebar" href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-gray-600 hover:text-gray-800 quest-action" onclick="event.stopPropagation(); handleKakaoOpen();">열기 →</a>
@@ -412,7 +412,7 @@
                                 <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
                                     <span class="text-2xl font-bold">LOCK</span>
                                 </div>
-                                <div class="flex-shrink-0 text-2xl">📰</div>
+                                <div class="flex-shrink-0 w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold">B</div>
                                 <div class="flex-1">
                                     <p class="text-sm font-bold text-gray-800">블로그</p>
                                     <a id="blog-link-sidebar" href="#" target="_blank" class="text-xs text-gray-600 hover:text-gray-800 quest-action" onclick="event.stopPropagation(); handleBlogOpen();">보기 →</a>
@@ -425,7 +425,7 @@
                                 <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
                                     <span class="text-2xl font-bold">LOCK</span>
                                 </div>
-                                <div class="flex-shrink-0 text-2xl">📷</div>
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold">P</div>
                                 <div class="flex-1">
                                     <p class="text-sm font-bold text-gray-800">사진 제출</p>
                                     <span id="image-submission-status-sidebar" class="text-xs text-gray-400">미제출</span>
@@ -438,7 +438,7 @@
                                 <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
                                     <span class="text-2xl font-bold">LOCK</span>
                                 </div>
-                                <div class="flex-shrink-0 text-2xl">✅</div>
+                                <div class="flex-shrink-0 w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center text-white font-bold">C</div>
                                 <div class="flex-1">
                                     <p class="text-sm font-bold text-gray-800">체크리스트</p>
                                     <p id="checklist-status-sidebar" class="text-xs text-gray-400">0/3 완료</p>
@@ -465,7 +465,7 @@
                 <!-- 커리큘럼 섹션 -->
                 <div class="bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden flex-1" style="min-height: 300px;">
                     <div class="p-4 border-b border-white border-opacity-10">
-                        <h3 class="font-semibold text-white">📚 커리큘럼</h3>
+                        <h3 class="font-semibold text-white">커리큘럼</h3>
                     </div>
                     <div id="lesson-list" class="divide-y divide-white divide-opacity-10 overflow-y-auto" style="max-height: 400px;">
                         <!-- 레슨 목록이 동적으로 로드됩니다 -->

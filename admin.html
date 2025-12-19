@@ -303,6 +303,13 @@
                             <input type="text" id="lesson-blog-link" placeholder="https://..."
                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                         </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">선생님 공지사항</label>
+                            <textarea id="lesson-teacher-notice" rows="4"
+                                      class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30 resize-none"
+                                      placeholder="학생들에게 전달할 공지사항을 입력하세요 (선택사항)"></textarea>
+                            <p class="text-xs text-gray-500 mt-1">강의 페이지 우측 상단에 표시됩니다</p>
+                        </div>
                         <div class="flex items-center space-x-2">
                             <input type="checkbox" id="lesson-preview" class="w-5 h-5 rounded bg-white bg-opacity-5 border-gray-600">
                             <label for="lesson-preview" class="text-white">미리보기 허용</label>
@@ -2687,6 +2694,7 @@
                 document.getElementById('lesson-video-url').value = lesson.video_url || '';
                 document.getElementById('lesson-order').value = lesson.order_num || 1;
                 document.getElementById('lesson-duration').value = lesson.duration || '';
+                document.getElementById('lesson-teacher-notice').value = lesson.teacher_notice || '';
                 document.getElementById('lesson-blog-link').value = lesson.blog_link || '';
                 document.getElementById('lesson-preview').checked = lesson.is_preview || false;
                 
@@ -2779,6 +2787,7 @@
                 order_num: parseInt(document.getElementById('lesson-order').value) || 1,
                 duration: parseInt(document.getElementById('lesson-duration').value) || 0,
                 blog_link: document.getElementById('lesson-blog-link').value,
+                teacher_notice: document.getElementById('lesson-teacher-notice').value || null,
                 is_preview: document.getElementById('lesson-preview').checked,
                 quiz_enabled: document.getElementById('quiz-enabled').checked,
                 quiz_popup_time: quizPopupTime,
