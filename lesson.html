@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-    <script src="js/site-auth.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Vimeo Player API -->
     <script src="https://player.vimeo.com/api/player.js"></script>
@@ -727,7 +726,7 @@
                 <div class="bg-white/5 rounded-lg p-3">
                     <div class="flex items-center justify-between">
                         <div class="flex-1">
-                            <p class="text-sm text-white font-semibold mb-1">핸드폰으로 제출하기</p>
+                            <p class="text-sm text-white font-semibold mb-1">📱 핸드폰으로 제출하기</p>
                             <p class="text-xs text-gray-400">QR 스캔하면 핸드폰에서 이 페이지가 열립니다</p>
                         </div>
                         <div id="lesson-qr-code" class="w-20 h-20 bg-white rounded p-1 shadow-lg"></div>
@@ -2796,7 +2795,7 @@
                                     
                                     ${quiz.explanation ? `
                                         <div class="p-4 rounded-lg bg-white bg-opacity-5">
-                                            <p class="text-xs text-gray-400 mb-2">해설</p>
+                                            <p class="text-xs text-gray-400 mb-2">💡 해설</p>
                                             <p class="text-white text-sm">${quiz.explanation}</p>
                                         </div>
                                     ` : ''}
