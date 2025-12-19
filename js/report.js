@@ -199,7 +199,7 @@ async function loadRecommendedCourses(currentCourseId) {
         // 현재 강의와 같은 카테고리의 다른 강의 가져오기
         const { data: currentCourse, error: courseError } = await window.supabase
             .from('courses')
-            .select('categories')
+            .select('category')
             .eq('id', currentCourseId)
             .single();
         
@@ -210,7 +210,7 @@ async function loadRecommendedCourses(currentCourseId) {
         }
 
         // currentCourse가 없으면 카테고리 필터링 없이 진행
-        const hasCategory = currentCourse && currentCourse.categories;
+        const hasCategory = currentCourse && currentCourse.category;
 
         // 현재 사용자 가져오기
         const user = window.currentUser || (await window.supabase.auth.getUser()).data.user;
@@ -238,7 +238,7 @@ async function loadRecommendedCourses(currentCourseId) {
             console.log('[추천 강의] 1단계: 같은 카테고리 강의 찾기');
             let query = window.supabase
                 .from('courses')
-                .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
+                .select('id, title, thumbnail_url, price, category, lessons (id)')
                 .eq('is_published', true);
             
             // 구매한 강의 제외
@@ -247,7 +247,7 @@ async function loadRecommendedCourses(currentCourseId) {
             }
             
             query = query
-                .contains('categories', currentCourse.categories)
+                .eq('category', currentCourse.category)
                 .order('created_at', { ascending: false })
                 .limit(2);
             
@@ -270,7 +270,7 @@ async function loadRecommendedCourses(currentCourseId) {
             
             let query2 = window.supabase
                 .from('courses')
-                .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
+                .select('id, title, thumbnail_url, price, category, lessons (id)')
                 .eq('is_published', true);
             
             if (purchasedCourseIds.length > 0) {
@@ -315,10 +315,6 @@ async function loadRecommendedCourses(currentCourseId) {
                         }
                     </div>
                     <h4 class="text-lg font-bold text-white line-clamp-2">${course.title}</h4>
-                    ${course.subtitle 
-                        ? `<p class="text-sm text-gray-400 line-clamp-2">${course.subtitle}</p>`
-                        : ''
-                    }
                     <div class="flex items-center justify-between pt-2">
                         <span class="text-white font-bold text-lg">${course.price ? `₩${course.price.toLocaleString()}` : '무료'}</span>
                         <span class="text-sm text-gray-400">${course.lessons?.length || 0}개 레슨</span>
