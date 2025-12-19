@@ -73,10 +73,9 @@ function renderReport(data) {
     const assignmentCount = Math.round((data.assignment_rate / 100) * data.total_lessons);
     document.getElementById('assignment-count').textContent = `${assignmentCount}개`;
 
-    // 코멘트 (없으면 기본 메시지 유지)
-    if (data.instructor_comment) {
-        document.getElementById('instructor-comment').textContent = data.instructor_comment;
-    }
+    // 코멘트 자동 생성
+    const comment = generateTeacherComment(data.average_watch_rate, data.assignment_rate, data.total_progress);
+    document.getElementById('instructor-comment').textContent = comment;
 
     // 2. 차트 렌더링
     initCharts(data.total_progress, data.assignment_rate);
@@ -200,29 +199,51 @@ async function loadRecommendedCourses(currentCourseId) {
             .eq('id', currentCourseId)
             .single();
 
-        if (!currentCourse) {
+        if (!currentCourse || !currentCourse.categories) {
             container.innerHTML = '<p class="text-gray-500 text-center col-span-full">추천 강의가 없습니다.</p>';
             return;
         }
 
-        // 같은 카테고리의 강의 중 최신 2개 가져오기
-        const { data: courses, error } = await window.supabase
+        // 현재 사용자 가져오기
+        const user = window.currentUser || (await window.supabase.auth.getUser()).data.user;
+        
+        // 사용자가 이미 구매한 강의 목록 가져오기
+        let purchasedCourseIds = [currentCourseId]; // 현재 강의는 제외
+        if (user) {
+            const { data: purchases } = await window.supabase
+                .from('purchases')
+                .select('course_id')
+                .eq('user_id', user.id);
+            if (purchases && purchases.length > 0) {
+                purchasedCourseIds = [...purchasedCourseIds, ...purchases.map(p => p.course_id)];
+            }
+        }
+
+        // 1단계: 같은 카테고리의 안 들은 강의 추천
+        let { data: courses, error } = await window.supabase
             .from('courses')
-            .select(`
-                id,
-                title,
-                subtitle,
-                thumbnail_url,
-                price,
-                categories,
-                lessons (id)
-            `)
+            .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
             .eq('is_published', true)
-            .neq('id', currentCourseId)
+            .not('id', 'in', `(${purchasedCourseIds.join(',')})`)
+            .contains('categories', currentCourse.categories)
             .order('created_at', { ascending: false })
             .limit(2);
 
         if (error) throw error;
+
+        // 2단계: 같은 카테고리에 추천할 강의가 없으면 다른 카테고리 추천
+        if (!courses || courses.length === 0) {
+            const { data: otherCourses, error: otherError } = await window.supabase
+                .from('courses')
+                .select('id, title, subtitle, thumbnail_url, price, categories, lessons (id)')
+                .eq('is_published', true)
+                .not('id', 'in', `(${purchasedCourseIds.join(',')})`)
+                .order('created_at', { ascending: false })
+                .limit(2);
+
+            if (otherError) throw otherError;
+            courses = otherCourses;
+        }
 
         if (!courses || courses.length === 0) {
             container.innerHTML = '<p class="text-gray-500 text-center col-span-full">추천 강의가 없습니다.</p>';
@@ -267,6 +288,52 @@ async function loadRecommendedCourses(currentCourseId) {
 // 마이페이지 쿠폰 탭으로 이동
 function goToMyPageCoupons() {
     window.location.href = 'mypage.html?tab=coupons';
+}
+
+// 선생님 코멘트 자동 생성
+function generateTeacherComment(watchRate, assignmentRate, progressRate) {
+    let comments = [];
+    
+    // 완강 여부
+    if (progressRate >= 100) {
+        comments.push("🎉 강의를 완강했어요! 정말 대단합니다!");
+    } else if (progressRate >= 80) {
+        comments.push("거의 다 왔어요! 조금만 더 힘내세요!");
+    }
+    
+    // 시청률 기반 코멘트
+    if (watchRate >= 90) {
+        comments.push("강의를 집중해서 시청했네요. 훌륭합니다! 💯");
+    } else if (watchRate >= 70) {
+        comments.push("강의를 꾸준히 잘 시청하고 있어요! 👍");
+    } else if (watchRate >= 50) {
+        comments.push("강의 시청률이 조금 낮아요. 복습하면서 다시 한번 들어보세요. 📚");
+    } else {
+        comments.push("강의를 좀 더 집중해서 들어보세요. 복습이 필요합니다. 💪");
+    }
+    
+    // 과제 제출률 기반 코멘트
+    if (assignmentRate >= 90) {
+        comments.push("과제를 매우 성실하게 완수했어요. 최고예요! ✨");
+    } else if (assignmentRate >= 70) {
+        comments.push("과제를 잘 수행하고 있어요. 계속 이 자세를 유지하세요! ✅");
+    } else if (assignmentRate >= 50) {
+        comments.push("과제를 조금 더 신경 써서 제출해주세요. 📝");
+    } else {
+        comments.push("과제 제출이 부족해요. 과제는 학습에 매우 중요합니다! 🔥");
+    }
+    
+    // 종합 평가
+    const avgScore = (watchRate + assignmentRate) / 2;
+    if (avgScore >= 85) {
+        comments.push("전반적으로 매우 우수합니다. 이 페이스를 유지하면 실력이 쑥쑥 늘 거예요!");
+    } else if (avgScore >= 70) {
+        comments.push("꾸준히 잘하고 있어요. 앞으로도 화이팅!");
+    } else {
+        comments.push("조금 더 시간을 투자하면 더 좋은 결과를 얻을 수 있어요. 함께 노력해봐요!");
+    }
+    
+    return comments.join(' ');
 }
 
 
