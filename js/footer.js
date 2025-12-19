@@ -57,8 +57,8 @@ function loadGlobalFooter() {
                 <div class="md:col-span-2">
                     <h4 class="font-bold mb-6 text-sm tracking-wider text-gray-500 uppercase">LEGAL</h4>
                     <ul class="space-y-3 text-sm font-light">
-                        <li><a href="#" class="hover:text-white text-gray-400 transition-colors">Terms of Service</a></li>
-                        <li><a href="#" class="hover:text-white text-gray-400 transition-colors font-semibold">Privacy Policy</a></li>
+                        <li><a href="terms.html" class="hover:text-white text-gray-400 transition-colors">Terms of Service</a></li>
+                        <li><a href="privacy.html" class="hover:text-white text-gray-400 transition-colors font-semibold">Privacy Policy</a></li>
                     </ul>
                 </div>
                 
