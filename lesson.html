@@ -36,6 +36,11 @@
             display: none !important;
         }
         
+        /* 비디오 하단 과제 섹션 숨기기 (사이드바로 이동) */
+        #assignment-section {
+            display: none !important;
+        }
+        
         /* 상단바는 aileron 유지 */
         header, header * {
             font-family: "aileron", sans-serif;
@@ -203,11 +208,11 @@
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto">
-        <!-- 상단: 영상 + 과제 섹션 -->
-        <div class="flex flex-col lg:flex-row">
+        <!-- 메인: 영상 + 우측 사이드바 -->
+        <div class="flex flex-col lg:flex-row gap-6">
             
             <!-- Video Section (좌측) -->
-            <div class="flex-1 lg:pr-0">
+            <div class="flex-1 lg:w-0" style="min-width: 0;">
                 <!-- Video Player -->
                 <div class="video-container" id="video-container">
                     <div class="absolute inset-0 flex items-center justify-center text-gray-500">
@@ -350,45 +355,123 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 하단: 커리큘럼 + 댓글 -->
-        <div class="flex flex-col lg:flex-row border-t border-white border-opacity-10">
-            <!-- 커리큘럼 섹션 (좌측) -->
-            <div class="w-full lg:w-80 bg-white bg-opacity-5 border-r border-white border-opacity-10">
-                <div class="p-4 border-b border-white border-opacity-10">
-                    <h3 class="font-semibold text-white">커리큘럼</h3>
-                </div>
-                <div id="lesson-list" class="divide-y divide-white divide-opacity-10 max-h-96 overflow-y-auto">
-                    <!-- 레슨 목록이 동적으로 로드됩니다 -->
-                </div>
-            </div>
-
-            <!-- 댓글 섹션 (우측) -->
-            <div class="flex-1 p-6">
-                <!-- Comments Section -->
-                <div class="space-y-6">
-                    <h2 class="text-xl font-bold text-white">댓글</h2>
-                    
-                    <!-- Comment Form -->
-                    <div id="comment-form-container" class="space-y-4">
-                        <textarea id="comment-input" 
-                                  class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white resize-none"
-                                  rows="3"
-                                  placeholder="댓글을 입력하세요..."></textarea>
-                        <div class="flex justify-end">
-                            <button onclick="submitComment()" 
-                                    class="btn-hover-scale px-6 py-2 bg-white text-black font-semibold rounded-lg text-sm">
-                                댓글 작성
-                            </button>
+            <!-- Right Sidebar: 공지사항 + 과제 + 커리큘럼 -->
+            <div class="w-full lg:w-96 flex flex-col gap-6">
+                
+                <!-- 공지사항 섹션 -->
+                <div class="bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden">
+                    <div class="p-4 border-b border-white border-opacity-10">
+                        <h3 class="font-semibold text-white">📢 선생님 공지사항</h3>
+                    </div>
+                    <div id="teacher-notice" class="p-4 text-gray-300 text-sm max-h-48 overflow-y-auto">
+                        <div id="notice-content" class="space-y-2">
+                            <p class="text-gray-500 text-center py-4">등록된 공지사항이 없습니다.</p>
                         </div>
                     </div>
-                    
-                    <!-- Comments List -->
-                    <div id="comments-list" class="space-y-4">
-                        <!-- 댓글이 동적으로 로드됩니다 -->
+                </div>
+
+                <!-- 과제 섹션 (90% 이상 수강 시 표시) -->
+                <div id="assignment-section-sidebar" class="hidden bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden flex-1" style="min-height: 300px;">
+                    <div class="p-4 border-b border-white border-opacity-10">
+                        <h3 class="font-semibold text-white">📝 과제 제출</h3>
+                    </div>
+                    <div class="p-4 overflow-y-auto" style="max-height: 400px;">
+                        <!-- 순차적 잠금 해제 방식 (세로 배치) -->
+                        <div class="space-y-3">
+                            
+                            <!-- 퀴즈 카드 (선택적) -->
+                            <div id="quest-quiz-sidebar" data-quest-type="quiz" class="hidden quest-card quest-unlocked p-4 rounded-xl bg-white text-black flex items-center space-x-3 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('quiz')">
+                                <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl hidden items-center justify-center">
+                                    <span class="text-2xl font-bold">LOCK</span>
+                                </div>
+                                <div class="flex-shrink-0 text-2xl">📝</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-800">퀴즈</p>
+                                    <p class="text-xs text-gray-400">풀어보기</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 카톡 카드 -->
+                            <div id="quest-kakao-sidebar" data-quest-type="kakao" class="quest-card p-4 rounded-xl bg-white text-black flex items-center space-x-3 transition-all duration-300 shadow-lg relative">
+                                <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                    <span class="text-2xl font-bold">LOCK</span>
+                                </div>
+                                <div class="flex-shrink-0 text-2xl">💬</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-800">카톡 제출</p>
+                                    <a id="kakao-link-sidebar" href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-gray-600 hover:text-gray-800 quest-action" onclick="event.stopPropagation(); handleKakaoOpen();">열기 →</a>
+                                </div>
+                            </div>
+                            
+                            <!-- 블로그 카드 (선택적) -->
+                            <div id="quest-blog-sidebar" data-quest-type="blog" class="hidden quest-card p-4 rounded-xl bg-white text-black flex items-center space-x-3 transition-all duration-300 shadow-lg relative">
+                                <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                    <span class="text-2xl font-bold">LOCK</span>
+                                </div>
+                                <div class="flex-shrink-0 text-2xl">📰</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-800">블로그</p>
+                                    <a id="blog-link-sidebar" href="#" target="_blank" class="text-xs text-gray-600 hover:text-gray-800 quest-action" onclick="event.stopPropagation(); handleBlogOpen();">보기 →</a>
+                                </div>
+                            </div>
+                            
+                            <!-- 사진 제출 카드 -->
+                            <div id="quest-image-sidebar" data-quest-type="image" class="quest-card p-4 rounded-xl bg-white text-black flex items-center space-x-3 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('image')">
+                                <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                    <span class="text-2xl font-bold">LOCK</span>
+                                </div>
+                                <div class="flex-shrink-0 text-2xl">📷</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-800">사진 제출</p>
+                                    <span id="image-submission-status-sidebar" class="text-xs text-gray-400">미제출</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 체크리스트 카드 -->
+                            <div id="quest-checklist-sidebar" data-quest-type="checklist" class="quest-card p-4 rounded-xl bg-white text-black flex items-center space-x-3 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('checklist')">
+                                <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                    <span class="text-2xl font-bold">LOCK</span>
+                                </div>
+                                <div class="flex-shrink-0 text-2xl">✅</div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold text-gray-800">체크리스트</p>
+                                    <p id="checklist-status-sidebar" class="text-xs text-gray-400">0/3 완료</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 완료 메시지 -->
+                        <div id="all-quests-complete-sidebar" class="hidden mt-4 p-3 rounded-xl bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30">
+                            <p class="text-green-400 font-bold text-sm text-center">모든 과제를 완료했습니다!</p>
+                        </div>
+                        
+                        <!-- 채점 결과 표시 -->
+                        <div id="grading-result-sidebar" class="hidden mt-4 p-3 rounded-lg bg-green-500/10 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-green-400 font-semibold text-xs">채점 완료</span>
+                                <span id="grading-score-sidebar" class="text-white font-bold text-xs"></span>
+                            </div>
+                            <p id="grading-comment-sidebar" class="text-xs text-gray-300"></p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 커리큘럼 섹션 -->
+                <div class="bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 overflow-hidden flex-1" style="min-height: 300px;">
+                    <div class="p-4 border-b border-white border-opacity-10">
+                        <h3 class="font-semibold text-white">📚 커리큘럼</h3>
+                    </div>
+                    <div id="lesson-list" class="divide-y divide-white divide-opacity-10 overflow-y-auto" style="max-height: 400px;">
+                        <!-- 레슨 목록이 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -1122,36 +1205,27 @@
             }
         }
 
-        function renderComment(comment) {
-            const date = new Date(comment.created_at).toLocaleDateString('ko-KR');
-            return `<div class="p-4 rounded-xl bg-white bg-opacity-5 space-y-2"><div class="flex items-center justify-between"><span class="font-semibold text-white">${comment.user_name || '익명'}</span><span class="text-xs text-gray-500">${date}</span></div><p class="text-gray-300">${comment.content}</p></div>`;
-        }
-
-        async function loadComments() {
+        // 공지사항 로드 함수
+        async function loadTeacherNotice() {
             if (!currentLesson) return;
             try {
-                const { data, error } = await window.supabase.from('comments').select('*, profiles(name)').eq('lesson_id', currentLesson.id).eq('is_approved', true).order('created_at', { ascending: false });
+                const { data, error } = await window.supabase
+                    .from('lessons')
+                    .select('teacher_notice')
+                    .eq('id', currentLesson.id)
+                    .single();
+                
                 if (error) throw error;
-                const container = document.getElementById('comments-list');
-                if (data && data.length > 0) {
-                    container.innerHTML = data.map(comment => { comment.user_name = comment.profiles?.name || '익명'; return renderComment(comment); }).join('');
+                
+                const container = document.getElementById('notice-content');
+                if (data && data.teacher_notice) {
+                    container.innerHTML = `<p class="whitespace-pre-wrap">${data.teacher_notice}</p>`;
                 } else {
-                    container.innerHTML = '<p class="text-gray-500 text-center py-4">아직 댓글이 없습니다.</p>';
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">등록된 공지사항이 없습니다.</p>';
                 }
-            } catch (error) { console.error('Load comments error:', error); }
-        }
-
-        async function submitComment() {
-            if (!currentUser) { if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) { window.location.href = 'auth.html'; } return; }
-            const input = document.getElementById('comment-input');
-            const content = input.value.trim();
-            if (!content) return;
-            try {
-                const { error } = await window.supabase.from('comments').insert({ lesson_id: currentLesson.id, user_id: currentUser.id, content: content, is_approved: true });
-                if (error) throw error;
-                input.value = '';
-                await loadComments();
-            } catch (error) { console.error('Submit comment error:', error); }
+            } catch (error) {
+                console.error('Load teacher notice error:', error);
+            }
         }
 
         async function loadLesson() {
@@ -1210,15 +1284,13 @@
             initVideoPlayer(currentLesson);
             renderLessonList(courseLessons, currentLesson.id);
             setupNavigation(courseLessons, currentLesson.id);
-            await loadComments();
+            
+            // 선생님 공지사항 로드
+            await loadTeacherNotice();
             
             // 퀴즈 로드
             if (currentUser) {
                 await loadQuizzes(currentLesson.id);
-            }
-            
-            if (!currentUser) { 
-                document.getElementById('comment-form-container').innerHTML = `<p class="text-gray-500 text-center py-4">댓글을 작성하려면 <a href="auth.html" class="text-white underline">로그인</a>해주세요.</p>`; 
             }
         }
 
@@ -1240,46 +1312,65 @@
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
             const assignmentSection = document.getElementById('assignment-section');
+            const assignmentSectionSidebar = document.getElementById('assignment-section-sidebar');
             
             if (progress >= 90 && currentUser) {
+                // 사이드바 과제 섹션 표시
+                if (assignmentSectionSidebar) {
+                    assignmentSectionSidebar.classList.remove('hidden');
+                }
+                // 기존 섹션은 숨김 처리됨 (CSS)
                 assignmentSection.classList.remove('hidden');
                 initQuestSystem();
                 loadAssignmentStatus();
             } else {
+                if (assignmentSectionSidebar) {
+                    assignmentSectionSidebar.classList.add('hidden');
+                }
                 assignmentSection.classList.add('hidden');
             }
         }
 
         // 퀘스트 시스템 초기화
         function initQuestSystem() {
-            // 퀴즈 카드 표시 여부
+            // 퀴즈 카드 표시 여부 (기존 + 사이드바)
             const hasQuiz = quizzes && quizzes.length > 0;
             const questQuiz = document.getElementById('quest-quiz');
+            const questQuizSidebar = document.getElementById('quest-quiz-sidebar');
             const arrowQuiz = document.getElementById('arrow-quiz');
             
             if (hasQuiz) {
-                questQuiz.classList.remove('hidden');
-                arrowQuiz.classList.remove('hidden');
+                if (questQuiz) questQuiz.classList.remove('hidden');
+                if (questQuizSidebar) questQuizSidebar.classList.remove('hidden');
+                if (arrowQuiz) arrowQuiz.classList.remove('hidden');
                 questProgress.quiz.unlocked = true;
             } else {
-                questQuiz.classList.add('hidden');
-                arrowQuiz.classList.add('hidden');
+                if (questQuiz) questQuiz.classList.add('hidden');
+                if (questQuizSidebar) questQuizSidebar.classList.add('hidden');
+                if (arrowQuiz) arrowQuiz.classList.add('hidden');
                 // 퀴즈가 없으면 카톡부터 시작
                 questProgress.kakao.unlocked = true;
             }
             
-            // 블로그 카드 표시 여부
+            // 블로그 카드 표시 여부 (기존 + 사이드바)
             const hasBlog = currentLesson?.blog_url;
             const questBlog = document.getElementById('quest-blog');
+            const questBlogSidebar = document.getElementById('quest-blog-sidebar');
             const arrowBlog = document.getElementById('arrow-blog');
             
             if (hasBlog) {
-                questBlog.classList.remove('hidden');
-                arrowBlog.classList.remove('hidden');
-                document.getElementById('blog-link').href = currentLesson.blog_url;
+                if (questBlog) questBlog.classList.remove('hidden');
+                if (questBlogSidebar) questBlogSidebar.classList.remove('hidden');
+                if (arrowBlog) arrowBlog.classList.remove('hidden');
+                
+                const blogLink = document.getElementById('blog-link');
+                const blogLinkSidebar = document.getElementById('blog-link-sidebar');
+                if (blogLink) blogLink.href = currentLesson.blog_url;
+                if (blogLinkSidebar) blogLinkSidebar.href = currentLesson.blog_url;
             } else {
-                questBlog.classList.add('hidden');
-                arrowBlog.classList.add('hidden');
+                if (questBlog) questBlog.classList.add('hidden');
+                if (questBlogSidebar) questBlogSidebar.classList.add('hidden');
+                if (arrowBlog) arrowBlog.classList.add('hidden');
             }
             
             updateQuestUI();
@@ -1287,36 +1378,62 @@
 
         // 퀘스트 UI 업데이트
         function updateQuestUI() {
-            // 각 퀘스트 카드 업데이트
+            // 각 퀘스트 카드 업데이트 (기존 + 사이드바)
             Object.keys(questProgress).forEach(questType => {
                 const quest = questProgress[questType];
                 const card = document.getElementById(`quest-${questType}`);
+                const cardSidebar = document.getElementById(`quest-${questType}-sidebar`);
                 
-                if (!card || card.classList.contains('hidden')) return;
-                
-                const lockEl = card.querySelector('.quest-lock');
-                const checkEl = card.querySelector('.quest-check');
-                
-                // 잠금 상태
-                if (quest.unlocked) {
-                    lockEl.classList.add('hidden');
-                    card.classList.add('quest-unlocked');
-                    card.classList.remove('opacity-50');
-                } else {
-                    lockEl.classList.remove('hidden');
-                    lockEl.classList.add('flex');
-                    card.classList.remove('quest-unlocked');
-                    card.classList.add('opacity-50');
+                // 기존 카드 업데이트
+                if (card && !card.classList.contains('hidden')) {
+                    const lockEl = card.querySelector('.quest-lock');
+                    const checkEl = card.querySelector('.quest-check');
+                    
+                    if (quest.unlocked) {
+                        lockEl.classList.add('hidden');
+                        card.classList.add('quest-unlocked');
+                        card.classList.remove('opacity-50');
+                    } else {
+                        lockEl.classList.remove('hidden');
+                        lockEl.classList.add('flex');
+                        card.classList.remove('quest-unlocked');
+                        card.classList.add('opacity-50');
+                    }
+                    
+                    if (quest.completed) {
+                        checkEl.classList.remove('hidden');
+                        checkEl.classList.add('flex');
+                        card.classList.add('ring-2', 'ring-green-500');
+                    } else {
+                        checkEl.classList.add('hidden');
+                        card.classList.remove('ring-2', 'ring-green-500');
+                    }
                 }
                 
-                // 완료 상태
-                if (quest.completed) {
-                    checkEl.classList.remove('hidden');
-                    checkEl.classList.add('flex');
-                    card.classList.add('ring-2', 'ring-green-500');
-                } else {
-                    checkEl.classList.add('hidden');
-                    card.classList.remove('ring-2', 'ring-green-500');
+                // 사이드바 카드 업데이트
+                if (cardSidebar && !cardSidebar.classList.contains('hidden')) {
+                    const lockEl = cardSidebar.querySelector('.quest-lock');
+                    const checkEl = cardSidebar.querySelector('.quest-check');
+                    
+                    if (quest.unlocked) {
+                        lockEl.classList.add('hidden');
+                        cardSidebar.classList.add('quest-unlocked');
+                        cardSidebar.classList.remove('opacity-50');
+                    } else {
+                        lockEl.classList.remove('hidden');
+                        lockEl.classList.add('flex');
+                        cardSidebar.classList.remove('quest-unlocked');
+                        cardSidebar.classList.add('opacity-50');
+                    }
+                    
+                    if (quest.completed) {
+                        checkEl.classList.remove('hidden');
+                        checkEl.classList.add('flex');
+                        cardSidebar.classList.add('ring-2', 'ring-green-500');
+                    } else {
+                        checkEl.classList.add('hidden');
+                        cardSidebar.classList.remove('ring-2', 'ring-green-500');
+                    }
                 }
             });
             
@@ -1327,10 +1444,13 @@
             });
             
             const completeMsg = document.getElementById('all-quests-complete');
+            const completeMsgSidebar = document.getElementById('all-quests-complete-sidebar');
             if (allCompleted) {
-                completeMsg.classList.remove('hidden');
+                if (completeMsg) completeMsg.classList.remove('hidden');
+                if (completeMsgSidebar) completeMsgSidebar.classList.remove('hidden');
             } else {
-                completeMsg.classList.add('hidden');
+                if (completeMsg) completeMsg.classList.add('hidden');
+                if (completeMsgSidebar) completeMsgSidebar.classList.add('hidden');
             }
         }
 
@@ -1454,7 +1574,10 @@
                     // 이미지 제출 완료 체크
                     if (assignment.image_completed) {
                         questProgress.image.completed = true;
-                        document.getElementById('image-submission-status').textContent = '제출완료';
+                        const statusEl = document.getElementById('image-submission-status');
+                        const statusElSidebar = document.getElementById('image-submission-status-sidebar');
+                        if (statusEl) statusEl.textContent = '제출완료';
+                        if (statusElSidebar) statusElSidebar.textContent = '제출완료';
                     }
                     
                     // 체크리스트 완료 체크
@@ -1463,7 +1586,10 @@
                     const kakaoComplete = assignment.kakao_completed || false;
                     const checkCount = [noteComplete, blogComplete, kakaoComplete].filter(Boolean).length;
                     
-                    document.getElementById('checklist-status').textContent = `${checkCount}/3 완료`;
+                    const checkStatusEl = document.getElementById('checklist-status');
+                    const checkStatusElSidebar = document.getElementById('checklist-status-sidebar');
+                    if (checkStatusEl) checkStatusEl.textContent = `${checkCount}/3 완료`;
+                    if (checkStatusElSidebar) checkStatusElSidebar.textContent = `${checkCount}/3 완료`;
                     
                     if (checkCount === 3) {
                         questProgress.checklist.completed = true;
@@ -1598,7 +1724,10 @@
                 
                 // 체크리스트 개수 업데이트
                 const checkCount = [assignmentData.note_completed, assignmentData.blog_completed, assignmentData.kakao_completed].filter(Boolean).length;
-                document.getElementById('checklist-status').textContent = `${checkCount}/3 완료`;
+                const checkStatusEl = document.getElementById('checklist-status');
+                const checkStatusElSidebar = document.getElementById('checklist-status-sidebar');
+                if (checkStatusEl) checkStatusEl.textContent = `${checkCount}/3 완료`;
+                if (checkStatusElSidebar) checkStatusElSidebar.textContent = `${checkCount}/3 완료`;
                 
                 // 성공 메시지
                 const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
@@ -2150,12 +2279,25 @@
                     // 채점 결과 표시
                     if (feedback && submission.status === 'graded') {
                         gradingResultEl.classList.remove('hidden');
-                        document.getElementById('grading-score').textContent = 
-                            feedback.score ? `${feedback.score}점` : (feedback.grade || '통과');
-                        document.getElementById('grading-comment').textContent = 
-                            feedback.comment || '잘 하셨습니다!';
+                        const gradingResultElSidebar = document.getElementById('grading-result-sidebar');
+                        if (gradingResultElSidebar) gradingResultElSidebar.classList.remove('hidden');
+                        
+                        const scoreText = feedback.score ? `${feedback.score}점` : (feedback.grade || '통과');
+                        const commentText = feedback.comment || '잘 하셨습니다!';
+                        
+                        const scoreEl = document.getElementById('grading-score');
+                        const scoreElSidebar = document.getElementById('grading-score-sidebar');
+                        const commentEl = document.getElementById('grading-comment');
+                        const commentElSidebar = document.getElementById('grading-comment-sidebar');
+                        
+                        if (scoreEl) scoreEl.textContent = scoreText;
+                        if (scoreElSidebar) scoreElSidebar.textContent = scoreText;
+                        if (commentEl) commentEl.textContent = commentText;
+                        if (commentElSidebar) commentElSidebar.textContent = commentText;
                     } else {
                         gradingResultEl.classList.add('hidden');
+                        const gradingResultElSidebar = document.getElementById('grading-result-sidebar');
+                        if (gradingResultElSidebar) gradingResultElSidebar.classList.add('hidden');
                     }
                     
                     // 퀘스트 완료 처리 (제출 완료 시)
