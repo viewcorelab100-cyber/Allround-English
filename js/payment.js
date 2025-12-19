@@ -434,10 +434,32 @@ async function applyCoupon() {
         
         if (error) throw error;
         
-        // 입력한 코드와 일치하는 쿠폰 찾기
-        const matchedCoupon = userCoupons?.find(uc => 
-            uc.coupons.code.toUpperCase() === couponCode
-        );
+        // 🔍 디버깅: 조회된 쿠폰 데이터 확인
+        console.log('🎟️ [쿠폰 적용] 입력한 코드:', couponCode);
+        console.log('🎟️ [쿠폰 적용] 조회된 사용자 쿠폰:', userCoupons);
+        console.log('🎟️ [쿠폰 적용] 쿠폰 개수:', userCoupons?.length);
+        
+        // 각 쿠폰의 coupons 정보 확인
+        userCoupons?.forEach((uc, index) => {
+            console.log(`🎟️ [쿠폰 ${index + 1}]`, {
+                id: uc.id,
+                coupons: uc.coupons,
+                code: uc.coupons?.code,
+                is_used: uc.is_used,
+                expires_at: uc.expires_at
+            });
+        });
+        
+        // 입력한 코드와 일치하는 쿠폰 찾기 (안전한 체크)
+        const matchedCoupon = userCoupons?.find(uc => {
+            if (!uc.coupons || !uc.coupons.code) {
+                console.warn('⚠️ [쿠폰 적용] coupons 정보가 없는 쿠폰:', uc);
+                return false;
+            }
+            return uc.coupons.code.toUpperCase() === couponCode;
+        });
+        
+        console.log('🎟️ [쿠폰 적용] 매칭된 쿠폰:', matchedCoupon);
         
         if (!matchedCoupon) {
             showCouponMessage('유효하지 않거나 사용할 수 없는 쿠폰입니다.', false);
