@@ -400,11 +400,9 @@ function showErrorState() {
 
 // 쿠폰 적용
 async function applyCoupon() {
-    // #region agent log
-    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:402',message:'applyCoupon 시작',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'ALL'})}).catch(()=>{});
-    // #endregion
-    
     const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
+    
+    console.log('🎟️ [쿠폰 적용 시작] 입력 코드:', couponCode);
     
     if (!couponCode) {
         showCouponMessage('쿠폰 코드를 입력해주세요.', false);
@@ -413,22 +411,15 @@ async function applyCoupon() {
     
     try {
         const user = await getCurrentUser();
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:416',message:'현재 사용자 정보',data:{userId:user?.id,userEmail:user?.email},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H3'})}).catch(()=>{});
-        // #endregion
+        console.log('🎟️ [사용자 확인]', { userId: user?.id, email: user?.email });
         
         if (!user) {
             showCouponMessage('로그인이 필요합니다.', false);
             return;
         }
         
-        // 쿠폰 코드로 사용 가능한 쿠폰 찾기
+        // 쿠폰 코드로 사용 가능한 쿠폰 찾기 (custom_code 포함)
         const nowISO = new Date().toISOString();
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:435',message:'쿠폰 조회 시작 - 필터 조건',data:{userId:user.id,isUsed:false,expiresAfter:nowISO,inputCode:couponCode},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
         
         const { data: userCoupons, error } = await window.supabase
             .from('user_coupons')
@@ -447,46 +438,47 @@ async function applyCoupon() {
             .eq('is_used', false)
             .gt('expires_at', nowISO);
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:456',message:'쿠폰 조회 결과',data:{error:error?.message,couponCount:userCoupons?.length,coupons:userCoupons?.map(uc=>({id:uc.id,couponId:uc.coupon_id,isUsed:uc.is_used,expiresAt:uc.expires_at,code:uc.coupons?.code,hasCouponsObject:!!uc.coupons}))},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1,H2,H4'})}).catch(()=>{});
-        // #endregion
-        
         if (error) throw error;
         
-        // 🔍 디버깅: 조회된 쿠폰 데이터 확인
-        console.log('🎟️ [쿠폰 적용] 입력한 코드:', couponCode);
-        console.log('🎟️ [쿠폰 적용] 조회된 사용자 쿠폰:', userCoupons);
-        console.log('🎟️ [쿠폰 적용] 쿠폰 개수:', userCoupons?.length);
-        
-        // 각 쿠폰의 coupons 정보 확인
-        userCoupons?.forEach((uc, index) => {
-            console.log(`🎟️ [쿠폰 ${index + 1}]`, {
+        console.log('🎟️ [쿠폰 조회 완료]', {
+            조회개수: userCoupons?.length,
+            쿠폰목록: userCoupons?.map(uc => ({
                 id: uc.id,
-                coupons: uc.coupons,
-                code: uc.coupons?.code,
+                custom_code: uc.custom_code,
+                db_code: uc.coupons?.code,
                 is_used: uc.is_used,
                 expires_at: uc.expires_at
-            });
+            }))
         });
         
-        // 입력한 코드와 일치하는 쿠폰 찾기 (안전한 체크)
+        
+        // 입력한 코드와 일치하는 쿠폰 찾기 (custom_code 우선, coupons.code 대체)
         const matchedCoupon = userCoupons?.find(uc => {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:464',message:'쿠폰 매칭 시도',data:{ucId:uc.id,hasCoupons:!!uc.coupons,hasCode:!!(uc.coupons?.code),dbCode:uc.coupons?.code,inputCode:couponCode,match:uc.coupons?.code?.toUpperCase()===couponCode},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H2'})}).catch(()=>{});
-            // #endregion
+            // custom_code가 있으면 우선 사용, 없으면 coupons.code 사용
+            const effectiveCode = uc.custom_code || uc.coupons?.code;
             
-            if (!uc.coupons || !uc.coupons.code) {
-                console.warn('⚠️ [쿠폰 적용] coupons 정보가 없는 쿠폰:', uc);
+            console.log('🔍 [매칭 시도]', {
+                ucId: uc.id,
+                custom_code: uc.custom_code,
+                db_code: uc.coupons?.code,
+                effective_code: effectiveCode,
+                입력코드: couponCode,
+                매칭여부: effectiveCode?.toUpperCase() === couponCode
+            });
+            
+            if (!effectiveCode) {
+                console.warn('⚠️ 쿠폰 코드가 없습니다:', uc);
                 return false;
             }
-            return uc.coupons.code.toUpperCase() === couponCode;
+            return effectiveCode.toUpperCase() === couponCode;
         });
         
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment.js:477',message:'최종 매칭 결과',data:{matched:!!matchedCoupon,matchedCode:matchedCoupon?.coupons?.code,matchedId:matchedCoupon?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1,H2'})}).catch(()=>{});
-        // #endregion
-        
-        console.log('🎟️ [쿠폰 적용] 매칭된 쿠폰:', matchedCoupon);
+        console.log('✅ [최종 매칭 결과]', {
+            성공: !!matchedCoupon,
+            쿠폰ID: matchedCoupon?.id,
+            쿠폰코드: matchedCoupon?.custom_code || matchedCoupon?.coupons?.code,
+            쿠폰명: matchedCoupon?.coupons?.name
+        });
         
         if (!matchedCoupon) {
             showCouponMessage('유효하지 않거나 사용할 수 없는 쿠폰입니다.', false);

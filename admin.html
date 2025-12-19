@@ -1055,12 +1055,12 @@
             }
             
             // 디버깅: 렌더링할 제출물 확인
-            console.log('🎨 [관리자] 렌더링할 제출물 수:', submissions.length);
+            console.log('[관리자] 렌더링할 제출물 수:', submissions.length);
             const withImages = submissions.filter(s => s.image_url);
-            console.log('🎨 [관리자] 이미지가 있는 제출물:', withImages.length);
+            console.log('[관리자] 이미지가 있는 제출물:', withImages.length);
             if (withImages.length > 0) {
-                console.log('🎨 [관리자] 첫 번째 제출물의 image_url:', withImages[0].image_url);
-                console.log('🎨 [관리자] 첫 번째 제출물 전체:', {
+                console.log('[관리자] 첫 번째 제출물의 image_url:', withImages[0].image_url);
+                console.log('[관리자] 첫 번째 제출물 전체:', {
                     id: withImages[0].id,
                     student: withImages[0].studentEmail,
                     image_url_length: withImages[0].image_url?.length,

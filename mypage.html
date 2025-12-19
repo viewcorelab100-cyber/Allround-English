@@ -146,7 +146,7 @@
                     수강 강의
                 </button>
                 <button onclick="showTab('orders')" id="tab-orders" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
-                    📦 주문/배송
+                    주문/배송
                 </button>
                 <button onclick="showTab('profile')" id="tab-profile" class="tab-btn px-4 md:px-6 py-2 md:py-3 rounded-xl text-gray-400 font-semibold text-sm md:text-base">
                     프로필 설정
@@ -424,8 +424,8 @@
         // 배송 상태 배지 HTML 반환
         function getShippingStatusBadge(status) {
             const badges = {
-                'PENDING_ADDRESS': '<span class="px-3 py-1 rounded-full text-xs bg-yellow-500 bg-opacity-20 text-yellow-400">⏳ 배송정보 미완료</span>',
-                'PREPARING': '<span class="px-3 py-1 rounded-full text-xs bg-blue-500 bg-opacity-20 text-blue-400">📋 배송준비중</span>',
+                'PENDING_ADDRESS': '<span class="px-3 py-1 rounded-full text-xs bg-yellow-500 bg-opacity-20 text-yellow-400">배송정보 미완료</span>',
+                'PREPARING': '<span class="px-3 py-1 rounded-full text-xs bg-blue-500 bg-opacity-20 text-blue-400">배송준비중</span>',
                 'SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-purple-500 bg-opacity-20 text-purple-400">배송중</span>',
                 'DELIVERED': '<span class="px-3 py-1 rounded-full text-xs bg-green-500 bg-opacity-20 text-green-400">배송완료</span>',
                 'NO_SHIPPING': '<span class="px-3 py-1 rounded-full text-xs bg-gray-500 bg-opacity-20 text-gray-400">배송없음</span>'
@@ -506,15 +506,15 @@
 
                     ${hasShippingInfo ? `
                     <div class="pt-4 border-t border-white border-opacity-10 space-y-3">
-                        <h4 class="text-sm font-semibold text-gray-300">📦 교재 배송 정보</h4>
+                        <h4 class="text-sm font-semibold text-gray-300">교재 배송 정보</h4>
                         
                         ${order.shipping_status === 'PENDING_ADDRESS' ? `
                             <div class="p-4 rounded-xl bg-yellow-500 bg-opacity-10 border border-yellow-500 border-opacity-30 space-y-3">
-                                <p class="text-yellow-400 text-sm font-semibold">📦 배송지 정보가 입력되지 않았습니다.</p>
+                                <p class="text-yellow-400 text-sm font-semibold">배송지 정보가 입력되지 않았습니다.</p>
                                 <p class="text-gray-400 text-xs">교재를 받으실 배송지를 입력해주세요.</p>
                                 <a href="payment-success.html?orderId=${order.id}&paymentKey=${order.payment_key || ''}&amount=${order.amount}" 
                                    class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold rounded-xl hover:bg-gray-100">
-                                    📦 배송 정보 입력하기
+                                    배송 정보 입력하기
                                 </a>
                             </div>
                         ` : `
@@ -562,16 +562,16 @@
                     <div class="pt-4 border-t border-white border-opacity-10">
                         <!-- 배송 정보 입력 버튼 -->
                         <div id="shipping-btn-${order.id}" class="p-4 rounded-xl bg-white bg-opacity-5 space-y-3">
-                            <p class="text-gray-400 text-sm">📦 교재 배송을 원하시면 배송 정보를 입력해주세요.</p>
+                            <p class="text-gray-400 text-sm">교재 배송을 원하시면 배송 정보를 입력해주세요.</p>
                             <button onclick="toggleShippingForm('${order.id}')" 
                                class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold rounded-xl hover:bg-gray-100">
-                                📦 배송 정보 입력하기
+                                배송 정보 입력하기
                             </button>
                         </div>
 
                         <!-- 배송 정보 입력 폼 (숨김) -->
                         <div id="shipping-form-${order.id}" class="hidden space-y-4 mt-4">
-                            <h4 class="text-lg font-bold text-white">📦 배송 정보</h4>
+                            <h4 class="text-lg font-bold text-white">배송 정보</h4>
                             
                             <div class="space-y-4">
                                 <div>
@@ -627,7 +627,7 @@
                                 </button>
                                 <button onclick="saveShippingFromMypage('${order.id}')" 
                                         class="flex-1 py-3 bg-white text-black font-semibold rounded-xl hover:bg-gray-100">
-                                    📦 교재 배송하기
+                                    교재 배송하기
                                 </button>
                             </div>
                         </div>
@@ -944,10 +944,6 @@
             try {
                 const user = await getCurrentUser();
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:945',message:'마이페이지 loadCoupons 시작',data:{userId:user?.id,userEmail:user?.email},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H3'})}).catch(()=>{});
-                // #endregion
-                
                 if (!user) return;
 
                 const { data: userCoupons, error } = await window.supabase
@@ -970,20 +966,12 @@
                     .eq('user_id', user.id)
                     .order('created_at', { ascending: false });
 
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:971',message:'마이페이지 쿠폰 조회 결과 (필터 전)',data:{error:error?.message,totalCount:userCoupons?.length,allCoupons:userCoupons?.map(uc=>({id:uc.id,couponId:uc.coupon_id,code:uc.coupons?.code,isUsed:uc.is_used,expiresAt:uc.expires_at}))},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1,H2'})}).catch(()=>{});
-                // #endregion
-
                 if (error) throw error;
 
                 // 사용 가능한 쿠폰과 사용 완료/만료된 쿠폰 분리
                 const now = new Date();
                 const available = userCoupons.filter(c => !c.is_used && new Date(c.expires_at) > now);
                 const unavailable = userCoupons.filter(c => c.is_used || new Date(c.expires_at) <= now);
-                
-                // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'mypage.html:983',message:'마이페이지 쿠폰 필터 결과',data:{nowTime:now.toISOString(),availableCount:available.length,unavailableCount:unavailable.length,availableCodes:available.map(c=>c.coupons?.code)},timestamp:Date.now(),sessionId:'debug-session',runId:'coupon-debug',hypothesisId:'H1'})}).catch(()=>{});
-                // #endregion
 
                 renderAvailableCoupons(available);
                 renderUsedCoupons(unavailable);
