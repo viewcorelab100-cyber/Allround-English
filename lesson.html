@@ -255,46 +255,89 @@
 
                     <!-- Assignment Section - 90% 이상 수강 시 표시 (영상 하단으로 이동) -->
                     <div id="assignment-section" class="hidden mt-8 pt-8 border-t border-white border-opacity-10">
-                        <h2 class="text-xl font-bold text-white mb-4">📝 과제 제출</h2>
+                        <h2 class="text-xl font-bold text-white mb-6">📝 과제 제출</h2>
                         
-                        <!-- 정사각형 카드 그리드 (가로 배치) -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            
-                            <!-- 카드 1: QR 코드 제출 -->
-                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
-                                <div id="qr-code-container" class="w-16 h-16 bg-black rounded-lg flex items-center justify-center">
-                                    <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=64x64&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
+                        <!-- 순차적 잠금 해제 방식 (가로 스크롤) -->
+                        <div class="overflow-x-auto pb-4">
+                            <div class="flex items-center space-x-4 min-w-max">
+                                
+                                <!-- 퀴즈 카드 (선택적) -->
+                                <div id="quest-quiz" data-quest-type="quiz" class="hidden quest-card quest-unlocked flex-shrink-0 w-32 h-40 p-3 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('quiz')">
+                                    <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                    <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl hidden items-center justify-center">
+                                        <span class="text-3xl">🔒</span>
+                                    </div>
+                                    <span class="text-3xl">📝</span>
+                                    <p class="text-xs text-gray-600 font-medium">퀴즈</p>
+                                    <p class="text-xs text-gray-400">풀어보기</p>
                                 </div>
-                                <p class="text-xs text-gray-600">카톡 제출</p>
-                                <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">열기 →</a>
+                                
+                                <!-- 화살표 1 (퀴즈→카톡) -->
+                                <div id="arrow-quiz" class="hidden flex-shrink-0 text-white text-2xl opacity-30">→</div>
+                                
+                                <!-- 카톡 카드 -->
+                                <div id="quest-kakao" data-quest-type="kakao" class="quest-card flex-shrink-0 w-32 h-40 p-3 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 transition-all duration-300 shadow-lg relative">
+                                    <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                    <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                        <span class="text-3xl">🔒</span>
+                                    </div>
+                                    <div id="qr-code-container" class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                                        <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=48x48&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
+                                    </div>
+                                    <p class="text-xs text-gray-600 font-medium">카톡 제출</p>
+                                    <a id="kakao-link" href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600 quest-action" onclick="event.stopPropagation(); handleKakaoOpen();">열기 →</a>
+                                </div>
+                                
+                                <!-- 화살표 2 (카톡→블로그) -->
+                                <div id="arrow-kakao" class="flex-shrink-0 text-white text-2xl opacity-30">→</div>
+                                
+                                <!-- 블로그 카드 (선택적) -->
+                                <div id="quest-blog" data-quest-type="blog" class="hidden quest-card flex-shrink-0 w-32 h-40 p-3 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 transition-all duration-300 shadow-lg relative">
+                                    <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                    <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                        <span class="text-3xl">🔒</span>
+                                    </div>
+                                    <span class="text-3xl">📝</span>
+                                    <p class="text-xs text-gray-600 font-medium">블로그</p>
+                                    <a id="blog-link" href="#" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600 quest-action" onclick="event.stopPropagation(); handleBlogOpen();">보기 →</a>
+                                </div>
+                                
+                                <!-- 화살표 3 (블로그→사진) -->
+                                <div id="arrow-blog" class="hidden flex-shrink-0 text-white text-2xl opacity-30">→</div>
+                                
+                                <!-- 사진 제출 카드 -->
+                                <div id="quest-image" data-quest-type="image" class="quest-card flex-shrink-0 w-32 h-40 p-3 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('image')">
+                                    <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                    <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                        <span class="text-3xl">🔒</span>
+                                    </div>
+                                    <span class="text-3xl">📷</span>
+                                    <p class="text-xs text-gray-600 font-medium">사진 제출</p>
+                                    <span id="image-submission-status" class="text-xs text-gray-400">미제출</span>
+                                </div>
+                                
+                                <!-- 화살표 4 (사진→체크리스트) -->
+                                <div id="arrow-image" class="flex-shrink-0 text-white text-2xl opacity-30">→</div>
+                                
+                                <!-- 체크리스트 카드 -->
+                                <div id="quest-checklist" data-quest-type="checklist" class="quest-card flex-shrink-0 w-32 h-40 p-3 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer transition-all duration-300 shadow-lg relative" onclick="handleQuestClick('checklist')">
+                                    <div class="quest-check absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full hidden items-center justify-center text-white text-xs font-bold">✓</div>
+                                    <div class="quest-lock absolute inset-0 bg-black bg-opacity-50 rounded-xl flex items-center justify-center">
+                                        <span class="text-3xl">🔒</span>
+                                    </div>
+                                    <span class="text-3xl">✅</span>
+                                    <p class="text-xs text-gray-600 font-medium">체크리스트</p>
+                                    <p id="checklist-status" class="text-xs text-gray-400">0/3 완료</p>
+                                </div>
+                                
                             </div>
-                            
-                            <!-- 카드 2: 블로그 숙제 -->
-                            <div id="blog-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 shadow-lg">
-                                <span class="text-3xl">📝</span>
-                                <p class="text-xs text-gray-600">블로그 숙제</p>
-                                <a id="blog-link" href="#" target="_blank" class="text-xs text-black font-semibold hover:text-gray-600">보기 →</a>
-                            </div>
-                            
-                            <!-- 카드 3: 체크리스트 -->
-                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openChecklistModal()">
-                                <span class="text-3xl">✅</span>
-                                <p class="text-xs text-gray-600">체크리스트</p>
-                                <p id="checklist-status" class="text-xs text-black font-semibold">0/3 완료</p>
-                            </div>
-                            
-                            <!-- 카드 4: 이미지 제출 -->
-                            <div class="aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openImageSubmitModal()">
-                                <span class="text-3xl">📷</span>
-                                <p class="text-xs text-gray-600">사진 제출</p>
-                                <span id="image-submission-status" class="text-xs text-black font-semibold">미제출</span>
-                            </div>
-                            
-                            <!-- 카드 5: 퀴즈 -->
-                            <div id="quiz-card" class="hidden aspect-square p-4 rounded-xl bg-white text-black flex flex-col items-center justify-center text-center space-y-2 cursor-pointer hover:bg-gray-100 transition-colors shadow-lg" onclick="openQuizModal()">
-                                <span class="text-3xl">📝</span>
-                                <p class="text-xs text-gray-600">퀴즈</p>
-                                <p class="text-xs font-semibold">풀어보기</p>
+                        </div>
+                        
+                        <!-- 완료 메시지 -->
+                        <div id="all-quests-complete" class="hidden mt-4 p-4 rounded-xl bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/30">
+                            <div class="flex items-center justify-center space-x-2">
+                                <span class="text-2xl">🎉</span>
+                                <p class="text-green-400 font-bold">모든 과제를 완료했습니다!</p>
                             </div>
                         </div>
                         
@@ -1187,23 +1230,198 @@
             saveCurrentProgress();
         });
 
+        // 과제 진행 상태
+        let questProgress = {
+            quiz: { completed: false, unlocked: false },
+            kakao: { completed: false, unlocked: false },
+            blog: { completed: false, unlocked: false },
+            image: { completed: false, unlocked: false },
+            checklist: { completed: false, unlocked: false }
+        };
+
         // 과제 섹션 표시/숨김 (90% 이상일 때만 표시)
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
             const assignmentSection = document.getElementById('assignment-section');
-            const quizCard = document.getElementById('quiz-card');
             
             if (progress >= 90 && currentUser) {
                 assignmentSection.classList.remove('hidden');
+                initQuestSystem();
                 loadAssignmentStatus();
-                
-                // 퀴즈도 90% 이상일 때 표시
-                if (quizzes.length > 0) {
-                    quizCard.classList.remove('hidden');
-                }
             } else {
                 assignmentSection.classList.add('hidden');
-                quizCard.classList.add('hidden');
+            }
+        }
+
+        // 퀘스트 시스템 초기화
+        function initQuestSystem() {
+            // 퀴즈 카드 표시 여부
+            const hasQuiz = quizzes && quizzes.length > 0;
+            const questQuiz = document.getElementById('quest-quiz');
+            const arrowQuiz = document.getElementById('arrow-quiz');
+            
+            if (hasQuiz) {
+                questQuiz.classList.remove('hidden');
+                arrowQuiz.classList.remove('hidden');
+                questProgress.quiz.unlocked = true;
+            } else {
+                questQuiz.classList.add('hidden');
+                arrowQuiz.classList.add('hidden');
+                // 퀴즈가 없으면 카톡부터 시작
+                questProgress.kakao.unlocked = true;
+            }
+            
+            // 블로그 카드 표시 여부
+            const hasBlog = currentLesson?.blog_url;
+            const questBlog = document.getElementById('quest-blog');
+            const arrowBlog = document.getElementById('arrow-blog');
+            
+            if (hasBlog) {
+                questBlog.classList.remove('hidden');
+                arrowBlog.classList.remove('hidden');
+                document.getElementById('blog-link').href = currentLesson.blog_url;
+            } else {
+                questBlog.classList.add('hidden');
+                arrowBlog.classList.add('hidden');
+            }
+            
+            updateQuestUI();
+        }
+
+        // 퀘스트 UI 업데이트
+        function updateQuestUI() {
+            // 각 퀘스트 카드 업데이트
+            Object.keys(questProgress).forEach(questType => {
+                const quest = questProgress[questType];
+                const card = document.getElementById(`quest-${questType}`);
+                
+                if (!card || card.classList.contains('hidden')) return;
+                
+                const lockEl = card.querySelector('.quest-lock');
+                const checkEl = card.querySelector('.quest-check');
+                
+                // 잠금 상태
+                if (quest.unlocked) {
+                    lockEl.classList.add('hidden');
+                    card.classList.add('quest-unlocked');
+                    card.classList.remove('opacity-50');
+                } else {
+                    lockEl.classList.remove('hidden');
+                    lockEl.classList.add('flex');
+                    card.classList.remove('quest-unlocked');
+                    card.classList.add('opacity-50');
+                }
+                
+                // 완료 상태
+                if (quest.completed) {
+                    checkEl.classList.remove('hidden');
+                    checkEl.classList.add('flex');
+                    card.classList.add('ring-2', 'ring-green-500');
+                } else {
+                    checkEl.classList.add('hidden');
+                    card.classList.remove('ring-2', 'ring-green-500');
+                }
+            });
+            
+            // 모든 퀘스트 완료 확인
+            const allCompleted = Object.keys(questProgress).every(key => {
+                const card = document.getElementById(`quest-${key}`);
+                return card.classList.contains('hidden') || questProgress[key].completed;
+            });
+            
+            const completeMsg = document.getElementById('all-quests-complete');
+            if (allCompleted) {
+                completeMsg.classList.remove('hidden');
+            } else {
+                completeMsg.classList.add('hidden');
+            }
+        }
+
+        // 다음 퀘스트 잠금 해제
+        function unlockNextQuest(currentQuest) {
+            const questOrder = ['quiz', 'kakao', 'blog', 'image', 'checklist'];
+            const currentIndex = questOrder.indexOf(currentQuest);
+            
+            // 다음 퀘스트 찾기 (숨겨진 카드는 스킵)
+            for (let i = currentIndex + 1; i < questOrder.length; i++) {
+                const nextQuest = questOrder[i];
+                const nextCard = document.getElementById(`quest-${nextQuest}`);
+                
+                if (nextCard && !nextCard.classList.contains('hidden')) {
+                    questProgress[nextQuest].unlocked = true;
+                    updateQuestUI();
+                    return;
+                }
+            }
+        }
+
+        // 퀘스트 완료 처리
+        function completeQuest(questType) {
+            questProgress[questType].completed = true;
+            unlockNextQuest(questType);
+            updateQuestUI();
+        }
+
+        // 퀘스트 클릭 핸들러
+        function handleQuestClick(questType) {
+            if (!questProgress[questType].unlocked) {
+                return; // 잠긴 퀘스트는 클릭 불가
+            }
+            
+            if (questType === 'quiz') {
+                openQuizModal();
+            } else if (questType === 'image') {
+                openImageSubmitModal();
+            } else if (questType === 'checklist') {
+                openChecklistModal();
+            }
+        }
+
+        // 카톡 열기 핸들러
+        async function handleKakaoOpen() {
+            if (!questProgress.kakao.unlocked) return;
+            
+            // 카톡 완료 처리
+            if (!questProgress.kakao.completed) {
+                completeQuest('kakao');
+                
+                // DB에 저장
+                if (currentUser && currentLesson) {
+                    await window.supabase
+                        .from('assignments')
+                        .upsert({
+                            user_id: currentUser.id,
+                            lesson_id: currentLesson.id,
+                            kakao_completed: true,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'user_id,lesson_id'
+                        });
+                }
+            }
+        }
+
+        // 블로그 열기 핸들러
+        async function handleBlogOpen() {
+            if (!questProgress.blog.unlocked) return;
+            
+            // 블로그 완료 처리
+            if (!questProgress.blog.completed) {
+                completeQuest('blog');
+                
+                // DB에 저장
+                if (currentUser && currentLesson) {
+                    await window.supabase
+                        .from('assignments')
+                        .upsert({
+                            user_id: currentUser.id,
+                            lesson_id: currentLesson.id,
+                            blog_completed: true,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'user_id,lesson_id'
+                        });
+                }
             }
         }
 
@@ -1211,12 +1429,70 @@
         async function loadAssignmentStatus() {
             if (!currentUser || !currentLesson) return;
 
-            const result = await getAssignment(currentUser.id, currentLesson.id);
-            if (result.success && result.data) {
-                document.getElementById('assignment-note').checked = result.data.note_completed || false;
-                document.getElementById('assignment-blog').checked = result.data.blog_completed || false;
-                document.getElementById('assignment-kakao').checked = result.data.kakao_completed || false;
-                updateAssignmentStatusDisplay(result.data);
+            try {
+                // 과제 데이터 불러오기
+                const { data: assignment, error } = await window.supabase
+                    .from('assignments')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .eq('lesson_id', currentLesson.id)
+                    .maybeSingle();
+                
+                if (assignment) {
+                    // 퀴즈 완료 체크
+                    if (assignment.quiz_completed) {
+                        questProgress.quiz.completed = true;
+                    }
+                    
+                    // 카톡 완료 체크
+                    if (assignment.kakao_completed) {
+                        questProgress.kakao.completed = true;
+                    }
+                    
+                    // 블로그 완료 체크
+                    if (assignment.blog_completed) {
+                        questProgress.blog.completed = true;
+                    }
+                    
+                    // 이미지 제출 완료 체크
+                    if (assignment.image_completed) {
+                        questProgress.image.completed = true;
+                        document.getElementById('image-submission-status').textContent = '제출완료';
+                    }
+                    
+                    // 체크리스트 완료 체크
+                    const noteComplete = assignment.note_completed || false;
+                    const blogComplete = assignment.blog_completed || false;
+                    const kakaoComplete = assignment.kakao_completed || false;
+                    const checkCount = [noteComplete, blogComplete, kakaoComplete].filter(Boolean).length;
+                    
+                    document.getElementById('checklist-status').textContent = `${checkCount}/3 완료`;
+                    
+                    if (checkCount === 3) {
+                        questProgress.checklist.completed = true;
+                    }
+                    
+                    // 완료된 퀘스트에 따라 다음 퀘스트 잠금 해제
+                    const questOrder = ['quiz', 'kakao', 'blog', 'image', 'checklist'];
+                    questOrder.forEach((quest, index) => {
+                        const card = document.getElementById(`quest-${quest}`);
+                        if (card && !card.classList.contains('hidden') && questProgress[quest].completed) {
+                            // 다음 퀘스트 잠금 해제
+                            for (let i = index + 1; i < questOrder.length; i++) {
+                                const nextQuest = questOrder[i];
+                                const nextCard = document.getElementById(`quest-${nextQuest}`);
+                                if (nextCard && !nextCard.classList.contains('hidden')) {
+                                    questProgress[nextQuest].unlocked = true;
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                    
+                    updateQuestUI();
+                }
+            } catch (error) {
+                console.error('Load assignment status error:', error);
             }
             
             // 학부모 정보 로드
@@ -1323,13 +1599,25 @@
             if (result.success) {
                 updateAssignmentStatusDisplay(result.data);
                 
+                // 체크리스트 개수 업데이트
+                const checkCount = [assignmentData.note_completed, assignmentData.blog_completed, assignmentData.kakao_completed].filter(Boolean).length;
+                document.getElementById('checklist-status').textContent = `${checkCount}/3 완료`;
+                
                 // 성공 메시지
                 const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
                 if (allCompleted) {
                     showAssignmentModal('✅', '과제가 제출되었습니다!', '수고하셨습니다.');
+                    
+                    // 퀘스트 완료 처리
+                    if (questProgress.checklist && !questProgress.checklist.completed) {
+                        completeQuest('checklist');
+                    }
                 } else {
                     showAssignmentModal('✅', '과제가 제출되었습니다.', '');
                 }
+                
+                // 모달 닫기
+                closeChecklistModal();
                 
                 // 코스 완료 여부 다시 체크 (모든 레슨 완료 시 리포트 버튼 표시)
                 await checkCourseCompletion();
@@ -1872,6 +2160,23 @@
                     } else {
                         gradingResultEl.classList.add('hidden');
                     }
+                    
+                    // 퀘스트 완료 처리 (제출 완료 시)
+                    if (questProgress.image && !questProgress.image.completed && submission.status !== 'pending') {
+                        // assignments 테이블에 이미지 제출 완료 저장
+                        await window.supabase
+                            .from('assignments')
+                            .upsert({
+                                user_id: currentUser.id,
+                                lesson_id: currentLesson.id,
+                                image_completed: true,
+                                updated_at: new Date().toISOString()
+                            }, {
+                                onConflict: 'user_id,lesson_id'
+                            });
+                        
+                        completeQuest('image');
+                    }
                 } else {
                     statusEl.textContent = '미제출';
                     statusEl.className = 'text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400';
@@ -2379,6 +2684,23 @@
                     .insert(responses);
 
                 if (error) throw error;
+                
+                // 퀘스트 완료 처리
+                if (questProgress.quiz && !questProgress.quiz.completed) {
+                    // assignments 테이블에 퀴즈 완료 저장
+                    await window.supabase
+                        .from('assignments')
+                        .upsert({
+                            user_id: user.data.user.id,
+                            lesson_id: currentLesson.id,
+                            quiz_completed: true,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'user_id,lesson_id'
+                        });
+                    
+                    completeQuest('quiz');
+                }
 
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
