@@ -258,7 +258,7 @@
                         <h2 class="text-xl font-bold text-white mb-6">📝 과제 제출</h2>
                         
                         <!-- 순차적 잠금 해제 방식 (가로 스크롤) -->
-                        <div class="overflow-x-auto pb-4">
+                        <div class="overflow-x-auto py-4">
                             <div class="flex items-center space-x-4 min-w-max">
                                 
                                 <!-- 퀴즈 카드 (선택적) -->
@@ -802,6 +802,13 @@
                     <span>📊</span>
                     <span>리포트 확인하기</span>
                 </button>
+                
+                <!-- 일주일 동안 보지 않기 체크박스 -->
+                <label class="flex items-center justify-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="hide-report-week" onchange="handleHideReportWeek(this.checked)" 
+                           class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0">
+                    <span class="text-sm text-gray-400">일주일 동안 보지 않기</span>
+                </label>
                 
                 <p class="text-xs text-gray-500 text-center">
                     버튼 클릭 시 학습 리포트가 생성되고<br>학부모님께 자동으로 발송됩니다.
@@ -2220,10 +2227,42 @@
 
         // 리포트 모달 열기/닫기
         function openReportModal() {
+            // 일주일 동안 보지 않기 체크 확인
+            const hideUntil = localStorage.getItem('hideReportModalUntil');
+            if (hideUntil) {
+                const hideDate = new Date(hideUntil);
+                const now = new Date();
+                if (now < hideDate) {
+                    console.log('리포트 모달 숨김 (일주일 동안 보지 않기 활성화)');
+                    return; // 모달을 표시하지 않음
+                } else {
+                    // 기간이 지났으면 localStorage 제거
+                    localStorage.removeItem('hideReportModalUntil');
+                }
+            }
+            
+            // 체크박스 초기화
+            document.getElementById('hide-report-week').checked = false;
             document.getElementById('report-modal').classList.remove('hidden');
         }
+        
         function closeReportModal() {
             document.getElementById('report-modal').classList.add('hidden');
+        }
+        
+        // 일주일 동안 보지 않기 처리
+        function handleHideReportWeek(checked) {
+            if (checked) {
+                // 현재 시간 + 7일
+                const hideUntil = new Date();
+                hideUntil.setDate(hideUntil.getDate() + 7);
+                localStorage.setItem('hideReportModalUntil', hideUntil.toISOString());
+                console.log('리포트 모달 일주일 동안 숨김 설정:', hideUntil);
+            } else {
+                // 체크 해제 시 localStorage 제거
+                localStorage.removeItem('hideReportModalUntil');
+                console.log('리포트 모달 숨김 해제');
+            }
         }
 
         // 체크리스트 상태 업데이트
