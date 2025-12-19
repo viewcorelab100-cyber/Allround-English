@@ -1246,6 +1246,10 @@
         
         // 코스 전체 완료 여부 체크
         async function checkCourseCompletion() {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:checkCourseCompletion:start',message:'완강 체크 시작',data:{userId:currentUser?.id,courseId:currentCourse?.id,lessonCount:courseLessons?.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1'})}).catch(()=>{});
+            // #endregion
+            
             if (!currentUser || !currentCourse || !courseLessons.length) return;
             
             try {
@@ -1263,6 +1267,10 @@
                 const completedLessons = progressData ? progressData.filter(p => p.is_completed).length : 0;
                 const totalLessons = courseLessons.length;
                 
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:checkCourseCompletion:progressCheck',message:'진도 체크',data:{completedLessons,totalLessons,isAllCompleted:completedLessons>=totalLessons},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H2'})}).catch(()=>{});
+                // #endregion
+                
                 // 모든 레슨이 완료되었는지 확인
                 if (completedLessons >= totalLessons) {
                     // 리포트는 모달로만 표시 (카드는 제거됨)
@@ -1275,6 +1283,10 @@
                         .eq('course_id', currentCourse.id)
                         .maybeSingle();
                     
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:checkCourseCompletion:beforeModal',message:'완강 확인됨, 모달 표시 예정',data:{hasExistingReport:!!existingReport,reportId:existingReport?.id},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+                    // #endregion
+                    
                     if (existingReport) {
                         // 이미 리포트가 있으면 버튼 텍스트 변경
                         const btn = document.getElementById('view-report-btn');
@@ -1284,6 +1296,9 @@
                     }
                     
                     // 완강 시 리포트 모달 자동 표시
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:checkCourseCompletion:callOpenModal',message:'openReportModal() 호출',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H4'})}).catch(()=>{});
+                    // #endregion
                     openReportModal();
                 }
             } catch (error) {
@@ -1915,6 +1930,9 @@
 
         // 리포트 모달 열기/닫기
         function openReportModal() {
+            // #region agent log
+            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:openReportModal',message:'리포트 모달 열기',data:{modalElement:!!document.getElementById('report-modal')},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H5'})}).catch(()=>{});
+            // #endregion
             document.getElementById('report-modal').classList.remove('hidden');
         }
         function closeReportModal() {
