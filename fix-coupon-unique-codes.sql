@@ -86,6 +86,25 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 4. 인덱스 추가
 CREATE INDEX IF NOT EXISTS idx_user_coupons_custom_code ON user_coupons(custom_code);
 
+-- 5. 기존에 발급된 쿠폰에도 고유 코드 생성 (custom_code가 NULL인 경우)
+DO $$
+DECLARE
+    coupon_record RECORD;
+    new_code TEXT;
+BEGIN
+    FOR coupon_record IN 
+        SELECT id FROM user_coupons WHERE custom_code IS NULL
+    LOOP
+        -- 고유 코드 생성
+        new_code := generate_unique_coupon_code();
+        
+        -- 업데이트
+        UPDATE user_coupons 
+        SET custom_code = new_code 
+        WHERE id = coupon_record.id;
+    END LOOP;
+END $$;
+
 COMMENT ON COLUMN user_coupons.custom_code IS '사용자별 고유 쿠폰 코드 (예: COMPLETE-A3F2B1)';
 COMMENT ON FUNCTION generate_unique_coupon_code IS '중복되지 않는 쿠폰 코드 생성';
 
