@@ -1771,49 +1771,12 @@
             document.getElementById('image-viewer-modal').classList.add('hidden');
         }
 
-        // ========== 공지사항 관리 함수 ==========
-        async function openNoticeManagement() {
-            document.getElementById('notice-modal').classList.remove('hidden');
-            
-            // 모든 레슨 목록 로드
-            try {
-                const { data: courses } = await window.supabase
-                    .from('courses')
-                    .select('id, title, lessons(id, title, order_index)')
-                    .order('title');
-                
-                const selectEl = document.getElementById('notice-lesson-select');
-                selectEl.innerHTML = '<option value="">레슨을 선택하세요</option>';
-                
-                if (courses) {
-                    courses.forEach(course => {
-                        if (course.lessons && course.lessons.length > 0) {
-                            course.lessons.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-                            course.lessons.forEach(lesson => {
-                                const option = document.createElement('option');
-                                option.value = lesson.id;
-                                option.textContent = `${course.title} - ${lesson.title}`;
-                                selectEl.appendChild(option);
-                            });
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Load lessons error:', error);
-            }
-        }
-        
-        function closeNoticeModal() {
-            document.getElementById('notice-modal').classList.add('hidden');
-            document.getElementById('notice-lesson-select').value = '';
-            document.getElementById('notice-content').value = '';
-            document.getElementById('notice-active').checked = true;
-        }
-        
-        async function loadNoticeForLesson() {
-            const lessonId = document.getElementById('notice-lesson-select').value;
+        // ========== 공지사항 관리 함수 (레슨 모달 내부에서 사용) ==========
+        // 레슨 모달에서 공지사항 로드
+        async function loadNoticeForLessonInModal(lessonId) {
             if (!lessonId) {
-                document.getElementById('notice-content').value = '';
+                document.getElementById('lesson-notice-content').value = '';
+                document.getElementById('lesson-notice-active').checked = true;
                 return;
             }
             
@@ -1827,29 +1790,32 @@
                     .maybeSingle();
                 
                 if (data) {
-                    document.getElementById('notice-content').value = data.content || '';
-                    document.getElementById('notice-active').checked = data.is_active !== false;
+                    document.getElementById('lesson-notice-content').value = data.content || '';
+                    document.getElementById('lesson-notice-active').checked = data.is_active !== false;
                 } else {
-                    document.getElementById('notice-content').value = '';
-                    document.getElementById('notice-active').checked = true;
+                    document.getElementById('lesson-notice-content').value = '';
+                    document.getElementById('lesson-notice-active').checked = true;
                 }
             } catch (error) {
                 console.error('Load notice error:', error);
             }
         }
         
-        async function saveNotice() {
-            const lessonId = document.getElementById('notice-lesson-select').value;
-            const content = document.getElementById('notice-content').value.trim();
-            const isActive = document.getElementById('notice-active').checked;
+        // 레슨 저장 시 공지사항도 함께 저장
+        async function saveNoticeForLesson(lessonId) {
+            const content = document.getElementById('lesson-notice-content').value.trim();
+            const isActive = document.getElementById('lesson-notice-active').checked;
             
-            if (!lessonId) {
-                alert('레슨을 선택해주세요.');
-                return;
-            }
-            
+            // 공지사항이 비어있으면 기존 공지사항 삭제
             if (!content) {
-                alert('공지사항 내용을 입력해주세요.');
+                try {
+                    await window.supabase
+                        .from('lesson_notices')
+                        .delete()
+                        .eq('lesson_id', lessonId);
+                } catch (error) {
+                    console.error('Delete notice error:', error);
+                }
                 return;
             }
             
@@ -1888,11 +1854,10 @@
                     if (error) throw error;
                 }
                 
-                alert('공지사항이 저장되었습니다.');
-                closeNoticeModal();
+                console.log('공지사항이 저장되었습니다.');
             } catch (error) {
                 console.error('Save notice error:', error);
-                alert('공지사항 저장 중 오류가 발생했습니다: ' + error.message);
+                // 공지사항 저장 실패해도 레슨은 저장되도록 에러를 throw하지 않음
             }
         }
 

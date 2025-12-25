@@ -248,103 +248,180 @@
                         </div>
                     </div>
 
-                    <!-- 과제 제출 현황 -->
+                    <!-- 과제 제출 현황 (카드 형식) -->
                     <div class="p-5 rounded-xl bg-white bg-opacity-5">
-                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
-                            과제 현황
-                        </h3>
+                        <h3 class="text-lg font-bold text-white mb-4">과제 현황</h3>
                         
-                        <!-- 체크리스트 과제 -->
-                        <div id="checklist-assignment-area" class="hidden space-y-3 mb-4">
-                            <p class="text-xs text-gray-400 mb-2">체크리스트</p>
-                            <label class="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-white hover:bg-opacity-5">
-                                <input type="checkbox" id="assignment-note" class="w-5 h-5 rounded border-gray-600 bg-transparent text-green-500 focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <span class="text-sm text-white group-hover:text-gray-300">노트 필기 완료 + 사진 전송</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-white hover:bg-opacity-5">
-                                <input type="checkbox" id="assignment-blog" class="w-5 h-5 rounded border-gray-600 bg-transparent text-green-500 focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <span class="text-sm text-white group-hover:text-gray-300">블로그 숙제 완료 + 사진 전송</span>
-                            </label>
-                            <label class="flex items-center space-x-3 cursor-pointer group p-2 rounded-lg hover:bg-white hover:bg-opacity-5">
-                                <input type="checkbox" id="assignment-kakao" class="w-5 h-5 rounded border-gray-600 bg-transparent text-green-500 focus:ring-white focus:ring-offset-0 cursor-pointer">
-                                <span class="text-sm text-white group-hover:text-gray-300">카톡으로 그 외 숙제 완료</span>
-                            </label>
-                            <button onclick="submitAssignment()" class="w-full px-4 py-2 bg-white bg-opacity-10 text-white text-sm font-semibold rounded-lg hover:bg-opacity-20 mt-2">
-                                체크리스트 제출
-                            </button>
-                            <div id="assignment-status" class="text-xs text-gray-400 text-center mt-2"></div>
-                        </div>
+                        <div id="assignment-cards-container" class="hidden space-y-3">
+                            <!-- 1. 퀴즈 카드 -->
+                            <div id="quiz-card" class="assignment-card p-4 rounded-xl border-2 border-purple-500/30 bg-purple-500/10 cursor-pointer hover:border-purple-500/50 transition-all" onclick="toggleCard('quiz-card')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-purple-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-semibold">퀴즈</p>
+                                            <p class="text-xs text-gray-400">1단계</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span id="quiz-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미완료</span>
+                                        <svg class="w-5 h-5 text-gray-400 transform transition-transform quiz-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="quiz-content hidden mt-4 pt-4 border-t border-white/10">
+                                    <p class="text-sm text-gray-300 mb-3">강의 시청 중 퀴즈가 표시됩니다</p>
+                                    <button onclick="event.stopPropagation(); completeQuiz()" class="w-full px-4 py-2 bg-purple-500 text-white text-sm font-semibold rounded-lg hover:bg-purple-600">
+                                        퀴즈 풀기
+                                    </button>
+                                </div>
+                            </div>
 
-                        <!-- QR 코드 및 블로그 링크 -->
-                        <div id="qr-blog-area" class="hidden p-3 rounded-lg bg-white bg-opacity-5 mb-3">
-                            <div class="flex gap-3 items-start">
-                                <div class="flex flex-col items-center space-y-1">
-                                    <p class="text-xs text-gray-400">과제 제출용 QR</p>
-                                    <div id="qr-code-container" class="w-20 h-20 bg-white rounded-lg">
-                                        <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://open.kakao.com/o/allround" alt="QR Code" class="w-full h-full rounded-lg">
+                            <!-- 2. 노트 필기 카드 -->
+                            <div id="note-card" class="assignment-card p-4 rounded-xl border-2 border-blue-500/30 bg-blue-500/10 cursor-pointer hover:border-blue-500/50 transition-all" onclick="toggleCard('note-card')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-semibold">노트 필기</p>
+                                            <p class="text-xs text-gray-400">2단계</p>
+                                        </div>
                                     </div>
-                                    <a href="https://open.kakao.com/o/allround" target="_blank" class="text-xs text-blue-400 hover:text-blue-300">링크 열기</a>
+                                    <div class="flex items-center space-x-2">
+                                        <span id="note-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미완료</span>
+                                        <svg class="w-5 h-5 text-gray-400 transform transition-transform note-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
                                 </div>
-                                <div id="blog-link-container" class="hidden flex-1 flex flex-col justify-center">
-                                    <p class="text-xs text-gray-400 mb-1">블로그 숙제</p>
-                                    <a id="blog-link" href="#" target="_blank" class="text-sm text-blue-400 hover:text-blue-300 underline">
-                                        블로그 보기 →
-                                    </a>
+                                <div class="note-content hidden mt-4 pt-4 border-t border-white/10">
+                                    <p class="text-sm text-gray-300 mb-3">노트 필기를 완료하고 카톡으로 사진을 전송하세요</p>
+                                    <div class="flex gap-2 mb-3">
+                                        <a href="https://open.kakao.com/o/allround" target="_blank" class="flex-1 px-4 py-2 bg-yellow-500 text-black text-sm font-semibold rounded-lg hover:bg-yellow-400 text-center">
+                                            카톡으로 전송
+                                        </a>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); completeNote()" class="w-full px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600">
+                                        완료 표시
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 3. 블로그 과제 카드 -->
+                            <div id="blog-card" class="assignment-card p-4 rounded-xl border-2 border-green-500/30 bg-green-500/10 cursor-pointer hover:border-green-500/50 transition-all" onclick="toggleCard('blog-card')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-green-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-semibold">블로그 과제</p>
+                                            <p class="text-xs text-gray-400">3단계</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span id="blog-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미완료</span>
+                                        <svg class="w-5 h-5 text-gray-400 transform transition-transform blog-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="blog-content hidden mt-4 pt-4 border-t border-white/10">
+                                    <div id="blog-link-display" class="hidden mb-3">
+                                        <p class="text-xs text-gray-400 mb-2">블로그 주소</p>
+                                        <a id="blog-link-btn" href="#" target="_blank" class="block p-3 bg-white/5 rounded-lg text-blue-400 hover:text-blue-300 text-sm break-all">
+                                            블로그 링크
+                                        </a>
+                                    </div>
+                                    <p class="text-sm text-gray-300 mb-3">블로그 과제를 완료하고 카톡으로 사진을 전송하세요</p>
+                                    <div class="flex gap-2 mb-3">
+                                        <a href="https://open.kakao.com/o/allround" target="_blank" class="flex-1 px-4 py-2 bg-yellow-500 text-black text-sm font-semibold rounded-lg hover:bg-yellow-400 text-center">
+                                            카톡으로 전송
+                                        </a>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); completeBlog()" class="w-full px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600">
+                                        완료 표시
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 4. 이미지 과제 카드 -->
+                            <div id="image-card" class="assignment-card p-4 rounded-xl border-2 border-orange-500/30 bg-orange-500/10 cursor-pointer hover:border-orange-500/50 transition-all" onclick="toggleCard('image-card')">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-orange-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-white font-semibold">이미지 과제 제출</p>
+                                            <p class="text-xs text-gray-400">4단계</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <span id="image-submission-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미제출</span>
+                                        <svg class="w-5 h-5 text-gray-400 transform transition-transform image-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="image-content hidden mt-4 pt-4 border-t border-white/10">
+                                    <!-- QR 코드 -->
+                                    <div class="bg-white/5 rounded-lg p-3 mb-3 flex items-center gap-3">
+                                        <div>
+                                            <p class="text-xs text-white font-semibold mb-1">핸드폰으로 제출</p>
+                                            <p class="text-xs text-gray-400">QR 스캔 후 이미지 제출</p>
+                                        </div>
+                                        <div id="lesson-qr-code" class="w-16 h-16 bg-white rounded p-1 flex-shrink-0"></div>
+                                    </div>
+                                    
+                                    <!-- 이미지 미리보기 -->
+                                    <div id="image-preview-container" class="hidden mb-3">
+                                        <img id="image-preview" src="" alt="미리보기" class="w-full max-h-32 object-contain rounded-lg border border-white/20">
+                                        <button onclick="clearImagePreview()" class="mt-2 text-xs text-red-400 hover:text-red-300">이미지 삭제</button>
+                                    </div>
+                                    
+                                    <!-- 이미지 선택 -->
+                                    <div id="image-upload-area" class="border-2 border-dashed border-white/20 rounded-lg p-4 text-center hover:border-white/40 cursor-pointer mb-3" onclick="document.getElementById('image-file-input').click()">
+                                        <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <p class="text-sm text-gray-400">클릭하여 이미지 선택</p>
+                                        <p class="text-xs text-gray-500 mt-1">JPG, PNG (최대 5MB)</p>
+                                    </div>
+                                    
+                                    <!-- 제출 버튼 -->
+                                    <button id="submit-image-btn" onclick="event.stopPropagation(); submitImageAssignment()" disabled
+                                            class="w-full px-4 py-2 bg-orange-500 text-white text-sm font-semibold rounded-lg disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-orange-600">
+                                        이미지 제출하기
+                                    </button>
+                                    
+                                    <!-- 채점 결과 -->
+                                    <div id="grading-result" class="hidden mt-3 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-green-400 font-semibold text-sm">채점 완료</span>
+                                            <span id="grading-score" class="text-white font-bold"></span>
+                                        </div>
+                                        <p id="grading-comment" class="text-sm text-gray-300 mt-2"></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- 이미지 과제 제출 -->
-                        <div id="image-assignment-area" class="hidden p-3 rounded-lg bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 mb-3">
-                            <div class="flex items-center justify-between mb-2">
-                                <p class="text-sm font-semibold text-white">이미지 과제</p>
-                                <span id="image-submission-status" class="text-xs px-2 py-1 rounded-full bg-gray-500/20 text-gray-400">미제출</span>
-                            </div>
-                            
-                            <!-- 핸드폰 QR -->
-                            <div class="bg-white/5 rounded-lg p-2 mb-2">
-                                <div class="flex items-center gap-2">
-                                    <div class="flex-1">
-                                        <p class="text-xs text-white font-semibold">핸드폰으로 제출</p>
-                                        <p class="text-xs text-gray-400">QR 스캔 후 제출</p>
-                                    </div>
-                                    <div id="lesson-qr-code" class="w-16 h-16 bg-white rounded p-1"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- 이미지 미리보기 -->
-                            <div id="image-preview-container" class="hidden mb-2">
-                                <img id="image-preview" src="" alt="미리보기" class="w-full max-h-32 object-contain rounded-lg border border-white/20">
-                                <button onclick="clearImagePreview()" class="mt-1 text-xs text-red-400 hover:text-red-300">삭제</button>
-                            </div>
-                            
-                            <!-- 이미지 선택 -->
-                            <div id="image-upload-area" class="border-2 border-dashed border-white/20 rounded-lg p-3 text-center hover:border-white/40 cursor-pointer mb-2" onclick="document.getElementById('image-file-input').click()">
-                                <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-xs text-gray-400">이미지 선택</p>
-                            </div>
-                            
-                            <!-- 제출 버튼 -->
-                            <button id="submit-image-btn" onclick="submitImageAssignment()" disabled
-                                    class="w-full px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg disabled:bg-gray-600 disabled:cursor-not-allowed">
-                                제출하기
-                            </button>
-                            
-                            <!-- 채점 결과 -->
-                            <div id="grading-result" class="hidden mt-2 p-2 rounded-lg bg-green-500/10 border border-green-500/30">
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-green-400 font-semibold">채점 완료</span>
-                                    <span id="grading-score" class="text-white font-bold"></span>
-                                </div>
-                                <p id="grading-comment" class="text-xs text-gray-300 mt-1"></p>
-                            </div>
-                        </div>
-                        
-                        <!-- 완료 상태 -->
-                        <div id="completion-status" class="text-xs text-center text-gray-400 mt-2"></div>
+                        <div id="completion-status" class="text-xs text-center text-gray-400 mt-4"></div>
                     </div>
                     
                     <!-- 코스 완료 -->
@@ -711,6 +788,9 @@
                 document.getElementById('progress-bar').style.width = `${progress}%`;
                 document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
                 
+                // 퀴즈 시간 체크
+                checkQuizTime(currentTime);
+                
                 // 90% 이상이면 과제 섹션 표시
                 checkAndShowAssignment(Math.round(progress));
             });
@@ -724,6 +804,12 @@
             vimeoPlayer.on('ended', function() {
                 maxWatchedTime = videoDuration;
                 saveVimeoProgress();
+                
+                // 퀴즈 시간이 설정되지 않았으면 영상 종료 후 퀴즈 표시
+                if (!quizShown && (!currentLesson.quiz_time || currentLesson.quiz_time <= 0)) {
+                    showQuizModal();
+                    quizShown = true;
+                }
             });
 
             // 주기적으로 진도 저장 (30초마다)
@@ -805,6 +891,9 @@
                 document.getElementById('progress-bar').style.width = `${progress}%`;
                 document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
                 
+                // 퀴즈 시간 체크
+                checkQuizTime(currentTime);
+                
                 // 90% 이상이면 과제 섹션 표시
                 checkAndShowAssignment(Math.round(progress));
             });
@@ -813,6 +902,12 @@
             videoElement.addEventListener('ended', function() {
                 maxWatchedTime = videoElement.duration;
                 saveNativeProgress();
+                
+                // 퀴즈 시간이 설정되지 않았으면 영상 종료 후 퀴즈 표시
+                if (!quizShown && (!currentLesson.quiz_time || currentLesson.quiz_time <= 0)) {
+                    showQuizModal();
+                    quizShown = true;
+                }
             });
 
             progressInterval = setInterval(() => {
@@ -938,6 +1033,7 @@
             const lessonId = getLessonId();
             if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
+            quizShown = false; // 레슨 로드 시 퀴즈 상태 초기화
             const lessonResult = await getLessonById(lessonId);
             if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
@@ -994,12 +1090,19 @@
             currentProgress = progress;
             
             if (progress >= 90 && currentUser) {
-                // 체크리스트 과제 표시
-                document.getElementById('checklist-assignment-area')?.classList.remove('hidden');
-                // QR 코드 영역 표시
-                document.getElementById('qr-blog-area')?.classList.remove('hidden');
-                // 이미지 과제 표시
-                document.getElementById('image-assignment-area')?.classList.remove('hidden');
+                // 과제 카드 컨테이너 표시
+                document.getElementById('assignment-cards-container')?.classList.remove('hidden');
+                
+                // 블로그 링크 표시
+                if (currentLesson?.blog_link) {
+                    const blogLinkDisplay = document.getElementById('blog-link-display');
+                    const blogLinkBtn = document.getElementById('blog-link-btn');
+                    if (blogLinkDisplay && blogLinkBtn) {
+                        blogLinkBtn.href = currentLesson.blog_link;
+                        blogLinkBtn.textContent = currentLesson.blog_link;
+                        blogLinkDisplay.classList.remove('hidden');
+                    }
+                }
                 
                 loadAssignmentStatus();
             }
@@ -1011,16 +1114,131 @@
             }
         }
 
+        // 카드 토글 함수
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            
+            const content = card.querySelector(`.${cardId.replace('-card', '-content')}`);
+            const arrow = card.querySelector(`.${cardId.replace('-card', '-arrow')}`);
+            
+            if (content && arrow) {
+                content.classList.toggle('hidden');
+                arrow.classList.toggle('rotate-180');
+            }
+        }
+
+        // 퀴즈 시간 체크
+        let quizShown = false;
+        function checkQuizTime(currentTime) {
+            if (quizShown) return;
+            if (!currentLesson) return;
+            
+            // quiz_time이 설정되어 있으면 해당 시간에 퀴즈 표시
+            if (currentLesson.quiz_time && currentTime >= currentLesson.quiz_time && currentTime < currentLesson.quiz_time + 2) {
+                showQuizModal();
+                quizShown = true;
+            }
+        }
+
+        // 퀴즈 모달 표시
+        function showQuizModal() {
+            // 비디오 일시정지
+            if (vimeoPlayer) {
+                vimeoPlayer.pause();
+            } else if (videoElement) {
+                videoElement.pause();
+            }
+            
+            showAssignmentModal('', '퀴즈 시간입니다!', '퀴즈 카드를 열어 문제를 풀어주세요.');
+        }
+
+        // 퀴즈 완료
+        function completeQuiz() {
+            const statusEl = document.getElementById('quiz-status');
+            if (statusEl) {
+                statusEl.textContent = '완료';
+                statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+            }
+            showAssignmentModal('', '퀴즈를 완료했습니다!', '');
+        }
+
+        // 노트 필기 완료
+        async function completeNote() {
+            if (!currentUser || !currentLesson) return;
+
+            const assignmentData = {
+                note_completed: true,
+                blog_completed: false,
+                kakao_completed: false
+            };
+
+            const result = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+            
+            if (result.success) {
+                const statusEl = document.getElementById('note-status');
+                if (statusEl) {
+                    statusEl.textContent = '완료';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                }
+                showAssignmentModal('', '노트 필기를 완료했습니다!', '');
+                updateAssignmentCardStatus();
+            }
+        }
+
+        // 블로그 과제 완료
+        async function completeBlog() {
+            if (!currentUser || !currentLesson) return;
+
+            const result = await getAssignment(currentUser.id, currentLesson.id);
+            const assignmentData = {
+                note_completed: result.data?.note_completed || false,
+                blog_completed: true,
+                kakao_completed: result.data?.kakao_completed || false
+            };
+
+            const saveResult = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+            
+            if (saveResult.success) {
+                const statusEl = document.getElementById('blog-status');
+                if (statusEl) {
+                    statusEl.textContent = '완료';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                }
+                showAssignmentModal('', '블로그 과제를 완료했습니다!', '');
+                updateAssignmentCardStatus();
+            }
+        }
+
+        // 과제 카드 상태 업데이트
+        function updateAssignmentCardStatus() {
+            // 과제 완료 여부에 따라 카드 상태 업데이트
+            // 이 함수는 필요시 추가 구현
+        }
+
         // 과제 상태 불러오기
         async function loadAssignmentStatus() {
             if (!currentUser || !currentLesson) return;
 
             const result = await getAssignment(currentUser.id, currentLesson.id);
             if (result.success && result.data) {
-                document.getElementById('assignment-note').checked = result.data.note_completed || false;
-                document.getElementById('assignment-blog').checked = result.data.blog_completed || false;
-                document.getElementById('assignment-kakao').checked = result.data.kakao_completed || false;
-                updateAssignmentStatusDisplay(result.data);
+                // 노트 필기 상태
+                if (result.data.note_completed) {
+                    const noteStatus = document.getElementById('note-status');
+                    if (noteStatus) {
+                        noteStatus.textContent = '완료';
+                        noteStatus.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                    }
+                }
+                
+                // 블로그 과제 상태
+                if (result.data.blog_completed) {
+                    const blogStatus = document.getElementById('blog-status');
+                    if (blogStatus) {
+                        blogStatus.textContent = '완료';
+                        blogStatus.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                    }
+                }
             }
             
             // 학부모 정보 로드
@@ -1028,6 +1246,9 @@
             
             // 코스 전체 완료 여부 체크
             await checkCourseCompletion();
+            
+            // 이미지 제출 상태 업데이트
+            updateSubmissionStatus();
         }
         
         // 사용자 프로필 로드 (학부모 정보 포함)
@@ -1096,36 +1317,11 @@
         }
 
         // 인증 제출하기 버튼 클릭 시 (과제만 저장, 알림은 리포트에서)
+        // 레거시 함수 - 카드 시스템으로 대체됨
         async function submitAssignment() {
-            if (!currentUser || !currentLesson) {
-                showAssignmentModal('⚠️', '로그인이 필요합니다.', '');
-                return;
-            }
-
-            const noteCheckbox = document.getElementById('assignment-note');
-            const blogCheckbox = document.getElementById('assignment-blog');
-            const kakaoCheckbox = document.getElementById('assignment-kakao');
-
-            // 최소 1개 이상 체크 확인
-            if (!noteCheckbox.checked && !blogCheckbox.checked && !kakaoCheckbox.checked) {
-                showAssignmentModal('', '최소 1개 이상의 과제를 완료해주세요.', '');
-                return;
-            }
-
-            const assignmentData = {
-                note_completed: noteCheckbox.checked,
-                blog_completed: blogCheckbox.checked,
-                kakao_completed: kakaoCheckbox.checked
-            };
-
-            const statusEl = document.getElementById('assignment-status');
-            statusEl.textContent = '제출 중...';
-            statusEl.className = 'text-sm text-yellow-400 text-center';
-
-            const result = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
-            
-            if (result.success) {
-                updateAssignmentStatusDisplay(result.data);
+            // 이 함수는 더 이상 사용되지 않음
+            // 각 과제는 개별 카드에서 완료 처리됨
+            return;
                 
                 // 성공 메시지
                 const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
@@ -1556,19 +1752,8 @@
 
         // 과제 상태 표시 업데이트
         function updateAssignmentStatusDisplay(data) {
-            const statusEl = document.getElementById('assignment-status');
-            const allCompleted = data.note_completed && data.blog_completed && data.kakao_completed;
-            const completedCount = [data.note_completed, data.blog_completed, data.kakao_completed].filter(Boolean).length;
-
-            if (allCompleted) {
-                statusEl.textContent = '모든 과제 완료!';
-                statusEl.className = 'text-sm text-green-400 text-center';
-            } else if (completedCount > 0) {
-                statusEl.textContent = `✓ ${completedCount}/3 완료`;
-                statusEl.className = 'text-sm text-gray-400 text-center';
-            } else {
-                statusEl.textContent = '';
-            }
+            // 레거시 함수 - 카드 시스템에서는 개별 상태 업데이트
+            // 각 카드는 독립적으로 상태를 표시함
         }
         
         document.addEventListener('DOMContentLoaded', loadLesson);
