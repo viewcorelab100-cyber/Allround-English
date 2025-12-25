@@ -1156,6 +1156,9 @@
         async function loadTeacherNotice() {
             if (!currentLesson) return;
             
+            const noticeEl = document.getElementById('teacher-notice');
+            if (!noticeEl) return;
+            
             try {
                 // 레슨별 공지사항 조회
                 const { data, error } = await window.supabase
@@ -1167,7 +1170,11 @@
                     .limit(1)
                     .maybeSingle();
                 
-                const noticeEl = document.getElementById('teacher-notice');
+                // 오류 발생 시 (테이블이 없거나 권한 문제) 조용히 기본 메시지 표시
+                if (error) {
+                    noticeEl.innerHTML = '<p class="text-sm text-gray-500">공지사항이 없습니다.</p>';
+                    return;
+                }
                 
                 if (data && data.content) {
                     noticeEl.innerHTML = `<p class="text-sm text-gray-300 leading-relaxed whitespace-pre-line">${data.content}</p>`;
@@ -1175,7 +1182,8 @@
                     noticeEl.innerHTML = '<p class="text-sm text-gray-500">공지사항이 없습니다.</p>';
                 }
             } catch (error) {
-                console.error('Load teacher notice error:', error);
+                // 테이블이 없거나 권한 문제로 오류 발생 시 조용히 처리
+                noticeEl.innerHTML = '<p class="text-sm text-gray-500">공지사항이 없습니다.</p>';
             }
         }
 
