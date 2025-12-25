@@ -1066,13 +1066,7 @@
             document.getElementById('back-to-course').href = `course-detail.html?id=${currentLesson.course.id}`;
             document.title = `${currentLesson.title} — ALLROUND`;
             
-            // 블로그 링크 표시
-            if (currentLesson.blog_link) {
-                document.getElementById('blog-link').href = currentLesson.blog_link;
-                document.getElementById('blog-link-container').classList.remove('hidden');
-            } else {
-                document.getElementById('blog-link-container').classList.add('hidden');
-            }
+            // 블로그 링크는 과제 카드 시스템에서 처리됨
             
             initVideoPlayer(currentLesson);
             renderLessonList(courseLessons, currentLesson.id);
@@ -1322,21 +1316,6 @@
             // 이 함수는 더 이상 사용되지 않음
             // 각 과제는 개별 카드에서 완료 처리됨
             return;
-                
-                // 성공 메시지
-                const allCompleted = assignmentData.note_completed && assignmentData.blog_completed && assignmentData.kakao_completed;
-                if (allCompleted) {
-                    showAssignmentModal('', '과제가 제출되었습니다!', '수고하셨습니다.');
-                } else {
-                    showAssignmentModal('', '과제가 제출되었습니다.', '');
-                }
-                
-                // 코스 완료 여부 다시 체크 (모든 레슨 완료 시 리포트 버튼 표시)
-                await checkCourseCompletion();
-            } else {
-                statusEl.textContent = '❌ 제출 실패. 다시 시도해주세요.';
-                statusEl.className = 'text-sm text-red-400 text-center';
-            }
         }
         
         // 리포트 확인하기 버튼 클릭 시 (리포트 생성 + 알림 발송 + 페이지 이동)

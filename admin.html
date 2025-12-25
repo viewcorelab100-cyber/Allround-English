@@ -343,7 +343,8 @@
                                        onchange="handleQuizExcelUpload(event)"
                                        class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200">
                                 <p class="text-xs text-gray-500 mt-2">
-                                    엑셀 파일을 업로드하면 자동으로 퀴즈가 생성됩니다. (기존 퀴즈는 덮어씌워집니다)
+                                    엑셀 파일을 업로드하면 자동으로 퀴즈가 생성됩니다. (기존 퀴즈는 덮어씌워집니다)<br>
+                                    등장시간(분/초)을 설정하면 영상 재생 시 해당 시간에 퀴즈가 자동으로 팝업됩니다.
                                 </p>
                             </div>
                             
@@ -3255,10 +3256,10 @@
         // 퀴즈 템플릿 다운로드
         function downloadQuizTemplate() {
             const template = [
-                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '정답', '해설'],
-                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', '1', 'Seoul is the capital city.'],
-                [2, 'OX', 'English is easy.', 'O', 'X', '', '', '2', 'It depends on the learner.'],
-                [3, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', 'go', 'Simple present tense']
+                ['문제번호', '문제유형', '질문', '선택지1', '선택지2', '선택지3', '선택지4', '정답', '해설', '등장시간(분)', '등장시간(초)'],
+                [1, '객관식', 'What is the capital of Korea?', 'Seoul', 'Busan', 'Incheon', 'Daegu', '1', 'Seoul is the capital city.', 5, 30],
+                [2, 'OX', 'English is easy.', 'O', 'X', '', '', '2', 'It depends on the learner.', 10, 15],
+                [3, '주관식', 'Fill in the blank: I ___ to school.', '', '', '', '', 'go', 'Simple present tense', 15, 0]
             ];
 
             const ws = XLSX.utils.aoa_to_sheet(template);
@@ -3267,7 +3268,7 @@
             
             // 컬럼 너비 설정
             ws['!cols'] = [
-                { wch: 10 }, { wch: 12 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 30 }
+                { wch: 10 }, { wch: 12 }, { wch: 40 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 30 }, { wch: 12 }, { wch: 12 }
             ];
 
             XLSX.writeFile(wb, 'quiz_template.xlsx');
@@ -3301,6 +3302,8 @@
                     const option4 = row['선택지4'] || row['보기4'] || '';
                     const correctAnswer = String(row['정답'] || '').trim();
                     const explanation = row['해설'] || '';
+                    const appearMinute = parseInt(row['등장시간(분)'] || row['분'] || 0);
+                    const appearSecond = parseInt(row['등장시간(초)'] || row['초'] || 0);
 
                     if (!question) {
                         throw new Error(`${questionNumber}번 문제의 질문이 비어있습니다.`);
@@ -3309,6 +3312,9 @@
                     if (!correctAnswer) {
                         throw new Error(`${questionNumber}번 문제의 정답이 비어있습니다.`);
                     }
+
+                    // 총 등장시간을 초 단위로 변환
+                    const appearTime = (appearMinute * 60) + appearSecond;
 
                     return {
                         questionNumber: parseInt(questionNumber),
@@ -3319,7 +3325,10 @@
                         option3,
                         option4,
                         correctAnswer,
-                        explanation
+                        explanation,
+                        appearMinute,
+                        appearSecond,
+                        appearTime
                     };
                 });
 
@@ -3360,6 +3369,7 @@
                                     quiz.questionType === 'OX' ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' :
                                     'bg-purple-500 bg-opacity-20 text-purple-400'
                                 }">${quiz.questionType}</span>
+                                <span class="text-xs text-cyan-400">⏰ ${quiz.appearMinute}분 ${quiz.appearSecond}초</span>
                             </div>
                             <p class="text-sm text-white">${quiz.question}</p>
                             ${quiz.option1 ? `<p class="text-xs text-gray-500 mt-1">① ${quiz.option1} ${quiz.option2 ? `② ${quiz.option2}` : ''} ${quiz.option3 ? `③ ${quiz.option3}` : ''} ${quiz.option4 ? `④ ${quiz.option4}` : ''}</p>` : ''}
@@ -3403,7 +3413,8 @@
                     option3: quiz.option3 || null,
                     option4: quiz.option4 || null,
                     correct_answer: quiz.correctAnswer,
-                    explanation: quiz.explanation || null
+                    explanation: quiz.explanation || null,
+                    appear_time: quiz.appearTime || 0
                 }));
 
                 const { error: insertError } = await window.supabase
@@ -3437,17 +3448,26 @@
                 if (error) throw error;
 
                 if (quizzes && quizzes.length > 0) {
-                    quizData = quizzes.map(q => ({
-                        questionNumber: q.question_number,
-                        questionType: q.question_type,
-                        question: q.question,
-                        option1: q.option1 || '',
-                        option2: q.option2 || '',
-                        option3: q.option3 || '',
-                        option4: q.option4 || '',
-                        correctAnswer: q.correct_answer,
-                        explanation: q.explanation || ''
-                    }));
+                    quizData = quizzes.map(q => {
+                        const appearTime = q.appear_time || 0;
+                        const appearMinute = Math.floor(appearTime / 60);
+                        const appearSecond = appearTime % 60;
+                        
+                        return {
+                            questionNumber: q.question_number,
+                            questionType: q.question_type,
+                            question: q.question,
+                            option1: q.option1 || '',
+                            option2: q.option2 || '',
+                            option3: q.option3 || '',
+                            option4: q.option4 || '',
+                            correctAnswer: q.correct_answer,
+                            explanation: q.explanation || '',
+                            appearMinute: appearMinute,
+                            appearSecond: appearSecond,
+                            appearTime: appearTime
+                        };
+                    });
 
                     displayQuizPreview();
                 }
