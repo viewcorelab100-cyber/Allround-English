@@ -173,6 +173,30 @@
         .fab-container.open .fab-button .icon-open {
             display: none;
         }
+        
+        /* 이미지 미리보기 가로 스크롤 스타일 */
+        #image-previews-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+        }
+        
+        #image-previews-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        #image-previews-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        #image-previews-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+        
+        #image-previews-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen">
@@ -710,7 +734,7 @@
                     </div>
                     
                     <!-- 이미지 미리보기 영역 -->
-                    <div id="image-previews-container" class="space-y-2">
+                    <div id="image-previews-container" class="flex gap-3 overflow-x-auto pb-2">
                         <!-- 선택된 이미지들이 여기 표시됩니다 -->
                     </div>
                     
@@ -1329,6 +1353,24 @@
                 lessonQuizzes = quizzes || [];
                 shownQuizIds = [];
                 console.log(`${lessonQuizzes.length}개의 퀴즈가 로드되었습니다.`);
+                
+                // 사용자가 이미 푼 퀴즈가 있는지 확인하여 상태 업데이트
+                if (currentUser && lessonQuizzes.length > 0) {
+                    const { data: results, error: resultError } = await window.supabase
+                        .from('quiz_results')
+                        .select('quiz_id')
+                        .eq('user_id', currentUser.id)
+                        .eq('lesson_id', lessonId);
+                    
+                    if (!resultError && results && results.length > 0) {
+                        // 이미 푼 퀴즈가 있으면 상태를 "완료"로 변경
+                        const statusEl = document.getElementById('quiz-status');
+                        if (statusEl) {
+                            statusEl.textContent = '완료';
+                            statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                        }
+                    }
+                }
             } catch (error) {
                 console.error('퀴즈 로드 오류:', error);
                 lessonQuizzes = [];
@@ -1865,15 +1907,14 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const previewDiv = document.createElement('div');
-                    previewDiv.className = 'relative bg-white/5 rounded-lg p-2';
+                    previewDiv.className = 'relative bg-white/5 rounded-lg p-2 flex-shrink-0';
+                    previewDiv.style.width = '120px';
                     previewDiv.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <img src="${e.target.result}" alt="미리보기 ${index + 1}" class="w-20 h-20 object-cover rounded">
-                            <div class="flex-1">
-                                <p class="text-white text-sm">${file.name}</p>
-                                <p class="text-gray-400 text-xs">${(file.size / 1024).toFixed(1)} KB</p>
-                            </div>
-                            <button onclick="removeImagePreview(${index})" class="px-3 py-1 bg-red-500/20 text-red-400 rounded text-sm hover:bg-red-500/30">
+                        <div class="flex flex-col items-center gap-2">
+                            <img src="${e.target.result}" alt="미리보기 ${index + 1}" class="w-full h-24 object-cover rounded">
+                            <p class="text-white text-xs truncate w-full text-center">${file.name}</p>
+                            <p class="text-gray-400 text-xs">${(file.size / 1024).toFixed(1)} KB</p>
+                            <button onclick="removeImagePreview(${index})" class="w-full px-2 py-1 bg-red-500/20 text-red-400 rounded text-xs hover:bg-red-500/30">
                                 삭제
                             </button>
                         </div>
