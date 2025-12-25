@@ -1160,15 +1160,22 @@
         function generateImageQRCode() {
             if (!currentLesson) return;
             
-            const uploadUrl = `${window.location.origin}/upload.html?lesson=${currentLesson.id}`;
             const qrContainer = document.getElementById('lesson-qr-code-modal');
-            if (qrContainer) {
+            if (!qrContainer) return;
+            
+            // 기존 QR 코드 제거
+            qrContainer.innerHTML = '';
+            
+            const uploadUrl = `${window.location.origin}/upload.html?lesson=${currentLesson.id}`;
+            
+            if (window.QRCode) {
                 new QRCode(qrContainer, {
                     text: uploadUrl,
                     width: 80,
                     height: 80,
                     colorDark: '#000000',
-                    colorLight: '#ffffff'
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
                 });
             }
         }
@@ -1223,6 +1230,13 @@
                     });
                 
                 if (error) throw error;
+                
+                // 퀴즈 상태를 "완료"로 업데이트
+                const statusEl = document.getElementById('quiz-status');
+                if (statusEl) {
+                    statusEl.textContent = '완료';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                }
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
             }
@@ -1735,31 +1749,107 @@
 
         // ========== 이미지 과제 제출 관련 함수 ==========
         let selectedImageFiles = [];
+        
+        // 이미지 압축 함수 (5MB 초과 시 자동 압축)
+        async function compressImage(file, maxSizeMB = 5) {
+            // 이미 5MB 이하면 그대로 반환
+            if (file.size <= maxSizeMB * 1024 * 1024) {
+                return file;
+            }
+            
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // 이미지가 너무 크면 해상도도 줄임
+                        const maxDimension = 2048;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = (height / width) * maxDimension;
+                                width = maxDimension;
+                            } else {
+                                width = (width / height) * maxDimension;
+                                height = maxDimension;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 압축된 이미지를 Blob으로 변환 (품질 0.7로 시작)
+                        canvas.toBlob(
+                            function(blob) {
+                                if (!blob) {
+                                    reject(new Error('이미지 압축 실패'));
+                                    return;
+                                }
+                                
+                                const compressedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compressedFile);
+                            },
+                            'image/jpeg',
+                            0.7
+                        );
+                    };
+                    img.onerror = function() {
+                        reject(new Error('이미지 로드 실패'));
+                    };
+                };
+                reader.onerror = function() {
+                    reject(new Error('파일 읽기 실패'));
+                };
+            });
+        }
 
         // 다중 이미지 선택 처리
-        function handleMultipleImageSelect(event) {
+        async function handleMultipleImageSelect(event) {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
 
             const validFiles = [];
+            let hasLargeFile = false;
             
             for (const file of files) {
-                // 파일 크기 체크 (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert(`${file.name}: 파일 크기는 5MB 이하여야 합니다.`);
-                    continue;
-                }
-
                 // 이미지 타입 체크
                 if (!file.type.startsWith('image/')) {
                     alert(`${file.name}: 이미지 파일만 업로드 가능합니다.`);
                     continue;
                 }
 
-                validFiles.push(file);
+                // 파일 크기 체크 및 자동 압축
+                if (file.size > 5 * 1024 * 1024) {
+                    hasLargeFile = true;
+                    try {
+                        const compressedFile = await compressImage(file);
+                        console.log(`${file.name}: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+                        validFiles.push(compressedFile);
+                    } catch (error) {
+                        console.error('이미지 압축 오류:', error);
+                        alert(`${file.name}: 압축 실패. 다른 이미지를 선택해주세요.`);
+                        continue;
+                    }
+                } else {
+                    validFiles.push(file);
+                }
             }
 
             if (validFiles.length === 0) return;
+            
+            if (hasLargeFile) {
+                alert('5MB를 초과하는 이미지가 자동으로 압축되었습니다.');
+            }
 
             selectedImageFiles = [...selectedImageFiles, ...validFiles];
             renderImagePreviews();
@@ -1872,15 +1962,9 @@
         let selectedImageFile = null;
 
         // 이미지 선택 처리
-        function handleImageSelect(event) {
+        async function handleImageSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            // 파일 크기 체크 (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('파일 크기는 5MB 이하여야 합니다.');
-                return;
-            }
 
             // 이미지 타입 체크
             if (!file.type.startsWith('image/')) {
@@ -1888,7 +1972,23 @@
                 return;
             }
 
-            selectedImageFile = file;
+            let finalFile = file;
+            
+            // 파일 크기 체크 및 자동 압축
+            if (file.size > 5 * 1024 * 1024) {
+                try {
+                    finalFile = await compressImage(file);
+                    const originalSize = (file.size / 1024 / 1024).toFixed(2);
+                    const compressedSize = (finalFile.size / 1024 / 1024).toFixed(2);
+                    alert(`이미지가 자동으로 압축되었습니다.\n${originalSize}MB → ${compressedSize}MB`);
+                } catch (error) {
+                    console.error('이미지 압축 오류:', error);
+                    alert('이미지 압축에 실패했습니다. 다른 이미지를 선택해주세요.');
+                    return;
+                }
+            }
+
+            selectedImageFile = finalFile;
 
             // 미리보기 표시
             const reader = new FileReader();
@@ -1898,7 +1998,7 @@
                 document.getElementById('image-upload-area').classList.add('hidden');
                 document.getElementById('submit-image-btn').disabled = false;
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(finalFile);
         }
 
         // 이미지 미리보기 삭제
