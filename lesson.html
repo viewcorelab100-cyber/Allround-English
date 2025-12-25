@@ -869,12 +869,6 @@
             vimeoPlayer.on('ended', function() {
                 maxWatchedTime = videoDuration;
                 saveVimeoProgress();
-                
-                // 퀴즈 시간이 설정되지 않았으면 영상 종료 후 퀴즈 표시
-                if (!quizShown && (!currentLesson.quiz_time || currentLesson.quiz_time <= 0)) {
-                    showQuizModal();
-                    quizShown = true;
-                }
             });
 
             // 주기적으로 진도 저장 (30초마다)
@@ -967,12 +961,6 @@
             videoElement.addEventListener('ended', function() {
                 maxWatchedTime = videoElement.duration;
                 saveNativeProgress();
-                
-                // 퀴즈 시간이 설정되지 않았으면 영상 종료 후 퀴즈 표시
-                if (!quizShown && (!currentLesson.quiz_time || currentLesson.quiz_time <= 0)) {
-                    showQuizModal();
-                    quizShown = true;
-                }
             });
 
             progressInterval = setInterval(() => {
@@ -1098,7 +1086,7 @@
             const lessonId = getLessonId();
             if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
-            quizShown = false; // 레슨 로드 시 퀴즈 상태 초기화
+            
             const lessonResult = await getLessonById(lessonId);
             if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
@@ -1132,6 +1120,9 @@
             document.title = `${currentLesson.title} — ALLROUND`;
             
             // 블로그 링크는 과제 카드 시스템에서 처리됨
+            
+            // 퀴즈 로드
+            await loadLessonQuizzes(lessonId);
             
             initVideoPlayer(currentLesson);
             renderLessonList(courseLessons, currentLesson.id);
@@ -1194,23 +1185,68 @@
             document.getElementById('quiz-modal').classList.add('hidden');
         }
 
-        // 퀴즈 제출
-        function submitQuiz() {
-            const answer = document.querySelector('input[name="quiz-answer"]:checked');
-            if (!answer) {
-                alert('답을 선택해주세요');
+        // 퀴즈 답안 제출
+        async function submitQuizAnswer() {
+            if (!currentQuiz || !currentUser) return;
+            
+            let userAnswer = '';
+            
+            // 문제 유형에 따라 답 가져오기
+            if (currentQuiz.question_type === '주관식') {
+                const input = document.querySelector('input[name="quiz-answer-text"]');
+                userAnswer = input ? input.value.trim() : '';
+            } else {
+                const selected = document.querySelector('input[name="quiz-answer"]:checked');
+                userAnswer = selected ? selected.value : '';
+            }
+            
+            if (!userAnswer) {
+                alert('답을 입력해주세요');
                 return;
             }
             
-            // 퀴즈 완료 처리
-            const statusEl = document.getElementById('quiz-status');
-            if (statusEl) {
-                statusEl.textContent = '완료';
-                statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+            // 정답 확인
+            const correctAnswer = currentQuiz.correct_answer.toString().trim();
+            const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            
+            // 결과 저장
+            try {
+                const { error } = await window.supabase
+                    .from('quiz_results')
+                    .insert({
+                        user_id: currentUser.id,
+                        lesson_id: currentLesson.id,
+                        quiz_id: currentQuiz.id,
+                        user_answer: userAnswer,
+                        is_correct: isCorrect,
+                        submitted_at: new Date().toISOString()
+                    });
+                
+                if (error) throw error;
+            } catch (error) {
+                console.error('퀴즈 결과 저장 오류:', error);
             }
             
+            // 결과 표시
             closeQuizModal();
-            showAssignmentModal('', '퀴즈를 완료했습니다!', '수고하셨습니다.');
+            
+            if (isCorrect) {
+                showAssignmentModal('', '정답입니다!', currentQuiz.explanation || '잘하셨습니다!');
+            } else {
+                showAssignmentModal('', '오답입니다', `정답: ${correctAnswer}\n\n${currentQuiz.explanation || ''}`);
+            }
+            
+            // 비디오 재생 재개
+            if (vimeoPlayer) {
+                vimeoPlayer.play();
+            } else if (videoElement) {
+                videoElement.play();
+            }
+        }
+        
+        // 퀴즈 제출 (구버전 호환)
+        function submitQuiz() {
+            submitQuizAnswer();
         }
 
         // 노트 모달 열기
@@ -1255,20 +1291,54 @@
         }
 
         // 퀴즈 시간 체크
-        let quizShown = false;
+        let lessonQuizzes = []; // 레슨의 모든 퀴즈 목록
+        let shownQuizIds = []; // 이미 표시된 퀴즈 ID 목록
+        let currentQuiz = null; // 현재 표시 중인 퀴즈
+        
+        // 레슨의 퀴즈 로드
+        async function loadLessonQuizzes(lessonId) {
+            try {
+                const { data: quizzes, error } = await window.supabase
+                    .from('quizzes')
+                    .select('*')
+                    .eq('lesson_id', lessonId)
+                    .order('appear_time');
+                
+                if (error) throw error;
+                
+                lessonQuizzes = quizzes || [];
+                shownQuizIds = [];
+                console.log(`${lessonQuizzes.length}개의 퀴즈가 로드되었습니다.`);
+            } catch (error) {
+                console.error('퀴즈 로드 오류:', error);
+                lessonQuizzes = [];
+            }
+        }
+        
         function checkQuizTime(currentTime) {
-            if (quizShown) return;
-            if (!currentLesson) return;
+            if (!currentLesson || lessonQuizzes.length === 0) return;
             
-            // quiz_time이 설정되어 있으면 해당 시간에 퀴즈 표시
-            if (currentLesson.quiz_time && currentTime >= currentLesson.quiz_time && currentTime < currentLesson.quiz_time + 2) {
-                showQuizModal();
-                quizShown = true;
+            // 아직 표시되지 않은 퀴즈 중에서 현재 시간에 해당하는 퀴즈 찾기
+            for (const quiz of lessonQuizzes) {
+                // 이미 표시한 퀴즈는 건너뛰기
+                if (shownQuizIds.includes(quiz.id)) continue;
+                
+                // appear_time 기준으로 퀴즈 표시 (±1초 범위)
+                const appearTime = quiz.appear_time || 0;
+                if (currentTime >= appearTime && currentTime < appearTime + 1) {
+                    showQuizModal(quiz);
+                    shownQuizIds.push(quiz.id);
+                    break; // 한 번에 하나의 퀴즈만 표시
+                }
             }
         }
 
         // 퀴즈 모달 표시 (시간 도달 시 자동 호출)
-        function showQuizModal() {
+        function showQuizModal(quiz) {
+            if (!quiz) return;
+            
+            currentQuiz = quiz;
+            
             // 비디오 일시정지
             if (vimeoPlayer) {
                 vimeoPlayer.pause();
@@ -1276,8 +1346,63 @@
                 videoElement.pause();
             }
             
+            // 퀴즈 내용 표시
+            displayQuizContent(quiz);
+            
             // 퀴즈 모달 열기
             openQuizModal();
+        }
+        
+        // 퀴즈 내용 표시
+        function displayQuizContent(quiz) {
+            // 퀴즈 헤더 업데이트
+            const headerTitle = document.querySelector('#quiz-modal h2');
+            if (headerTitle) {
+                headerTitle.textContent = quiz.question_number ? `퀴즈 ${quiz.question_number}번` : '퀴즈';
+            }
+            
+            // 퀴즈 내용 영역
+            const quizContent = document.getElementById('quiz-content');
+            if (!quizContent) return;
+            
+            // 퀴즈 내용 생성
+            let quizHTML = `<div class="space-y-4">`;
+            
+            // 문제
+            quizHTML += `<p class="text-lg text-white font-semibold">${quiz.question}</p>`;
+            
+            // 문제 유형에 따라 선택지 표시
+            if (quiz.question_type === '객관식' && quiz.option1) {
+                quizHTML += '<div class="space-y-2">';
+                if (quiz.option1) quizHTML += `<label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"><input type="radio" name="quiz-answer" value="1" class="w-5 h-5"><span class="text-white">① ${quiz.option1}</span></label>`;
+                if (quiz.option2) quizHTML += `<label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"><input type="radio" name="quiz-answer" value="2" class="w-5 h-5"><span class="text-white">② ${quiz.option2}</span></label>`;
+                if (quiz.option3) quizHTML += `<label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"><input type="radio" name="quiz-answer" value="3" class="w-5 h-5"><span class="text-white">③ ${quiz.option3}</span></label>`;
+                if (quiz.option4) quizHTML += `<label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10"><input type="radio" name="quiz-answer" value="4" class="w-5 h-5"><span class="text-white">④ ${quiz.option4}</span></label>`;
+                quizHTML += '</div>';
+            } else if (quiz.question_type === 'OX') {
+                quizHTML += `
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10">
+                            <input type="radio" name="quiz-answer" value="O" class="w-5 h-5">
+                            <span class="text-white">O</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10">
+                            <input type="radio" name="quiz-answer" value="X" class="w-5 h-5">
+                            <span class="text-white">X</span>
+                        </label>
+                    </div>
+                `;
+            } else if (quiz.question_type === '주관식') {
+                quizHTML += `
+                    <input type="text" name="quiz-answer-text" placeholder="답을 입력하세요" 
+                           class="w-full px-4 py-3 bg-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                `;
+            }
+            
+            quizHTML += `</div>`;
+            
+            // 내용 교체
+            quizContent.innerHTML = quizHTML;
         }
 
         // 노트 필기 완료
@@ -1899,6 +2024,9 @@
                 const statusEl = document.getElementById('image-submission-status');
                 const gradingResultEl = document.getElementById('grading-result');
 
+                // 요소가 없으면 종료 (에러 방지)
+                if (!statusEl || !gradingResultEl) return;
+
                 if (submissions && submissions.length > 0) {
                     const submission = submissions[0];
                     const feedback = submission.teacher_feedback?.[0];
@@ -1918,10 +2046,15 @@
                     // 채점 결과 표시
                     if (feedback && submission.status === 'graded') {
                         gradingResultEl.classList.remove('hidden');
-                        document.getElementById('grading-score').textContent = 
-                            feedback.score ? `${feedback.score}점` : (feedback.grade || '통과');
-                        document.getElementById('grading-comment').textContent = 
-                            feedback.comment || '잘 하셨습니다!';
+                        const scoreEl = document.getElementById('grading-score');
+                        const commentEl = document.getElementById('grading-comment');
+                        
+                        if (scoreEl) {
+                            scoreEl.textContent = feedback.score ? `${feedback.score}점` : (feedback.grade || '통과');
+                        }
+                        if (commentEl) {
+                            commentEl.textContent = feedback.comment || '잘 하셨습니다!';
+                        }
                     } else {
                         gradingResultEl.classList.add('hidden');
                     }
@@ -1949,6 +2082,9 @@
 
                 const historyEl = document.getElementById('submission-history');
                 const listEl = document.getElementById('submission-list');
+
+                // 요소가 없으면 종료 (에러 방지)
+                if (!historyEl || !listEl) return;
 
                 if (submissions && submissions.length > 0) {
                     historyEl.classList.remove('hidden');
