@@ -226,9 +226,26 @@
             <!-- Video Section (좌측) -->
             <div class="flex-1 lg:pr-0">
                 <!-- Video Player -->
-                <div class="video-container" id="video-container">
+                <div class="video-container relative" id="video-container">
                     <div class="absolute inset-0 flex items-center justify-center text-gray-500">
                         영상을 불러오는 중...
+                    </div>
+                    
+                    <!-- 비디오 종료 오버레이 (비디오 영역 내부) -->
+                    <div id="video-end-overlay" class="absolute inset-0 bg-black bg-opacity-95 z-50 hidden flex items-center justify-center p-6">
+                        <div class="text-center space-y-6 max-w-2xl">
+                            <div class="space-y-4">
+                                <h2 class="text-3xl font-bold text-white">강의 시청 완료</h2>
+                                <p class="text-lg text-gray-300">
+                                    과제를 제출하세요.<br>
+                                    Final 제출까지 완료해야 수강완료 처리됩니다.
+                                </p>
+                            </div>
+                            <button onclick="closeVideoEndOverlay()" 
+                                    class="px-8 py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-100 shadow-lg">
+                                과제 확인하기
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -597,23 +614,6 @@
                     확인
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- 비디오 종료 오버레이 -->
-    <div id="video-end-overlay" class="fixed inset-0 bg-black bg-opacity-95 z-[150] hidden flex items-center justify-center p-6">
-        <div class="text-center space-y-6 max-w-2xl">
-            <div class="space-y-4">
-                <h2 class="text-4xl font-bold text-white">강의 시청 완료</h2>
-                <p class="text-xl text-gray-300">
-                    과제를 제출하세요.<br>
-                    Final 제출까지 완료해야 수강완료 처리됩니다.
-                </p>
-            </div>
-            <button onclick="closeVideoEndOverlay()" 
-                    class="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 shadow-lg">
-                과제 확인하기
-            </button>
         </div>
     </div>
 
@@ -2468,14 +2468,17 @@
                 // 3. 블로그 과제 확인 (임시로 항상 true - 실제로는 체크 필요)
                 const blogComplete = true;
                 
-                // 4. 이미지 제출 확인
+                // 4. 이미지 제출 확인 (제출됨 또는 채점 대기 상태면 완료로 인정)
                 const { data: submissions } = await window.supabase
                     .from('student_submissions')
-                    .select('id')
+                    .select('id, status')
                     .eq('user_id', currentUser.id)
                     .eq('lesson_id', currentLesson.id);
                 
-                const imageComplete = submissions && submissions.length > 0;
+                const imageComplete = submissions && submissions.length > 0 && 
+                                     (submissions[0].status === 'submitted' || 
+                                      submissions[0].status === 'reviewing' || 
+                                      submissions[0].status === 'graded');
                 
                 // 모든 과제가 완료되었으면 팝업 표시
                 if (quizComplete && noteComplete && blogComplete && imageComplete) {
