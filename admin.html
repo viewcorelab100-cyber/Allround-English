@@ -122,7 +122,7 @@
             <!-- 대시보드 섹션 -->
             <section id="section-dashboard" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
-                    <span class="mr-3">📊</span>대시보드
+                    대시보드
                 </h1>
                 <p class="text-gray-400">대시보드 내용이 여기에 표시됩니다.</p>
             </section>
@@ -463,9 +463,14 @@
 
             <!-- 과제 관리 섹션 -->
             <section id="section-assignments" class="space-y-6">
-                <h1 class="text-2xl font-bold text-white mb-6 flex items-center">
-                    <span class="mr-3">📝</span>과제 관리
-                </h1>
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white flex items-center">
+                        과제 관리
+                    </h1>
+                    <button onclick="openNoticeManagement()" class="px-4 py-2 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-lg hover:bg-opacity-30 text-sm font-semibold">
+                        공지사항 관리
+                    </button>
+                </div>
 
                 <!-- 요약 카드들 -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -551,18 +556,19 @@
                     <table class="w-full">
                         <thead class="bg-white bg-opacity-5">
                             <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">제출일</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">활동일</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">학생</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">강의/레슨</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">진도율</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">체크리스트</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">퀴즈</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">이미지</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">상태</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
                             </tr>
                         </thead>
                         <tbody id="assignments-table-body">
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                <td colspan="8" class="px-4 py-8 text-center text-gray-500">
                                     데이터를 불러오는 중...
                                 </td>
                             </tr>
@@ -577,7 +583,7 @@
                     <div class="bg-neutral-900 rounded-2xl w-full max-w-4xl">
                         <!-- 모달 헤더 -->
                         <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                            <h2 class="text-xl font-bold text-white">📝 과제 채점</h2>
+                            <h2 class="text-xl font-bold text-white">과제 채점</h2>
                             <button onclick="closeGradingModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                         </div>
 
@@ -679,7 +685,7 @@
                                     취소
                                 </button>
                                 <button onclick="saveGrading()" class="flex-1 py-3 bg-white rounded-xl text-black font-semibold hover:bg-gray-200">
-                                    💾 채점 저장
+                                    채점 저장
                                 </button>
                             </div>
                         </div>
@@ -690,6 +696,52 @@
             <!-- 이미지 확대 모달 -->
             <div id="image-viewer-modal" class="fixed inset-0 bg-black bg-opacity-95 z-[60] hidden flex items-center justify-center p-4" onclick="closeImageViewer()">
                 <img id="image-viewer-img" class="max-w-full max-h-full object-contain">
+            </div>
+
+            <!-- 공지사항 관리 모달 -->
+            <div id="notice-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden overflow-y-auto">
+                <div class="min-h-screen py-8 px-4 flex items-start justify-center">
+                    <div class="bg-neutral-900 rounded-2xl w-full max-w-4xl">
+                        <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                            <h2 class="text-xl font-bold text-white">공지사항 관리</h2>
+                            <button onclick="closeNoticeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        </div>
+                        
+                        <div class="p-6 space-y-6">
+                            <!-- 레슨 선택 -->
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">레슨 선택</label>
+                                <select id="notice-lesson-select" class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none" onchange="loadNoticeForLesson()">
+                                    <option value="">레슨을 선택하세요</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 공지사항 내용 -->
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">공지사항 내용</label>
+                                <textarea id="notice-content" rows="6"
+                                          class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white placeholder-gray-500 focus:outline-none resize-none"
+                                          placeholder="학생들에게 전달할 공지사항을 입력하세요"></textarea>
+                            </div>
+                            
+                            <!-- 활성화 상태 -->
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="notice-active" checked class="w-5 h-5 rounded">
+                                <label for="notice-active" class="text-white">공지사항 활성화</label>
+                            </div>
+                            
+                            <!-- 저장 버튼 -->
+                            <div class="flex gap-4">
+                                <button onclick="closeNoticeModal()" class="flex-1 py-3 bg-white bg-opacity-10 rounded-xl text-white font-semibold hover:bg-opacity-20">
+                                    취소
+                                </button>
+                                <button onclick="saveNotice()" class="flex-1 py-3 bg-yellow-500 rounded-xl text-black font-semibold hover:bg-yellow-400">
+                                    저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 주문/배송 관리 섹션 -->
@@ -805,67 +857,182 @@
             }
         }
 
-        // 과제 데이터 로드 (최근 제출순)
+        // 과제 데이터 로드 (모든 학생의 모든 과제 정보 통합)
         let allSubmissions = [];
         let currentAssignmentFilter = 'pending';
 
         async function loadStudentAssignments() {
             try {
-                // 모든 과제 제출 데이터
-                const { data: submissions, error: subError } = await window.supabase
-                    .from('student_submissions')
-                    .select('*, teacher_feedback(*)')
-                    .order('updated_at', { ascending: false });
-
-                if (subError) throw subError;
-
-                // 모든 프로필 데이터
+                // 1. 모든 프로필 데이터
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email');
+                    .select('id, name, email')
+                    .order('name');
 
                 if (profileError) throw profileError;
 
-                // 모든 레슨 데이터
-                const { data: lessons, error: lessonError } = await window.supabase
-                    .from('lessons')
-                    .select('id, title, order_num, course_id');
-
-                if (lessonError) throw lessonError;
-
-                // 모든 강의 목록
+                // 2. 모든 강의 목록
                 const { data: courses, error: courseError } = await window.supabase
                     .from('courses')
                     .select('id, title');
 
                 if (courseError) throw courseError;
 
+                // 3. 모든 레슨 데이터
+                const { data: lessons, error: lessonError } = await window.supabase
+                    .from('lessons')
+                    .select('id, title, order_num, course_id');
+
+                if (lessonError) throw lessonError;
+
+                // 4. 모든 과제 제출 데이터 (체크리스트 + 이미지)
+                const { data: submissions, error: subError } = await window.supabase
+                    .from('student_submissions')
+                    .select('*, teacher_feedback(*)');
+
+                if (subError) throw subError;
+
+                // 5. 진도율 데이터
+                const { data: progress, error: progressError } = await window.supabase
+                    .from('progress')
+                    .select('*');
+
+                if (progressError) throw progressError;
+
+                // 6. 퀴즈 결과 데이터
+                const { data: quizResults, error: quizError } = await window.supabase
+                    .from('quiz_results')
+                    .select('*');
+
+                // 퀴즈 결과가 없어도 계속 진행
+                const quizResultsData = quizResults || [];
+
                 // 맵 생성
                 const profileMap = new Map();
                 profiles?.forEach(p => profileMap.set(p.id, p));
 
-                const lessonMap = new Map();
-                lessons?.forEach(l => lessonMap.set(l.id, l));
-
                 const courseMap = new Map();
                 courses?.forEach(c => courseMap.set(c.id, c));
 
-                // 제출물에 학생, 레슨, 강의 정보 추가
-                allSubmissions = (submissions || []).map(sub => {
-                    const profile = profileMap.get(sub.user_id);
-                    const lesson = lessonMap.get(sub.lesson_id);
-                    const course = lesson ? courseMap.get(lesson.course_id) : null;
-                    const feedback = sub.teacher_feedback?.[0];
+                const lessonMap = new Map();
+                lessons?.forEach(l => lessonMap.set(l.id, l));
 
-                    return {
-                        ...sub,
-                        studentName: profile?.name || '알 수 없음',
-                        studentEmail: profile?.email || '',
-                        lessonTitle: lesson?.title || '알 수 없음',
-                        lessonOrder: lesson?.order_num || 0,
-                        courseTitle: course?.title || '알 수 없음',
-                        feedback: feedback
-                    };
+                // submission 맵 (user_id + lesson_id 조합으로)
+                const submissionMap = new Map();
+                submissions?.forEach(sub => {
+                    const key = `${sub.user_id}_${sub.lesson_id}`;
+                    submissionMap.set(key, sub);
+                });
+
+                // progress 맵
+                const progressMap = new Map();
+                progress?.forEach(p => {
+                    const key = `${p.user_id}_${p.lesson_id}`;
+                    progressMap.set(key, p);
+                });
+
+                // quiz 맵 (user_id + lesson_id로 집계)
+                const quizMap = new Map();
+                quizResultsData.forEach(q => {
+                    const key = `${q.user_id}_${q.lesson_id}`;
+                    if (!quizMap.has(key)) {
+                        quizMap.set(key, []);
+                    }
+                    quizMap.get(key).push(q);
+                });
+
+                // 모든 학생-레슨 조합 생성
+                allSubmissions = [];
+                profiles?.forEach(profile => {
+                    lessons?.forEach(lesson => {
+                        const key = `${profile.id}_${lesson.id}`;
+                        const submission = submissionMap.get(key);
+                        const prog = progressMap.get(key);
+                        const quizzes = quizMap.get(key) || [];
+                        const course = courseMap.get(lesson.course_id);
+                        const feedback = submission?.teacher_feedback?.[0];
+
+                        // 퀴즈 점수 계산
+                        let quizScore = null;
+                        let quizTotal = 0;
+                        let quizCorrect = 0;
+                        if (quizzes.length > 0) {
+                            quizzes.forEach(q => {
+                                quizTotal++;
+                                if (q.is_correct) quizCorrect++;
+                            });
+                            quizScore = Math.round((quizCorrect / quizTotal) * 100);
+                        }
+
+                        // 진도율 계산
+                        const watchedSeconds = prog?.watched_seconds || 0;
+                        const totalSeconds = prog?.total_seconds || 0;
+                        const watchRate = totalSeconds > 0 ? Math.round((watchedSeconds / totalSeconds) * 100) : 0;
+
+                        // 체크리스트 완료율
+                        const noteCompleted = submission?.note_completed || false;
+                        const blogCompleted = submission?.blog_completed || false;
+                        const kakaoCompleted = submission?.kakao_completed || false;
+                        const checklistCount = [noteCompleted, blogCompleted, kakaoCompleted].filter(Boolean).length;
+                        const checklistRate = Math.round((checklistCount / 3) * 100);
+
+                        // 이미지 과제 상태
+                        let imageStatus = 'none';
+                        if (submission?.image_url) {
+                            if (submission.status === 'graded') {
+                                imageStatus = 'graded';
+                            } else if (submission.status === 'returned') {
+                                imageStatus = 'returned';
+                            } else {
+                                imageStatus = 'pending';
+                            }
+                        }
+
+                        // 전체 완료 여부 판단
+                        const isCompleted = checklistCount === 3 && imageStatus === 'graded' && watchRate >= 80 && (quizTotal === 0 || quizScore >= 60);
+                        const hasActivity = submission || prog || quizzes.length > 0;
+
+                        allSubmissions.push({
+                            id: submission?.id || `${profile.id}_${lesson.id}`,
+                            user_id: profile.id,
+                            lesson_id: lesson.id,
+                            studentName: profile.name || '알 수 없음',
+                            studentEmail: profile.email || '',
+                            courseTitle: course?.title || '알 수 없음',
+                            lessonTitle: lesson.title || '알 수 없음',
+                            lessonOrder: lesson.order_num || 0,
+                            // 체크리스트
+                            note_completed: noteCompleted,
+                            blog_completed: blogCompleted,
+                            kakao_completed: kakaoCompleted,
+                            checklistRate: checklistRate,
+                            // 진도율
+                            watched_seconds: watchedSeconds,
+                            total_seconds: totalSeconds,
+                            watchRate: watchRate,
+                            // 퀴즈
+                            quizScore: quizScore,
+                            quizTotal: quizTotal,
+                            quizCorrect: quizCorrect,
+                            // 이미지 과제
+                            image_url: submission?.image_url || null,
+                            imageStatus: imageStatus,
+                            status: submission?.status || null,
+                            feedback: feedback,
+                            // 기타
+                            updated_at: submission?.updated_at || prog?.updated_at || null,
+                            created_at: submission?.created_at || prog?.created_at || null,
+                            isCompleted: isCompleted,
+                            hasActivity: hasActivity
+                        });
+                    });
+                });
+
+                // 최근 활동순 정렬
+                allSubmissions.sort((a, b) => {
+                    const dateA = new Date(a.updated_at || a.created_at || 0);
+                    const dateB = new Date(b.updated_at || b.created_at || 0);
+                    return dateB - dateA;
                 });
 
                 // 통계 업데이트
@@ -877,15 +1044,18 @@
             } catch (error) {
                 console.error('Load assignments error:', error);
                 document.getElementById('assignments-table-body').innerHTML = 
-                    '<tr><td colspan="7" class="px-4 py-8 text-center text-red-400">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
+                    '<tr><td colspan="8" class="px-4 py-8 text-center text-red-400">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
             }
         }
 
         function updateAssignmentStats() {
-            const pending = allSubmissions.filter(s => s.status === 'submitted' || (s.image_url && !s.status)).length;
-            const graded = allSubmissions.filter(s => s.status === 'graded').length;
-            const returned = allSubmissions.filter(s => s.status === 'returned').length;
-            const total = allSubmissions.length;
+            const pending = allSubmissions.filter(s => 
+                (s.imageStatus === 'pending') || 
+                (s.hasActivity && !s.isCompleted && s.imageStatus !== 'graded')
+            ).length;
+            const graded = allSubmissions.filter(s => s.imageStatus === 'graded' || s.isCompleted).length;
+            const returned = allSubmissions.filter(s => s.imageStatus === 'returned').length;
+            const total = allSubmissions.filter(s => s.hasActivity).length;
 
             document.getElementById('stat-pending-grade').textContent = pending;
             document.getElementById('stat-graded').textContent = graded;
@@ -914,13 +1084,19 @@
         function applyAssignmentFilters() {
             let filtered = allSubmissions;
 
+            // 활동이 있는 것만 표시
+            filtered = filtered.filter(s => s.hasActivity);
+
             // 상태별 필터
             if (currentAssignmentFilter === 'pending') {
-                filtered = filtered.filter(s => s.status === 'submitted' || (s.image_url && !s.status));
+                filtered = filtered.filter(s => 
+                    (s.imageStatus === 'pending') || 
+                    (s.hasActivity && !s.isCompleted && s.imageStatus !== 'graded')
+                );
             } else if (currentAssignmentFilter === 'graded') {
-                filtered = filtered.filter(s => s.status === 'graded');
+                filtered = filtered.filter(s => s.imageStatus === 'graded' || s.isCompleted);
             } else if (currentAssignmentFilter === 'returned') {
-                filtered = filtered.filter(s => s.status === 'returned');
+                filtered = filtered.filter(s => s.imageStatus === 'returned');
             }
 
             // 학생 이름 검색
@@ -940,8 +1116,8 @@
                 const start = new Date(startDate);
                 start.setHours(0, 0, 0, 0);
                 filtered = filtered.filter(s => {
-                    if (!s.created_at) return false;
-                    const submissionDate = new Date(s.created_at);
+                    if (!s.created_at && !s.updated_at) return false;
+                    const submissionDate = new Date(s.updated_at || s.created_at);
                     return submissionDate >= start;
                 });
             }
@@ -950,8 +1126,8 @@
                 const end = new Date(endDate);
                 end.setHours(23, 59, 59, 999);
                 filtered = filtered.filter(s => {
-                    if (!s.created_at) return false;
-                    const submissionDate = new Date(s.created_at);
+                    if (!s.created_at && !s.updated_at) return false;
+                    const submissionDate = new Date(s.updated_at || s.created_at);
                     return submissionDate <= end;
                 });
             }
@@ -971,39 +1147,72 @@
             const tbody = document.getElementById('assignments-table-body');
 
             if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">제출된 과제가 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">과제 활동이 없습니다.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = submissions.map(sub => {
-                const submittedDate = sub.updated_at ? new Date(sub.updated_at).toLocaleDateString('ko-KR') : '-';
+                const activityDate = sub.updated_at ? new Date(sub.updated_at).toLocaleDateString('ko-KR') : 
+                                    sub.created_at ? new Date(sub.created_at).toLocaleDateString('ko-KR') : '-';
                 
-                // 체크리스트 상태 (읽기 전용)
-                const checkNote = sub.note_completed ? '✅' : '⬜';
-                const checkBlog = sub.blog_completed ? '✅' : '⬜';
-                const checkKakao = sub.kakao_completed ? '✅' : '⬜';
+                // 진도율 표시
+                const watchRateDisplay = sub.watchRate > 0 
+                    ? `<div class="flex items-center space-x-2">
+                         <div class="w-16 h-2 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                             <div class="h-full bg-green-500" style="width: ${sub.watchRate}%"></div>
+                         </div>
+                         <span class="text-xs text-green-400">${sub.watchRate}%</span>
+                       </div>
+                       <p class="text-xs text-gray-500 mt-1">${formatTime(sub.watched_seconds)} / ${formatTime(sub.total_seconds)}</p>`
+                    : '<span class="text-gray-500 text-sm">미수강</span>';
+                
+                 // 체크리스트 상태
+                 const checkNote = sub.note_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
+                 const checkBlog = sub.blog_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
+                 const checkKakao = sub.kakao_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
+                 const checklistDisplay = `
+                     <div class="flex items-center space-x-2 text-sm">
+                         <span title="노트">${checkNote}</span>
+                         <span title="블로그">${checkBlog}</span>
+                         <span title="카톡">${checkKakao}</span>
+                     </div>
+                     <p class="text-xs text-gray-500 mt-1">${sub.checklistRate}%</p>
+                 `;
+
+                // 퀴즈 결과
+                const quizDisplay = sub.quizScore !== null
+                    ? `<div class="text-center">
+                         <p class="text-sm ${sub.quizScore >= 80 ? 'text-green-400' : sub.quizScore >= 60 ? 'text-yellow-400' : 'text-red-400'} font-bold">${sub.quizScore}점</p>
+                         <p class="text-xs text-gray-500">${sub.quizCorrect}/${sub.quizTotal}</p>
+                       </div>`
+                    : '<span class="text-gray-500 text-sm">미응시</span>';
 
                 // 이미지 미리보기
                 const imagePreview = sub.image_url 
                     ? `<img src="${sub.image_url}" class="w-12 h-12 object-cover rounded cursor-pointer" onclick="viewFullImage('${sub.image_url}')">`
                     : '<span class="text-gray-500 text-sm">없음</span>';
 
-                // 상태 뱃지
-                let statusBadge = '';
-                if (sub.status === 'graded') {
+                // 이미지 과제 상태 뱃지
+                let imageBadge = '';
+                if (sub.imageStatus === 'graded') {
                     const score = sub.feedback?.score || '-';
-                    statusBadge = `<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm whitespace-nowrap">${score}점</span>`;
-                } else if (sub.status === 'returned') {
-                    statusBadge = '<span class="inline-block px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm whitespace-nowrap">재제출</span>';
-                } else if (sub.image_url || sub.status === 'submitted') {
-                    statusBadge = '<span class="inline-block px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-sm whitespace-nowrap">대기중</span>';
-                } else {
-                    statusBadge = '<span class="inline-block px-3 py-1 bg-gray-500 bg-opacity-20 text-gray-400 rounded text-sm whitespace-nowrap">미제출</span>';
+                    imageBadge = `<span class="inline-block px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">${score}점</span>`;
+                } else if (sub.imageStatus === 'returned') {
+                    imageBadge = '<span class="inline-block px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs whitespace-nowrap">재제출</span>';
+                } else if (sub.imageStatus === 'pending') {
+                    imageBadge = '<span class="inline-block px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-xs whitespace-nowrap">대기</span>';
                 }
+
+                const imageDisplay = `
+                    <div class="flex flex-col items-center space-y-1">
+                        ${imagePreview}
+                        ${imageBadge}
+                    </div>
+                `;
 
                 return `
                     <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
-                        <td class="px-4 py-4 text-sm text-gray-300">${submittedDate}</td>
+                        <td class="px-4 py-4 text-sm text-gray-300">${activityDate}</td>
                         <td class="px-4 py-4">
                             <p class="text-white">${sub.studentName}</p>
                             <p class="text-xs text-gray-500">${sub.studentEmail}</p>
@@ -1012,22 +1221,32 @@
                             <p class="text-white">${sub.courseTitle}</p>
                             <p class="text-xs text-gray-500">${sub.lessonOrder}강 ${sub.lessonTitle}</p>
                         </td>
-                        <td class="px-4 py-4 text-sm">
-                            <span title="노트">${checkNote}</span>
-                            <span title="블로그">${checkBlog}</span>
-                            <span title="카톡">${checkKakao}</span>
-                        </td>
-                        <td class="px-4 py-4">${imagePreview}</td>
-                        <td class="px-4 py-4">${statusBadge}</td>
+                        <td class="px-4 py-4">${watchRateDisplay}</td>
+                        <td class="px-4 py-4">${checklistDisplay}</td>
+                        <td class="px-4 py-4">${quizDisplay}</td>
+                        <td class="px-4 py-4">${imageDisplay}</td>
                         <td class="px-4 py-4">
-                            <button onclick="openGradingModalDirect('${sub.id}', '${sub.studentName}', '${sub.studentEmail}', '${sub.lessonOrder}강 ${sub.lessonTitle}')" 
+                            <button onclick="openAssignmentDetailModal('${sub.user_id}', '${sub.lesson_id}', '${sub.studentName}', '${sub.studentEmail}', '${sub.lessonOrder}강 ${sub.lessonTitle}')" 
                                     class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
-                                ${sub.status === 'graded' ? '상세' : '채점'}
+                                상세
                             </button>
                         </td>
                     </tr>
                 `;
             }).join('');
+        }
+
+        // 과제 상세 모달 (이미지 채점 포함)
+        function openAssignmentDetailModal(userId, lessonId, studentName, studentEmail, lessonTitle) {
+            const assignment = allSubmissions.find(s => s.user_id === userId && s.lesson_id === lessonId);
+            if (!assignment) return;
+
+            // 이미지 과제가 있으면 채점 모달, 없으면 정보만 표시
+            if (assignment.image_url) {
+                openGradingModalDirect(assignment.id, studentName, studentEmail, lessonTitle);
+            } else {
+                alert(`${studentName} - ${lessonTitle}\n\n진도율: ${assignment.watchRate}%\n체크리스트: ${assignment.checklistRate}%\n퀴즈: ${assignment.quizScore !== null ? assignment.quizScore + '점' : '미응시'}\n이미지 과제: 미제출`);
+            }
         }
 
         // 통계 업데이트
@@ -1191,7 +1410,7 @@
                                                             <img src="${lesson.imageSubmission.image_url}" class="w-full h-full object-cover">
                                                         </div>
                                                         <div>
-                                                            <p class="text-sm text-white">📷 이미지 과제</p>
+                                                            <p class="text-sm text-white">이미지 과제</p>
                                                             <p class="text-xs text-gray-500">${lesson.imageSubmission.submitted_at ? new Date(lesson.imageSubmission.submitted_at).toLocaleString('ko-KR') : ''}</p>
                                                         </div>
                                                     </div>
@@ -1205,10 +1424,10 @@
                                                 </div>
                                             ` : ''}
                                             
-                                            <!-- 📱 모바일 과제 제출용 QR 코드 -->
+                                            <!-- 모바일 과제 제출용 QR 코드 -->
                                             <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg p-3 mt-2 flex items-center justify-between border border-blue-500/20">
                                                 <div class="flex-1">
-                                                    <p class="text-sm text-white font-semibold mb-1">📱 핸드폰으로 제출하기</p>
+                                                    <p class="text-sm text-white font-semibold mb-1">핸드폰으로 제출하기</p>
                                                     <p class="text-xs text-gray-400">QR 스캔 → 강의 페이지 → 이미지 업로드</p>
                                                 </div>
                                                 <div class="flex items-center space-x-2">
@@ -1595,6 +1814,131 @@
 
         function closeImageViewer() {
             document.getElementById('image-viewer-modal').classList.add('hidden');
+        }
+
+        // ========== 공지사항 관리 함수 ==========
+        async function openNoticeManagement() {
+            document.getElementById('notice-modal').classList.remove('hidden');
+            
+            // 모든 레슨 목록 로드
+            try {
+                const { data: courses } = await window.supabase
+                    .from('courses')
+                    .select('id, title, lessons(id, title, order_index)')
+                    .order('title');
+                
+                const selectEl = document.getElementById('notice-lesson-select');
+                selectEl.innerHTML = '<option value="">레슨을 선택하세요</option>';
+                
+                if (courses) {
+                    courses.forEach(course => {
+                        if (course.lessons && course.lessons.length > 0) {
+                            course.lessons.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+                            course.lessons.forEach(lesson => {
+                                const option = document.createElement('option');
+                                option.value = lesson.id;
+                                option.textContent = `${course.title} - ${lesson.title}`;
+                                selectEl.appendChild(option);
+                            });
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Load lessons error:', error);
+            }
+        }
+        
+        function closeNoticeModal() {
+            document.getElementById('notice-modal').classList.add('hidden');
+            document.getElementById('notice-lesson-select').value = '';
+            document.getElementById('notice-content').value = '';
+            document.getElementById('notice-active').checked = true;
+        }
+        
+        async function loadNoticeForLesson() {
+            const lessonId = document.getElementById('notice-lesson-select').value;
+            if (!lessonId) {
+                document.getElementById('notice-content').value = '';
+                return;
+            }
+            
+            try {
+                const { data } = await window.supabase
+                    .from('lesson_notices')
+                    .select('*')
+                    .eq('lesson_id', lessonId)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                
+                if (data) {
+                    document.getElementById('notice-content').value = data.content || '';
+                    document.getElementById('notice-active').checked = data.is_active !== false;
+                } else {
+                    document.getElementById('notice-content').value = '';
+                    document.getElementById('notice-active').checked = true;
+                }
+            } catch (error) {
+                console.error('Load notice error:', error);
+            }
+        }
+        
+        async function saveNotice() {
+            const lessonId = document.getElementById('notice-lesson-select').value;
+            const content = document.getElementById('notice-content').value.trim();
+            const isActive = document.getElementById('notice-active').checked;
+            
+            if (!lessonId) {
+                alert('레슨을 선택해주세요.');
+                return;
+            }
+            
+            if (!content) {
+                alert('공지사항 내용을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                // 기존 공지사항 확인
+                const { data: existing } = await window.supabase
+                    .from('lesson_notices')
+                    .select('id')
+                    .eq('lesson_id', lessonId)
+                    .maybeSingle();
+                
+                if (existing) {
+                    // 업데이트
+                    const { error } = await window.supabase
+                        .from('lesson_notices')
+                        .update({
+                            content: content,
+                            is_active: isActive,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', existing.id);
+                    
+                    if (error) throw error;
+                } else {
+                    // 새로 생성
+                    const { error } = await window.supabase
+                        .from('lesson_notices')
+                        .insert({
+                            lesson_id: lessonId,
+                            content: content,
+                            is_active: isActive,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        });
+                    
+                    if (error) throw error;
+                }
+                
+                alert('공지사항이 저장되었습니다.');
+                closeNoticeModal();
+            } catch (error) {
+                console.error('Save notice error:', error);
+                alert('공지사항 저장 중 오류가 발생했습니다: ' + error.message);
+            }
         }
 
         // 점수별 자동 피드백 생성 함수
@@ -2104,7 +2448,7 @@
 
                 if (updateError) throw updateError;
 
-                console.log(`✅ 강의 총 시간 자동 업데이트: ${totalHours}시간`);
+                console.log(`강의 총 시간 자동 업데이트: ${totalHours}시간`);
 
             } catch (error) {
                 console.error('Update course duration error:', error);
@@ -2996,7 +3340,7 @@
                 // 퀴즈 미리보기 표시
                 displayQuizPreview();
                 
-                alert(`✅ ${quizData.length}개의 퀴즈가 업로드되었습니다!`);
+                alert(`${quizData.length}개의 퀴즈가 업로드되었습니다!`);
 
             } catch (error) {
                 console.error('엑셀 파싱 오류:', error);
@@ -3082,7 +3426,7 @@
 
                 if (insertError) throw insertError;
 
-                console.log(`✅ ${quizzes.length}개의 퀴즈가 저장되었습니다.`);
+                console.log(`${quizzes.length}개의 퀴즈가 저장되었습니다.`);
                 
                 // 퀴즈 데이터 초기화
                 quizData = [];
