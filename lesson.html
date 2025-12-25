@@ -1281,13 +1281,19 @@
 
         // 이미지 모달 열기
         function openImageModal() {
-            document.getElementById('image-modal').classList.remove('hidden');
-            updateSubmissionStatus();
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                updateSubmissionStatus();
+            }
         }
 
         // 이미지 모달 닫기
         function closeImageModal() {
-            document.getElementById('image-modal').classList.add('hidden');
+            const modal = document.getElementById('image-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
 
         // 퀴즈 시간 체크
@@ -2010,7 +2016,17 @@
 
         // 제출 상태 업데이트
         async function updateSubmissionStatus() {
+            // 필수 조건 확인
             if (!currentUser || !currentLesson) return;
+
+            // DOM 요소 확인 (없으면 조용히 종료)
+            const statusEl = document.getElementById('image-submission-status');
+            const gradingResultEl = document.getElementById('grading-result');
+            
+            if (!statusEl || !gradingResultEl) {
+                // 필요한 DOM 요소가 없으면 조용히 종료 (이미지 과제 카드가 없는 레슨일 수 있음)
+                return;
+            }
 
             try {
                 const { data: submissions } = await window.supabase
@@ -2020,12 +2036,6 @@
                     .eq('lesson_id', currentLesson.id)
                     .order('created_at', { ascending: false })
                     .limit(1);
-
-                const statusEl = document.getElementById('image-submission-status');
-                const gradingResultEl = document.getElementById('grading-result');
-
-                // 요소가 없으면 종료 (에러 방지)
-                if (!statusEl || !gradingResultEl) return;
 
                 if (submissions && submissions.length > 0) {
                     const submission = submissions[0];
