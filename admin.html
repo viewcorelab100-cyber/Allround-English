@@ -847,19 +847,35 @@
                     .from('student_submissions')
                     .select('*, teacher_feedback(*)');
 
-                if (subError) throw subError;
+                if (subError) {
+                    console.error('과제 제출 데이터 로드 오류:', subError);
+                    throw subError;
+                }
+                
+                console.log('과제 제출 데이터 (체크리스트):', submissions?.length || 0, '건');
 
                 // 5. 진도율 데이터
                 const { data: progress, error: progressError } = await window.supabase
                     .from('progress')
                     .select('*');
 
-                if (progressError) throw progressError;
+                if (progressError) {
+                    console.error('진도율 데이터 로드 오류:', progressError);
+                    throw progressError;
+                }
+                
+                console.log('진도율 데이터:', progress?.length || 0, '건');
 
                 // 6. 퀴즈 결과 데이터
                 const { data: quizResults, error: quizError } = await window.supabase
                     .from('quiz_results')
                     .select('*');
+
+                if (quizError) {
+                    console.error('퀴즈 데이터 로드 오류:', quizError);
+                }
+                
+                console.log('퀴즈 데이터:', quizResults?.length || 0, '건');
 
                 // 퀴즈 결과가 없어도 계속 진행
                 const quizResultsData = quizResults || [];
@@ -992,6 +1008,16 @@
                     return dateB - dateA;
                 });
 
+                // 데이터 통계 로그
+                console.log('===== 과제 관리 데이터 통계 =====');
+                console.log('전체 학생-레슨 조합:', allSubmissions.length);
+                console.log('활동이 있는 항목:', allSubmissions.filter(s => s.hasActivity).length);
+                console.log('진도율 데이터 있는 항목:', allSubmissions.filter(s => s.watchRate > 0).length);
+                console.log('체크리스트 데이터 있는 항목:', allSubmissions.filter(s => s.checklistRate > 0).length);
+                console.log('퀴즈 데이터 있는 항목:', allSubmissions.filter(s => s.quizScore !== null).length);
+                console.log('이미지 제출 항목:', allSubmissions.filter(s => s.image_url).length);
+                console.log('===============================');
+
                 // 통계 업데이트
                 updateAssignmentStats();
 
@@ -1041,8 +1067,12 @@
         function applyAssignmentFilters() {
             let filtered = allSubmissions;
 
+            console.log('필터 적용 전:', filtered.length, '건');
+
             // 활동이 있는 것만 표시
             filtered = filtered.filter(s => s.hasActivity);
+
+            console.log('활동 필터 후:', filtered.length, '건');
 
             // 상태별 필터
             if (currentAssignmentFilter === 'pending') {
@@ -1050,10 +1080,16 @@
                     (s.imageStatus === 'pending') || 
                     (s.hasActivity && !s.isCompleted && s.imageStatus !== 'graded')
                 );
+                console.log('대기중 필터 후:', filtered.length, '건');
             } else if (currentAssignmentFilter === 'graded') {
                 filtered = filtered.filter(s => s.imageStatus === 'graded' || s.isCompleted);
+                console.log('완료 필터 후:', filtered.length, '건');
             } else if (currentAssignmentFilter === 'returned') {
                 filtered = filtered.filter(s => s.imageStatus === 'returned');
+                console.log('반려 필터 후:', filtered.length, '건');
+            } else if (currentAssignmentFilter === 'all') {
+                // 모든 활동 표시 (hasActivity 필터만 적용됨)
+                console.log('전체 필터:', filtered.length, '건');
             }
 
             // 학생 이름 검색
@@ -1102,6 +1138,8 @@
 
         function renderAssignmentsTable(submissions) {
             const tbody = document.getElementById('assignments-table-body');
+
+            console.log('과제 테이블 렌더링:', submissions?.length || 0, '건');
 
             if (!submissions || submissions.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">과제 활동이 없습니다.</td></tr>';
