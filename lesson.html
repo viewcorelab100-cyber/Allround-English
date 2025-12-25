@@ -353,18 +353,7 @@
                         <div id="completion-status" class="text-xs text-center text-gray-400 mt-4"></div>
                     </div>
                     
-                    <!-- 코스 완료 -->
-                    <div id="course-complete-section" class="hidden p-4 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-                        <div class="text-center space-y-2">
-                            <h3 class="text-lg font-bold text-white">축하합니다!</h3>
-                            <p class="text-sm text-gray-300">모든 강의 완료!</p>
-                        </div>
-                        <div id="report-status" class="text-xs text-gray-400 text-center mt-2"></div>
-                        <button id="view-report-btn" onclick="openReportModal()" 
-                                class="w-full px-4 py-3 bg-white text-black font-bold rounded-lg mt-3 text-sm">
-                            리포트 확인하기
-                        </button>
-                    </div>
+                    <!-- 코스 완료 섹션은 제거되고 팝업으로 대체됨 -->
                     
                     <!-- 커리큘럼 -->
                     <div class="p-4 rounded-xl bg-white bg-opacity-5">
@@ -1269,7 +1258,12 @@
             const unsolvedQuiz = lessonQuizzes.find(quiz => !shownQuizIds.includes(quiz.id));
             
             if (!unsolvedQuiz) {
-                // 모든 퀴즈를 다 풀었음
+                // 모든 퀴즈를 다 풀었음 - 상태를 완료로 변경
+                const statusEl = document.getElementById('quiz-status');
+                if (statusEl) {
+                    statusEl.textContent = '완료';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                }
                 showAssignmentModal('', '퀴즈 완료', '이미 모든 퀴즈를 완료했습니다.');
                 return;
             }
@@ -1668,8 +1662,6 @@
         async function checkCourseCompletion() {
             if (!currentUser || !currentCourse || !courseLessons.length) return;
             
-            const completeSection = document.getElementById('course-complete-section');
-            
             try {
                 // 모든 레슨의 진도 가져오기
                 const lessonIds = courseLessons.map(l => l.id);
@@ -1687,24 +1679,8 @@
                 
                 // 모든 레슨이 완료되었는지 확인
                 if (completedLessons >= totalLessons) {
-                    completeSection.classList.remove('hidden');
-                    
-                    // 이미 리포트가 발송되었는지 확인
-                    const { data: existingReport } = await window.supabase
-                        .from('course_reports')
-                        .select('id, public_id')
-                        .eq('user_id', currentUser.id)
-                        .eq('course_id', currentCourse.id)
-                        .maybeSingle();
-                    
-                    if (existingReport) {
-                        // 이미 리포트가 있으면 버튼 텍스트 변경
-                        const btn = document.getElementById('view-report-btn');
-                        btn.innerHTML = '<span>리포트 다시 보기</span>';
-                        document.getElementById('report-status').textContent = '리포트가 이미 발송되었습니다.';
-                    }
-                } else {
-                    completeSection.classList.add('hidden');
+                    // 팝업으로 리포트 모달 열기
+                    openReportModal();
                 }
             } catch (error) {
                 console.error('Check course completion error:', error);
@@ -2085,11 +2061,20 @@
                 btn.textContent = originalText;
                 btn.disabled = true;
 
-                // 상태 업데이트
-                updateSubmissionStatus();
+                // 즉시 상태 업데이트
+                const statusEl = document.getElementById('image-submission-status');
+                if (statusEl) {
+                    statusEl.textContent = '채점 대기';
+                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-blue-500/20 text-blue-400';
+                }
 
                 closeImageModal();
                 showAssignmentModal('', '이미지가 제출되었습니다!', `총 ${submittedCount}개 파일이 제출되었습니다.`);
+                
+                // 상태 업데이트 (모달 닫은 후 - 혹시 모를 경우를 대비)
+                setTimeout(() => {
+                    updateSubmissionStatus();
+                }, 500);
 
             } catch (error) {
                 console.error('Image upload error:', error);
