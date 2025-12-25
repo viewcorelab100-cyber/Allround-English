@@ -919,10 +919,6 @@
                 videoDuration = duration;
                 console.log('Vimeo 영상 길이:', duration, '초');
                 
-                // #region agent log
-                console.log('[DEBUG] Video duration set', {videoDuration:duration,maxWatchedTime});
-                // #endregion
-                
                 // 마지막 시청 위치 불러오기 (duration 설정 후)
                 loadLastPositionForVimeo();
             });
@@ -977,34 +973,18 @@
         }
 
         async function loadLastPositionForVimeo() {
-            // #region agent log
-            console.log('[DEBUG] loadLastPositionForVimeo entry', {hasPlayer:!!(customVimeoPlayer?.player || vimeoPlayer),hasUser:!!currentUser,hasLesson:!!currentLesson,videoDuration});
-            // #endregion
-            
             const player = customVimeoPlayer?.player || vimeoPlayer;
             if (!currentUser || !currentLesson || !player) return;
             
             const result = await getLessonProgress(currentUser.id, currentLesson.id);
             
-            // #region agent log
-            console.log('[DEBUG] getLessonProgress result', {success:result.success,lastPosition:result.data?.last_position,watchedSeconds:result.data?.watched_seconds,videoDuration,willExceed:result.data?.last_position>videoDuration});
-            // #endregion
-            
             if (result.success && result.data) {
                 if (result.data.last_position) {
-                    // #region agent log
-                    console.log('[DEBUG] BEFORE setCurrentTime', {lastPosition:result.data.last_position,videoDuration,willExceed:result.data.last_position>videoDuration});
-                    // #endregion
-                    
                     // Fix: Only seek if position is within valid range
                     const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
                     if (safePosition > 0 && safePosition < videoDuration) {
                         player.setCurrentTime(safePosition);
                     }
-                    
-                    // #region agent log
-                    console.log('[DEBUG] AFTER setCurrentTime', {safePosition,originalPosition:result.data.last_position});
-                    // #endregion
                 }
                 if (result.data.watched_seconds) {
                     maxWatchedTime = result.data.watched_seconds;
@@ -1200,10 +1180,6 @@
         }
 
         async function loadLesson() {
-            // #region agent log
-            console.log('[DEBUG] loadLesson entry', {hasSupabase:!!window.supabase,supabaseType:typeof window.supabase,hasGetCurrentUser:typeof getCurrentUser});
-            // #endregion
-            
             const lessonId = getLessonId();
             if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
@@ -1338,10 +1314,6 @@
 
         // 퀴즈 답안 제출
         async function submitQuizAnswer() {
-            // #region agent log
-            console.log('[DEBUG] submitQuizAnswer entry', {hasSupabase:!!window.supabase,hasCurrentQuiz:!!currentQuiz,hasCurrentUser:!!currentUser,quizId:currentQuiz?.id,userId:currentUser?.id});
-            // #endregion
-            
             if (!currentQuiz || !currentUser) return;
             
             let userAnswer = '';
@@ -1364,10 +1336,6 @@
             const correctAnswer = currentQuiz.correct_answer.toString().trim();
             const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
             
-            // #region agent log
-            console.log('[DEBUG] BEFORE quiz insert', {supabaseUrl:window.supabase?._supabaseUrl,userId:currentUser.id,lessonId:currentLesson.id,quizId:currentQuiz.id,isCorrect});
-            // #endregion
-            
             // 결과 저장
             try {
                 const { error } = await window.supabase
@@ -1380,10 +1348,6 @@
                         is_correct: isCorrect,
                         submitted_at: new Date().toISOString()
                     });
-                
-                // #region agent log
-                console.log('[DEBUG] AFTER quiz insert', {hasError:!!error,errorMessage:error?.message,errorCode:error?.code,errorDetails:error?.details});
-                // #endregion
                 
                 if (error) throw error;
                 
