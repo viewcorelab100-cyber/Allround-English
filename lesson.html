@@ -261,8 +261,8 @@
             </div>
 
             <!-- 우측 사이드바 (항상 표시) -->
-            <div class="w-full lg:w-96 bg-white bg-opacity-5 border-l border-white border-opacity-10 flex flex-col max-h-screen overflow-y-auto">
-                <div class="space-y-6 p-6">
+            <div class="w-full lg:w-96 bg-white bg-opacity-5 border-l border-white border-opacity-10">
+                <div class="space-y-6 p-6 max-h-screen overflow-y-auto">
                     <!-- 선생님 공지사항 -->
                     <div class="p-5 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30">
                         <h3 class="text-lg font-bold text-white mb-3 flex items-center">
@@ -357,7 +357,7 @@
                             <p class="text-sm text-gray-300">모든 강의 완료!</p>
                         </div>
                         <div id="report-status" class="text-xs text-gray-400 text-center mt-2"></div>
-                        <button id="view-report-btn" onclick="viewAndSendReport()" 
+                        <button id="view-report-btn" onclick="openReportModal()" 
                                 class="w-full px-4 py-3 bg-white text-black font-bold rounded-lg mt-3 text-sm">
                             리포트 확인하기
                         </button>
@@ -604,6 +604,53 @@
                         class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl shadow-lg hover:bg-gray-100">
                     확인
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리포트 발송 모달 -->
+    <div id="report-send-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md shadow-2xl">
+            <div class="p-8 space-y-6">
+                <!-- 닫기 버튼 -->
+                <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                    <h2 class="text-2xl font-bold text-white">리포트 발송</h2>
+                    <button onclick="closeReportModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <!-- 컨텐츠 -->
+                <div class="text-center space-y-4">
+                    <div class="w-20 h-20 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto">
+                        <span class="text-4xl">📊</span>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-white">학습 리포트 생성</h3>
+                        <p class="text-gray-300 text-sm" id="report-modal-message">
+                            학습 리포트를 생성하고 학부모님께 발송하시겠습니까?
+                        </p>
+                    </div>
+                    
+                    <!-- 진행 상태 -->
+                    <div id="report-progress" class="hidden space-y-2">
+                        <div class="flex items-center justify-center space-x-2">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            <span id="report-progress-text" class="text-white text-sm">리포트 생성 중...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 버튼들 -->
+                <div id="report-buttons" class="flex gap-3">
+                    <button onclick="closeReportModal()" 
+                            class="flex-1 px-6 py-3 bg-white/10 rounded-xl text-white font-semibold hover:bg-white/20">
+                        취소
+                    </button>
+                    <button onclick="confirmSendReport()" 
+                            class="flex-1 px-6 py-3 bg-yellow-500 rounded-xl text-black font-semibold hover:bg-yellow-600">
+                        확인
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1209,19 +1256,24 @@
         
         // 퀴즈 모달 열기
         async function openQuizModal() {
-            // 이미 퀴즈를 완료했는지 확인
-            const statusEl = document.getElementById('quiz-status');
-            if (statusEl && statusEl.textContent === '완료') {
-                showAssignmentModal('', '퀴즈 완료', '이미 완료한 퀴즈입니다.');
-                return;
-            }
-            
             // 퀴즈가 없는 경우
             if (!lessonQuizzes || lessonQuizzes.length === 0) {
                 showAssignmentModal('', '퀴즈 없음', '이 강의에는 퀴즈가 없습니다.');
                 return;
             }
             
+            // 아직 풀지 않은 퀴즈 찾기
+            const unsolvedQuiz = lessonQuizzes.find(quiz => !shownQuizIds.includes(quiz.id));
+            
+            if (!unsolvedQuiz) {
+                // 모든 퀴즈를 다 풀었음
+                showAssignmentModal('', '퀴즈 완료', '이미 모든 퀴즈를 완료했습니다.');
+                return;
+            }
+            
+            // 첫 번째 미해결 퀴즈 표시
+            currentQuiz = unsolvedQuiz;
+            displayQuizContent(unsolvedQuiz);
             document.getElementById('quiz-modal').classList.remove('hidden');
         }
 
@@ -1269,11 +1321,22 @@
                 
                 if (error) throw error;
                 
-                // 퀴즈 상태를 "완료"로 업데이트
-                const statusEl = document.getElementById('quiz-status');
-                if (statusEl) {
-                    statusEl.textContent = '완료';
-                    statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                // 푼 퀴즈 ID를 shownQuizIds에 추가
+                if (!shownQuizIds.includes(currentQuiz.id)) {
+                    shownQuizIds.push(currentQuiz.id);
+                }
+                
+                // 모든 퀴즈를 풀었는지 확인
+                const allCompleted = lessonQuizzes.length > 0 && 
+                                    lessonQuizzes.every(quiz => shownQuizIds.includes(quiz.id));
+                
+                // 퀴즈 상태를 "완료"로 업데이트 (모든 퀴즈를 풀었을 때만)
+                if (allCompleted) {
+                    const statusEl = document.getElementById('quiz-status');
+                    if (statusEl) {
+                        statusEl.textContent = '완료';
+                        statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                    }
                 }
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
@@ -1381,11 +1444,16 @@
                         const completedQuizIds = results.map(r => r.quiz_id);
                         shownQuizIds = [...completedQuizIds];
                         
-                        // 이미 푼 퀴즈가 있으면 상태를 "완료"로 변경
-                        const statusEl = document.getElementById('quiz-status');
-                        if (statusEl) {
-                            statusEl.textContent = '완료';
-                            statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                        // 모든 퀴즈를 다 풀었는지 확인
+                        const allCompleted = lessonQuizzes.every(quiz => completedQuizIds.includes(quiz.id));
+                        
+                        // 모든 퀴즈를 풀었을 때만 상태를 "완료"로 변경
+                        if (allCompleted) {
+                            const statusEl = document.getElementById('quiz-status');
+                            if (statusEl) {
+                                statusEl.textContent = '완료';
+                                statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
+                            }
                         }
                     }
                 }
@@ -1648,23 +1716,33 @@
             return;
         }
         
-        // 리포트 확인하기 버튼 클릭 시 (리포트 생성 + 알림 발송 + 페이지 이동)
-        async function viewAndSendReport() {
+        // 리포트 모달 열기
+        function openReportModal() {
+            document.getElementById('report-send-modal').classList.remove('hidden');
+            document.getElementById('report-progress').classList.add('hidden');
+            document.getElementById('report-buttons').classList.remove('hidden');
+            document.getElementById('report-modal-message').textContent = '학습 리포트를 생성하고 학부모님께 발송하시겠습니까?';
+        }
+        
+        // 리포트 모달 닫기
+        function closeReportModal() {
+            document.getElementById('report-send-modal').classList.add('hidden');
+        }
+        
+        // 리포트 발송 확인
+        async function confirmSendReport() {
             if (!currentUser || !currentCourse) {
                 alert('로그인이 필요합니다.');
                 return;
             }
             
-            const btn = document.getElementById('view-report-btn');
-            const statusEl = document.getElementById('report-status');
-            
-            // 버튼 비활성화 및 로딩 상태 표시
-            btn.disabled = true;
-            btn.innerHTML = '<span>⏳</span><span>리포트 생성 중...</span>';
-            statusEl.textContent = '';
+            // UI 업데이트
+            document.getElementById('report-buttons').classList.add('hidden');
+            document.getElementById('report-progress').classList.remove('hidden');
             
             try {
                 // 1. 리포트 생성
+                document.getElementById('report-progress-text').textContent = '리포트 생성 중...';
                 const reportResult = await generateCourseReport(currentUser.id, currentCourse.id);
                 
                 if (!reportResult.success) {
@@ -1677,9 +1755,9 @@
                 
                 // 2. 학부모 알림 발송 (처음 발송하는 경우에만)
                 if (userProfile && userProfile.parent_phone && userProfile.parent_notification_enabled) {
-                    btn.innerHTML = '<span>📤</span><span>학부모님께 발송 중...</span>';
+                    document.getElementById('report-progress-text').textContent = '학부모님께 발송 중...';
                     
-                    // 이미 알림을 발송했는지 확인 (parent_notifications 테이블)
+                    // 이미 알림을 발송했는지 확인
                     const { data: existingNotif } = await window.supabase
                         .from('parent_notifications')
                         .select('id')
@@ -1688,24 +1766,24 @@
                         .maybeSingle();
                     
                     if (!existingNotif) {
-                        // 알림 발송
                         await sendCourseCompleteNotification(reportUrl);
-                        statusEl.textContent = '학부모님께 리포트가 발송되었습니다!';
+                        document.getElementById('report-modal-message').textContent = '학부모님께 리포트가 발송되었습니다!';
                     } else {
-                        statusEl.textContent = '리포트가 이미 발송되었습니다.';
+                        document.getElementById('report-modal-message').textContent = '리포트가 이미 발송되었습니다.';
                     }
                 }
                 
-                // 3. 리포트 페이지로 이동
+                // 3. 성공 메시지 표시 후 리포트 페이지로 이동
+                document.getElementById('report-progress-text').textContent = '완료!';
                 setTimeout(() => {
                     window.location.href = reportUrl;
                 }, 1500);
                 
             } catch (error) {
                 console.error('Report generation error:', error);
-                statusEl.textContent = '❌ 리포트 생성에 실패했습니다.';
-                btn.disabled = false;
-                btn.innerHTML = '<span>리포트 확인하기</span>';
+                document.getElementById('report-progress').classList.add('hidden');
+                document.getElementById('report-buttons').classList.remove('hidden');
+                document.getElementById('report-modal-message').textContent = '리포트 생성에 실패했습니다. 다시 시도해주세요.';
             }
         }
         
@@ -1986,12 +2064,13 @@
 
                     // 제출 기록 저장
                     await window.supabase
-                        .from('submissions')
+                        .from('student_submissions')
                         .insert([{
                             user_id: currentUser.id,
                             lesson_id: currentLesson.id,
                             image_url: urlData.publicUrl,
-                            status: 'submitted'
+                            status: 'submitted',
+                            submitted_at: new Date().toISOString()
                         }]);
                 }
 
@@ -2499,3 +2578,4 @@
     </script>
 </body>
 </html>
+
