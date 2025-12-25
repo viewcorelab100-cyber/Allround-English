@@ -600,6 +600,23 @@
         </div>
     </div>
 
+    <!-- 비디오 종료 오버레이 -->
+    <div id="video-end-overlay" class="fixed inset-0 bg-black bg-opacity-95 z-[150] hidden flex items-center justify-center p-6">
+        <div class="text-center space-y-6 max-w-2xl">
+            <div class="space-y-4">
+                <h2 class="text-4xl font-bold text-white">강의 시청 완료</h2>
+                <p class="text-xl text-gray-300">
+                    과제를 제출하세요.<br>
+                    Final 제출까지 완료해야 수강완료 처리됩니다.
+                </p>
+            </div>
+            <button onclick="closeVideoEndOverlay()" 
+                    class="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-100 shadow-lg">
+                과제 확인하기
+            </button>
+        </div>
+    </div>
+
     <!-- 리포트 발송 모달 -->
     <div id="report-send-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
         <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md shadow-2xl">
@@ -935,10 +952,11 @@
                 saveVimeoProgress();
             });
 
-            // 영상 종료 시 진도 저장
+            // 영상 종료 시 진도 저장 및 오버레이 표시
             vimeoPlayer.on('ended', function() {
                 maxWatchedTime = videoDuration;
                 saveVimeoProgress();
+                showVideoEndOverlay();
             });
 
             // 주기적으로 진도 저장 (30초마다)
@@ -1031,6 +1049,7 @@
             videoElement.addEventListener('ended', function() {
                 maxWatchedTime = videoElement.duration;
                 saveNativeProgress();
+                showVideoEndOverlay();
             });
 
             progressInterval = setInterval(() => {
@@ -1340,6 +1359,8 @@
                         statusEl.textContent = '완료';
                         statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
                     }
+                    // 모든 과제 완료 확인
+                    setTimeout(() => checkAllAssignmentsComplete(), 1000);
                 }
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
@@ -2116,6 +2137,8 @@
                 // 상태 업데이트 (모달 닫은 후 - 혹시 모를 경우를 대비)
                 setTimeout(() => {
                     updateSubmissionStatus();
+                    // 모든 과제 완료 확인
+                    checkAllAssignmentsComplete();
                 }, 500);
 
             } catch (error) {
@@ -2401,6 +2424,87 @@
         // 과제 제출 완료 모달 닫기
         function closeAssignmentModal() {
             document.getElementById('assignment-complete-modal').classList.add('hidden');
+        }
+        
+        // 비디오 종료 오버레이 표시
+        function showVideoEndOverlay() {
+            document.getElementById('video-end-overlay').classList.remove('hidden');
+        }
+        
+        // 비디오 종료 오버레이 닫기
+        function closeVideoEndOverlay() {
+            document.getElementById('video-end-overlay').classList.add('hidden');
+            // 과제 섹션으로 스크롤
+            const assignmentSection = document.getElementById('assignment-cards-container');
+            if (assignmentSection) {
+                assignmentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // 모든 과제 완료 여부 확인
+        async function checkAllAssignmentsComplete() {
+            if (!currentUser || !currentLesson) return;
+            
+            try {
+                // 1. 퀴즈 완료 확인
+                const { data: quizResults } = await window.supabase
+                    .from('quiz_results')
+                    .select('quiz_id')
+                    .eq('user_id', currentUser.id)
+                    .eq('lesson_id', currentLesson.id);
+                
+                const { data: allQuizzes } = await window.supabase
+                    .from('quizzes')
+                    .select('id')
+                    .eq('lesson_id', currentLesson.id);
+                
+                const quizComplete = allQuizzes && quizResults && 
+                                    allQuizzes.length > 0 && 
+                                    quizResults.length >= allQuizzes.length;
+                
+                // 2. 노트 필기 확인 (임시로 항상 true - 실제로는 체크 필요)
+                const noteComplete = true;
+                
+                // 3. 블로그 과제 확인 (임시로 항상 true - 실제로는 체크 필요)
+                const blogComplete = true;
+                
+                // 4. 이미지 제출 확인
+                const { data: submissions } = await window.supabase
+                    .from('student_submissions')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('lesson_id', currentLesson.id);
+                
+                const imageComplete = submissions && submissions.length > 0;
+                
+                // 모든 과제가 완료되었으면 팝업 표시
+                if (quizComplete && noteComplete && blogComplete && imageComplete) {
+                    showNextLessonModal();
+                }
+            } catch (error) {
+                console.error('과제 완료 확인 오류:', error);
+            }
+        }
+        
+        // 다음 강의로 이동 모달 표시
+        function showNextLessonModal() {
+            // 다음 레슨 찾기
+            const currentIndex = courseLessons.findIndex(l => l.id === currentLesson.id);
+            const nextLesson = currentIndex >= 0 && currentIndex < courseLessons.length - 1 
+                ? courseLessons[currentIndex + 1] 
+                : null;
+            
+            if (nextLesson) {
+                showAssignmentModal('🎉', '모든 과제 완료!', '다음 강의로 넘어가주세요.');
+                // 모달 확인 버튼에 다음 강의로 이동 기능 추가
+                const modal = document.getElementById('assignment-complete-modal');
+                const btn = modal.querySelector('button');
+                btn.onclick = function() {
+                    window.location.href = `lesson.html?lesson=${nextLesson.id}`;
+                };
+            } else {
+                showAssignmentModal('🎊', '축하합니다!', '이 강의의 모든 과제를 완료했습니다!');
+            }
         }
 
         // 과제 상태 표시 업데이트
