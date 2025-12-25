@@ -1207,7 +1207,20 @@
         // ========== 모달 관련 함수 ==========
         
         // 퀴즈 모달 열기
-        function openQuizModal() {
+        async function openQuizModal() {
+            // 이미 퀴즈를 완료했는지 확인
+            const statusEl = document.getElementById('quiz-status');
+            if (statusEl && statusEl.textContent === '완료') {
+                showAssignmentModal('', '퀴즈 완료', '이미 완료한 퀴즈입니다.');
+                return;
+            }
+            
+            // 퀴즈가 없는 경우
+            if (!lessonQuizzes || lessonQuizzes.length === 0) {
+                showAssignmentModal('', '퀴즈 없음', '이 강의에는 퀴즈가 없습니다.');
+                return;
+            }
+            
             document.getElementById('quiz-modal').classList.remove('hidden');
         }
 
@@ -1363,6 +1376,10 @@
                         .eq('lesson_id', lessonId);
                     
                     if (!resultError && results && results.length > 0) {
+                        // 이미 푼 퀴즈 ID들을 shownQuizIds에 추가 (다시 표시되지 않도록)
+                        const completedQuizIds = results.map(r => r.quiz_id);
+                        shownQuizIds = [...completedQuizIds];
+                        
                         // 이미 푼 퀴즈가 있으면 상태를 "완료"로 변경
                         const statusEl = document.getElementById('quiz-status');
                         if (statusEl) {
