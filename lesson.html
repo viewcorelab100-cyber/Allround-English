@@ -16,7 +16,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-    <script src="js/auth.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Vimeo Player API -->
     <script src="https://player.vimeo.com/api/player.js"></script>
@@ -921,7 +920,7 @@
                 console.log('Vimeo 영상 길이:', duration, '초');
                 
                 // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:919',message:'Video duration set',data:{videoDuration:duration,maxWatchedTime},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+                console.log('[DEBUG] Video duration set', {videoDuration:duration,maxWatchedTime});
                 // #endregion
                 
                 // 마지막 시청 위치 불러오기 (duration 설정 후)
@@ -979,7 +978,7 @@
 
         async function loadLastPositionForVimeo() {
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:976',message:'loadLastPositionForVimeo entry',data:{hasPlayer:!!(customVimeoPlayer?.player || vimeoPlayer),hasUser:!!currentUser,hasLesson:!!currentLesson,videoDuration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+            console.log('[DEBUG] loadLastPositionForVimeo entry', {hasPlayer:!!(customVimeoPlayer?.player || vimeoPlayer),hasUser:!!currentUser,hasLesson:!!currentLesson,videoDuration});
             // #endregion
             
             const player = customVimeoPlayer?.player || vimeoPlayer;
@@ -988,13 +987,13 @@
             const result = await getLessonProgress(currentUser.id, currentLesson.id);
             
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:981',message:'getLessonProgress result',data:{success:result.success,lastPosition:result.data?.last_position,watchedSeconds:result.data?.watched_seconds,videoDuration,willExceed:result.data?.last_position>videoDuration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+            console.log('[DEBUG] getLessonProgress result', {success:result.success,lastPosition:result.data?.last_position,watchedSeconds:result.data?.watched_seconds,videoDuration,willExceed:result.data?.last_position>videoDuration});
             // #endregion
             
             if (result.success && result.data) {
                 if (result.data.last_position) {
                     // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:983',message:'BEFORE setCurrentTime',data:{lastPosition:result.data.last_position,videoDuration,willExceed:result.data.last_position>videoDuration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+                    console.log('[DEBUG] BEFORE setCurrentTime', {lastPosition:result.data.last_position,videoDuration,willExceed:result.data.last_position>videoDuration});
                     // #endregion
                     
                     // Fix: Only seek if position is within valid range
@@ -1004,7 +1003,7 @@
                     }
                     
                     // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:983',message:'AFTER setCurrentTime',data:{safePosition,originalPosition:result.data.last_position},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,E'})}).catch(()=>{});
+                    console.log('[DEBUG] AFTER setCurrentTime', {safePosition,originalPosition:result.data.last_position});
                     // #endregion
                 }
                 if (result.data.watched_seconds) {
@@ -1202,7 +1201,7 @@
 
         async function loadLesson() {
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1195',message:'loadLesson entry',data:{hasSupabase:!!window.supabase,supabaseType:typeof window.supabase,hasGetCurrentUser:typeof getCurrentUser},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,D'})}).catch(()=>{});
+            console.log('[DEBUG] loadLesson entry', {hasSupabase:!!window.supabase,supabaseType:typeof window.supabase,hasGetCurrentUser:typeof getCurrentUser});
             // #endregion
             
             const lessonId = getLessonId();
@@ -1340,7 +1339,7 @@
         // 퀴즈 답안 제출
         async function submitQuizAnswer() {
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1308',message:'submitQuizAnswer entry',data:{hasSupabase:!!window.supabase,hasCurrentQuiz:!!currentQuiz,hasCurrentUser:!!currentUser,quizId:currentQuiz?.id,userId:currentUser?.id},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+            console.log('[DEBUG] submitQuizAnswer entry', {hasSupabase:!!window.supabase,hasCurrentQuiz:!!currentQuiz,hasCurrentUser:!!currentUser,quizId:currentQuiz?.id,userId:currentUser?.id});
             // #endregion
             
             if (!currentQuiz || !currentUser) return;
@@ -1366,7 +1365,7 @@
             const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
             
             // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1332',message:'BEFORE quiz insert',data:{supabaseUrl:window.supabase?._supabaseUrl,userId:currentUser.id,lessonId:currentLesson.id,quizId:currentQuiz.id,isCorrect},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+            console.log('[DEBUG] BEFORE quiz insert', {supabaseUrl:window.supabase?._supabaseUrl,userId:currentUser.id,lessonId:currentLesson.id,quizId:currentQuiz.id,isCorrect});
             // #endregion
             
             // 결과 저장
@@ -1383,7 +1382,7 @@
                     });
                 
                 // #region agent log
-                fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lesson.html:1344',message:'AFTER quiz insert',data:{hasError:!!error,errorMessage:error?.message,errorCode:error?.code,errorDetails:error?.details},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
+                console.log('[DEBUG] AFTER quiz insert', {hasError:!!error,errorMessage:error?.message,errorCode:error?.code,errorDetails:error?.details});
                 // #endregion
                 
                 if (error) throw error;
