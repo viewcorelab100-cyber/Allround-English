@@ -1,6 +1,26 @@
 // Global Footer Component
 // This script injects the global footer into the page
 
+/**
+ * KB 에스크로 인증마크 팝업 열기
+ */
+function openKBEscrowPopup() {
+    // 1. 팝업창 열기
+    window.open(
+        '',
+        'KB_AUTHMARK',
+        'height=604, width=648, status=yes, toolbar=no, menubar=no, location=no'
+    );
+
+    // 2. 폼 전송
+    const form = document.querySelector('form[name="KB_AUTHMARK_FORM"]');
+    if (form) {
+        form.action = 'https://okbfex.kbstar.com/quics';
+        form.target = 'KB_AUTHMARK';
+        form.submit();
+    }
+}
+
 function loadGlobalFooter() {
     // Check if footer already exists to prevent duplicates
     if (document.getElementById('allround-footer')) return;
@@ -74,11 +94,22 @@ function loadGlobalFooter() {
             </div>
 
             <!-- Bottom Copyright Line (Moved up before the big text to avoid overlay issues) -->
-             <div class="flex flex-col md:flex-row justify-between items-end border-t border-white/10 pt-6 pb-8 md:pb-12">
-                <div class="flex flex-col gap-1">
-                    <p class="text-[10px] text-gray-600 uppercase tracking-widest">&copy; 2025 ALLROUND. ALL RIGHTS RESERVED.</p>
+             <div class="flex flex-col md:flex-row justify-between items-center md:items-end border-t border-white/10 pt-6 pb-8 md:pb-12 gap-4">
+                <div class="flex flex-col gap-1 order-2 md:order-1">
+                    <p class="text-[10px] text-gray-600 uppercase tracking-widest text-center md:text-left">&copy; 2025 ALLROUND. ALL RIGHTS RESERVED.</p>
                 </div>
-                <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-2 md:mt-0">ENGLISH COMMUNICATION TRAINING</p>
+                
+                <!-- KB 에스크로 인증마크 -->
+                <div class="order-1 md:order-2">
+                    <a href="#" onclick="openKBEscrowPopup(); return false;" class="inline-block opacity-60 hover:opacity-100 transition-opacity">
+                        <img 
+                            src="https://img1.kbstar.com/img/escrow/escrowcmark.gif" 
+                            alt="KB에스크로 이체 인증마크" 
+                            class="h-8">
+                    </a>
+                </div>
+                
+                <p class="text-[10px] text-gray-600 uppercase tracking-widest order-3 text-center md:text-right">ENGLISH COMMUNICATION TRAINING</p>
             </div>
 
         </div>
@@ -97,6 +128,20 @@ function loadGlobalFooter() {
 
     // Always append to body to ensure full width (especially for admin pages with sidebars)
     document.body.appendChild(footer);
+    
+    // KB 에스크로 숨겨진 폼 추가
+    if (!document.querySelector('form[name="KB_AUTHMARK_FORM"]')) {
+        const escrowForm = document.createElement('form');
+        escrowForm.name = 'KB_AUTHMARK_FORM';
+        escrowForm.method = 'get';
+        escrowForm.style.display = 'none';
+        escrowForm.innerHTML = `
+            <input type="hidden" name="page" value="C021590">
+            <input type="hidden" name="cc" value="b034066:b035526">
+            <input type="hidden" name="mHValue" value="b71eeaaa968d2df8a876249cd03bd7e1">
+        `;
+        document.body.appendChild(escrowForm);
+    }
     
     // Special handling for admin page with sidebar
     // Check if there's a sidebar (admin page)

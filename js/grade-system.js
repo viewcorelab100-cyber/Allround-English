@@ -28,7 +28,7 @@ function getGradeInfo(score) {
         return {
             grade: 'A+',
             message: '완벽히 이해했어요!',
-            emoji: '🌟',
+            emoji: '',
             color: '#FFD700',
             bgColor: 'bg-yellow-500',
             textColor: 'text-yellow-400',
@@ -39,7 +39,7 @@ function getGradeInfo(score) {
         return {
             grade: 'A',
             message: '작은 실수가 있었지만 정확히 이해하고 있어요!',
-            emoji: '✨',
+            emoji: '',
             color: '#FFE55C',
             bgColor: 'bg-yellow-400',
             textColor: 'text-yellow-300',
@@ -50,7 +50,7 @@ function getGradeInfo(score) {
         return {
             grade: 'B+',
             message: '대부분 이해했어요! 조금만 더 복습하면 완벽해요!',
-            emoji: '💫',
+            emoji: '',
             color: '#90EE90',
             bgColor: 'bg-green-400',
             textColor: 'text-green-400',
@@ -61,7 +61,7 @@ function getGradeInfo(score) {
         return {
             grade: 'B',
             message: '잘 이해하고 있어요!',
-            emoji: '✅',
+            emoji: '',
             color: '#98D8C8',
             bgColor: 'bg-green-300',
             textColor: 'text-green-300',
@@ -72,7 +72,7 @@ function getGradeInfo(score) {
         return {
             grade: 'C+',
             message: '기본은 이해했어요! 조금 더 연습이 필요해요!',
-        emoji: '📚',
+        emoji: '',
             color: '#87CEEB',
             bgColor: 'bg-blue-400',
             textColor: 'text-blue-400',
@@ -83,7 +83,7 @@ function getGradeInfo(score) {
         return {
             grade: 'C',
             message: '기본 개념은 알고 있어요! 복습하면 더 좋아질 거예요!',
-            emoji: '📖',
+            emoji: '',
             color: '#87CEEB',
             bgColor: 'bg-blue-300',
             textColor: 'text-blue-300',
@@ -94,7 +94,7 @@ function getGradeInfo(score) {
         return {
             grade: 'D',
             message: '조금 더 노력이 필요해요! 다시 한번 복습해봐요!',
-            emoji: '💪',
+            emoji: '',
             color: '#FFA500',
             bgColor: 'bg-orange-400',
             textColor: 'text-orange-400',
@@ -104,8 +104,8 @@ function getGradeInfo(score) {
     else {
         return {
             grade: 'F',
-            message: '다시 공부해봐요! 선생님께 질문하세요!',
-            emoji: '📝',
+            message: '오늘의 강의를 다시 시청해주세요. 복습하면서 어려운 부분은 메모해서 선생님께 질문해 주세요!',
+            emoji: '',
             color: '#FF6B6B',
             bgColor: 'bg-red-500',
             textColor: 'text-red-400',
@@ -126,7 +126,7 @@ function createGradeBadgeHTML(score, showMessage = true) {
     if (!showMessage) {
         return `
             <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg ${gradeInfo.bgColor} bg-opacity-20 border border-current ${gradeInfo.textColor}">
-                <span class="text-2xl">${gradeInfo.emoji}</span>
+                ${gradeInfo.emoji ? `<span class="text-2xl">${gradeInfo.emoji}</span>` : ''}
                 <span class="font-bold text-xl">${gradeInfo.grade}</span>
             </div>
         `;
@@ -135,7 +135,7 @@ function createGradeBadgeHTML(score, showMessage = true) {
     return `
         <div class="inline-block px-6 py-4 rounded-xl ${gradeInfo.bgColor} bg-opacity-10 border-2 border-current ${gradeInfo.textColor}">
             <div class="flex items-center space-x-3 mb-2">
-                <span class="text-3xl">${gradeInfo.emoji}</span>
+                ${gradeInfo.emoji ? `<span class="text-3xl">${gradeInfo.emoji}</span>` : ''}
                 <span class="font-bold text-2xl">${gradeInfo.grade}</span>
             </div>
             <p class="text-lg font-semibold mt-2">${gradeInfo.message}</p>
@@ -196,6 +196,13 @@ function getGradeText(score) {
 function getGradeMessage(score) {
     return getGradeInfo(score).message;
 }
+
+
+
+
+
+
+
 
 
 

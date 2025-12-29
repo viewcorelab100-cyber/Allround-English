@@ -98,7 +98,7 @@ function createGradingResultHTML(data) {
                         color: ${data.isPassed ? '#000000' : '#dc2626'};
                         letter-spacing: 2px;
                     ">
-                        ${data.isPassed ? 'PASSED' : 'RESUBMISSION REQUIRED'}
+                        ${data.isPassed ? '채점완료' : '재제출요청'}
                     </p>
                 </div>
 

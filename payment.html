@@ -262,8 +262,19 @@
     <footer class="py-12 px-6">
         <div class="max-w-6xl mx-auto">
             <div class="w-full h-px bg-white opacity-20 mb-8"></div>
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
                 <img src="/logo.png" alt="ALLROUND" class="h-6 md:h-8 w-auto">
+                
+                <!-- KB 에스크로 인증마크 -->
+                <div class="flex items-center">
+                    <a href="#" onclick="openKBEscrowPopup(); return false;" class="inline-block opacity-80 hover:opacity-100 transition-opacity">
+                        <img 
+                            src="https://img1.kbstar.com/img/escrow/escrowcmark.gif" 
+                            alt="KB에스크로 이체 인증마크" 
+                            class="h-8">
+                    </a>
+                </div>
+                
                 <div class="text-sm text-gray-400">
                     © 2024 ALLROUND. All rights reserved.
                 </div>
@@ -271,9 +282,17 @@
         </div>
     </footer>
 
+    <!-- KB 에스크로 인증마크 숨겨진 폼 -->
+    <form name="KB_AUTHMARK_FORM" method="get" style="display: none;">
+        <input type="hidden" name="page" value="C021590">
+        <input type="hidden" name="cc" value="b034066:b035526">
+        <input type="hidden" name="mHValue" value="b71eeaaa968d2df8a876249cd03bd7e1">
+    </form>
+
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/courses.js"></script>
+    <script src="js/escrow.js"></script>
     <script src="js/payment.js?v=20241219-debug-all"></script>
     <script>
         // 전화번호 자동 하이픈 포맷
