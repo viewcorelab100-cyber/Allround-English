@@ -4,239 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
     <title>ALLROUND — English Communication</title>
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <style>
         body {
-            font-family: "aileron", sans-serif;
             background-color: #000000;
-            overflow-x: hidden;
-        }
-        
-        * {
-            letter-spacing: 0.02em;
-        }
-        
-        /* 상단바는 aileron 유지 */
-        header, header * {
-            font-family: "aileron", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            perspective: 1200px;
         }
 
-        .nav-link {
-            transition: color 0.2s ease-in-out;
+        /* 카드 컨테이너 */
+        .card-deck {
+            position: relative;
+            width: 260px; /* 정사각형 */
+            height: 260px;
+            transform-style: preserve-3d;
+            transform: rotateX(0deg); 
         }
 
-        .nav-link:hover {
-            color: #999;
-        }
-
-        /* 인트로 카드 스타일 */
-        .intro-card {
+        /* 개별 카드 공통 스타일 */
+        .card {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 1.5rem; /* rounded-3xl */
+            border-radius: 1.5rem;
             background-size: cover;
             background-position: center;
-            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            aspect-ratio: 1 / 1; 
+            box-shadow: -10px 10px 20px rgba(0,0,0,0.6);
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            backface-visibility: hidden;
         }
 
-        .intro-card:hover {
-            z-index: 50 !important;
-            transform: translateY(-20px) !important;
-        }
-
-        /* 펼쳐짐 애니메이션 */
-        .spread-active .card-1 {
-            transform: translateX(-110%) rotate(-3deg);
-        }
-        .spread-active .card-1:hover {
-            transform: translateX(-110%) rotate(-3deg) translateY(-20px);
-        }
-
-        .spread-active .card-2 {
-            transform: translateX(0) scale(1.05);
-            z-index: 10;
-        }
-        .spread-active .card-2:hover {
-            transform: translateX(0) scale(1.05) translateY(-20px);
-        }
-
-        .spread-active .card-3 {
-            transform: translateX(110%) rotate(3deg);
-        }
-        .spread-active .card-3:hover {
-            transform: translateX(110%) rotate(3deg) translateY(-20px);
+        /* 
+           1. 초기 상태 (Stacked & Vertical)
+           - Card 1 (폭죽): 맨 앞 (z-index: 3, translateZ: 0)
+           - Card 2 (Courses): 중간 (z-index: 2, translateZ: -30)
+           - Card 3 (About): 맨 뒤 (z-index: 1, translateZ: -60)
+        */
+        
+        .card {
+            transform: translate3d(0, 0, 0) rotateY(-35deg);
         }
         
-        /* 카드 내부 텍스트 오버레이 */
-        .card-overlay {
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        /* Card 1 (폭죽 - 맨 앞) */
+        .card:nth-child(1) { z-index: 3; filter: brightness(1.0); transform: translate3d(0, 0, 0) rotateY(-35deg); }
+        
+        /* Card 2 (Courses - 중간) */
+        .card:nth-child(2) { z-index: 2; filter: brightness(0.8); transform: translate3d(0, 0, -30px) rotateY(-35deg); }
+        
+        /* Card 3 (About - 맨 뒤) */
+        .card:nth-child(3) { z-index: 1; filter: brightness(0.6); transform: translate3d(0, 0, -60px) rotateY(-35deg); }
+
+
+        /* 
+           2. 자동 애니메이션 (Spread Out)
+           - 전체 중앙 정렬을 위해 translateX 값 조정
+        */
+
+        /* Card 1 (About - 왼쪽) */
+        .spread-active .card:nth-child(1) {
+            transform: translate3d(-120px, 0, 0) rotateY(-35deg);
+        }
+
+        /* Card 2 (Program - 중앙) */
+        .spread-active .card:nth-child(2) {
+            transform: translate3d(0, 0, -30px) rotateY(-35deg);
+        }
+
+        /* Card 3 (Online - 오른쪽) */
+        .spread-active .card:nth-child(3) {
+            transform: translate3d(120px, 0, -60px) rotateY(-35deg);
+        }
+
+
+        /* 
+           3. 호버 인터랙션 (Vertical Lift)
+        */
+        
+        .spread-active .card:hover {
+            transition-duration: 0.4s;
+            filter: brightness(1.2);
+            box-shadow: -20px 30px 40px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        /* Card 1 (About) 호버 */
+        .spread-active .card:nth-child(1):hover {
+            transform: translate3d(-120px, -25%, 0) rotateY(-35deg);
+        }
+        /* Card 2 (Program) 호버 */
+        .spread-active .card:nth-child(2):hover {
+            transform: translate3d(0, -25%, -30px) rotateY(-35deg);
+        }
+        /* Card 3 (Online) 호버 */
+        .spread-active .card:nth-child(3):hover {
+            transform: translate3d(120px, -25%, -60px) rotateY(-35deg);
+        }
+
+        /* 하단 텍스트 (호버 시 표시) - 카드 외부에 배치 */
+        .guide-text {
+            position: fixed;
+            bottom: 180px; /* 카드 하단 위치 */
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.8);
+            font-size: 0.75rem; /* 작은 크기 */
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-family: sans-serif; /* 산스세리프 */
+            pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        .intro-card:hover .card-overlay {
-            opacity: 1;
-        }
-        
-        /* 페이드인 애니메이션 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex flex-col">
+<body>
     
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
-            <div class="grid grid-cols-3 items-center mb-4">
-                <!-- 좌측: 모바일 햄버거 메뉴 -->
-                <div class="flex justify-start">
-                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    </button>
-                </div>
-                
-                <!-- 중앙: 로고 -->
-                <div class="flex justify-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="h-8 md:h-10 w-auto">
-                    </a>
-                </div>
-                
-                <!-- 우측: Auth 버튼 -->
-                <div class="flex justify-end">
-                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
-                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm whitespace-nowrap hidden sm:inline">Sign Up</a>
-                    </div>
-                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
-                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
-                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            
-            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="about.html" class="nav-link text-white">ABOUT</a>
-                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-                <a href="board.html" class="nav-link text-white">게시판</a>
-            </nav>
-        </div>
+    <div id="card-deck" class="card-deck">
+        <!-- Card 1: About (왼쪽) -->
+        <div class="card" id="card-1" onclick="location.href='about.html'" style="background-image: url('about.png');"></div>
         
-        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
-            <nav class="px-4 py-6 space-y-4">
-                <a href="about.html" class="block nav-link text-white text-sm py-2">ABOUT</a>
-                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
-                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
-                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Main Content: Full Screen Cards -->
-    <main class="flex-grow flex items-center justify-center relative overflow-hidden" style="min-height: 100vh;">
-        <!-- 배경 장식 -->
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-50"></div>
-
-        <!-- 카드 컨테이너 -->
-        <div id="intro-cards" class="relative w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] md:w-[380px] md:h-[380px] z-10 transition-all duration-1000 mt-20 md:mt-0">
-            
-            <!-- Card 1: About (Left) -->
-            <div onclick="location.href='about.html'" class="intro-card card-1 bg-gray-800" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80'); z-index: 1;">
-                <div class="card-overlay absolute inset-0 flex items-end p-6 rounded-3xl">
-                    <div class="font-['Playfair_Display']">
-                        <span class="text-xs font-bold text-gray-300 tracking-wider font-sans">ABOUT US</span>
-                        <h3 class="text-2xl font-bold text-white">Who We Are</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3: Courses (Right) -->
-            <div onclick="location.href='courses.html'" class="intro-card card-3 bg-gray-800" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'); z-index: 2;">
-                <div class="card-overlay absolute inset-0 flex items-end p-6 rounded-3xl">
-                    <div class="font-['Playfair_Display']">
-                        <span class="text-xs font-bold text-gray-300 tracking-wider font-sans">ONLINE COURSES</span>
-                        <h3 class="text-2xl font-bold text-white">Learn Now</h3>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 2: Original (Center) -->
-            <div onclick="location.href='original.html'" class="intro-card card-2 bg-gray-800" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80'); z-index: 3;">
-                <div class="card-overlay absolute inset-0 flex items-end p-6 rounded-3xl">
-                    <div class="font-['Playfair_Display']">
-                        <span class="text-xs font-bold text-gray-300 tracking-wider font-sans">ORIGINAL</span>
-                        <h3 class="text-2xl font-bold text-white">Programs</h3>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        <!-- Card 2: Program (중간) -->
+        <div class="card" id="card-2" onclick="location.href='original.html'" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80');"></div>
         
-        <!-- 하단 안내 텍스트 -->
-        <div class="absolute bottom-10 left-0 right-0 text-center z-10 opacity-0 animate-[fadeIn_1s_ease-out_1.5s_forwards]">
-            <p class="text-gray-500 text-xs md:text-sm tracking-[0.2em] font-light">SELECT A CARD TO EXPLORE</p>
-        </div>
-    </main>
-
-    <script src="js/supabase-config.js"></script>
-    <script src="js/auth.js"></script>
+        <!-- Card 3: Online (오른쪽) -->
+        <div class="card" id="card-3" onclick="location.href='courses.html'" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80');"></div>
+    </div>
     
-    <!-- 인트로 카드 애니메이션 & 모바일 메뉴 스크립트 -->
+    <!-- 하단 텍스트 (호버 시 표시) -->
+    <div class="guide-text" id="text-1">ABOUT</div>
+    <div class="guide-text" id="text-2">PROGRAM</div>
+    <div class="guide-text" id="text-3">ONLINE</div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 카드 애니메이션 (0.5초 후 시작)
             setTimeout(() => {
-                const container = document.getElementById('intro-cards');
-                if (container) {
-                    container.classList.add('spread-active');
+                const deck = document.getElementById('card-deck');
+                if (deck) {
+                    deck.classList.add('spread-active');
                 }
-            }, 500);
-
-            // 모바일 메뉴 토글
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
+            }, 1000);
             
-            if (mobileMenuBtn && mobileMenu) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
-                    const spans = mobileMenuBtn.querySelectorAll('span');
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        spans[0].style.transform = 'rotate(45deg) translateY(6px)';
-                        spans[1].style.opacity = '0';
-                        spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
-                    } else {
-                        spans[0].style.transform = 'none';
-                        spans[1].style.opacity = '1';
-                        spans[2].style.transform = 'none';
-                    }
+            // 카드 호버 시 텍스트 표시
+            const cards = document.querySelectorAll('.card');
+            const texts = document.querySelectorAll('.guide-text');
+            
+            cards.forEach((card, index) => {
+                card.addEventListener('mouseenter', () => {
+                    texts[index].style.opacity = '1';
                 });
-            }
+                card.addEventListener('mouseleave', () => {
+                    texts[index].style.opacity = '0';
+                });
+            });
         });
     </script>
-    <script src="js/footer.js"></script>
+
 </body>
 </html>
