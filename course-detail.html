@@ -310,7 +310,7 @@
                         </div>
                     </div>
                     <div class="space-y-6"><h2 class="text-2xl font-bold text-white">커리큘럼</h2><div class="space-y-2">${renderLessons(course.lessons, hasAccess)}</div></div>
-                    ${course.long_description ? `<div class="space-y-6"><h2 class="text-2xl font-bold text-white">강의 소개</h2><div class="prose prose-invert max-w-none text-gray-400">${course.long_description}</div></div>` : ''}
+                    ${course.long_description ? `<div class="space-y-6"><h2 class="text-2xl font-bold text-white">강의 소개</h2><div class="prose prose-invert max-w-none text-gray-400">${typeof course.long_description === 'string' ? course.long_description : ''}</div></div>` : ''}
                 </div>
             `;
             document.title = `${course.title} — ALLROUND`;
