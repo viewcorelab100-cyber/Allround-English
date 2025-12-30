@@ -185,7 +185,9 @@
                 durationText = `${totalMinutes}분`;
             }
             
-            const lessonsText = course.lessons ? `${course.lessons}강` : '';
+            // 강의 수 표시 (lessonCount 또는 lessons 배열 길이 사용)
+            const lessonCount = course.lessonCount || (Array.isArray(course.lessons) ? course.lessons.length : 0);
+            const lessonsText = lessonCount > 0 ? `${lessonCount}강` : '';
             
             return `
                 <div class="course-card rounded-2xl overflow-hidden bg-white bg-opacity-5">
@@ -224,7 +226,7 @@
                     price: 71000,
                     totalDuration: 720,
                     thumbnail_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
-                    lessons: 12
+                    lessonCount: 12
                 },
                 {
                     id: 'temp-reading-01',
@@ -234,7 +236,7 @@
                     price: 71000,
                     totalDuration: 720,
                     thumbnail_url: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80',
-                    lessons: 12
+                    lessonCount: 12
                 },
                 {
                     id: 'temp-structure-01',
@@ -244,7 +246,7 @@
                     price: 71000,
                     totalDuration: 720,
                     thumbnail_url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
-                    lessons: 12
+                    lessonCount: 12
                 }
             ];
             
