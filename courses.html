@@ -185,23 +185,28 @@
                 durationText = `${totalMinutes}분`;
             }
             
+            // 임시 강의 여부 확인
+            const isTemp = course.id && course.id.startsWith('temp-');
+            const lessonsText = course.lessons ? `${course.lessons}강` : '';
+            
             return `
-                <div class="course-card rounded-2xl overflow-hidden bg-white bg-opacity-5">
+                <div class="course-card rounded-2xl overflow-hidden bg-white bg-opacity-5 ${isTemp ? 'relative' : ''}">
+                    ${isTemp ? '<div class="absolute top-4 right-4 z-10 bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full">교육청 승인 대기</div>' : ''}
                     <div class="h-48 bg-cover bg-center" style="background-image: url('${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}'); background-color: #111;">
                     </div>
                     <div class="p-6 space-y-4">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-semibold text-gray-400">${course.category || 'General'}</span>
-                            <span class="text-xs text-gray-500">${durationText}</span>
+                            <span class="text-xs text-gray-500">${lessonsText}${lessonsText && durationText ? ' / ' : ''}${durationText}</span>
                         </div>
                         <h3 class="text-xl font-bold text-white">${course.title}</h3>
                         <p class="text-sm text-gray-400 line-clamp-2">${course.description || ''}</p>
                         <div class="flex items-center justify-between pt-4">
                             <span class="text-2xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</span>
-                            <a href="course-detail.html?id=${course.id}" 
-                               class="btn-hover-scale px-6 py-2 bg-white text-black font-semibold rounded-lg text-sm">
-                                자세히 보기
-                            </a>
+                            ${isTemp 
+                                ? '<button onclick="alert(\'교육청 승인 절차가 진행 중인 강의입니다. 승인 완료 후 수강 신청이 가능합니다.\')" class="btn-hover-scale px-6 py-2 bg-gray-600 text-gray-300 font-semibold rounded-lg text-sm cursor-not-allowed">준비 중</button>'
+                                : `<a href="course-detail.html?id=${course.id}" class="btn-hover-scale px-6 py-2 bg-white text-black font-semibold rounded-lg text-sm">자세히 보기</a>`
+                            }
                         </div>
                     </div>
                 </div>
@@ -212,10 +217,50 @@
         async function loadCourses() {
             const grid = document.getElementById('courses-grid');
             
+            // 교육청 승인용 임시 강의 데이터
+            const tempCourses = [
+                {
+                    id: 'temp-grammar-01',
+                    title: 'ALLROUND GRAMMAR 01',
+                    description: '체계적인 문법 학습으로 영어의 기초를 탄탄하게 다집니다.',
+                    category: 'Grammar',
+                    price: 71000,
+                    totalDuration: 720,
+                    thumbnail_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+                    lessons: 12
+                },
+                {
+                    id: 'temp-reading-01',
+                    title: 'ALLROUND READING 01',
+                    description: '다양한 주제의 지문을 통해 독해력과 어휘력을 향상시킵니다.',
+                    category: 'Reading',
+                    price: 71000,
+                    totalDuration: 720,
+                    thumbnail_url: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80',
+                    lessons: 12
+                },
+                {
+                    id: 'temp-structure-01',
+                    title: 'ALLROUND STRUCTURE 01',
+                    description: '영어 문장 구조를 체계적으로 학습하여 정확한 문장 구사 능력을 키웁니다.',
+                    category: 'Structure',
+                    price: 71000,
+                    totalDuration: 720,
+                    thumbnail_url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
+                    lessons: 12
+                }
+            ];
+            
             const result = await getAllCourses();
             
+            // 실제 강의 데이터와 임시 강의 데이터 합치기
+            let allCourses = [...tempCourses];
             if (result.success && result.data.length > 0) {
-                grid.innerHTML = result.data.map(renderCourseCard).join('');
+                allCourses = [...allCourses, ...result.data];
+            }
+            
+            if (allCourses.length > 0) {
+                grid.innerHTML = allCourses.map(renderCourseCard).join('');
             } else {
                 grid.innerHTML = `
                     <div class="text-center text-gray-500 col-span-full py-20">
