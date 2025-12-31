@@ -11,7 +11,7 @@
   ],
   "headers": [
     {
-      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|ico))",
+      "source": "/:path*.:ext(png|jpg|jpeg|gif|svg|ico)",
       "headers": [
         {
           "key": "Cache-Control",
