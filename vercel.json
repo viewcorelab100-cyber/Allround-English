@@ -1,14 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "."
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
@@ -17,11 +8,11 @@
   ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|ico))",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },
@@ -35,11 +26,11 @@
       ]
     },
     {
-      "source": "/css/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
