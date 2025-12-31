@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="refresh" content="0; url=courses.html">
     <title>ALLROUND — English Communication</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 즉시 리다이렉트
+        window.location.replace('courses.html');
+    </script>
     <style>
         body {
             background-color: #000000;
@@ -14,161 +18,17 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden;
-            perspective: 1200px;
+            color: #ffffff;
+            font-family: sans-serif;
         }
-
-        /* 카드 컨테이너 */
-        .card-deck {
-            position: relative;
-            width: 260px; /* 정사각형 */
-            height: 260px;
-            transform-style: preserve-3d;
-            transform: rotateX(0deg); 
+        .loading {
+            text-align: center;
         }
-
-        /* 개별 카드 공통 스타일 */
-        .card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 1.5rem;
-            background-size: cover;
-            background-position: center;
-            aspect-ratio: 1 / 1; 
-            box-shadow: -10px 10px 20px rgba(0,0,0,0.6);
-            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-            backface-visibility: hidden;
-        }
-
-        /* 
-           1. 초기 상태 (Stacked & Vertical)
-           - Card 1 (폭죽): 맨 앞 (z-index: 3, translateZ: 0)
-           - Card 2 (Courses): 중간 (z-index: 2, translateZ: -30)
-           - Card 3 (About): 맨 뒤 (z-index: 1, translateZ: -60)
-        */
-        
-        .card {
-            transform: translate3d(0, 0, 0) rotateY(-35deg);
-        }
-        
-        /* Card 1 (폭죽 - 맨 앞) */
-        .card:nth-child(1) { z-index: 3; filter: brightness(1.0); transform: translate3d(0, 0, 0) rotateY(-35deg); }
-        
-        /* Card 2 (Courses - 중간) */
-        .card:nth-child(2) { z-index: 2; filter: brightness(0.8); transform: translate3d(0, 0, -30px) rotateY(-35deg); }
-        
-        /* Card 3 (About - 맨 뒤) */
-        .card:nth-child(3) { z-index: 1; filter: brightness(0.6); transform: translate3d(0, 0, -60px) rotateY(-35deg); }
-
-
-        /* 
-           2. 자동 애니메이션 (Spread Out)
-           - 전체 중앙 정렬을 위해 translateX 값 조정
-        */
-
-        /* Card 1 (About - 왼쪽) */
-        .spread-active .card:nth-child(1) {
-            transform: translate3d(-120px, 0, 0) rotateY(-35deg);
-        }
-
-        /* Card 2 (Program - 중앙) */
-        .spread-active .card:nth-child(2) {
-            transform: translate3d(0, 0, -30px) rotateY(-35deg);
-        }
-
-        /* Card 3 (Online - 오른쪽) */
-        .spread-active .card:nth-child(3) {
-            transform: translate3d(120px, 0, -60px) rotateY(-35deg);
-        }
-
-
-        /* 
-           3. 호버 인터랙션 (Vertical Lift)
-        */
-        
-        .spread-active .card:hover {
-            transition-duration: 0.4s;
-            filter: brightness(1.2);
-            box-shadow: -20px 30px 40px rgba(0,0,0,0.8);
-            z-index: 10;
-        }
-
-        /* Card 1 (About) 호버 */
-        .spread-active .card:nth-child(1):hover {
-            transform: translate3d(-120px, -25%, 0) rotateY(-35deg);
-        }
-        /* Card 2 (Program) 호버 */
-        .spread-active .card:nth-child(2):hover {
-            transform: translate3d(0, -25%, -30px) rotateY(-35deg);
-        }
-        /* Card 3 (Online) 호버 */
-        .spread-active .card:nth-child(3):hover {
-            transform: translate3d(120px, -25%, -60px) rotateY(-35deg);
-        }
-
-        /* 하단 텍스트 (호버 시 표시) - 카드 외부에 배치 */
-        .guide-text {
-            position: fixed;
-            bottom: 100px; /* 카드와 화면 하단 중간 */
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.8);
-            font-size: 0.75rem; /* 작은 크기 */
-            font-weight: 400;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            font-family: sans-serif; /* 산스세리프 */
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
     </style>
 </head>
 <body>
-    
-    <div id="card-deck" class="card-deck">
-        <!-- Card 1: About (왼쪽) -->
-        <div class="card" id="card-1" onclick="location.href='about.html'" style="background-image: url('https://fqxbfetyfjyzomgrczwi.supabase.co/storage/v1/object/public/homepage-images/about.png');"></div>
-        
-        <!-- Card 2: Program (중간) -->
-        <div class="card" id="card-2" onclick="location.href='firstee.html'" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80');"></div>
-        
-        <!-- Card 3: Online (오른쪽) -->
-        <div class="card" id="card-3" onclick="location.href='courses.html'" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80');"></div>
+    <div class="loading">
+        <p>강의 페이지로 이동 중...</p>
     </div>
-    
-    <!-- 하단 텍스트 (호버 시 표시) -->
-    <div class="guide-text" id="text-1">ABOUT</div>
-    <div class="guide-text" id="text-2">PROGRAM</div>
-    <div class="guide-text" id="text-3">ONLINE</div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const deck = document.getElementById('card-deck');
-                if (deck) {
-                    deck.classList.add('spread-active');
-                }
-            }, 1000);
-            
-            // 카드 호버 시 텍스트 표시
-            const cards = document.querySelectorAll('.card');
-            const texts = document.querySelectorAll('.guide-text');
-            
-            cards.forEach((card, index) => {
-                card.addEventListener('mouseenter', () => {
-                    texts[index].style.opacity = '1';
-                });
-                card.addEventListener('mouseleave', () => {
-                    texts[index].style.opacity = '0';
-                });
-            });
-        });
-    </script>
-
 </body>
 </html>
