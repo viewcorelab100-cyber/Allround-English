@@ -15,6 +15,11 @@ const watchPatterns = [
   '**/*.html',
   '**/*.css',
   '**/*.js',
+  '**/*.png',
+  '**/*.jpg',
+  '**/*.jpeg',
+  '**/*.gif',
+  '**/*.svg',
   'css/**/*',
   'js/**/*'
 ];
@@ -62,11 +67,16 @@ function autoCommitAndPush() {
     return;
   }
 
-  // 2. HTML, CSS, JS 파일만 스테이징
-  console.log('HTML, CSS, JS 파일 스테이징 중...');
+  // 2. HTML, CSS, JS, 이미지 파일 스테이징
+  console.log('HTML, CSS, JS, 이미지 파일 스테이징 중...');
   execGitCommand('git add "*.html"');
   execGitCommand('git add "*.css"');
   execGitCommand('git add "*.js"');
+  execGitCommand('git add "*.png"');
+  execGitCommand('git add "*.jpg"');
+  execGitCommand('git add "*.jpeg"');
+  execGitCommand('git add "*.gif"');
+  execGitCommand('git add "*.svg"');
   execGitCommand('git add "css/*"');
   execGitCommand('git add "js/*"');
 
@@ -133,7 +143,7 @@ function scheduleCommit(filePath) {
 
 // 파일 감시 시작
 console.log('🚀 자동 커밋 시스템 시작!');
-console.log('감시 중인 파일 유형: HTML, CSS, JS');
+console.log('감시 중인 파일 유형: HTML, CSS, JS, 이미지(PNG, JPG, GIF, SVG)');
 console.log('제외된 파일: .env, credentials, .sql, node_modules 등');
 console.log('커밋 대기 시간: 5초 (여러 파일 변경 대응)\n');
 
