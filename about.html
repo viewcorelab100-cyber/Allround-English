@@ -4,248 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
-    <title>Our Services - The Spectrum</title>
+    <title>About - Allround</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Noto+Serif+KR:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         body {
-            font-family: 'Playfair Display', serif;
-            background-color: #111;
-            color: white;
-            overflow: hidden;
+            font-family: 'Noto Serif KR', serif;
+            background-color: #000;
+            color: #fff;
             margin: 0;
-            height: 100vh;
+            line-height: 2.2; /* 여유로운 줄간격 */
+            word-break: keep-all; /* 단어 단위 줄바꿈 */
         }
 
-        .scene-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: #111;
-        }
-
-        /* 1. 배경 이미지 (흑백 처리) */
-        .bg-image {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(100%) brightness(0.4) contrast(1.1);
-            transition: transform 0.8s ease, filter 0.5s ease;
-            z-index: 1;
-        }
-
-        /* 필름 노이즈 */
-        .film-grain {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            opacity: 0.15;
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            mix-blend-mode: overlay;
-        }
-
-        /* 2. 컬러 그라데이션 스팟 (Overlay) */
-        /* 사진 속 사물 위치에 맞춰서 그라데이션 원을 배치 */
-        .color-spot {
-            position: absolute;
-            inset: 0; /* 전체 화면 덮음 */
-            z-index: 10;
-            pointer-events: none; /* 클릭 통과 */
-            mix-blend-mode: overlay; /* 흑백 사진 위에 색상을 입힘 */
-            opacity: 0.8;
-            transition: clip-path 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
-        }
-
-        /* 
-           좌표 설정 (사진: https://picsum.photos/id/201/1920/1080 기준)
-           - Secret (좌측 나무결): 20% 70%
-           - Academy (중앙 안경): 48% 52%
-           - Online (우측 배경): 80% 30%
-        */
-
-        .spot-secret {
-            background: radial-gradient(circle at 20% 70%, #FFBC96, #ff9a9e);
-            clip-path: circle(8% at 20% 70%); /* 기본 크기 */
-        }
-
-        .spot-academy {
-            background: radial-gradient(circle at 48% 52%, #89A6C6, #a18cd1);
-            clip-path: circle(8% at 48% 52%);
-        }
-
-        .spot-online {
-            background: radial-gradient(circle at 80% 30%, #FFE6C7, #84fab0);
-            clip-path: circle(10% at 80% 30%);
-        }
-
-
-        /* 3. 트리거 (실제 클릭 영역) */
-        /* 스팟 위치와 동일하게 잡아줌 */
-        .trigger {
-            position: absolute;
-            z-index: 20;
-            border-radius: 50%;
-            cursor: pointer;
-            /* background: rgba(255,0,0,0.2); 디버깅용 */
-        }
-        
-        /* 사진 속 사물 위치에 맞게 트리거 배치 */
-        .trigger-secret { top: 62%; left: 12%; width: 16%; height: 16%; }
-        .trigger-academy { top: 44%; left: 40%; width: 16%; height: 16%; }
-        .trigger-online { top: 20%; left: 70%; width: 20%; height: 20%; }
-
-
-        /* 4. 정보 카드 */
-        .info-card {
-            position: absolute;
-            z-index: 30;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem 2rem;
-            border-left: 2px solid white;
-            color: white;
+        /* 스크롤 애니메이션을 위한 기본 상태 */
+        .reveal-text {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease;
-            pointer-events: none;
-            width: 300px;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* 부드러운 감속 커브 */
+            will-change: opacity, transform;
         }
 
-        /* 정보 카드 위치 */
-        .info-secret { top: 55%; left: 25%; border-color: #FFBC96; }
-        .info-academy { top: 65%; left: 50%; transform: translate(-50%, 20px); border-color: #89A6C6; }
-        .info-online { top: 45%; right: 15%; border-color: #FFE6C7; }
-
-
-        /* --- 인터랙션 로직 --- */
-        
-        /* Secret 호버 */
-        .trigger-secret:hover ~ .spot-secret {
-            clip-path: circle(12% at 20% 70%); /* 커짐 */
-            opacity: 1; /* 더 선명하게 */
-        }
-        .trigger-secret:hover ~ .info-secret {
+        /* 활성화 상태 */
+        .reveal-text.active {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Academy 호버 */
-        .trigger-academy:hover ~ .spot-academy {
-            clip-path: circle(12% at 48% 52%);
-            opacity: 1;
-        }
-        .trigger-academy:hover ~ .info-academy {
-            opacity: 1;
-            transform: translate(-50%, 0);
+        /* 텍스트 강조 스타일 */
+        .highlight {
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            display: inline-block;
         }
 
-        /* Online 호버 */
-        .trigger-online:hover ~ .spot-online {
-            clip-path: circle(15% at 80% 30%);
-            opacity: 1;
-        }
-        .trigger-online:hover ~ .info-online {
-            opacity: 1;
-            transform: translateY(0);
+        /* 문단 간 여백 */
+        .text-section {
+            margin-bottom: 25vh; /* 화면 높이의 25% 만큼 여백 */
+            padding: 0 1rem;
         }
 
-        /* 하나라도 호버 시 배경 어둡게 */
-        .scene-container:has(.trigger:hover) .bg-image {
-            filter: grayscale(100%) brightness(0.2);
-            transform: scale(1.02);
+        /* 마지막 섹션 여백 조정 */
+        .text-section:last-child {
+            margin-bottom: 30vh;
         }
         
-        /* 호버 안된 다른 스팟 흐리게 */
-        .scene-container:has(.trigger:hover) .color-spot {
-            opacity: 0.2;
+        /* 텍스트 투명도 계층 */
+        .text-body {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            font-size: 1.05rem;
         }
-        /* 호버 된 스팟은 다시 선명하게 (위의 규칙 덮어쓰기 위해 !important 사용 가능하나, 구체성으로 해결) */
-        .trigger-secret:hover ~ .spot-secret { opacity: 1; mix-blend-mode: hard-light; } /* 색상을 더 쨍하게 */
-        .trigger-academy:hover ~ .spot-academy { opacity: 1; mix-blend-mode: hard-light; }
-        .trigger-online:hover ~ .spot-online { opacity: 1; mix-blend-mode: hard-light; }
-
-
-        /* 텍스트 스타일 */
-        .service-label { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
-        .service-title { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1; }
-        .service-desc { font-size: 0.9rem; font-weight: 300; color: #ddd; line-height: 1.5; }
-
-        /* 사용자 사진 커스텀 가이드 (주석) */
-        /* 
-           사진을 바꾸려면 .bg-image의 src를 변경하세요.
-           사물 위치가 바뀌면 .spot-*, .trigger-* 의 top/left % 값을 조정하세요.
-        */
         
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .bg-image { object-position: 60% center; }
-            
-            /* 모바일 위치 조정 예시 */
-            .spot-secret { background: radial-gradient(circle at 20% 70%, #FFBC96, #ff9a9e); clip-path: circle(12% at 20% 70%); }
-            .trigger-secret { top: 62%; left: 10%; width: 20%; height: 15%; }
-            .info-secret { top: 50%; left: 10%; width: 80%; }
+        .text-title {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
         }
 
+        /* 구분선 스타일 */
+        .divider {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
+            margin: 10vh auto;
+            opacity: 0;
+            transform: scaleY(0);
+            transition: all 1s ease;
+        }
+        .divider.active {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+
+        /* 드래그 방지 */
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
     </style>
 </head>
-<body>
+<body class="no-select">
 
-    <div class="scene-container">
-        
-        <!-- 타이틀 -->
-        <div class="absolute top-10 left-0 right-0 text-center z-50 pointer-events-none mix-blend-difference text-white">
-            <h2 class="text-xs font-light tracking-[0.5em] opacity-80 mb-2 uppercase">Our Services</h2>
-            <h1 class="text-4xl md:text-5xl font-serif">The Spectrum</h1>
+    <!-- 메인 컨텐츠 컨테이너 -->
+    <main class="max-w-2xl mx-auto pt-[30vh] pb-[20vh] text-center">
+
+        <!-- 섹션 1: 도입부 -->
+        <div class="text-section reveal-text">
+            <p class="text-title">교육은</p>
+            <p class="text-body">재능으로 만들어지는 결과가 아닙니다.</p>
         </div>
 
-        <!-- 1. 배경 이미지 (사용자 사진으로 교체 가능) -->
-        <img src="https://picsum.photos/id/201/1920/1080" alt="Background" class="bg-image">
-        
-        <!-- 2. 필름 노이즈 -->
-        <div class="film-grain"></div>
-
-        <!-- 3. 트리거 (가장 앞에 위치) -->
-        <a href="/secret" class="trigger trigger-secret"></a>
-        <a href="/academy" class="trigger trigger-academy"></a>
-        <a href="/online" class="trigger trigger-online"></a>
-
-        <!-- 4. 컬러 스팟 (그라데이션 색상) -->
-        <!-- 원래 사진이 아니라, 그라데이션 레이어를 clip-path로 보여줌 -->
-        <div class="color-spot spot-secret"></div>
-        <div class="color-spot spot-academy"></div>
-        <div class="color-spot spot-online"></div>
-
-        <!-- 5. 정보 카드 -->
-        <div class="info-card info-secret">
-            <span class="service-label" style="color: #FFBC96;">For Celebrities</span>
-            <h3 class="service-title">Secret Class</h3>
-            <p class="service-desc">렌즈 너머에 숨겨진<br>당신만의 특별한 이야기</p>
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                끝까지 걷는 사람만이<br>
+                도달할 수 있는 지점이 있을 뿐입니다.
+            </p>
         </div>
 
-        <div class="info-card info-academy">
-            <span class="service-label" style="color: #89A6C6;">The Community</span>
-            <h3 class="service-title">Academy</h3>
-            <p class="service-desc">기록하고, 공유하며<br>함께 성장하는 배움의 장</p>
+        <!-- 구분선 -->
+        <div class="divider reveal-text"></div>
+
+        <!-- 섹션 2: 아이와 선생님 -->
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                처음 길에 들어선 아이는<br>
+                방향을 알지 못합니다.<br>
+                <br>
+                어디에 발을 디뎌야 하는지,<br>
+                어디서 멈춰야 하는지도 모릅니다.
+            </p>
         </div>
 
-        <div class="info-card info-online">
-            <span class="service-label" style="color: #FFE6C7;">Infinite Wave</span>
-            <h3 class="service-title">Online Class</h3>
-            <p class="service-desc">디지털 세상으로 확장되는<br>무한한 가능성</p>
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                이 시기에는<br>
+                아이 혼자 감당하게 두지 않습니다.
+            </p>
         </div>
 
-        <div class="absolute bottom-8 left-0 right-0 text-center z-40 text-white/40 text-[10px] tracking-[0.3em] animate-pulse pointer-events-none">
-            HOVER THE OBJECTS
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                선생님은<br>
+                아이의 옆에 서서<br>
+                같은 속도로 걸으며<br>
+                넘어지는 지점을 함께 확인하고,<br>
+                다시 일어나는 방법을 반복해서 보여줍니다.
+            </p>
         </div>
-    </div>
 
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                기초란<br>
+                혼자 견디게 두는 시간이 아니라,<br>
+                <span class="highlight">함께 견디는 시간을 통해 만들어지는 힘</span>이라고<br>
+                믿기 때문입니다.
+            </p>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="divider reveal-text"></div>
+
+        <!-- 섹션 3: 성장과 선생님의 역할 변화 -->
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                어느 순간부터<br>
+                아이의 발걸음은 흔들리지 않기 시작합니다.<br>
+                <br>
+                같은 길을 여러 번 지나며<br>
+                자신만의 균형을 만들고,<br>
+                스스로 속도를 조절하는 법을 익힙니다.
+            </p>
+        </div>
+
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                이때부터 선생님의 역할은 달라집니다.
+            </p>
+        </div>
+
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                앞서 가는 대신,<br>
+                <span class="highlight">더 멀리 이어진 길을 보여주는 사람</span>이 됩니다.
+            </p>
+        </div>
+
+        <div class="text-section reveal-text">
+            <p class="text-body">
+                이미 지나본 사람으로서<br>
+                지금보다 더 긴 거리와,<br>
+                더 긴 시간을 견뎌야 하는 구간을<br>
+                조용히 안내합니다.
+            </p>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="divider reveal-text"></div>
+
+        <!-- 섹션 4: 마지막 목표와 철학 -->
+        <div class="text-section reveal-text">
+            <p class="text-title">마지막 목표는 분명합니다.</p>
+            <p class="text-body">
+                누군가의 손을 잡지 않아도,<br>
+                누군가의 속도에 맞추지 않아도,<br>
+                스스로의 판단으로<br>
+                원하는 방향을 선택하고<br>
+                끝까지 걸어갈 수 있는 사람으로<br>
+                성장시키는 것.
+            </p>
+        </div>
+
+        <div class="text-section reveal-text">
+            <p class="text-body" style="font-size: 1.15rem; line-height: 2.4;">
+                <span style="font-family: 'Playfair Display', serif; letter-spacing: 0.1em; font-size: 0.9em;">ALLROUND</span>가 말하는 교육은<br>
+                <br>
+                <span class="highlight" style="font-size: 1.3rem;">스스로의 기준으로,</span><br>
+                <span class="highlight" style="font-size: 1.3rem;">자신의 길을 끝까지 걸을 수 있게 만드는 일</span>입니다.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Footer Script -->
     <script src="js/footer.js"></script>
+
+    <script>
+        // 스크롤 인터랙션 관찰자 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15 // 15% 정도 보일 때 트리거
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        // 약간의 시차를 두고 등장 (빠르게 스크롤 시 순차적 느낌)
+                        setTimeout(() => {
+                            entry.target.classList.add('active');
+                        }, index * 100); // 딜레이를 주면 여러 개가 동시에 보일 때 순차적으로 뜸
+                        
+                        // 한 번 나타나면 관찰 중지 (선택 사항, 계속 감지하려면 이 줄 삭제)
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // 관찰 대상 등록
+            const revealElements = document.querySelectorAll('.reveal-text');
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
 </body>
 </html>
