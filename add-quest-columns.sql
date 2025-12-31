@@ -27,3 +27,14 @@ WHERE EXISTS (
 AND image_completed = false;
 
 
+
+
+
+
+
+
+
+
+
+
+
