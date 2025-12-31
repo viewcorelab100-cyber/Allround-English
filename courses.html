@@ -224,50 +224,10 @@
         async function loadCourses() {
             const grid = document.getElementById('courses-grid');
             
-            // 교육청 승인용 임시 강의 데이터
-            const tempCourses = [
-                {
-                    id: 'temp-grammar-01',
-                    title: 'ALLROUND GRAMMAR 01',
-                    description: '체계적인 문법 학습으로 영어의 기초를 탄탄하게 다집니다.',
-                    category: 'Grammar',
-                    price: 71000,
-                    totalDuration: 720,
-                    thumbnail_url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
-                    lessonCount: 12
-                },
-                {
-                    id: 'temp-reading-01',
-                    title: 'ALLROUND READING 01',
-                    description: '다양한 주제의 지문을 통해 독해력과 어휘력을 향상시킵니다.',
-                    category: 'Reading',
-                    price: 71000,
-                    totalDuration: 720,
-                    thumbnail_url: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80',
-                    lessonCount: 12
-                },
-                {
-                    id: 'temp-structure-01',
-                    title: 'ALLROUND STRUCTURE 01',
-                    description: '영어 문장 구조를 체계적으로 학습하여 정확한 문장 구사 능력을 키웁니다.',
-                    category: 'Structure',
-                    price: 71000,
-                    totalDuration: 720,
-                    thumbnail_url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
-                    lessonCount: 12
-                }
-            ];
-            
             const result = await getAllCourses();
             
-            // 실제 강의 데이터와 임시 강의 데이터 합치기
-            let allCourses = [...tempCourses];
             if (result.success && result.data.length > 0) {
-                allCourses = [...allCourses, ...result.data];
-            }
-            
-            if (allCourses.length > 0) {
-                grid.innerHTML = allCourses.map(renderCourseCard).join('');
+                grid.innerHTML = result.data.map(renderCourseCard).join('');
             } else {
                 grid.innerHTML = `
                     <div class="text-center text-gray-500 col-span-full py-20">
