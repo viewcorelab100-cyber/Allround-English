@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coming Soon — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "aileron", sans-serif;
+            background-color: #000000;
+        }
+        
+        .main-content {
+            font-family: 'Playfair Display', "aileron", serif;
+        }
+        
+        header, header * {
+            font-family: "aileron", sans-serif;
+        }
+        
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .btn-hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .btn-hover-scale:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <div class="grid grid-cols-3 items-center mb-4">
+                <div class="flex justify-start">
+                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    </button>
+                </div>
+                
+                <div class="flex justify-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="/logo.png" alt="ALLROUND" class="h-8 md:h-10 w-auto">
+                    </a>
+                </div>
+                
+                <div class="flex justify-end">
+                </div>
+            </div>
+            
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="coming-soon.html" class="nav-link text-white">ABOUT</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="coming-soon.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="h-36"></div>
+
+    <main class="main-content">
+        <section class="min-h-screen flex items-center justify-center px-4 md:px-6">
+            <div class="max-w-4xl mx-auto text-center space-y-8">
+                <div class="space-y-4">
+                    <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white">
+                        Coming Soon
+                    </h1>
+                    <div class="w-24 h-1 bg-white mx-auto"></div>
+                </div>
+                
+                <p class="text-xl md:text-2xl lg:text-3xl text-gray-400 max-w-2xl mx-auto">
+                    곧 더 나은 모습으로 찾아뵙겠습니다
+                </p>
+                
+                <p class="text-base md:text-lg text-gray-500 max-w-xl mx-auto">
+                    현재 페이지를 준비 중입니다.<br>
+                    빠른 시일 내에 멋진 콘텐츠로 돌아오겠습니다.
+                </p>
+                
+                <div class="pt-8">
+                    <a href="courses.html" 
+                       class="btn-hover-scale inline-block px-8 py-3 bg-white text-black font-semibold rounded-lg text-base">
+                        강의 페이지로 이동
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <img src="/logo.png" alt="ALLROUND" class="h-6 md:h-8 w-auto">
+                <div class="text-sm text-gray-400">
+                    © 2024 ALLROUND. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+
