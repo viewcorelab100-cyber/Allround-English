@@ -11,77 +11,89 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Noto+Serif+KR:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     
     <style>
         body {
             font-family: 'Noto Serif KR', serif;
-            background-color: #000;
-            color: #fff;
             margin: 0;
-            line-height: 2.2; /* 여유로운 줄간격 */
-            word-break: keep-all; /* 단어 단위 줄바꿈 */
+            line-height: 2.2;
+            word-break: keep-all;
         }
 
-        /* 스크롤 애니메이션을 위한 기본 상태 */
+        /* Hero Section (Image Only) */
+        .hero-section {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 160px;
+        }
+        @media (max-width: 768px) {
+            .hero-section {
+                padding-top: 140px;
+            }
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .hero-image-container {
+            max-width: 1400px;
+            width: 100%;
+            height: 70%;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        @media (min-width: 768px) {
+            .hero-image-container {
+                padding: 0 4rem;
+            }
+        }
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0.8);
+            transform: scale(1.05);
+            transition: transform 10s ease;
+            border-radius: 0.5rem;
+        }
+        .hero-section:hover .hero-image {
+            transform: scale(1.0);
+        }
+
+        /* Reveal Animation */
         .reveal-text {
             opacity: 0;
             transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); /* 부드러운 감속 커브 */
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
-
-        /* 활성화 상태 */
         .reveal-text.active {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* 텍스트 강조 스타일 */
-        .highlight {
-            font-weight: 600;
-            color: #fff;
-            position: relative;
-            display: inline-block;
+        /* Layout Utilities */
+        .section-padding {
+            padding: 8rem 2rem;
         }
-
-        /* 문단 간 여백 */
-        .text-section {
-            margin-bottom: 25vh; /* 화면 높이의 25% 만큼 여백 */
-            padding: 0 1rem;
-        }
-
-        /* 마지막 섹션 여백 조정 */
-        .text-section:last-child {
-            margin-bottom: 30vh;
-        }
-        
-        /* 텍스트 투명도 계층 */
-        .text-body {
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
-            font-size: 1.05rem;
-        }
-        
-        .text-title {
-            color: #fff;
-            font-size: 1.25rem;
-            font-weight: 500;
-            margin-bottom: 2rem;
-        }
-
-        /* 구분선 스타일 */
-        .divider {
-            width: 1px;
-            height: 60px;
-            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
-            margin: 10vh auto;
-            opacity: 0;
-            transform: scaleY(0);
-            transition: all 1s ease;
-        }
-        .divider.active {
-            opacity: 1;
-            transform: scaleY(1);
+        @media (min-width: 768px) {
+            .section-padding {
+                padding: 10rem 4rem;
+            }
         }
 
         /* 드래그 방지 */
@@ -89,172 +101,353 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        
+        /* Smooth Grayscale Transition */
+        .grayscale-hover {
+            filter: grayscale(100%);
+            transition: filter 0.7s ease;
+        }
+        .grayscale-hover:hover {
+            filter: grayscale(0%);
+        }
+
+        /* Grayscale to Color Animation */
+        .grayscale-animate {
+            filter: grayscale(100%);
+            transition: filter 0.5s ease;
+        }
+        .grayscale-animate.active {
+            filter: grayscale(0%);
+        }
+
+        /* Section Container - 좌우 여백 */
+        .section-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        @media (min-width: 768px) {
+            .section-container {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
     </style>
 </head>
 <body class="no-select">
 
-    <!-- 메인 컨텐츠 컨테이너 -->
-    <main class="max-w-2xl mx-auto pt-[30vh] pb-[20vh] text-center">
-
-        <!-- 섹션 1: 도입부 -->
-        <div class="text-section reveal-text">
-            <p class="text-title">교육은</p>
-            <p class="text-body">재능으로 만들어지는 결과가 아닙니다.</p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                끝까지 걷는 사람만이<br>
-                도달할 수 있는 지점이 있을 뿐입니다.
-            </p>
-        </div>
-
-        <!-- 구분선 -->
-        <div class="divider reveal-text"></div>
-
-        <!-- 섹션 2: 아이와 선생님 -->
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                처음 길에 들어선 아이는<br>
-                방향을 알지 못합니다.<br>
-                <br>
-                어디에 발을 디뎌야 하는지,<br>
-                어디서 멈춰야 하는지도 모릅니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                이 시기에는<br>
-                아이 혼자 감당하게 두지 않습니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                선생님은<br>
-                아이의 옆에 서서<br>
-                같은 속도로 걸으며<br>
-                넘어지는 지점을 함께 확인하고,<br>
-                다시 일어나는 방법을 반복해서 보여줍니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                기초란<br>
-                혼자 견디게 두는 시간이 아니라,<br>
-                <span class="highlight">함께 견디는 시간을 통해 만들어지는 힘</span>이라고<br>
-                믿기 때문입니다.
-            </p>
-        </div>
-
-        <!-- 구분선 -->
-        <div class="divider reveal-text"></div>
-
-        <!-- 섹션 3: 성장과 선생님의 역할 변화 -->
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                어느 순간부터<br>
-                아이의 발걸음은 흔들리지 않기 시작합니다.<br>
-                <br>
-                같은 길을 여러 번 지나며<br>
-                자신만의 균형을 만들고,<br>
-                스스로 속도를 조절하는 법을 익힙니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                이때부터 선생님의 역할은 달라집니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                앞서 가는 대신,<br>
-                <span class="highlight">더 멀리 이어진 길을 보여주는 사람</span>이 됩니다.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body">
-                이미 지나본 사람으로서<br>
-                지금보다 더 긴 거리와,<br>
-                더 긴 시간을 견뎌야 하는 구간을<br>
-                조용히 안내합니다.
-            </p>
-        </div>
-
-        <!-- 구분선 -->
-        <div class="divider reveal-text"></div>
-
-        <!-- 섹션 4: 마지막 목표와 철학 -->
-        <div class="text-section reveal-text">
-            <p class="text-title">마지막 목표는 분명합니다.</p>
-            <p class="text-body">
-                누군가의 손을 잡지 않아도,<br>
-                누군가의 속도에 맞추지 않아도,<br>
-                스스로의 판단으로<br>
-                원하는 방향을 선택하고<br>
-                끝까지 걸어갈 수 있는 사람으로<br>
-                성장시키는 것.
-            </p>
-        </div>
-
-        <div class="text-section reveal-text">
-            <p class="text-body" style="font-size: 1.15rem; line-height: 2.4;">
-                <span style="font-family: 'Playfair Display', serif; letter-spacing: 0.1em; font-size: 0.9em;">ALLROUND</span>가 말하는 교육은<br>
-                <br>
-                <span class="highlight" style="font-size: 1.3rem;">스스로의 기준으로,</span><br>
-                <span class="highlight" style="font-size: 1.3rem;">자신의 길을 끝까지 걸을 수 있게 만드는 일</span>입니다.
-            </p>
-        </div>
-
-        <!-- 섹션 5: 원장 사진 및 커리큘럼 버튼 -->
-        <div class="text-section reveal-text" style="margin-bottom: 20vh;">
-            <!-- 원장 사진 -->
-            <div class="relative w-full max-w-lg mx-auto mb-12 overflow-hidden" style="aspect-ratio: 4/5;">
-                <img src="director.jpg" alt="Director" class="w-full h-full object-cover grayscale opacity-90 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
+            <div class="grid grid-cols-3 items-center mb-4">
+                <!-- 좌측: 모바일 햄버거 메뉴 -->
+                <div class="flex justify-start">
+                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    </button>
+                </div>
+                
+                <!-- 중앙: 로고 (항상 중앙 고정) -->
+                <div class="flex justify-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="/logo.png" alt="ALLROUND" class="h-4 md:h-5 w-auto">
+                    </a>
+                </div>
+                
+                <!-- 우측: Auth 버튼 영역 -->
+                <div class="flex justify-end">
+                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
+                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
+                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm whitespace-nowrap hidden sm:inline">Sign Up</a>
+                    </div>
+                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4 whitespace-nowrap">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
+                    </div>
+                </div>
             </div>
-
-            <!-- CURRICULUM 버튼 -->
-            <a href="curriculum.html" class="inline-block mt-12 px-12 py-4 border border-white text-white font-[Playfair_Display] tracking-[0.2em] text-sm hover:bg-white hover:text-black transition-colors duration-300">
-                CURRICULUM
-            </a>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="about.html" class="nav-link text-white">ABOUT</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="coming-soon.html" class="nav-link text-white">게시판</a>
+            </nav>
         </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="about.html" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
 
-    </main>
+    <!-- 1. Hero Section (Image Only, No Text) -->
+    <section class="hero-section">
+        <div class="hero-image-container">
+            <img src="about11.png" alt="Atmosphere" class="hero-image">
+        </div>
+    </section>
+
+    <!-- 2. Intro Section (Black Background, Center Text) -->
+    <section class="bg-black text-white section-padding text-center">
+        <div class="section-container">
+            <div class="max-w-2xl mx-auto reveal-text">
+                <p class="text-gray-400 mb-6 font-[Playfair_Display]" style="font-size: 22px;">Education</p>
+                <p class="text-lg leading-loose font-light">
+                    교육은 재능으로<br>
+                    만들어지는 결과가 아닙니다.<br>
+                    <br>
+                    끝까지 걷는 사람만이<br>
+                    도달할 수 있는 지점이 있을 뿐입니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Confusion Section (White Background, Image Left / Text Right) -->
+    <section class="bg-white text-black py-12 md:py-20">
+        <div class="section-container flex flex-col md:flex-row min-h-[70vh] gap-8 md:gap-12">
+            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
+                <img src="about2.png" alt="Beginning" class="w-full h-full object-cover grayscale-hover">
+            </div>
+            <div class="w-full md:w-1/2 flex items-center justify-center">
+                <div class="reveal-text px-6">
+                    <p class="text-lg leading-loose text-gray-800">
+                        처음 길에 들어선 아이는<br>
+                        방향을 알지 못합니다.<br>
+                        <br>
+                        어디에 발을 디뎌야 하는지,<br>
+                        어디서 멈춰야 하는지도 모릅니다.<br>
+                        <br>
+                        <span class="font-medium text-black">이 시기에는 아이 혼자 감당하게 두지 않습니다.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Teacher's Role Section (Black Background, Text Left / Image Right) -->
+    <section class="bg-black text-white py-12 md:py-20">
+        <div class="section-container flex flex-col-reverse md:flex-row min-h-[70vh] gap-8 md:gap-12">
+            <div class="w-full md:w-1/2 flex items-center justify-center">
+                <div class="reveal-text text-left md:text-right px-6">
+                    <p class="text-lg leading-loose text-gray-300">
+                        선생님은 아이의 옆에 서서<br>
+                        같은 속도로 걸으며<br>
+                        넘어지는 지점을 함께 확인하고,<br>
+                        다시 일어나는 방법을 반복해서 보여줍니다.<br>
+                        <br>
+                        <span class="text-white font-bold text-xl">
+                            "기초란 혼자 견디게 두는 시간이 아니라,<br>
+                            함께 견디는 시간을 통해 만들어지는 힘"
+                        </span><br>
+                        이라고 믿기 때문입니다.
+                    </p>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
+                <img src="about3.png" alt="Guidance" class="w-full h-full object-cover grayscale-hover opacity-90">
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Growth Section (White Background, Center Text) -->
+    <section class="bg-white text-black section-padding text-center">
+        <div class="section-container">
+            <div class="max-w-2xl mx-auto reveal-text">
+                <p class="text-lg leading-loose text-gray-800">
+                    어느 순간부터<br>
+                    아이의 발걸음은 흔들리지 않기 시작합니다.<br>
+                    <br>
+                    같은 길을 여러 번 지나며<br>
+                    자신만의 균형을 만들고,<br>
+                    스스로 속도를 조절하는 법을 익힙니다.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. New Role Section (Black Background, Image Left / Text Right) -->
+    <section class="bg-black text-white py-12 md:py-20">
+        <div class="section-container flex flex-col md:flex-row min-h-[70vh] gap-8 md:gap-12">
+            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
+                <img src="about4.png" alt="Horizon" class="w-full h-full object-cover grayscale-animate opacity-90" id="about4-image">
+            </div>
+            <div class="w-full md:w-1/2 flex items-center justify-center">
+                <div class="reveal-text px-6">
+                    <p class="text-lg leading-loose text-gray-300">
+                        이때부터 선생님의 역할은 달라집니다.<br>
+                        <br>
+                        앞서 가는 대신,<br>
+                        <span class="text-white font-bold">더 멀리 이어진 길을 보여주는 사람</span>이 됩니다.<br>
+                        <br>
+                        이미 지나본 사람으로서<br>
+                        지금보다 더 긴 거리와,<br>
+                        더 긴 시간을 견뎌야 하는 구간을<br>
+                        조용히 안내합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Final Goal & Philosophy (White Background, Center) -->
+    <section class="bg-white text-black section-padding text-center">
+        <div class="section-container">
+            <div class="max-w-3xl mx-auto reveal-text">
+                <h2 class="text-3xl md:text-4xl font-[Playfair_Display] mb-12">Final Goal</h2>
+                <p class="text-xl leading-loose text-gray-800 mb-12">
+                    누군가의 손을 잡지 않아도,<br>
+                    누군가의 속도에 맞추지 않아도,<br>
+                    스스로의 판단으로 원하는 방향을 선택하고<br>
+                    끝까지 걸어갈 수 있는 사람으로 성장시키는 것.
+                </p>
+            <div class="w-px h-24 bg-black mx-auto my-12 opacity-20"></div>
+            <p class="text-2xl font-serif">
+                <span class="font-[Playfair_Display] tracking-widest text-xl align-middle mr-2">ALLROUND</span>가 말하는 교육은<br>
+                <br>
+                <span class="font-bold">스스로의 기준으로,<br>
+                자신의 길을 끝까지 걸을 수 있게 만드는 일</span>입니다.
+            </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Director Section (Black Background, Director Photo & Biography) -->
+    <section class="bg-black text-white py-20 md:py-32">
+        <div class="section-container flex flex-col md:flex-row gap-12 md:gap-16 items-center">
+            <!-- Director Photo (Left) -->
+            <div class="w-full md:w-5/12 reveal-text">
+                <div class="relative aspect-[4/5] overflow-hidden rounded-lg">
+                    <img src="director.jpg" alt="ALLROUND Director" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-1000">
+                </div>
+            </div>
+            
+            <!-- Director Biography (Right) -->
+            <div class="w-full md:w-7/12 reveal-text">
+                <h2 class="text-3xl md:text-4xl font-[Playfair_Display] mb-8">Director</h2>
+                <div class="space-y-6 text-gray-300 leading-loose">
+                    <p class="text-lg">
+                        <span class="text-white font-medium">올라운드 원장</span>
+                    </p>
+                    
+                    <div class="space-y-3 text-base">
+                        <p>• ㅇㅇㅇ</p>
+                        <p>• ㅇㅇㅇ</p>
+                        <p>• ㅇㅇㅇ</p>
+                        <p>• ㅇㅇㅇ</p>
+                    </div>
+                    
+                    <div class="pt-4 space-y-3 text-base">
+                        <p class="text-white font-medium">주요 저서 및 활동</p>
+                        <p>• ㅇㅇㅇ</p>
+                        <p>• ㅇㅇㅇ</p>
+                        <p>• ㅇㅇㅇ</p>
+                    </div>
+                    
+                    <div class="pt-8">
+                        <a href="curriculum.html" class="inline-block px-12 py-4 border border-white text-white font-[Playfair_Display] tracking-[0.2em] text-sm hover:bg-white hover:text-black transition-all duration-300">
+                            CURRICULUM
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Footer Script -->
     <script src="js/footer.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
 
     <script>
-        // 스크롤 인터랙션 관찰자 설정
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+
+        // Scroll Observer
         document.addEventListener('DOMContentLoaded', () => {
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
-                threshold: 0.15 // 15% 정도 보일 때 트리거
+                threshold: 0.15
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach((entry, index) => {
                     if (entry.isIntersecting) {
-                        // 약간의 시차를 두고 등장 (빠르게 스크롤 시 순차적 느낌)
                         setTimeout(() => {
                             entry.target.classList.add('active');
-                        }, index * 100); // 딜레이를 주면 여러 개가 동시에 보일 때 순차적으로 뜸
-                        
-                        // 한 번 나타나면 관찰 중지 (선택 사항, 계속 감지하려면 이 줄 삭제)
+                        }, 100); 
                         observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
 
-            // 관찰 대상 등록
             const revealElements = document.querySelectorAll('.reveal-text');
             revealElements.forEach(el => observer.observe(el));
+
+            // About4 Image Color Animation (0.5s delay)
+            const about4Image = document.getElementById('about4-image');
+            if (about4Image) {
+                const imageObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                about4Image.classList.add('active');
+                            }, 500); // 0.5초 후 컬러로
+                            imageObserver.unobserve(about4Image);
+                        }
+                    });
+                }, observerOptions);
+                
+                imageObserver.observe(about4Image);
+            }
         });
     </script>
 </body>
