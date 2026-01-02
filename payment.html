@@ -58,29 +58,29 @@
     <header class="fixed top-0 left-0 right-0 bg-black z-50">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
             <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4">
+            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
                 <!-- 좌측: 모바일 햄버거 메뉴 -->
-                <div class="flex justify-start">
+                <div class="flex justify-start items-center">
                     <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
                         <span class="block w-5 h-0.5 bg-white transition-all"></span>
                         <span class="block w-5 h-0.5 bg-white transition-all"></span>
                         <span class="block w-5 h-0.5 bg-white transition-all"></span>
                     </button>
                 </div>
-                
-                <!-- 중앙: 로고 (항상 중앙 고정) -->
-                <div class="flex justify-center">
+
+                <!-- 중앙: 로고 (grid 중앙 고정) -->
+                <div class="flex justify-center items-center">
                     <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="h-8 md:h-10 w-auto">
+                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
                     </a>
                 </div>
-                
+
                 <!-- 우측: Auth 버튼 영역 -->
-                <div class="flex justify-end">
+                <div class="flex justify-end items-center">
                     <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
                         <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
                     </div>
-                    <div id="user-menu" class="hidden flex flex-row items-center space-x-2 md:space-x-4 whitespace-nowrap">
+                    <div id="user-menu" class="hidden items-center space-x-2 md:space-x-4 whitespace-nowrap">
                         <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
                         <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
                         <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
