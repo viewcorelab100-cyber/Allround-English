@@ -105,14 +105,21 @@
             height: 100vh;
             z-index: 9999;
             display: flex;
-            align-items: center; /* master.html: items-end, but here we center for bold effect as requested "로고가 볼드하게" */
-            justify-content: center;
+            align-items: flex-end; /* 하단 정렬 */
+            justify-content: flex-end; /* 우측 정렬 */
+            padding: 2rem; /* 기본 여백 */
             overflow: hidden;
             background-color: #000;
         }
+        
+        @media (min-width: 768px) {
+            #page-loader {
+                padding: 4rem; /* 데스크탑 여백 */
+            }
+        }
 
         .loader-text {
-            font-size: 15vw; 
+            font-size: 12vw; 
             line-height: 1;
             font-weight: 700; /* Bold */
             letter-spacing: -0.04em;
@@ -348,16 +355,18 @@
             gsap.set("#hero-title", { opacity: 0, y: 50 });
             gsap.set("#hero-subtitle", { opacity: 0, y: 30 });
             
+            // 0.5초 대기 -> 로고 페이드인 -> 천천히 위로 (배경과 함께)
             tl.to(".loader-text", {
                 opacity: 1,
                 duration: 1.5,
-                ease: "power2.out"
+                ease: "power2.out",
+                delay: 0.5 // 0.5초 쉬고
             })
             .to("#page-loader", {
-                y: "-100%",
-                duration: 1.5,
+                y: "-100%", // 천천히 위로
+                duration: 1.8,
                 ease: "power3.inOut",
-                delay: 0.5
+                delay: 0.2 // 로고 페이드인 완료 후 살짝 텀 두고 올라감
             })
             // Hero Content Animations start as loader lifts up
             .to("#hero-title", {
