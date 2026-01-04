@@ -95,9 +95,40 @@
             opacity: 0; 
             /* GSAP will handle opacity and transform */
         }
+
+        /* Loading Screen Styles */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 9999;
+            display: flex;
+            align-items: center; /* master.html: items-end, but here we center for bold effect as requested "로고가 볼드하게" */
+            justify-content: center;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        .loader-text {
+            font-size: 15vw; 
+            line-height: 1;
+            font-weight: 700; /* Bold */
+            letter-spacing: -0.04em;
+            color: white; 
+            white-space: nowrap;
+            opacity: 0; 
+            font-family: 'Playfair Display', serif;
+        }
     </style>
 </head>
 <body class="bg-black text-white font-serif antialiased overflow-x-hidden selection:bg-white/20">
+
+    <!-- Page Loader -->
+    <div id="page-loader">
+        <h1 class="loader-text">ALLROUND</h1>
+    </div>
 
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent" id="main-header">
@@ -310,21 +341,38 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // 1. Hero Animation
-            const heroTl = gsap.timeline();
-            heroTl.to("#hero-title", {
+            // 1. Opening Sequence (Loader -> Hero)
+            const tl = gsap.timeline();
+            
+            // Initial states
+            gsap.set("#hero-title", { opacity: 0, y: 50 });
+            gsap.set("#hero-subtitle", { opacity: 0, y: 30 });
+            
+            tl.to(".loader-text", {
+                opacity: 1,
+                duration: 1.5,
+                ease: "power2.out"
+            })
+            .to("#page-loader", {
+                y: "-100%",
+                duration: 1.5,
+                ease: "power3.inOut",
+                delay: 0.5
+            })
+            // Hero Content Animations start as loader lifts up
+            .to("#hero-title", {
                 opacity: 1,
                 y: 0,
                 duration: 1.5,
-                ease: "power3.out",
-                delay: 0.5
-            })
+                ease: "power3.out"
+            }, "-=1.0") // Overlap with loader moving up
             .to("#hero-subtitle", {
                 opacity: 1,
                 y: 0,
                 duration: 1.2,
                 ease: "power3.out"
-            }, "-=1.0");
+            }, "-=1.2");
+
 
             // 2. Parallax Effects
             // Apply parallax to all images with class .parallax-img inside .parallax-container
