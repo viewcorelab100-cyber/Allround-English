@@ -7,454 +7,442 @@
     <title>About - Allround</title>
     
     <!-- Fonts -->
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Noto+Serif+KR:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@200;300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
     
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'], // 한글/본문 (고딕 계열)
+                        serif: ['Playfair Display', 'serif'], // 영문 (Playfair Display)
+                        display: ['Playfair Display', 'serif'], // 타이틀/강조
+                    },
+                    colors: {
+                        brand: {
+                            black: '#000000',
+                            dark: '#111111',
+                            gray: '#333333'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
+        /* 기본 폰트 적용 (본문 - 한글 우선) */
         body {
-            font-family: 'Noto Serif KR', serif;
-            margin: 0;
-            line-height: 2.2;
-            word-break: keep-all;
-        }
-
-        /* 상단바는 aileron 유지 */
-        header, header * {
-            font-family: "aileron", sans-serif;
-        }
-
-        /* Hero Section (Image Only) */
-        .hero-section {
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-            background-color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 160px;
-        }
-        @media (max-width: 768px) {
-            .hero-section {
-                padding-top: 140px;
-            }
-        }
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-            z-index: 1;
-            pointer-events: none;
-        }
-        .hero-image-container {
-            max-width: 1400px;
-            width: 100%;
-            height: 70%;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        @media (min-width: 768px) {
-            .hero-image-container {
-                padding: 0 4rem;
-            }
-        }
-        .hero-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: brightness(0.8);
-            transform: scale(1.05);
-            transition: transform 10s ease;
-            border-radius: 0.5rem;
-        }
-        .hero-section:hover .hero-image {
-            transform: scale(1.0);
-        }
-
-        /* Reveal Animation */
-        .reveal-text {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
-        }
-        .reveal-text.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Layout Utilities */
-        .section-padding {
-            padding: 8rem 2rem;
-        }
-        @media (min-width: 768px) {
-            .section-padding {
-                padding: 10rem 4rem;
-            }
-        }
-
-        /* 드래그 방지 */
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
+            font-family: 'Noto Sans KR', 'Playfair Display', sans-serif;
         }
         
-        /* Smooth Grayscale Transition */
-        .grayscale-hover {
-            filter: grayscale(100%);
-            transition: filter 0.7s ease;
+        /* 타이틀 및 영문 텍스트 (Playfair Display) */
+        h1, h2, .font-serif, .accordion-trigger span {
+            font-family: 'Playfair Display', serif;
         }
-        .grayscale-hover:hover {
-            filter: grayscale(0%);
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
         }
 
-        /* Grayscale to Color Animation */
-        .grayscale-animate {
-            filter: grayscale(100%);
-            transition: filter 0.5s ease;
+        /* Minimal Accordion Styles */
+        .accordion-content {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            /* 패딩은 내부 div에서 처리하여 높이 계산 오류 방지 */
         }
-        .grayscale-animate.active {
-            filter: grayscale(0%);
+        .accordion-content.active {
+            opacity: 1;
+            /* max-height는 inline style 혹은 매우 큰 값으로 CSS 처리 */
+            max-height: 2000px; 
+        }
+        
+        .accordion-trigger:hover .accordion-icon {
+            transform: rotate(90deg);
+        }
+        
+        .accordion-trigger.active .accordion-icon {
+            transform: rotate(135deg);
         }
 
-        /* Section Container - 좌우 여백 */
-        .section-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
+        /* Smooth Text Selection */
+        ::selection {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
-        @media (min-width: 768px) {
-            .section-container {
-                padding-left: 4rem;
-                padding-right: 4rem;
-            }
+
+        /* Image Masking Effect (Optional) */
+        .reveal-img {
+            opacity: 0; 
+            /* GSAP will handle opacity and transform */
         }
     </style>
 </head>
-<body class="no-select">
+<body class="bg-black text-white font-serif antialiased overflow-x-hidden selection:bg-white/20">
 
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
-            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
-                <!-- 좌측: 모바일 햄버거 메뉴 -->
-                <div class="flex justify-start items-center">
-                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    </button>
-                </div>
-
-                <!-- 중앙: 로고 (grid 중앙 고정) -->
-                <div class="flex justify-center items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent" id="main-header">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
+            <div class="flex justify-between items-center">
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1 z-50">
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                </button>
+                
+                <!-- Logo -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none md:flex-1 md:text-center">
+                    <a href="index.html" class="inline-block">
+                        <img src="logo.png" alt="ALLROUND" class="h-5 md:h-6 w-auto brightness-0 invert">
                     </a>
                 </div>
-
-                <!-- 우측: Auth 버튼 영역 -->
-                <div class="flex justify-end items-center">
-                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
-                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm whitespace-nowrap hidden sm:inline">Sign Up</a>
-                    </div>
-                    <div id="user-menu" class="hidden items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
-                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
-                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
+                
+                <!-- Desktop Nav & Auth -->
+                <div class="hidden md:flex items-center space-x-8 md:absolute md:right-6 md:top-6">
+                    <nav class="flex space-x-6 text-sm font-light tracking-wider">
+                        <a href="about.html" class="nav-link text-white hover:text-gray-300 transition-colors">ABOUT</a>
+                        <a href="courses.html" class="nav-link text-white hover:text-gray-300 transition-colors">COURSES</a>
+                    </nav>
+                    <div class="w-px h-4 bg-white/30"></div>
+                    <div id="auth-buttons" class="flex items-center space-x-4 text-xs tracking-widest">
+                        <a href="auth.html" class="text-white hover:text-gray-300 transition-colors">LOGIN</a>
                     </div>
                 </div>
             </div>
-            
-            <!-- 구분선 -->
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            
-            <!-- 데스크톱 네비게이션 -->
-            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="about.html" class="nav-link text-white">ABOUT</a>
-                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="coming-soon.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="coming-soon.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-                <a href="coming-soon.html" class="nav-link text-white">게시판</a>
-            </nav>
         </div>
-        
-        <!-- 모바일 메뉴 (토글) -->
-        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
-            <nav class="px-4 py-6 space-y-4">
-                <a href="about.html" class="block nav-link text-white text-sm py-2">ABOUT</a>
-                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
-                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
-                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
-                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
-                <a href="coming-soon.html" class="block nav-link text-white text-sm py-2">게시판</a>
-            </nav>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-black z-40 hidden flex-col items-center justify-center space-y-8 opacity-0 transition-opacity duration-300">
+            <a href="about.html" class="text-2xl font-serif text-white">ABOUT</a>
+            <a href="courses.html" class="text-2xl font-serif text-white">COURSES</a>
+            <a href="auth.html" class="text-xl font-light text-gray-400 mt-8">LOGIN</a>
         </div>
     </header>
 
-    <!-- 1. Hero Section (Image Only, No Text) -->
-    <section class="hero-section">
-        <div class="hero-image-container">
-            <img src="about11.png" alt="Atmosphere" class="hero-image">
+    <!-- 1. Hero Section (Full Screen Video) -->
+    <section class="relative h-screen w-full overflow-hidden flex items-center justify-center">
+        <!-- Background Video -->
+        <div class="absolute inset-0 z-0">
+            <video class="w-full h-full object-cover" autoplay muted loop playsinline poster="about1.png">
+                <source src="snow.mp4" type="video/mp4">
+                <img src="about1.png" alt="Snowy Field" class="w-full h-full object-cover">
+            </video>
+            <div class="absolute inset-0 bg-black/40"></div>
+            <!-- Gradient to blend with content below -->
+            <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent"></div>
         </div>
-    </section>
-
-    <!-- 2. Intro Section (Black Background, Center Text) -->
-    <section class="bg-black text-white section-padding text-center">
-        <div class="section-container">
-            <div class="max-w-2xl mx-auto reveal-text">
-                <p class="text-gray-400 mb-6 font-[Playfair_Display]" style="font-size: 22px;">Education</p>
-                <p class="text-lg leading-loose font-light">
-                    교육은 재능으로<br>
-                    만들어지는 결과가 아닙니다.<br>
-                    <br>
-                    끝까지 걷는 사람만이<br>
-                    도달할 수 있는 지점이 있을 뿐입니다.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. Confusion Section (White Background, Image Left / Text Right) -->
-    <section class="bg-white text-black py-12 md:py-20">
-        <div class="section-container flex flex-col md:flex-row min-h-[70vh] gap-8 md:gap-12">
-            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
-                <img src="about2.png" alt="Beginning" class="w-full h-full object-cover grayscale-hover">
-            </div>
-            <div class="w-full md:w-1/2 flex items-center justify-center">
-                <div class="reveal-text px-6">
-                    <p class="text-lg leading-loose text-gray-800">
-                        처음 길에 들어선 아이는<br>
-                        방향을 알지 못합니다.<br>
-                        <br>
-                        어디에 발을 디뎌야 하는지,<br>
-                        어디서 멈춰야 하는지도 모릅니다.<br>
-                        <br>
-                        <span class="font-medium text-black">이 시기에는 아이 혼자 감당하게 두지 않습니다.</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Teacher's Role Section (Black Background, Text Left / Image Right) -->
-    <section class="bg-black text-white py-12 md:py-20">
-        <div class="section-container flex flex-col-reverse md:flex-row min-h-[70vh] gap-8 md:gap-12">
-            <div class="w-full md:w-1/2 flex items-center justify-center">
-                <div class="reveal-text text-left md:text-right px-6">
-                    <p class="text-lg leading-loose text-gray-300">
-                        선생님은 아이의 옆에 서서<br>
-                        같은 속도로 걸으며<br>
-                        넘어지는 지점을 함께 확인하고,<br>
-                        다시 일어나는 방법을 반복해서 보여줍니다.<br>
-                        <br>
-                        <span class="text-white font-bold text-xl">
-                            "기초란 혼자 견디게 두는 시간이 아니라,<br>
-                            함께 견디는 시간을 통해 만들어지는 힘"
-                        </span><br>
-                        이라고 믿기 때문입니다.
-                    </p>
-                </div>
-            </div>
-            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
-                <img src="about3.png" alt="Guidance" class="w-full h-full object-cover grayscale-hover opacity-90">
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Growth Section (White Background, Center Text) -->
-    <section class="bg-white text-black section-padding text-center">
-        <div class="section-container">
-            <div class="max-w-2xl mx-auto reveal-text">
-                <p class="text-lg leading-loose text-gray-800">
-                    어느 순간부터<br>
-                    아이의 발걸음은 흔들리지 않기 시작합니다.<br>
-                    <br>
-                    같은 길을 여러 번 지나며<br>
-                    자신만의 균형을 만들고,<br>
-                    스스로 속도를 조절하는 법을 익힙니다.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- 6. New Role Section (Black Background, Image Left / Text Right) -->
-    <section class="bg-black text-white py-12 md:py-20">
-        <div class="section-container flex flex-col md:flex-row min-h-[70vh] gap-8 md:gap-12">
-            <div class="w-full md:w-1/2 relative overflow-hidden rounded-lg">
-                <img src="about4.png" alt="Horizon" class="w-full h-full object-cover grayscale-animate opacity-90" id="about4-image">
-            </div>
-            <div class="w-full md:w-1/2 flex items-center justify-center">
-                <div class="reveal-text px-6">
-                    <p class="text-lg leading-loose text-gray-300">
-                        이때부터 선생님의 역할은 달라집니다.<br>
-                        <br>
-                        앞서 가는 대신,<br>
-                        <span class="text-white font-bold">더 멀리 이어진 길을 보여주는 사람</span>이 됩니다.<br>
-                        <br>
-                        이미 지나본 사람으로서<br>
-                        지금보다 더 긴 거리와,<br>
-                        더 긴 시간을 견뎌야 하는 구간을<br>
-                        조용히 안내합니다.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 7. Final Goal & Philosophy (White Background, Center) -->
-    <section class="bg-white text-black section-padding text-center">
-        <div class="section-container">
-            <div class="max-w-3xl mx-auto reveal-text">
-                <h2 class="text-3xl md:text-4xl font-[Playfair_Display] mb-12">Final Goal</h2>
-                <p class="text-xl leading-loose text-gray-800 mb-12">
-                    누군가의 손을 잡지 않아도,<br>
-                    누군가의 속도에 맞추지 않아도,<br>
-                    스스로의 판단으로 원하는 방향을 선택하고<br>
-                    끝까지 걸어갈 수 있는 사람으로 성장시키는 것.
-                </p>
-            <div class="w-px h-24 bg-black mx-auto my-12 opacity-20"></div>
-            <p class="text-2xl font-serif">
-                <span class="font-[Playfair_Display] tracking-widest text-xl align-middle mr-2">ALLROUND</span>가 말하는 교육은<br>
-                <br>
-                <span class="font-bold">스스로의 기준으로,<br>
-                자신의 길을 끝까지 걸을 수 있게 만드는 일</span>입니다.
+        
+        <!-- Centered Title -->
+        <div class="relative z-10 text-center px-4">
+            <h1 class="text-6xl md:text-9xl font-bold tracking-tighter text-white opacity-0 transform translate-y-10" id="hero-title">
+                ALLROUND
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-300 font-light tracking-widest opacity-0 transform translate-y-4" id="hero-subtitle">
+                Authentic Education Philosophy
             </p>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-70">
+            <div class="animate-bounce text-center">
+                <span class="text-xs tracking-widest uppercase mb-2 block">Scroll</span>
+                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
             </div>
         </div>
     </section>
 
-    <!-- 8. Director Section (Black Background, Director Photo & Biography) -->
-    <section class="bg-black text-white py-20 md:py-32">
-        <div class="section-container flex flex-col md:flex-row gap-12 md:gap-16 items-center">
-            <!-- Director Photo (Left) -->
-            <div class="w-full md:w-5/12 reveal-text">
-                <div class="relative aspect-[4/5] overflow-hidden rounded-lg">
-                    <img src="director.jpg" alt="ALLROUND Director" class="w-full h-full object-cover grayscale hover:grayscale-0 transition duration-1000">
+    <!-- Main Content Wrapper (Continuous Flow) -->
+    <main class="relative w-full overflow-hidden pt-20 pb-40">
+        
+        <!-- Section 1: Right Image, Left Text -->
+        <section class="relative min-h-[90vh] flex items-center py-20">
+            <!-- Parallax Image Container (Freedom Positioning) -->
+            <div class="absolute right-0 top-0 md:right-[5%] md:top-[10%] w-full md:w-[60vw] h-[60vh] md:h-[80vh] overflow-hidden opacity-80 z-0 parallax-container">
+                <img src="p1.jpg" 
+                     alt="Endless Road" 
+                     class="w-full h-full object-cover transition-all duration-700 transform scale-110 parallax-img">
+            </div>
+
+            <!-- Minimal Dropdown Content (Overlapping) -->
+            <div class="relative z-10 w-full max-w-md ml-4 md:ml-[15%] mt-[40vh] md:mt-0 px-6">
+                <div class="accordion-item backdrop-blur-sm bg-black/20 md:bg-transparent border-b border-white/30 pb-2">
+                    <button class="accordion-trigger w-full flex justify-between items-end py-4 text-left group focus:outline-none">
+                        <div>
+                            <span class="block text-[10px] text-gray-400 mb-1 font-serif tracking-[0.2em] uppercase">Philosophy 01</span>
+                            <h2 class="text-[20px] leading-tight font-sans font-thin text-white group-hover:text-gray-200 transition-colors">교육은 재능이 아닙니다</h2>
+                        </div>
+                        <span class="accordion-icon text-xl font-light text-gray-400 transition-transform duration-300 origin-center">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="py-6">
+                            <p class="text-gray-300 text-sm leading-7 font-light font-sans">
+                                교육은 재능으로 만들어지는 결과가 아닙니다. 끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다. 
+                                우리는 빠른 성과보다 단단한 기초를 믿습니다.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
+
+        <!-- Section 2: Left Image, Right Text (Lower) -->
+        <section class="relative min-h-[90vh] flex items-center py-20">
+            <!-- Parallax Image Container -->
+            <div class="absolute left-0 top-[20%] md:left-[5%] md:top-[15%] w-full md:w-[50vw] h-[50vh] md:h-[70vh] overflow-hidden opacity-80 z-0 parallax-container">
+                <img src="p2.jpg" 
+                     alt="Walking Together" 
+                     class="w-full h-full object-cover grayscale transition-all duration-700 transform scale-110 parallax-img">
+            </div>
+
+            <!-- Minimal Dropdown Content -->
+            <div class="relative z-10 w-full max-w-md ml-auto mr-4 md:mr-[15%] mt-[30vh] md:mt-[20vh] px-6">
+                <div class="accordion-item backdrop-blur-sm bg-black/20 md:bg-transparent border-b border-white/30 pb-2">
+                    <button class="accordion-trigger w-full flex justify-between items-end py-4 text-left group focus:outline-none">
+                        <div>
+                            <span class="block text-[10px] text-gray-400 mb-1 font-serif tracking-[0.2em] uppercase">Philosophy 02</span>
+                            <h2 class="text-[20px] leading-tight font-sans font-thin text-white group-hover:text-gray-200 transition-colors">함께 걷는 시간</h2>
+                        </div>
+                        <span class="accordion-icon text-xl font-light text-gray-400 transition-transform duration-300 origin-center">+</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="py-6">
+                            <p class="text-gray-300 text-sm leading-7 font-light font-sans">
+                                처음 길에 들어선 아이는 방향을 알지 못합니다. 
+                                기초란 혼자 견디게 두는 시간이 아니라, 함께 견디는 시간을 통해 만들어지는 힘이라고 믿기 때문입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Text Only (Center) -->
+        <section class="relative min-h-[60vh] flex items-center py-20">
+            <!-- Minimal Dropdown Content - Moved to Left -->
+            <div class="relative z-10 w-full max-w-md px-6 ml-4 md:ml-[15%]">
+                <div class="accordion-item backdrop-blur-sm bg-black/20 md:bg-transparent border-b border-white/30 pb-2 text-center md:text-left">
+                    <button class="accordion-trigger w-full flex justify-between items-end py-4 text-left group focus:outline-none">
+                        <div>
+                            <span class="block text-[10px] text-gray-400 mb-1 font-serif tracking-[0.2em] uppercase">Philosophy 03</span>
+                            <h2 class="text-[20px] leading-tight font-sans font-thin text-white group-hover:text-gray-200 transition-colors">스스로 속도를 조절하는 균형</h2>
+                        </div>
+                        <span class="accordion-icon text-xl font-light text-gray-400 transition-transform duration-300 origin-center">+</span>
+                    </button>
+                    <div class="accordion-content text-left">
+                        <div class="py-6">
+                            <p class="text-gray-300 text-sm leading-7 font-light font-sans">
+                                어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다. 
+                                이미 지나본 사람으로서 더 긴 거리와 시간을 견뎌야 하는 구간을 조용히 안내합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Full Width Image Bottom, Text Top Center -->
+        <section class="relative min-h-[100vh] flex flex-col justify-start items-center pt-32 pb-20">
             
-            <!-- Director Biography (Right) -->
-            <div class="w-full md:w-7/12 reveal-text">
-                <h2 class="text-3xl md:text-4xl font-[Playfair_Display] mb-8">Director</h2>
-                <div class="space-y-6 text-gray-300 leading-loose">
-                    <p class="text-lg">
-                        <span class="text-white font-medium">올라운드 원장</span>
-                    </p>
-                    
-                    <div class="space-y-3 text-base">
-                        <p>• ㅇㅇㅇ</p>
-                        <p>• ㅇㅇㅇ</p>
-                        <p>• ㅇㅇㅇ</p>
-                        <p>• ㅇㅇㅇ</p>
-                    </div>
-                    
-                    <div class="pt-4 space-y-3 text-base">
-                        <p class="text-white font-medium">주요 저서 및 활동</p>
-                        <p>• ㅇㅇㅇ</p>
-                        <p>• ㅇㅇㅇ</p>
-                        <p>• ㅇㅇㅇ</p>
-                    </div>
-                    
-                    <div class="pt-8">
-                        <a href="curriculum.html" class="inline-block px-12 py-4 border border-white text-white font-[Playfair_Display] tracking-[0.2em] text-sm hover:bg-white hover:text-black transition-all duration-300">
-                            CURRICULUM
-                        </a>
+            <!-- Minimal Dropdown Content (Top Center) -->
+            <div class="relative z-20 w-full max-w-lg px-6 mb-20 md:mb-0">
+                <div class="accordion-item backdrop-blur-sm bg-black/20 md:bg-transparent border-b border-white/30 pb-2 text-center md:text-left">
+                    <button class="accordion-trigger w-full flex justify-between items-end py-4 text-left group focus:outline-none">
+                        <div>
+                            <span class="block text-[10px] text-gray-400 mb-1 font-serif tracking-[0.2em] uppercase">Philosophy 04</span>
+                            <h2 class="text-[20px] leading-tight font-sans font-thin text-white group-hover:text-gray-200 transition-colors">끝까지 걸어갈 수 있는 사람</h2>
+                        </div>
+                        <span class="accordion-icon text-xl font-light text-gray-400 transition-transform duration-300 origin-center">+</span>
+                    </button>
+                    <div class="accordion-content text-left">
+                        <div class="py-6">
+                            <p class="text-gray-300 text-sm leading-7 font-light font-sans mb-0">
+                                ALLROUND가 말하는 교육은 스스로의 기준으로, 자신의 길을 끝까지 걸을 수 있게 만드는 일입니다.
+                                누군가의 손을 잡지 않아도, 원하는 방향을 선택하고 끝까지 걸어갈 수 있도록.
+                            </p>
+                        </div>
                     </div>
                 </div>
+                <!-- Curriculum Button - Moved outside accordion to be always visible and clickable -->
+                <div class="text-center mt-[40vh] mb-20 relative z-50">
+                    <a href="curriculum.html" class="btn-hover-scale inline-block px-10 py-4 bg-transparent text-white font-serif border border-white hover:bg-white hover:text-black uppercase tracking-widest transition-all duration-300 text-sm">
+                        Curriculum
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Footer Script -->
-    <script src="js/footer.js"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/auth.js"></script>
+            <!-- Parallax Image Container (Bottom Fullish) -->
+            <div class="absolute bottom-0 left-0 right-0 h-[70vh] md:h-[80vh] overflow-hidden opacity-60 z-0 parallax-container-vertical">
+                <img src="p3.png" 
+                     alt="Standing Alone" 
+                     class="w-full h-full object-cover object-bottom grayscale hover:grayscale-0 transition-all duration-700 transform scale-110 parallax-img">
+                <!-- Gradient Fade Top -->
+                <div class="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black to-transparent"></div>
+            </div>
+        </section>
+
+    </main>
 
     <script>
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                const spans = mobileMenuBtn.querySelectorAll('span');
-                if (!mobileMenu.classList.contains('hidden')) {
-                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
-                    spans[1].style.opacity = '0';
-                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
-                } else {
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                }
-            });
-            
-            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                    const spans = mobileMenuBtn.querySelectorAll('span');
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                });
-            });
-        }
+        // Register ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
 
-        // Scroll Observer
         document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.15
-            };
+            
+            // 1. Hero Animation
+            const heroTl = gsap.timeline();
+            heroTl.to("#hero-title", {
+                opacity: 1,
+                y: 0,
+                duration: 1.5,
+                ease: "power3.out",
+                delay: 0.5
+            })
+            .to("#hero-subtitle", {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "power3.out"
+            }, "-=1.0");
 
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.classList.add('active');
-                        }, 100); 
-                        observer.unobserve(entry.target);
+            // 2. Parallax Effects
+            // Apply parallax to all images with class .parallax-img inside .parallax-container
+            document.querySelectorAll('.parallax-container').forEach(container => {
+                const img = container.querySelector('.parallax-img');
+                
+                // Image Scale & Y Movement
+                gsap.fromTo(img, 
+                    { y: -50, scale: 1.1 },
+                    {
+                        y: 50,
+                        scale: 1.0,
+                        scrollTrigger: {
+                            trigger: container,
+                            start: "top bottom", // when container top enters bottom of viewport
+                            end: "bottom top",   // when container bottom leaves top of viewport
+                            scrub: 1.5           // smooth scrubbing
+                        }
                     }
-                });
-            }, observerOptions);
+                );
+            });
 
-            const revealElements = document.querySelectorAll('.reveal-text');
-            revealElements.forEach(el => observer.observe(el));
+             // Vertical Parallax for the last section
+             const lastContainer = document.querySelector('.parallax-container-vertical');
+             if (lastContainer) {
+                 const img = lastContainer.querySelector('.parallax-img');
+                 gsap.fromTo(img,
+                    { y: -30 },
+                    {
+                        y: 30,
+                        scrollTrigger: {
+                            trigger: lastContainer,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1
+                        }
+                    }
+                 );
+             }
 
-            // About4 Image Color Animation (0.5s delay)
-            const about4Image = document.getElementById('about4-image');
-            if (about4Image) {
-                const imageObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            setTimeout(() => {
-                                about4Image.classList.add('active');
-                            }, 500); // 0.5초 후 컬러로
-                            imageObserver.unobserve(about4Image);
+            // 3. Dropdown (Accordion) Logic
+            const accordions = document.querySelectorAll('.accordion-item');
+
+            accordions.forEach(item => {
+                const button = item.querySelector('.accordion-trigger');
+                const content = item.querySelector('.accordion-content');
+                
+                button.addEventListener('click', () => {
+                    const isActive = button.classList.contains('active');
+                    
+                    // Close all others first (Optional: remove this block if you want multiple open)
+                    accordions.forEach(otherItem => {
+                        const otherBtn = otherItem.querySelector('.accordion-trigger');
+                        const otherContent = otherItem.querySelector('.accordion-content');
+                        if (otherBtn !== button) {
+                            otherBtn.classList.remove('active');
+                            otherContent.classList.remove('active');
+                            otherContent.style.maxHeight = "0";
                         }
                     });
-                }, observerOptions);
-                
-                imageObserver.observe(about4Image);
+
+                    // Toggle current
+                    if (!isActive) {
+                        button.classList.add('active');
+                        content.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    } else {
+                        button.classList.remove('active');
+                        content.classList.remove('active');
+                        content.style.maxHeight = "0";
+                    }
+                });
+            });
+
+            // 4. Header Scroll Effect
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-black/80', 'backdrop-blur-md');
+                    header.classList.remove('bg-transparent');
+                } else {
+                    header.classList.remove('bg-black/80', 'backdrop-blur-md');
+                    header.classList.add('bg-transparent');
+                }
+            });
+
+            // 5. Mobile Menu Logic
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    
+                    if (isHidden) {
+                        mobileMenu.classList.remove('hidden');
+                        setTimeout(() => mobileMenu.classList.remove('opacity-0'), 10);
+                        document.body.style.overflow = 'hidden';
+                        spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                        spans[1].style.opacity = '0';
+                        spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                    } else {
+                        mobileMenu.classList.add('opacity-0');
+                        setTimeout(() => mobileMenu.classList.add('hidden'), 300);
+                        document.body.style.overflow = '';
+                        spans[0].style.transform = 'none';
+                        spans[1].style.opacity = '1';
+                        spans[2].style.transform = 'none';
+                    }
+                });
             }
         });
     </script>
+    
+    <!-- Global Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/footer.js"></script>
 </body>
 </html>
