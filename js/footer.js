@@ -53,7 +53,7 @@ function loadGlobalFooter() {
                             </div>
                             <div class="text-xs text-gray-500 space-y-1 font-light">
                                 <p>대표자: 배은영 | 개인정보보호책임자: 배은영</p>
-                                <p>사업자등록번호: 721-18-02487</p>
+                                <p>사업자등록번호: 560-94-02154</p>
                                 <p>통신판매업신고: 발급 중</p>
                                 <p>주소: 서울 강남구 대치동 943-29 3층 3138호</p>
                                 <p class="pt-2">Email: unyoung15@gmail.com</p>
