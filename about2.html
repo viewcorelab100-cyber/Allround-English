@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Philosophy - ALLROUND</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Poppins:wght@300;400;500;600&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        serif: ['Libre Baskerville', 'serif'],
+                        display: ['Libre Baskerville', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#06432A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #ffffff;
+            color: #111111;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Opening Screen */
+        #opening-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 10000; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .curtain { position: absolute; top: 0; width: 50%; height: 100%; background-color: #000; }
+        #curtain-left { left: 0; }
+        #curtain-right { right: 0; }
+        #opening-logo { position: relative; z-index: 10001; width: 75vw; max-width: 1200px; filter: brightness(0) invert(1); opacity: 0; }
+
+        /* Header Styles */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 1rem; z-index: 50; transition: all 0.5s ease; }
+        header.scrolled { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 1rem 1rem; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
+        .header-logo-img { height: 1.5rem; width: auto; opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease; }
+        header.scrolled .header-logo-img {
+            opacity: 1;
+            filter: brightness(0) invert(16%) sepia(87%) saturate(506%) hue-rotate(114deg) brightness(95%) contrast(104%);
+        }
+        .nav-link { font-family: 'Poppins', sans-serif; font-size: 13px; letter-spacing: 0.1em; transition: color 0.3s ease; }
+
+        /* Hero Section */
+        #hero-section {
+            position: relative; height: 100vh; width: 100%; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hero-video-bg { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; }
+        .hero-video-bg video { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); }
+        .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 1; }
+        #hero-logo-img { position: relative; z-index: 2; width: 75vw; max-width: 1200px; filter: brightness(0) invert(1); opacity: 0; }
+
+        /* Philosophy Sections */
+        .philosophy-section { position: relative; width: 100%; background: #fff; padding-bottom: 12rem; }
+        
+        .big-word-container {
+            padding-top: 20rem; padding-bottom: 5rem;
+            display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .big-word {
+            font-family: 'Libre Baskerville', serif; font-size: 14vw; font-weight: 700;
+            letter-spacing: 0.02em; color: #06432A; line-height: 1; text-transform: uppercase;
+        }
+
+        .section-video-wrapper { padding: 0 10vw; margin-bottom: 6rem; }
+        .section-video-container { position: relative; height: 65vh; width: 100%; overflow: hidden; }
+        .section-video-container video { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Minimal Accordion Structure - Slim & Compact */
+        .philosophy-accordion {
+            max-width: 500px;
+            margin-left: 10vw; /* 좌측 정렬 (영상 좌측 여백과 동일하게) */
+            border-top: 1px solid #eee;
+            opacity: 0; transform: translateY(30px);
+        }
+        .accordion-item { border-bottom: 1px solid #eee; background: #fff; }
+        .accordion-trigger {
+            width: 100%; padding: 1.2rem 0;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: all 0.3s ease; text-align: left;
+        }
+        .accordion-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 0.95rem; line-height: 1.5; font-weight: 700; color: #06432A; /* 브랜드 초록색 및 Bold 적용 */
+            word-break: keep-all; flex: 1; padding-right: 1.5rem;
+        }
+        .accordion-icon { width: 16px; height: 16px; transition: transform 0.4s ease; color: #06432A; flex-shrink: 0; }
+        .accordion-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fff;
+        }
+        .accordion-inner { padding: 0 0 2rem; font-size: 0.9rem; line-height: 2.2; font-weight: 300; color: #555; word-break: keep-all; }
+        
+        .accordion-item.active .accordion-content { max-height: 1000px; }
+        .accordion-item.active .accordion-icon { transform: rotate(45deg); }
+        .accordion-item.active .accordion-title { font-weight: 700; }
+
+        /* Footer Color Fix */
+        footer { background-color: #13372A !important; }
+
+        /* Animations */
+        .reveal-word { opacity: 0; transform: translateY(80px); }
+    </style>
+</head>
+<body class="bg-white">
+
+    <!-- Opening Screen -->
+    <div id="opening-screen">
+        <div id="curtain-left" class="curtain"></div>
+        <div id="curtain-right" class="curtain"></div>
+        <img src="logo.png" id="opening-logo" alt="ALLROUND">
+    </div>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center relative">
+            <div class="md:hidden w-6"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html">
+                    <img src="logo.png" alt="ALLROUND" class="header-logo-img">
+                </a>
+            </div>
+            <div class="hidden md:flex items-center space-x-8 ml-auto">
+                <nav class="flex space-x-6">
+                    <a href="about.html" class="nav-link text-white hover:text-gray-300">ABOUT</a>
+                    <a href="courses.html" class="nav-link text-white hover:text-gray-300">COURSES</a>
+                </nav>
+                <div class="w-px h-4 bg-white/30" id="header-divider"></div>
+                <div id="auth-buttons">
+                    <a href="auth.html" class="nav-link text-white hover:text-gray-300">LOGIN</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero-section">
+        <div class="hero-video-bg">
+            <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
+            <div class="hero-overlay"></div>
+        </div>
+        <img src="logo.png" id="hero-logo-img" alt="ALLROUND">
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        
+        <!-- Section 1: JOURNEY -->
+        <section class="philosophy-section">
+            <div class="big-word-container">
+                <h2 class="big-word reveal-word">Journey</h2>
+            </div>
+            <div class="section-video-wrapper">
+                <div class="section-video-container">
+                    <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="philosophy-accordion reveal-content">
+                <div class="accordion-item">
+                    <div class="accordion-trigger">
+                        <h3 class="accordion-title">교육은 재능으로 만들어지는 결과가 아닙니다.</h3>
+                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다.<br><br>
+                            처음 길에 들어선 아이는 방향을 알지 못합니다.<br>
+                            어디에 발을 디뎌야 하는지, 어디서 멈춰야 하는지도 모릅니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: TOGETHER -->
+        <section class="philosophy-section">
+            <div class="big-word-container">
+                <h2 class="big-word reveal-word">Together</h2>
+            </div>
+            <div class="section-video-wrapper">
+                <div class="section-video-container">
+                    <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="philosophy-accordion reveal-content">
+                <div class="accordion-item">
+                    <div class="accordion-trigger">
+                        <h3 class="accordion-title">이 시기에는 아이 혼자 감당하게 두지 않습니다.</h3>
+                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            선생님은 아이의 옆에 서서 같은 속도로 걸으며 넘어지는 지점을 함께 확인하고,<br>
+                            다시 일어나는 방법을 반복해서 보여줍니다.<br><br>
+                            기초란 혼자 견디게 두는 시간이 아니라,<br>
+                            <strong>함께 견디는 시간을 통해 만들어지는 힘</strong>이라고 믿기 때문입니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: BALANCE -->
+        <section class="philosophy-section">
+            <div class="big-word-container">
+                <h2 class="big-word reveal-word">Balance</h2>
+            </div>
+            <div class="section-video-wrapper">
+                <div class="section-video-container">
+                    <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="philosophy-accordion reveal-content">
+                <div class="accordion-item">
+                    <div class="accordion-trigger">
+                        <h3 class="accordion-title">어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다.</h3>
+                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            같은 길을 여러 번 지나며 자신만의 균형을 만들고,<br>
+                            스스로 속도를 조절하는 법을 익힙니다.<br><br>
+                            이때부터 선생님의 역할은 달라집니다.<br>
+                            앞서 가는 대신, 더 멀리 이어진 길을 보여주는 사람이 됩니다.<br>
+                            이미 지나본 사람으로서 지금보다 더 긴 거리와,<br>
+                            더 긴 시간을 견뎌야 하는 구간을 조용히 안내합니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: ALLROUND -->
+        <section class="philosophy-section">
+            <div class="big-word-container">
+                <h2 class="big-word reveal-word">Allround</h2>
+            </div>
+            <div class="section-video-wrapper">
+                <div class="section-video-container">
+                    <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
+                </div>
+            </div>
+            <div class="philosophy-accordion reveal-content">
+                <div class="accordion-item">
+                    <div class="accordion-trigger">
+                        <h3 class="accordion-title">마지막 목표는 분명합니다.</h3>
+                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner">
+                            누군가의 손을 잡지 않아도, 누군가의 속도에 맞추지 않아도,<br>
+                            스스로의 판단으로 원하는 방향을 선택하고<br>
+                            끝까지 걸어갈 수 있는 사람으로 성장시키는 것.<br><br>
+                            ALLROUND가 말하는 교육은<br>
+                            <strong>스스로의 기준으로, 자신의 길을 끝까지 걸을 수 있게 만드는 일</strong>입니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/footer.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.onload = () => {
+            const tl = gsap.timeline();
+
+            // 1. Opening Sequence
+            tl.to("#opening-logo", { opacity: 1, duration: 2, ease: "power2.inOut" })
+            .addLabel("split")
+            .to("#curtain-left", { xPercent: -100, duration: 1.5, ease: "power3.inOut" }, "split")
+            .to("#curtain-right", { xPercent: 100, duration: 1.5, ease: "power3.inOut" }, "split")
+            .to("#hero-logo-img", { opacity: 1, duration: 0.1 }, "split")
+            .to("#opening-logo", { opacity: 0, duration: 0.5 }, "split+=0.5")
+            .to("#opening-screen", { display: "none", duration: 0 });
+
+            // 2. Header Scroll Effect
+            const header = document.getElementById('main-header');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const divider = document.getElementById('header-divider');
+
+            ScrollTrigger.create({
+                trigger: "#hero-section",
+                start: "bottom 80",
+                onEnter: () => {
+                    header.classList.add('scrolled');
+                    navLinks.forEach(link => { link.classList.remove('text-white'); link.classList.add('text-black'); });
+                    divider.classList.remove('bg-white/30'); divider.classList.add('bg-black/10');
+                },
+                onLeaveBack: () => {
+                    header.classList.remove('scrolled');
+                    navLinks.forEach(link => { link.classList.add('text-white'); link.classList.remove('text-black'); });
+                    divider.classList.add('bg-white/30'); divider.classList.remove('bg-black/10');
+                }
+            });
+
+            // 3. Reveal Animations
+            document.querySelectorAll('.philosophy-section').forEach(section => {
+                const word = section.querySelector('.reveal-word');
+                const content = section.querySelector('.reveal-content');
+                
+                gsap.to(word, {
+                    scrollTrigger: { trigger: section, start: "top 60%", toggleActions: "play none none reverse" },
+                    opacity: 1, y: 0, duration: 1.5, ease: "expo.out"
+                });
+
+                gsap.to(content, {
+                    scrollTrigger: { trigger: content, start: "top 85%", toggleActions: "play none none reverse" },
+                    opacity: 1, y: 0, duration: 1.2, ease: "power3.out"
+                });
+            });
+
+            // 4. Accordion Logic
+            document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const item = trigger.parentElement;
+                    item.classList.toggle('active');
+                    setTimeout(() => ScrollTrigger.refresh(), 600);
+                });
+            });
+        };
+    </script>
+</body>
+</html>
