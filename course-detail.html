@@ -294,7 +294,7 @@
                             <div><span class="text-sm font-semibold text-gray-400">${course.category || 'General'}</span></div>
                             <h1 class="text-4xl md:text-5xl font-bold text-white">${course.title}</h1>
                             <p class="text-lg text-gray-400">${course.description || ''}</p>
-                            <div class="flex items-center space-x-6 text-sm text-gray-500"><span>${course.lessons?.length || 0}개 레슨</span><span>${totalDurationText}</span></div>
+                            <div class="flex items-center space-x-6 text-sm text-gray-500"><span>${course.lessons?.length || 0}개 레슨</span><span>${totalDurationText}</span><span class="text-xs text-gray-600">| 본 강의는 6개월간 제공됩니다.</span></div>
                             ${hasAccess ? `
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-sm"><span class="text-gray-400">수강 진도</span><span class="text-white">${progress?.progress || 0}%</span></div>
