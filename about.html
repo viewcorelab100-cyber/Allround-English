@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>About - Allround</title>
+    <title>About - ALLROUND</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@200;300;400;500;600&family=Noto+Sans+KR:wght@300;400;500&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@100;300;400;500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,16 +23,14 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Noto Sans KR', 'sans-serif'], // 한글/본문 (고딕 계열)
-                        serif: ['Playfair Display', 'serif'], // 영문 (Playfair Display)
-                        display: ['Playfair Display', 'serif'], // 타이틀/강조
-                        poppins: ['Poppins', 'sans-serif'], // 네비게이션, 푸터 영문
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        display: ['Playfair Display', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
                     },
                     colors: {
                         brand: {
-                            black: '#000000',
-                            dark: '#111111',
-                            gray: '#333333'
+                            green: '#06432A'
                         }
                     }
                 }
@@ -40,487 +38,408 @@
         }
     </script>
     <style>
-        /* 기본 폰트 적용 (본문 - 한글 우선) */
         body {
             font-family: 'Noto Sans KR', 'Playfair Display', sans-serif;
-            background-color: #ffffff; /* 배경 흰색으로 변경 */
-            color: #111111; /* 기본 텍스트 검정색으로 변경 */
+            background-color: #ffffff;
+            color: #111111;
+            overflow-x: hidden;
         }
         
-        /* 타이틀 및 영문 텍스트 (Playfair Display) */
-        h1, h2, .font-serif, .accordion-trigger span {
+        h1, h2, h3, .font-serif {
             font-family: 'Playfair Display', serif;
         }
-        
-        /* 네비게이션 폰트 (Poppins) */
-        .nav-link, #auth-buttons a, #hero-subtitle {
-            font-family: 'Poppins', sans-serif;
-            letter-spacing: 0.1em; /* 자간 넓힘 */
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #111;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #666;
-        }
 
-        /* Minimal Accordion Styles */
-        .accordion-content {
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            /* 패딩은 내부 div에서 처리하여 높이 계산 오류 방지 */
-        }
-        .accordion-content.active {
-            opacity: 1;
-            /* max-height는 inline style 혹은 매우 큰 값으로 CSS 처리 */
-            max-height: 2000px; 
-        }
-        
-        .accordion-trigger:hover .accordion-icon {
-            transform: rotate(90deg);
-        }
-        
-        .accordion-trigger.active .accordion-icon {
-            transform: rotate(135deg);
-        }
-
-        /* Smooth Text Selection */
-        ::selection {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-
-        /* Image Masking Effect (Optional) */
-        .reveal-img {
-            opacity: 0; 
-            /* GSAP will handle opacity and transform */
-        }
-
-        /* Loading Screen Styles */
-        #page-loader {
+        /* Opening Screen */
+        #opening-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
-            z-index: 9999;
+            z-index: 10000;
             display: flex;
-            align-items: flex-end; /* 하단 정렬 */
-            justify-content: flex-end; /* 우측 정렬 */
-            padding: 2rem; /* 기본 여백 */
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
-            background-color: #000;
-        }
-        
-        @media (min-width: 768px) {
-            #page-loader {
-                padding: 4rem; /* 데스크탑 여백 */
-            }
         }
 
-        .loader-text {
-            font-size: 12vw; 
-            line-height: 1;
-            font-weight: 700; /* Bold */
-            letter-spacing: -0.04em;
-            color: white; 
-            white-space: nowrap;
-            opacity: 0; 
-            font-family: 'Playfair Display', serif;
+        .curtain {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #000;
+        }
+        #curtain-left { left: 0; }
+        #curtain-right { right: 0; }
+
+        #opening-logo {
+            position: relative;
+            z-index: 10001;
+            width: 40vw;
+            max-width: 600px;
+            filter: brightness(0) invert(1);
+            opacity: 0;
+        }
+
+        /* Header (Full Structure) */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 1rem;
+            z-index: 50;
+            transition: all 0.5s ease;
+        }
+        
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1rem;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+        }
+        
+        .header-logo-img {
+            height: 1.5rem;
+            width: auto;
+            opacity: 0; /* 히어로에서는 로고 안보임 */
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        header.scrolled .header-logo-img {
+            opacity: 1;
+            /* Force Black first, then apply #06432A */
+            filter: brightness(0) invert(16%) sepia(87%) saturate(506%) hue-rotate(114deg) brightness(95%) contrast(104%);
+        }
+
+        /* Footer Color Fix */
+        footer {
+            background-color: #13372A !important;
+        }
+
+        .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        /* Hero Section */
+        #hero-section {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .video-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+
+        #hero-logo-img {
+            position: relative;
+            z-index: 2;
+            width: 40vw;
+            max-width: 600px;
+            filter: brightness(0) invert(1);
+            opacity: 0;
+        }
+
+        /* Parallax & Philosophy */
+        .parallax-container { overflow: hidden; position: relative; }
+        .parallax-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); }
+        .philosophy-text { font-size: 0.875rem; line-height: 2; font-weight: 300; color: #333; }
+        .philosophy-title { font-size: 1.25rem; font-weight: 300; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+        .section-num { font-family: 'Poppins', sans-serif; font-size: 0.75rem; letter-spacing: 0.2em; color: #999; margin-bottom: 0.5rem; display: block; }
+
+        /* Scroll Indicator */
+        .scroll-down {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10;
+            color: white; text-align: center; font-family: 'Poppins', sans-serif; font-size: 10px;
+            letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.7;
+        }
+        .scroll-down svg { width: 20px; height: 20px; margin: 8px auto 0; animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
         }
     </style>
 </head>
-<body class="bg-white text-black font-serif antialiased overflow-x-hidden selection:bg-black/20">
+<body class="bg-white">
 
-    <!-- Page Loader -->
-    <div id="page-loader">
-        <img src="logo.png" alt="ALLROUND" class="w-[20vw] h-auto brightness-0 invert opacity-0 loader-logo">
+    <!-- Opening Screen -->
+    <div id="opening-screen">
+        <div id="curtain-left" class="curtain"></div>
+        <div id="curtain-right" class="curtain"></div>
+        <img src="logo.png" id="opening-logo" alt="ALLROUND">
     </div>
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent" id="main-header">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-6">
-            <div class="flex justify-between items-center">
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1 z-50">
-                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                </button>
-                
-                <!-- Logo -->
-                <div class="absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none md:flex-1 md:text-center">
-                    <a href="index.html" class="inline-block">
-                        <img src="logo.png" alt="ALLROUND" class="h-5 md:h-6 w-auto brightness-0 invert" id="header-logo">
-                    </a>
-                </div>
-                
-                <!-- Desktop Nav & Auth -->
-                <div class="hidden md:flex items-center space-x-8 md:absolute md:right-6 md:top-6">
-                    <nav class="flex space-x-6 text-sm font-light tracking-widest">
-                        <a href="about.html" class="nav-link text-white hover:text-gray-300 transition-colors">ABOUT</a>
-                        <a href="courses.html" class="nav-link text-white hover:text-gray-300 transition-colors">COURSES</a>
-                    </nav>
-                    <div class="w-px h-4 bg-white/30" id="header-divider"></div>
-                    <div id="auth-buttons" class="flex items-center space-x-4 text-xs tracking-widest">
-                        <a href="auth.html" class="text-white hover:text-gray-300 transition-colors">LOGIN</a>
-                    </div>
+    <header id="main-header">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center relative">
+            <!-- Mobile Menu Placeholder -->
+            <div class="md:hidden w-6"></div>
+            
+            <!-- Logo (Centered) -->
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html">
+                    <img src="logo.png" alt="ALLROUND" class="header-logo-img">
+                </a>
+            </div>
+            
+            <!-- Right Elements -->
+            <div class="hidden md:flex items-center space-x-8 ml-auto">
+                <nav class="flex space-x-6">
+                    <a href="about.html" class="nav-link text-white hover:text-gray-300">ABOUT</a>
+                    <a href="courses.html" class="nav-link text-white hover:text-gray-300">COURSES</a>
+                </nav>
+                <div class="w-px h-4 bg-white/30" id="header-divider"></div>
+                <div id="auth-buttons">
+                    <a href="auth.html" class="nav-link text-white hover:text-gray-300">LOGIN</a>
                 </div>
             </div>
-        </div>
-
-        <!-- Mobile Menu Overlay -->
-        <div id="mobile-menu" class="fixed inset-0 bg-black z-40 hidden flex-col items-center justify-center space-y-8 opacity-0 transition-opacity duration-300">
-            <a href="about.html" class="text-2xl font-serif text-white">ABOUT</a>
-            <a href="courses.html" class="text-2xl font-serif text-white">COURSES</a>
-            <a href="auth.html" class="text-xl font-light text-gray-400 mt-8">LOGIN</a>
         </div>
     </header>
 
-    <!-- 1. Hero Section (Full Screen Video) -->
-    <section class="relative h-screen w-full overflow-hidden flex items-center justify-center">
-        <!-- Background Video -->
-        <div class="absolute inset-0 z-0">
-            <video class="w-full h-full object-cover scale-125" autoplay muted loop playsinline poster="about1.png">
+    <!-- Hero Section -->
+    <section id="hero-section">
+        <div class="video-bg">
+            <video autoplay muted loop playsinline poster="about1.png">
                 <source src="snow.mp4" type="video/mp4">
-                <img src="about1.png" alt="Snowy Field" class="w-full h-full object-cover">
             </video>
-            <div class="absolute inset-0 bg-black/40"></div>
-            <!-- Gradient to blend with content below -->
-            <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
+            <div class="hero-overlay"></div>
         </div>
         
-        <!-- Centered Title -->
-        <div class="relative z-10 text-center px-4 flex flex-col items-center">
-            <img src="logo.png" alt="ALLROUND" class="w-[36rem] md:w-[54rem] brightness-0 invert opacity-0 transform translate-y-10" id="hero-title">
-            <p class="mt-8 text-lg md:text-xl text-gray-300 font-light tracking-widest opacity-0 transform translate-y-4" id="hero-subtitle">
-                Authentic Education Philosophy
-            </p>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-70 z-20 text-white">
-            <div class="animate-bounce text-center">
-                <span class="text-xs tracking-widest uppercase mb-2 block">Scroll</span>
-                <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
-            </div>
+        <img src="logo.png" id="hero-logo-img" alt="ALLROUND">
+
+        <div class="scroll-down">
+            Scroll
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
         </div>
     </section>
 
-    <!-- Main Content Wrapper (Continuous Flow) -->
-    <main class="relative w-full overflow-hidden pt-20 pb-40">
+    <!-- Main Content -->
+    <main class="relative w-full overflow-hidden pb-40">
         
-        <!-- Section 1: Right Image, Left Text -->
-        <section class="relative min-h-[90vh] flex flex-col md:flex-row items-center py-20 gap-10 md:gap-0">
-            <!-- Text Content (Left) -->
-            <div class="relative z-10 w-full md:w-5/12 px-6 md:pl-20 order-2 md:order-1">
-                <div class="pb-2">
-                    <div class="w-full py-4 text-left group">
-                        <div>
-                            <span class="block text-gray-500 mb-2 font-poppins tracking-[0.2em] uppercase text-xs">Philosophy <span class="text-xl font-light text-gray-500 ml-1 align-middle">01</span></span>
-                            <h2 class="text-[20px] leading-tight font-sans font-light text-black mb-6">교육은 재능이 아닙니다</h2>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="py-2">
-                            <p class="text-gray-800 text-sm leading-7 font-light font-sans">
-                                교육은 재능으로 만들어지는 결과가 아닙니다.<br>
-                                끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다.<br>
-                                우리는 빠른 성과보다 단단한 기초를 믿습니다.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Section 1 -->
+        <section class="flex flex-col md:flex-row items-center pt-32 pb-20">
+            <div class="w-full md:w-5/12 px-6 md:pl-20 order-2 md:order-1 mt-12 md:mt-0">
+                <span class="section-num">PHILOSOPHY 01</span>
+                <h2 class="philosophy-title">교육은 재능이 아닙니다</h2>
+                <p class="philosophy-text">
+                    교육은 재능으로 만들어지는 결과가 아닙니다.<br>
+                    끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다.
+                </p>
             </div>
-
-            <!-- Image Container (Right) -->
-            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] overflow-hidden opacity-100 z-0 parallax-container order-1 md:order-2">
-                <img src="p1.jpg" 
-                     alt="Endless Road" 
-                     class="w-full h-full object-cover transition-all duration-700 transform scale-110 parallax-img">
+            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] parallax-container order-1 md:order-2">
+                <img src="p1.jpg" alt="Philosophy" class="parallax-img">
             </div>
         </section>
 
-        <!-- Section 2: Left Image, Right Text -->
-        <section class="relative min-h-[90vh] flex flex-col md:flex-row items-center py-20 gap-10 md:gap-0">
-            <!-- Image Container (Left) -->
-            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] overflow-hidden opacity-100 z-0 parallax-container">
-                <img src="p2.jpg" 
-                     alt="Walking Together" 
-                     class="w-full h-full object-cover grayscale transition-all duration-700 transform scale-110 parallax-img">
+        <!-- Section 2 -->
+        <section class="flex flex-col md:flex-row items-center py-20">
+            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] parallax-container">
+                <img src="p2.jpg" alt="Philosophy" class="parallax-img grayscale">
             </div>
-
-            <!-- Text Content (Right) -->
-            <div class="relative z-10 w-full md:w-5/12 px-6 md:pr-20">
-                <div class="pb-2 pl-0 md:pl-10">
-                    <div class="w-full py-4 text-left group">
-                        <div>
-                            <span class="block text-gray-500 mb-2 font-poppins tracking-[0.2em] uppercase text-xs">Philosophy <span class="text-xl font-light text-gray-500 ml-1 align-middle">02</span></span>
-                            <h2 class="text-[20px] leading-tight font-sans font-light text-black mb-6">함께 걷는 시간</h2>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="py-2">
-                            <p class="text-gray-800 text-sm leading-7 font-light font-sans">
-                                처음 길에 들어선 아이는 방향을 알지 못합니다.<br>
-                                기초란 혼자 견디게 두는 시간이 아니라,<br>
-                                함께 견디는 시간을 통해 만들어지는 힘이라고 믿기 때문입니다.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <div class="w-full md:w-5/12 px-6 md:pr-20 md:pl-10 mt-12 md:mt-0">
+                <span class="section-num">PHILOSOPHY 02</span>
+                <h2 class="philosophy-title">방향을 모르는 아이</h2>
+                <p class="philosophy-text">
+                    처음 길에 들어선 아이는 방향을 알지 못합니다.<br>
+                    어디에 발을 디뎌야 하는지, 어디서 멈춰야 하는지도 모릅니다.
+                </p>
             </div>
         </section>
 
-        <!-- Section 3: Left Aligned Text Only -->
-        <section class="relative min-h-[60vh] flex flex-col items-start justify-center py-20">
-            <!-- Text Content (Left) -->
-            <div class="relative z-10 w-full max-w-2xl px-6 md:pl-20">
-                <div class="pb-2 text-left">
-                    <div class="w-full py-4 text-left group">
-                        <div>
-                            <span class="block text-gray-500 mb-2 font-poppins tracking-[0.2em] uppercase text-xs">Philosophy <span class="text-xl font-light text-gray-500 ml-1 align-middle">03</span></span>
-                            <h2 class="text-[20px] leading-tight font-sans font-light text-black mb-6">스스로 속도를 조절하는 균형</h2>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="py-2 text-left">
-                            <p class="text-gray-800 text-sm leading-7 font-light font-sans">
-                                어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다.<br>
-                                이미 지나본 사람으로서 더 긴 거리와 시간을<br>
-                                견뎌야 하는 구간을 조용히 안내합니다.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Section 3 -->
+        <section class="py-32 px-6 text-center bg-gray-50">
+            <div class="max-w-2xl mx-auto">
+                <span class="section-num">PHILOSOPHY 03</span>
+                <h2 class="philosophy-title">함께 견디는 시간</h2>
+                <p class="philosophy-text">
+                    이 시기에는 아이 혼자 감당하게 두지 않습니다. 선생님은 아이의 옆에 서서 같은 속도로 걸으며 넘어지는 지점을 함께 확인하고, 다시 일어나는 방법을 반복해서 보여줍니다.<br><br>
+                    기초란 혼자 견디게 두는 시간이 아니라, <strong>함께 견디는 시간을 통해 만들어지는 힘</strong>이라고 믿기 때문입니다.
+                </p>
             </div>
         </section>
 
-        <!-- Section 4: Full Width Image Bottom, Text Top Center -->
-        <section class="relative min-h-[100vh] flex flex-col justify-start items-center pt-32 pb-20">
-            
-            <!-- Minimal Dropdown Content (Top Center) -->
-            <div class="relative z-20 w-full max-w-lg px-6 mb-20 md:mb-0">
-                <div class="pb-2 text-center">
-                    <div class="w-full py-4 text-center group">
-                        <div>
-                            <span class="block text-gray-500 mb-2 font-poppins tracking-[0.2em] uppercase text-xs">Philosophy <span class="text-xl font-light text-gray-500 ml-1 align-middle">04</span></span>
-                            <h2 class="text-[20px] leading-tight font-sans font-light text-black mb-6">끝까지 걸어갈 수 있는 사람</h2>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="py-2 text-center">
-                            <p class="text-gray-800 text-sm leading-7 font-light font-sans mb-0">
-                                ALLROUND가 말하는 교육은 스스로의 기준으로,<br>
-                                자신의 길을 끝까지 걸을 수 있게 만드는 일입니다.<br>
-                                누군가의 손을 잡지 않아도, 원하는 방향을 선택하고 끝까지 걸어갈 수 있도록.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Curriculum Button - Moved outside accordion to be always visible and clickable -->
-                <div class="text-center mt-[40vh] mb-20 relative z-50">
-                    <a href="curriculum.html" class="btn-hover-scale inline-block px-10 py-4 bg-transparent text-black font-serif border border-black hover:bg-black hover:text-white uppercase tracking-widest transition-all duration-300 text-sm font-poppins">
-                        Curriculum
-                    </a>
-                </div>
+        <!-- Section 4 -->
+        <section class="flex flex-col md:flex-row items-center py-20">
+            <div class="w-full md:w-5/12 px-6 md:pl-20 order-2 md:order-1 mt-12 md:mt-0">
+                <span class="section-num">PHILOSOPHY 04</span>
+                <h2 class="philosophy-title">자신만의 균형</h2>
+                <p class="philosophy-text">
+                    어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다.<br>
+                    같은 길을 여러 번 지나며 자신만의 균형을 만들고, 스스로 속도를 조절하는 법을 익힙니다.
+                </p>
             </div>
+            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] parallax-container order-1 md:order-2">
+                <img src="p3.png" alt="Philosophy" class="parallax-img">
+            </div>
+        </section>
 
-            <!-- Parallax Image Container (Bottom Fullish) -->
-            <div class="absolute bottom-0 left-0 right-0 h-[70vh] md:h-[80vh] overflow-hidden opacity-60 z-0 parallax-container-vertical">
-                <img src="p3.png" 
-                     alt="Standing Alone" 
-                     class="w-full h-full object-cover object-bottom grayscale hover:grayscale-0 transition-all duration-700 transform scale-110 parallax-img">
-                <!-- Gradient Fade Top -->
-                <div class="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-white to-transparent"></div>
+        <!-- Section 5 -->
+        <section class="flex flex-col md:flex-row items-center py-20">
+            <div class="w-full md:w-7/12 h-[50vh] md:h-[80vh] parallax-container">
+                <img src="p1.jpg" alt="Philosophy" class="parallax-img brightness-75">
+            </div>
+            <div class="w-full md:w-5/12 px-6 md:pr-20 md:pl-10 mt-12 md:mt-0">
+                <span class="section-num">PHILOSOPHY 05</span>
+                <h2 class="philosophy-title">더 멀리 이어진 길</h2>
+                <p class="philosophy-text">
+                    이때부터 선생님의 역할은 달라집니다. 앞서 가는 대신, <strong>더 멀리 이어진 길을 보여주는 사람</strong>이 됩니다. 이미 지나본 사람으로서 지금보다 더 긴 거리와, 더 긴 시간을 견뎌야 하는 구간을 조용히 안내합니다.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 6 -->
+        <section class="py-32 px-6 text-center">
+            <div class="max-w-2xl mx-auto">
+                <span class="section-num">PHILOSOPHY 06</span>
+                <h2 class="philosophy-title">스스로 걷는 사람</h2>
+                <p class="philosophy-text">
+                    마지막 목표는 분명합니다. 누군가의 손을 잡지 않아도, 누군가의 속도에 맞추지 않아도, 스스로의 판단으로 원하는 방향을 선택하고 끝까지 걸어갈 수 있는 사람으로 성장시키는 것.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 7 -->
+        <section class="py-40 px-6 text-center bg-black text-white">
+            <div class="max-w-3xl mx-auto">
+                <span class="section-num text-gray-500">PHILOSOPHY 07</span>
+                <h2 class="philosophy-title text-white text-3xl mb-8">ALLROUND의 교육</h2>
+                <p class="philosophy-text text-gray-300 text-lg md:text-xl">
+                    ALLROUND가 말하는 교육은<br>
+                    <strong>스스로의 기준으로, 자신의 길을 끝까지 걸을 수 있게 만드는 일</strong>입니다.
+                </p>
+                <div class="mt-16">
+                    <a href="courses.html" class="inline-block px-10 py-4 border border-white text-white hover:bg-white hover:text-black transition-all tracking-widest text-xs font-poppins uppercase">View Courses</a>
+                </div>
             </div>
         </section>
 
     </main>
 
+    <script src="js/footer.js"></script>
+
     <script>
-        // Register ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Opening Sequence (Loader -> Hero)
+        window.onload = () => {
             const tl = gsap.timeline();
-            
-            // Initial states
-            gsap.set("#hero-title", { opacity: 0, y: 50 });
-            gsap.set("#hero-subtitle", { opacity: 0, y: 30 });
-            
-            // 0.5초 대기 -> 로고 페이드인 -> 천천히 위로 (배경과 함께)
-            tl.to(".loader-logo", { // Changed from .loader-text to .loader-logo
-                opacity: 1,
-                duration: 1.5,
-                ease: "power2.out",
-                delay: 0.5 // 0.5초 쉬고
-            })
-            .to("#page-loader", {
-                y: "-100%", // 천천히 위로
-                duration: 1.8,
-                ease: "power3.inOut",
-                delay: 0.2 // 로고 페이드인 완료 후 살짝 텀 두고 올라감
-            })
-            // Hero Content Animations start as loader lifts up
-            .to("#hero-title", {
-                opacity: 1,
-                y: 0,
-                duration: 1.5,
-                ease: "power3.out"
-            }, "-=1.0") // Overlap with loader moving up
-            .to("#hero-subtitle", {
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power3.out"
-            }, "-=1.2");
 
-
-            // 2. Parallax Effects
-            // Apply parallax to all images with class .parallax-img inside .parallax-container
-            document.querySelectorAll('.parallax-container').forEach(container => {
-                const img = container.querySelector('.parallax-img');
-                
-                // Image Scale & Y Movement
-                gsap.fromTo(img, 
-                    { y: -50, scale: 1.1 },
-                    {
-                        y: 50,
-                        scale: 1.0,
-                        scrollTrigger: {
-                            trigger: container,
-                            start: "top bottom", // when container top enters bottom of viewport
-                            end: "bottom top",   // when container bottom leaves top of viewport
-                            scrub: 1.5           // smooth scrubbing
-                        }
-                    }
-                );
+            // 1. Opening Sequence
+            tl.to("#opening-logo", {
+                opacity: 1,
+                duration: 2,
+                ease: "power2.inOut"
+            })
+            .addLabel("split")
+            .to("#curtain-left", {
+                xPercent: -100,
+                duration: 1.5,
+                ease: "power3.inOut"
+            }, "split")
+            .to("#curtain-right", {
+                xPercent: 100,
+                duration: 1.5,
+                ease: "power3.inOut"
+            }, "split")
+            .to("#hero-logo-img", {
+                opacity: 1,
+                duration: 0.1
+            }, "split")
+            .to("#opening-logo", {
+                opacity: 0,
+                duration: 0.5
+            }, "split+=0.5")
+            .to("#opening-screen", {
+                display: "none",
+                duration: 0
             });
 
-             // Vertical Parallax for the last section
-             const lastContainer = document.querySelector('.parallax-container-vertical');
-             if (lastContainer) {
-                 const img = lastContainer.querySelector('.parallax-img');
-                 gsap.fromTo(img,
-                    { y: -30 },
-                    {
-                        y: 30,
-                        scrollTrigger: {
-                            trigger: lastContainer,
-                            start: "top bottom",
-                            end: "bottom top",
-                            scrub: 1
-                        }
-                    }
-                 );
-             }
-
-            // 3. Dropdown (Accordion) Logic - REMOVED (Static Text now)
-            
-            // 4. Header Scroll Effect
+            // 2. Header Scroll Effect
             const header = document.getElementById('main-header');
-            const logo = document.getElementById('header-logo');
-            const divider = document.getElementById('header-divider');
             const navLinks = document.querySelectorAll('.nav-link');
-            const loginLink = document.querySelector('#auth-buttons a');
-            
-            // Helper to set header colors
-            function setHeaderStyle(isDark) {
-                if (isDark) {
-                    // White Background (Scrolled)
-                    header.classList.add('bg-white');
-                    header.classList.remove('shadow-sm'); // 그림자 제거
-                    header.classList.remove('bg-transparent');
-                    logo.classList.remove('invert'); // Black Logo (keep brightness-0)
-                    divider.classList.remove('bg-white/30');
-                    divider.classList.add('bg-black/30');
+            const divider = document.getElementById('header-divider');
+
+            ScrollTrigger.create({
+                trigger: "#hero-section",
+                start: "bottom 80",
+                onEnter: () => {
+                    header.classList.add('scrolled');
                     navLinks.forEach(link => {
-                        link.classList.remove('text-white', 'hover:text-gray-300');
+                        link.classList.remove('text-white');
                         link.classList.add('text-black', 'hover:text-gray-600');
                     });
-                    loginLink.classList.remove('text-white', 'hover:text-gray-300');
-                    loginLink.classList.add('text-black', 'hover:text-gray-600');
-                    
-                    // Mobile menu button color change needs svg manipulation or class toggle
-                    const mobileBtnSpans = document.querySelectorAll('#mobile-menu-btn span');
-                    mobileBtnSpans.forEach(span => span.classList.remove('bg-white'));
-                    mobileBtnSpans.forEach(span => span.classList.add('bg-black'));
-                    
-                } else {
-                    // Transparent Background (Top)
-                    header.classList.remove('bg-white');
-                    header.classList.remove('shadow-sm'); // 그림자 제거
-                    header.classList.add('bg-transparent');
-                    logo.classList.add('brightness-0', 'invert'); // White Logo
-                    divider.classList.add('bg-white/30');
-                    divider.classList.remove('bg-black/30');
+                    divider.classList.remove('bg-white/30');
+                    divider.classList.add('bg-black/10');
+                },
+                onLeaveBack: () => {
+                    header.classList.remove('scrolled');
                     navLinks.forEach(link => {
-                        link.classList.add('text-white', 'hover:text-gray-300');
+                        link.classList.add('text-white');
                         link.classList.remove('text-black', 'hover:text-gray-600');
                     });
-                    loginLink.classList.add('text-white', 'hover:text-gray-300');
-                    loginLink.classList.remove('text-black', 'hover:text-gray-600');
-                    
-                    const mobileBtnSpans = document.querySelectorAll('#mobile-menu-btn span');
-                    mobileBtnSpans.forEach(span => span.classList.add('bg-white'));
-                    mobileBtnSpans.forEach(span => span.classList.remove('bg-black'));
-                }
-            }
-
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    setHeaderStyle(true);
-                } else {
-                    setHeaderStyle(false);
+                    divider.classList.add('bg-white/30');
+                    divider.classList.remove('bg-black/10');
                 }
             });
 
-            // 5. Mobile Menu Logic
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuBtn && mobileMenu) {
-                mobileMenuBtn.addEventListener('click', () => {
-                    const isHidden = mobileMenu.classList.contains('hidden');
-                    const spans = mobileMenuBtn.querySelectorAll('span');
-                    
-                    if (isHidden) {
-                        mobileMenu.classList.remove('hidden');
-                        setTimeout(() => mobileMenu.classList.remove('opacity-0'), 10);
-                        document.body.style.overflow = 'hidden';
-                        spans[0].style.transform = 'rotate(45deg) translateY(6px)';
-                        spans[1].style.opacity = '0';
-                        spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
-                    } else {
-                        mobileMenu.classList.add('opacity-0');
-                        setTimeout(() => mobileMenu.classList.add('hidden'), 300);
-                        document.body.style.overflow = '';
-                        spans[0].style.transform = 'none';
-                        spans[1].style.opacity = '1';
-                        spans[2].style.transform = 'none';
+            // 3. Parallax Effects
+            document.querySelectorAll('.parallax-container').forEach(container => {
+                const img = container.querySelector('.parallax-img');
+                gsap.to(img, {
+                    yPercent: 20,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: container,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
                     }
                 });
-            }
-        });
+            });
+
+            // 4. Reveal Animations
+            document.querySelectorAll('section').forEach(section => {
+                const elements = section.querySelectorAll('.section-num, .philosophy-title, .philosophy-text');
+                if (elements.length > 0) {
+                    gsap.from(elements, {
+                        y: 30,
+                        opacity: 0,
+                        duration: 1,
+                        stagger: 0.2,
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 80%",
+                            toggleActions: "play none none reverse"
+                        }
+                    });
+                }
+            });
+        };
     </script>
-    
-    <!-- Global Scripts -->
-    <script src="js/supabase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>

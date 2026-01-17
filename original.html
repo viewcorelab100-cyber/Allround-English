@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Original System - ALLROUND</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@700&family=Noto+Sans+KR:wght@100;300;400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        serif: ['Libre Baskerville', 'serif'],
+                        display: ['Libre Baskerville', 'serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#06432A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Opening Screen */
+        #opening-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 10000; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .curtain { position: absolute; top: 0; width: 50%; height: 100%; background-color: #000; }
+        #curtain-left { left: 0; }
+        #curtain-right { right: 0; }
+        #opening-logo { position: relative; z-index: 10001; width: 75vw; max-width: 1200px; filter: brightness(0) invert(1); opacity: 0; }
+
+        /* Header Styles */
+        header { position: fixed; top: 0; left: 0; width: 100%; padding: 1.5rem 1rem; z-index: 50; transition: all 0.5s ease; }
+        header.scrolled { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); padding: 1rem 1rem; box-shadow: 0 1px 0 rgba(255,255,255,0.05); }
+        .header-logo-img { height: 1.5rem; width: auto; opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease; filter: brightness(0) invert(1); }
+        header.scrolled .header-logo-img { opacity: 1; }
+        .nav-link { font-family: 'Poppins', sans-serif; font-size: 13px; letter-spacing: 0.1em; transition: color 0.3s ease; color: #fff; }
+
+        /* Hero Section */
+        #hero-section {
+            position: relative; height: 100vh; width: 100%; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            background-color: #000;
+        }
+        .hero-title {
+            position: relative; z-index: 2; color: #fff; text-align: center;
+        }
+        .hero-title h1 { font-family: 'Libre Baskerville', serif; font-size: 10vw; line-height: 1; margin-bottom: 2rem; }
+        .hero-title p { font-family: 'Poppins', sans-serif; font-weight: 300; letter-spacing: 0.5em; text-transform: uppercase; font-size: 1rem; color: #666; }
+
+        /* Content Sections */
+        .system-section { position: relative; width: 100%; padding: 15rem 0; background: #000; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        .section-title { font-family: 'Libre Baskerville', serif; font-size: 4rem; color: #fff; margin-bottom: 4rem; text-align: center; opacity: 0; transform: translateY(50px); }
+        .section-text { max-width: 800px; margin: 0 auto; text-align: center; font-size: 1.125rem; line-height: 2.4; font-weight: 300; color: #999; word-break: keep-all; opacity: 0; transform: translateY(30px); }
+        .section-text strong { font-weight: 600; color: #fff; }
+
+        /* Atom Diagram Styling */
+        .atom-scene {
+            perspective: 2000px;
+            width: 100%;
+            padding: 6rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+        }
+        
+        .atom-grid {
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Atom Node */
+        .atom-node {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            transform-style: preserve-3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .atom-text {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1rem;
+            color: #fff;
+            letter-spacing: 0.05em;
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 0 15px rgba(0,0,0,1);
+        }
+
+        /* Orbital Rings - Thicker lines */
+        .orbit {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 1.5px solid rgba(255, 255, 255, 0.5); /* 두께 증가 */
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
+
+        .orbit-1 { animation: orbitRotate1 15s infinite linear; }
+        .orbit-2 { animation: orbitRotate2 20s infinite linear; }
+        .orbit-3 { animation: orbitRotate3 25s infinite linear; }
+
+        @keyframes orbitRotate1 {
+            0% { transform: rotateX(65deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(65deg) rotateY(360deg) rotateZ(360deg); }
+        }
+        @keyframes orbitRotate2 {
+            0% { transform: rotateX(-65deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(-65deg) rotateY(360deg) rotateZ(360deg); }
+        }
+        @keyframes orbitRotate3 {
+            0% { transform: rotateX(0deg) rotateY(80deg) rotateZ(0deg); }
+            100% { transform: rotateX(360deg) rotateY(80deg) rotateZ(360deg); }
+        }
+
+        /* Connector Arrows */
+        .atom-arrow {
+            color: rgba(255, 255, 255, 0.4);
+            width: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* Cluster Layout */
+        .atom-cluster {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            align-items: center;
+            transform-style: preserve-3d;
+            padding: 2rem;
+        }
+        .atom-cluster-row {
+            display: flex;
+            gap: 5rem;
+            transform-style: preserve-3d;
+        }
+
+        /* Loop Arrows in Cluster */
+        .loop-arrows {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .loop-svg { width: 100%; height: 100%; overflow: visible; }
+        .loop-path { fill: none; stroke: rgba(255, 255, 255, 0.2); stroke-width: 1.5; stroke-dasharray: 4 4; }
+        .loop-head { fill: rgba(255, 255, 255, 0.2); }
+
+        /* Responsive Flow */
+        @media (max-width: 1024px) {
+            .atom-grid { flex-direction: column; gap: 4rem; }
+            .atom-arrow { transform: rotate(90deg); height: 40px; }
+            .atom-cluster-row { flex-direction: column; gap: 4rem; }
+            .loop-arrows { display: none; } /* 모바일에서는 순환 화살표 숨김 */
+        }
+
+        /* Footer Color Fix */
+        footer { background-color: #13372A !important; }
+
+        @media (max-width: 768px) {
+            .section-title { font-size: 2.5rem; }
+            .hero-title h1 { font-size: 15vw; }
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <!-- Opening Screen -->
+    <div id="opening-screen">
+        <div id="curtain-left" class="curtain"></div>
+        <div id="curtain-right" class="curtain"></div>
+        <img src="logo.png" id="opening-logo" alt="ALLROUND">
+    </div>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center relative">
+            <div class="md:hidden w-6"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html">
+                    <img src="logo.png" alt="ALLROUND" class="header-logo-img">
+                </a>
+            </div>
+            <div class="hidden md:flex items-center space-x-8 ml-auto">
+                <nav class="flex space-x-6">
+                    <a href="about.html" class="nav-link hover:text-gray-300">ABOUT</a>
+                    <a href="courses.html" class="nav-link hover:text-gray-300">COURSES</a>
+                </nav>
+                <div class="w-px h-4 bg-white/20" id="header-divider"></div>
+                <div id="auth-buttons">
+                    <a href="auth.html" class="nav-link hover:text-gray-300">LOGIN</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero-section">
+        <div class="hero-title">
+            <p>Education Excellence</p>
+            <h1>System</h1>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+        
+        <!-- Section 1: Structure (Atom 3D Diagram) -->
+        <section class="system-section overflow-hidden">
+            <div class="container">
+                <h2 class="section-title">Structure</h2>
+                
+                <div class="atom-scene">
+                    <div class="atom-grid">
+                        
+                        <!-- Node 1: Input -->
+                        <div class="atom-node">
+                            <div class="orbit orbit-1"></div>
+                            <div class="orbit orbit-2"></div>
+                            <div class="orbit orbit-3"></div>
+                            <span class="atom-text">Input</span>
+                        </div>
+
+                        <!-- Arrow 1: Horizontal -->
+                        <div class="atom-arrow">
+                            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="0" y1="10" x2="35" y2="10" />
+                                <path d="M30 5l5 5-5 5" />
+                            </svg>
+                        </div>
+
+                        <!-- Center Cluster with Loop Arrows -->
+                        <div class="atom-cluster">
+                            <div class="loop-arrows">
+                                <svg class="loop-svg" viewBox="0 0 400 300">
+                                    <!-- Action to Feedback -->
+                                    <path d="M180,60 Q120,100 100,160" class="loop-path" />
+                                    <polygon points="100,160 97,152 105,154" class="loop-head" />
+                                    
+                                    <!-- Feedback to Revision -->
+                                    <path d="M140,240 Q200,260 260,240" class="loop-path" />
+                                    <polygon points="260,240 252,243 254,235" class="loop-head" />
+
+                                    <!-- Revision to Action -->
+                                    <path d="M300,160 Q280,100 220,60" class="loop-path" />
+                                    <polygon points="220,60 228,63 223,55" class="loop-head" />
+                                </svg>
+                            </div>
+
+                            <!-- Action Node (Top) -->
+                            <div class="atom-node">
+                                <div class="orbit orbit-1"></div>
+                                <div class="orbit orbit-2"></div>
+                                <div class="orbit orbit-3"></div>
+                                <span class="atom-text">Action</span>
+                            </div>
+                            
+                            <div class="atom-cluster-row">
+                                <!-- Feedback Node -->
+                                <div class="atom-node">
+                                    <div class="orbit orbit-1"></div>
+                                    <div class="orbit orbit-2"></div>
+                                    <div class="orbit orbit-3"></div>
+                                    <span class="atom-text">Feedback</span>
+                                </div>
+                                <!-- Revision Node -->
+                                <div class="atom-node">
+                                    <div class="orbit orbit-1"></div>
+                                    <div class="orbit orbit-2"></div>
+                                    <div class="orbit orbit-3"></div>
+                                    <span class="atom-text">Revision</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow 2: Horizontal -->
+                        <div class="atom-arrow">
+                            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <line x1="0" y1="10" x2="35" y2="10" />
+                                <path d="M30 5l5 5-5 5" />
+                            </svg>
+                        </div>
+
+                        <!-- Node 5: Habit -->
+                        <div class="atom-node">
+                            <div class="orbit orbit-1"></div>
+                            <div class="orbit orbit-2"></div>
+                            <div class="orbit orbit-3"></div>
+                            <span class="atom-text">Habit</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section-text mt-20">
+                    올라운드는 상위권을 위한 학원이 아닙니다. <br>
+                    <strong>상위권이 될 수밖에 없는 학습 구조를 만드는 시스템</strong>입니다.<br><br>
+                    작은 루틴 하나가 아이의 학습 태도를 바꾸고,<br>
+                    그 태도가 결국 결과를 만듭니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Density -->
+        <section class="system-section">
+            <div class="container">
+                <h2 class="section-title">Density</h2>
+                
+                <div class="relative w-full h-[400px] flex items-center justify-center mb-16 diagram-reveal opacity-0" style="perspective: 1000px;">
+                    <div class="absolute w-[300px] h-[300px] rounded-full border border-white/5 transform rotateX(60deg) translateZ(-50px)"></div>
+                    <div class="absolute w-[220px] h-[220px] rounded-full border border-white/10 transform rotateX(60deg) translateZ(0px)"></div>
+                    <div class="absolute w-[140px] h-[140px] rounded-full border border-white/20 transform rotateX(60deg) translateZ(50px) flex items-center justify-center">
+                        <span class="transform rotateX(-60deg) font-serif text-white tracking-widest text-sm">FOCUS</span>
+                    </div>
+                </div>
+
+                <div class="section-text">
+                    공부의 밀도는 높게, 관리와 피드백은 현미경처럼 세밀하게.<br>
+                    올라운드는 ‘얼마나 많이 나갔는가’를 묻기 전에 <br>
+                    <strong>누가, 어떻게 따라오고 있는가</strong>를 먼저 봅니다.<br><br>
+                    빠르게 가되, 누구도 놓치지 않기 위해서입니다.<br>
+                    반복 시청, 재도전, 재제출까지 학습자의 속도에 맞춰 <br>
+                    끝까지 완성되도록 설계합니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Environment -->
+        <section class="system-section">
+            <div class="container">
+                <h2 class="section-title">Environment</h2>
+                <div class="section-text">
+                    단순한 학원이 아니라 습관이 실제로 작동하도록 만드는 교육 시스템.<br><br>
+                    공부 습관은 말로 만들어지지 않습니다. <br>
+                    매일 반복되는 관리, 지연 없는 피드백, <br>
+                    그리고 <strong>스스로 다시 생각하게 만드는 구조</strong> 속에서 만들어집니다.<br><br>
+                    올라운드는 아이에게 “열심히 해라”라고 말하지 않습니다.<br>
+                    열심히 할 수밖에 없는 환경을 먼저 설계합니다.
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Care | System | Proof -->
+        <section class="system-section">
+            <div class="container">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                    <div class="reveal-up p-12 border border-white/10 rounded-full aspect-square flex flex-col items-center justify-center relative overflow-hidden group">
+                        <h3 class="font-serif text-2xl mb-6">Care</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed font-light">
+                            매일 숙제 제출<br>모든 과제 확인<br>빠짐없는 채점과 코멘트
+                        </p>
+                    </div>
+                    <div class="reveal-up p-12 border border-white/10 rounded-full aspect-square flex flex-col items-center justify-center relative overflow-hidden group">
+                        <h3 class="font-serif text-2xl mb-6">System</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed font-light">
+                            1차 채점 → 스스로 오답 수정<br>재제출 → 2차 보완 피드백
+                        </p>
+                    </div>
+                    <div class="reveal-up p-12 border border-white/10 rounded-full aspect-square flex flex-col items-center justify-center relative overflow-hidden group">
+                        <h3 class="font-serif text-2xl mb-6">Proof</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed font-light">
+                            결과는 자연스럽게<br>증명됩니다
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-24 text-center section-text !text-white">
+                    합격은 목표가 아니라, 관리와 시스템이 지속된 결과입니다.<br>
+                    <strong>관리 구조가 되면, 공부는 혼자서도 굴러갑니다.</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Daily Cycle -->
+        <section class="system-section">
+            <div class="container">
+                <h2 class="section-title">Daily Cycle</h2>
+                
+                <div class="flex flex-col md:flex-row justify-between items-center max-w-5xl mx-auto gap-8 mb-16 diagram-reveal opacity-0">
+                    <div class="flex-1 w-full p-8 border border-white/10 rounded-2xl bg-white/[0.02] text-center">
+                        <span class="text-[10px] font-poppins text-gray-500 mb-4 block uppercase tracking-widest">Step 01</span>
+                        <p class="text-sm">매일 숙제 제출</p>
+                    </div>
+                    <div class="hidden md:block text-white/20">→</div>
+                    <div class="flex-1 w-full p-8 border border-white/10 rounded-2xl bg-white/[0.02] text-center">
+                        <span class="text-[10px] font-poppins text-gray-500 mb-4 block uppercase tracking-widest">Step 02</span>
+                        <p class="text-sm">24시간 내 피드백</p>
+                    </div>
+                    <div class="hidden md:block text-white/20">→</div>
+                    <div class="flex-1 w-full p-8 border border-white/10 rounded-2xl bg-white/[0.02] text-center">
+                        <span class="text-[10px] font-poppins text-gray-500 mb-4 block uppercase tracking-widest">Step 03</span>
+                        <p class="text-sm">오답 수정 후 재전송</p>
+                    </div>
+                    <div class="hidden md:block text-white/20">→</div>
+                    <div class="flex-1 w-full p-8 border border-white/10 rounded-2xl bg-white/[0.02] text-center">
+                        <span class="text-[10px] font-poppins text-gray-500 mb-4 block uppercase tracking-widest">Step 04</span>
+                        <p class="text-sm">완전 보완 및 심화</p>
+                    </div>
+                </div>
+
+                <div class="section-text">
+                    월·화·수·목 매일 숙제를 제출하면 → 24시간 내 1차 채점 및 피드백 <br>
+                    → 학생 스스로 오답 수정 후 재전송 → 2차 채점으로 완전 보완 <br>
+                    → 본 수업에서 최종 피드백과 심화 학습<br><br>
+                    <strong>즉시 채점. 즉시 피드백. 즉시 보완.</strong><br>
+                    올라운드의 관리는 아이의 ‘오늘 공부’를 그날 완성합니다.
+                </div>
+                <div class="text-center mt-20">
+                    <a href="courses.html" class="inline-block px-12 py-5 border border-white/20 text-white text-[11px] font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-300">View Curriculum</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/footer.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.onload = () => {
+            const tl = gsap.timeline();
+
+            // 1. Opening Sequence
+            tl.to("#opening-logo", { opacity: 1, duration: 2, ease: "power2.inOut" })
+            .addLabel("split")
+            .to("#curtain-left", { xPercent: -100, duration: 1.5, ease: "power3.inOut" }, "split")
+            .to("#curtain-right", { xPercent: 100, duration: 1.5, ease: "power3.inOut" }, "split")
+            .to("#opening-logo", { opacity: 0, duration: 0.5 }, "split+=0.5")
+            .to("#opening-screen", { display: "none", duration: 0 });
+
+            // 2. Header Scroll Effect
+            const header = document.getElementById('main-header');
+            const divider = document.getElementById('header-divider');
+
+            ScrollTrigger.create({
+                trigger: "#hero-section",
+                start: "bottom 80",
+                onEnter: () => {
+                    header.classList.add('scrolled');
+                },
+                onLeaveBack: () => {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // 3. Section Reveal Animations
+            document.querySelectorAll('.system-section').forEach(section => {
+                const title = section.querySelector('.section-title');
+                const text = section.querySelector('.section-text');
+                const atomScene = section.querySelector('.atom-scene');
+                const reveals = section.querySelectorAll('.reveal-up');
+                const diagramReveal = section.querySelectorAll('.diagram-reveal');
+
+                if(title) {
+                    gsap.to(title, {
+                        scrollTrigger: { trigger: title, start: "top 80%", toggleActions: "play none none reverse" },
+                        opacity: 1, y: 0, duration: 1.2, ease: "power3.out"
+                    });
+                }
+
+                if(text) {
+                    gsap.to(text, {
+                        scrollTrigger: { trigger: text, start: "top 85%", toggleActions: "play none none reverse" },
+                        opacity: 1, y: 0, duration: 1, ease: "power3.out", delay: 0.2
+                    });
+                }
+
+                if(atomScene) {
+                    gsap.to(atomScene, {
+                        scrollTrigger: { trigger: atomScene, start: "top 70%", toggleActions: "play none none reverse" },
+                        opacity: 1, duration: 1.5, ease: "power2.out"
+                    });
+                }
+
+                if(diagramReveal.length > 0) {
+                    gsap.to(diagramReveal, {
+                        scrollTrigger: { trigger: diagramReveal[0], start: "top 80%", toggleActions: "play none none reverse" },
+                        opacity: 1, duration: 1.5, ease: "power2.out"
+                    });
+                }
+
+                if(reveals.length > 0) {
+                    gsap.from(reveals, {
+                        scrollTrigger: { trigger: reveals[0], start: "top 85%", toggleActions: "play none none reverse" },
+                        y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
+                    });
+                }
+            });
+        };
+    </script>
+</body>
+</html>

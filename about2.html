@@ -92,34 +92,22 @@
         .section-video-container { position: relative; height: 65vh; width: 100%; overflow: hidden; }
         .section-video-container video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Minimal Accordion Structure - Slim & Compact */
-        .philosophy-accordion {
-            max-width: 500px;
-            margin-left: 10vw; /* 좌측 정렬 (영상 좌측 여백과 동일하게) */
-            border-top: 1px solid #eee;
+        /* Centered Text Structure */
+        .philosophy-text-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
             opacity: 0; transform: translateY(30px);
+            padding: 0 2rem;
         }
-        .accordion-item { border-bottom: 1px solid #eee; background: #fff; }
-        .accordion-trigger {
-            width: 100%; padding: 1.2rem 0;
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: all 0.3s ease; text-align: left;
+        .philosophy-sub-title {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.5rem; line-height: 1.4; font-weight: 700; color: #06432A;
+            margin-bottom: 2.5rem; word-break: keep-all;
         }
-        .accordion-title {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 0.95rem; line-height: 1.5; font-weight: 700; color: #06432A; /* 브랜드 초록색 및 Bold 적용 */
-            word-break: keep-all; flex: 1; padding-right: 1.5rem;
+        .philosophy-description {
+            font-size: 1.05rem; line-height: 2.2; font-weight: 300; color: #555; word-break: keep-all;
         }
-        .accordion-icon { width: 16px; height: 16px; transition: transform 0.4s ease; color: #06432A; flex-shrink: 0; }
-        .accordion-content {
-            max-height: 0; overflow: hidden; transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #fff;
-        }
-        .accordion-inner { padding: 0 0 2rem; font-size: 0.9rem; line-height: 2.2; font-weight: 300; color: #555; word-break: keep-all; }
-        
-        .accordion-item.active .accordion-content { max-height: 1000px; }
-        .accordion-item.active .accordion-icon { transform: rotate(45deg); }
-        .accordion-item.active .accordion-title { font-weight: 700; }
 
         /* Footer Color Fix */
         footer { background-color: #13372A !important; }
@@ -181,20 +169,13 @@
                     <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
                 </div>
             </div>
-            <div class="philosophy-accordion reveal-content">
-                <div class="accordion-item">
-                    <div class="accordion-trigger">
-                        <h3 class="accordion-title">교육은 재능으로 만들어지는 결과가 아닙니다.</h3>
-                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-inner">
-                            끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다.<br><br>
-                            처음 길에 들어선 아이는 방향을 알지 못합니다.<br>
-                            어디에 발을 디뎌야 하는지, 어디서 멈춰야 하는지도 모릅니다.
-                        </div>
-                    </div>
-                </div>
+            <div class="philosophy-text-container reveal-content">
+                <h3 class="philosophy-sub-title">교육은 재능으로 만들어지는 결과가 아닙니다.</h3>
+                <p class="philosophy-description">
+                    끝까지 걷는 사람만이 도달할 수 있는 지점이 있을 뿐입니다.<br><br>
+                    처음 길에 들어선 아이는 방향을 알지 못합니다.<br>
+                    어디에 발을 디뎌야 하는지, 어디서 멈춰야 하는지도 모릅니다.
+                </p>
             </div>
         </section>
 
@@ -208,21 +189,14 @@
                     <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
                 </div>
             </div>
-            <div class="philosophy-accordion reveal-content">
-                <div class="accordion-item">
-                    <div class="accordion-trigger">
-                        <h3 class="accordion-title">이 시기에는 아이 혼자 감당하게 두지 않습니다.</h3>
-                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-inner">
-                            선생님은 아이의 옆에 서서 같은 속도로 걸으며 넘어지는 지점을 함께 확인하고,<br>
-                            다시 일어나는 방법을 반복해서 보여줍니다.<br><br>
-                            기초란 혼자 견디게 두는 시간이 아니라,<br>
-                            <strong>함께 견디는 시간을 통해 만들어지는 힘</strong>이라고 믿기 때문입니다.
-                        </div>
-                    </div>
-                </div>
+            <div class="philosophy-text-container reveal-content">
+                <h3 class="philosophy-sub-title">이 시기에는 아이 혼자 감당하게 두지 않습니다.</h3>
+                <p class="philosophy-description">
+                    선생님은 아이의 옆에 서서 같은 속도로 걸으며 넘어지는 지점을 함께 확인하고,<br>
+                    다시 일어나는 방법을 반복해서 보여줍니다.<br><br>
+                    기초란 혼자 견디게 두는 시간이 아니라,<br>
+                    <strong>함께 견디는 시간을 통해 만들어지는 힘</strong>이라고 믿기 때문입니다.
+                </p>
             </div>
         </section>
 
@@ -236,23 +210,16 @@
                     <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
                 </div>
             </div>
-            <div class="philosophy-accordion reveal-content">
-                <div class="accordion-item">
-                    <div class="accordion-trigger">
-                        <h3 class="accordion-title">어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다.</h3>
-                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-inner">
-                            같은 길을 여러 번 지나며 자신만의 균형을 만들고,<br>
-                            스스로 속도를 조절하는 법을 익힙니다.<br><br>
-                            이때부터 선생님의 역할은 달라집니다.<br>
-                            앞서 가는 대신, 더 멀리 이어진 길을 보여주는 사람이 됩니다.<br>
-                            이미 지나본 사람으로서 지금보다 더 긴 거리와,<br>
-                            더 긴 시간을 견뎌야 하는 구간을 조용히 안내합니다.
-                        </div>
-                    </div>
-                </div>
+            <div class="philosophy-text-container reveal-content">
+                <h3 class="philosophy-sub-title">어느 순간부터 아이의 발걸음은 흔들리지 않기 시작합니다.</h3>
+                <p class="philosophy-description">
+                    같은 길을 여러 번 지나며 자신만의 균형을 만들고,<br>
+                    스스로 속도를 조절하는 법을 익힙니다.<br><br>
+                    이때부터 선생님의 역할은 달라집니다.<br>
+                    앞서 가는 대신, 더 멀리 이어진 길을 보여주는 사람이 됩니다.<br>
+                    이미 지나본 사람으로서 지금보다 더 긴 거리와,<br>
+                    더 긴 시간을 견뎌야 하는 구간을 조용히 안내합니다.
+                </p>
             </div>
         </section>
 
@@ -266,21 +233,19 @@
                     <video autoplay muted loop playsinline><source src="1.mp4" type="video/mp4"></video>
                 </div>
             </div>
-            <div class="philosophy-accordion reveal-content">
-                <div class="accordion-item">
-                    <div class="accordion-trigger">
-                        <h3 class="accordion-title">마지막 목표는 분명합니다.</h3>
-                        <svg class="accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-inner">
-                            누군가의 손을 잡지 않아도, 누군가의 속도에 맞추지 않아도,<br>
-                            스스로의 판단으로 원하는 방향을 선택하고<br>
-                            끝까지 걸어갈 수 있는 사람으로 성장시키는 것.<br><br>
-                            ALLROUND가 말하는 교육은<br>
-                            <strong>스스로의 기준으로, 자신의 길을 끝까지 걸을 수 있게 만드는 일</strong>입니다.
-                        </div>
-                    </div>
+            <div class="philosophy-text-container reveal-content">
+                <h3 class="philosophy-sub-title">마지막 목표는 분명합니다.</h3>
+                <p class="philosophy-description">
+                    누군가의 손을 잡지 않아도, 누군가의 속도에 맞추지 않아도,<br>
+                    스스로의 판단으로 원하는 방향을 선택하고<br>
+                    끝까지 걸어갈 수 있는 사람으로 성장시키는 것.
+                </p>
+                <div class="mt-16">
+                    <p class="philosophy-description mb-10">
+                        ALLROUND가 말하는 교육은<br>
+                        <strong>스스로의 기준으로, 자신의 길을 끝까지 걸을 수 있게 만드는 일</strong>입니다.
+                    </p>
+                    <a href="courses.html" class="inline-block px-10 py-4 bg-brand-green text-white text-[11px] font-medium tracking-[0.2em] uppercase hover:bg-black transition-all duration-300">Curriculum</a>
                 </div>
             </div>
         </section>
@@ -337,15 +302,6 @@
                 gsap.to(content, {
                     scrollTrigger: { trigger: content, start: "top 85%", toggleActions: "play none none reverse" },
                     opacity: 1, y: 0, duration: 1.2, ease: "power3.out"
-                });
-            });
-
-            // 4. Accordion Logic
-            document.querySelectorAll('.accordion-trigger').forEach(trigger => {
-                trigger.addEventListener('click', () => {
-                    const item = trigger.parentElement;
-                    item.classList.toggle('active');
-                    setTimeout(() => ScrollTrigger.refresh(), 600);
                 });
             });
         };

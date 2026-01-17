@@ -4,22 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
-    <title>배너 카드 컴포넌트</title>
+    <title>배너 카드 컴포넌트 & 디자인 시스템</title>
+    
+    <!-- Google Fonts: Playfair Display (English), Noto Sans KR (Korean) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for Interactions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'], // 한글/본문 (고딕 계열)
+                        serif: ['Playfair Display', 'serif'], // 영문 (Playfair Display)
+                        display: ['Playfair Display', 'serif'], // 타이틀/강조
+                    },
+                    borderRadius: {
+                        DEFAULT: '0px',
+                        'none': '0px',
+                        'sm': '0px',
+                        'md': '0px',
+                        'lg': '0px',
+                        'xl': '0px',
+                        '2xl': '0px',
+                        '3xl': '0px',
+                        'full': '0px',
+                    },
+                    colors: {
+                        'brand-black': '#000000',
+                        'brand-white': '#FFFFFF',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* 세리프 폰트 적용 */
+        /* 기본 폰트 적용 (본문 - 한글 우선) */
         body {
+            font-family: 'Noto Sans KR', 'Playfair Display', sans-serif;
+            overflow-x: hidden; /* 가로 스크롤 방지 */
+        }
+        
+        /* 타이틀 및 버튼 폰트 (Playfair Display) */
+        h1, h2, h3, h4, h5, h6, button, .font-display {
             font-family: 'Playfair Display', serif;
         }
-        
-        /* 배경 이미지 오버레이를 위한 커스텀 스타일 */
-        .banner-overlay {
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%);
+
+        /* 영문 텍스트 전용 클래스 */
+        .font-en {
+            font-family: 'Playfair Display', serif;
         }
-        
+
         /* 버튼 호버 효과 */
         .btn-hover-scale {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -29,232 +69,225 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         }
+
+        /* Loading Screen Styles */
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 9999;
+            /* 배경색은 페이지별로 인라인 스타일이나 클래스로 지정 */
+            display: flex;
+            align-items: flex-end; /* 텍스트 하단 정렬 */
+            justify-content: center;
+            overflow: hidden;
+            padding-bottom: 5vh;
+        }
+
+        .loader-text {
+            /* font-size는 JS로 반응형 처리하거나 clamp 사용 추천 */
+            font-size: 18vw; 
+            line-height: 1;
+            font-weight: 400; /* Regular */
+            letter-spacing: -0.04em;
+            color: black; 
+            white-space: nowrap;
+            opacity: 0; /* 초기 상태: 안보임 (Fade In을 위해) */
+            /* transform은 JS로 제어 */
+        }
+        
+        /* 헤더 스타일 (로고 위치 잡기 위함) */
+        header {
+            position: fixed; /* absolute -> fixed (스크롤 시에도 상단 고정, 등장 효과 위해) */
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 1rem;
+            z-index: 50;
+            display: flex;
+            justify-content: center; /* 로고 중앙 정렬 */
+            background: rgba(255, 255, 255, 0.9); /* 배경 추가 (내려올 때 콘텐츠 가림) */
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: black;
+            /* opacity: 0; 제거 (GSAP fromTo로 제어) */
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen py-12 px-4">
-    
-    <div class="max-w-6xl mx-auto space-y-12">
-        
-        <!-- 페이지 헤더 -->
-        <div class="text-center mb-16">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">배너 카드 컴포넌트</h1>
-            <p class="text-gray-600">다양한 스타일의 배너 카드를 확인하세요</p>
-        </div>
+<body class="bg-white min-h-screen">
 
-        <!-- 배너 카드 1: 배경 이미지가 있는 경우 (상단 이미지 + 하단 검은 배경) -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">1. 배경 이미지가 있는 배너 카드</h2>
-            
-            <div class="rounded-2xl overflow-hidden shadow-2xl bg-black">
-                <!-- 상단: 이미지 영역 -->
-                <div class="h-64 bg-cover bg-center" 
-                     style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80');">
-                </div>
-                
-                <!-- 하단: 검은 배경에 흰색 텍스트 (중앙정렬) -->
-                <div class="bg-black p-8 md:p-12 text-white space-y-6 text-center flex flex-col items-center">
-                    
-                    <!-- 뱃지 -->
-                    <div>
-                        <span class="text-sm font-semibold text-white">
-                            NEW
-                        </span>
-                    </div>
-                    
-                    <!-- 타이틀과 본문 -->
-                    <div class="space-y-4">
-                        <h3 class="text-4xl md:text-5xl font-bold leading-tight">
-                            A New Beginning in English Learning
-                        </h3>
-                        <p class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto">
-                            Experience systematic and effective learning with All-Round English. 
-                            Enhance your English skills with a customized curriculum led by native instructors.
-                        </p>
-                    </div>
-                    
-                    <!-- 버튼 그룹 -->
-                    <div class="flex flex-wrap gap-4 pt-4 justify-center">
-                        <button class="btn-hover-scale px-8 py-4 bg-white text-black font-semibold rounded-xl shadow-lg hover:bg-gray-100">
-                            Start Free Trial
-                        </button>
-                        <button class="btn-hover-scale px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white hover:bg-white hover:bg-opacity-10">
-                            Learn More
-                        </button>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- 배너 카드 2: 배경 이미지가 없는 경우 (배경색 #13372A) -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">2. 배경 이미지가 없는 배너 카드</h2>
-            
-            <div class="relative rounded-2xl overflow-hidden shadow-2xl h-96" style="background-color: #13372A;">
-                
-                <!-- 콘텐츠 -->
-                <div class="relative h-full flex flex-col justify-between p-8 md:p-12 text-white">
-                    
-                    <!-- 뱃지 -->
-                    <div class="flex justify-start">
-                        <span class="text-sm font-semibold text-white">
-                            Special Offer
-                        </span>
-                    </div>
-                    
-                    <!-- 타이틀과 본문 -->
-                    <div class="space-y-4">
-                        <h3 class="text-4xl md:text-5xl font-bold leading-tight">
-                            Premium Membership 30% Off
-                        </h3>
-                        <p class="text-lg md:text-xl text-white text-opacity-90 max-w-2xl">
-                            Sign up now and enjoy 30% off for the first 3 months 
-                            with full access to all premium features. 
-                            Don't miss this opportunity!
-                        </p>
-                    </div>
-                    
-                    <!-- 버튼 그룹 -->
-                    <div class="flex flex-wrap gap-4">
-                        <button class="btn-hover-scale px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl shadow-lg hover:shadow-xl hover:bg-gray-100">
-                            Join Now
-                        </button>
-                        <button class="btn-hover-scale px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white hover:bg-white hover:bg-opacity-10">
-                            Compare Plans
-                        </button>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- 배너 카드 3: 배경색 #FFE5E3 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">3. 배경색이 있는 배너 카드</h2>
-            
-            <div class="relative rounded-2xl overflow-hidden shadow-2xl h-96" style="background-color: #FFE5E3;">
-                
-                <!-- 장식 요소 (선택적) -->
-                <div class="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -mr-48 -mt-48"></div>
-                <div class="absolute bottom-0 left-0 w-64 h-64 bg-white opacity-10 rounded-full -ml-32 -mb-32"></div>
-                
-                <!-- 콘텐츠 -->
-                <div class="relative h-full flex flex-col justify-between p-8 md:p-12 text-black">
-                    
-                    <!-- 뱃지 -->
-                    <div class="flex justify-start">
-                        <span class="text-sm font-semibold text-black">
-                            Featured
-                        </span>
-                    </div>
-                    
-                    <!-- 타이틀과 본문 -->
-                    <div class="space-y-4">
-                        <h3 class="text-4xl md:text-5xl font-bold leading-tight text-black">
-                            Transform Your English Skills
-                        </h3>
-                        <p class="text-lg md:text-xl text-black max-w-2xl">
-                            Join thousands of students who have achieved fluency 
-                            through our proven methodology and personalized approach 
-                            to language learning.
-                        </p>
-                    </div>
-                    
-                    <!-- 버튼 그룹 -->
-                    <div class="flex flex-wrap gap-4">
-                        <button class="btn-hover-scale px-8 py-4 bg-black text-white font-semibold rounded-xl shadow-lg hover:bg-opacity-80">
-                            Get Started
-                        </button>
-                        <button class="btn-hover-scale px-8 py-4 bg-transparent text-black font-semibold rounded-xl border-2 border-black hover:bg-black hover:bg-opacity-5">
-                            View Success Stories
-                        </button>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- 배너 카드 4: 블랙 배경에 소프트 핑크 요소 -->
-        <section class="mb-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">4. 블랙 & 소프트 핑크 배너 카드</h2>
-            
-            <div class="relative rounded-2xl overflow-hidden shadow-2xl h-96 bg-black">
-                
-                <!-- 장식 요소 (소프트 핑크) -->
-                <div class="absolute top-0 left-0 w-96 h-96 rounded-full -ml-48 -mt-48" style="background: radial-gradient(circle, rgba(255, 182, 193, 0.2) 0%, transparent 70%);"></div>
-                <div class="absolute bottom-0 right-0 w-80 h-80 rounded-full -mr-40 -mb-40" style="background: radial-gradient(circle, rgba(255, 182, 193, 0.15) 0%, transparent 70%);"></div>
-                
-                <!-- 콘텐츠 -->
-                <div class="relative h-full flex flex-col justify-between p-8 md:p-12">
-                    
-                    <!-- 뱃지 -->
-                    <div class="flex justify-start">
-                        <span class="text-sm font-semibold text-white">
-                            Limited Time
-                        </span>
-                    </div>
-                    
-                    <!-- 타이틀과 본문 -->
-                    <div class="space-y-4">
-                        <h3 class="text-4xl md:text-5xl font-bold leading-tight" style="color: #FFB6C1;">
-                            Exclusive VIP Program
-                        </h3>
-                        <p class="text-lg md:text-xl text-white max-w-2xl">
-                            Unlock premium benefits and personalized coaching sessions 
-                            with our elite instructor team. Elevate your learning experience 
-                            to extraordinary levels.
-                        </p>
-                    </div>
-                    
-                    <!-- 버튼 그룹 -->
-                    <div class="flex flex-wrap gap-4">
-                        <button class="btn-hover-scale px-8 py-4 text-black font-semibold rounded-xl shadow-lg" style="background-color: #FFB6C1;">
-                            Join VIP
-                        </button>
-                        <button class="btn-hover-scale px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white">
-                            Learn About VIP
-                        </button>
-                    </div>
-                    
-                </div>
-            </div>
-        </section>
-
-        <!-- 사용 가이드 -->
-        <section class="bg-white rounded-xl shadow-lg p-8 mt-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">사용 가이드</h2>
-            <div class="prose max-w-none">
-                <h3 class="text-lg font-semibold text-gray-700 mb-2">배너 카드 구성 요소</h3>
-                <ul class="space-y-2 text-gray-600">
-                    <li><strong>뱃지:</strong> 상단에 위치하며 "NEW", "Special Offer" 등 텍스트만 표시 (배경, 테두리, 아이콘 없음)</li>
-                    <li><strong>타이틀:</strong> 큰 세리프 폰트로 주요 메시지 전달 (text-4xl ~ text-5xl)</li>
-                    <li><strong>본문 텍스트:</strong> 타이틀을 보완하는 상세 설명</li>
-                    <li><strong>CTA 버튼:</strong> 주요 행동 유도 버튼 (더 눈에 띄는 색상)</li>
-                    <li><strong>Sub 버튼:</strong> 부가적인 행동 유도 버튼 (투명 또는 아웃라인 스타일)</li>
-                </ul>
-                
-                <h3 class="text-lg font-semibold text-gray-700 mt-6 mb-2">네 가지 배너 카드 스타일</h3>
-                <ul class="space-y-2 text-gray-600">
-                    <li><strong>카드 1:</strong> 상단 이미지 + 하단 검은 배경 (흰색 텍스트, 중앙 정렬)</li>
-                    <li><strong>카드 2:</strong> 전체 배경색 #13372A (어두운 그린, 흰색 텍스트)</li>
-                    <li><strong>카드 3:</strong> 전체 배경색 #FFE5E3 (연한 핑크, 검정 텍스트)</li>
-                    <li><strong>카드 4:</strong> 블랙 배경 (라이트 핑크 #FFB6C1 텍스트 및 버튼)</li>
-                </ul>
-                
-                <h3 class="text-lg font-semibold text-gray-700 mt-6 mb-2">커스터마이징 방법</h3>
-                <ul class="space-y-2 text-gray-600">
-                    <li><strong>배경 이미지 변경:</strong> style="background-image: url('이미지주소')" 수정</li>
-                    <li><strong>배경색 변경:</strong> style="background-color: #색상코드" 수정</li>
-                    <li><strong>폰트:</strong> Playfair Display 세리프 폰트 적용됨</li>
-                    <li><strong>높이 조절:</strong> h-96 (384px), h-64 (256px) 등의 클래스로 조절</li>
-                    <li><strong>반응형:</strong> md: 접두사로 태블릿/데스크톱 스타일 지정</li>
-                </ul>
-            </div>
-        </section>
-
+    <!-- [DESIGN RULE] 1. PAGE LOADER INTERACTION TEMPLATE -->
+    <!-- 애니메이션 로직:
+         1. loader-text Fade In
+         2. page-loader Slide Up
+         3. header Slide Down
+    -->
+    <div id="page-loader" class="bg-white">
+        <h1 class="loader-text font-display">ALLROUND</h1>
     </div>
 
+    <!-- HEADER (Example) -->
+    <header>
+        <a href="#" class="header-logo">ALLROUND</a>
+    </header>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <main id="main-content" class="py-12 px-4 opacity-0 pt-24"> <!-- pt-24로 헤더 공간 확보 -->
+        
+        <div class="max-w-6xl mx-auto space-y-12">
+            
+            <!-- 페이지 헤더 -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl font-normal text-black mb-4 uppercase tracking-widest">Banner Card Components</h1>
+                <p class="text-gray-600 font-en text-xl tracking-wide">Explore various banner styles in classic monochrome</p>
+            </div>
+
+            <!-- 배너 카드 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-normal text-black mb-6 uppercase tracking-wider font-display">1. Image Background Card</h2>
+                <div class="overflow-hidden shadow-2xl bg-black">
+                    <div class="h-64 bg-cover bg-center grayscale" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80');"></div>
+                    <div class="bg-black p-8 md:p-12 text-white space-y-6 text-center flex flex-col items-center">
+                        <div>
+                            <span class="text-sm font-normal text-white uppercase tracking-widest border-b-[0.5px] border-white pb-1 font-display">NEW</span>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-4xl md:text-5xl font-normal leading-tight uppercase tracking-widest font-display">A New Beginning</h3>
+                            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-sans font-light leading-relaxed tracking-wide">
+                                All-Round English와 함께 체계적이고 효과적인 학습을 경험하세요.<br> 
+                                원어민 강사들이 이끄는 맞춤형 커리큘럼으로 영어 실력을 향상시키세요.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-4 pt-4 justify-center">
+                            <button class="btn-hover-scale px-8 py-4 bg-white text-black font-display shadow-lg hover:bg-gray-200 uppercase tracking-widest">Start Free Trial</button>
+                            <button class="btn-hover-scale px-8 py-4 bg-transparent text-white font-display border border-white hover:bg-white hover:text-black uppercase tracking-widest">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 배너 카드 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-normal text-black mb-6 uppercase tracking-wider font-display">2. Solid Background Card</h2>
+                <div class="relative overflow-hidden shadow-2xl h-96 bg-black">
+                    <div class="relative h-full flex flex-col justify-between p-8 md:p-12 text-white">
+                        <div class="flex justify-start">
+                            <span class="text-sm font-normal text-white uppercase tracking-widest border-b-[0.5px] border-white pb-1 font-display">Special Offer</span>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-4xl md:text-5xl font-normal leading-tight uppercase tracking-widest font-display">Premium Membership 30% Off</h3>
+                            <p class="text-lg md:text-xl text-gray-300 max-w-2xl font-sans font-light leading-relaxed tracking-wide">
+                                지금 가입하고 첫 3개월 동안 30% 할인을 받으세요.<br>
+                                모든 프리미엄 기능을 이용할 수 있습니다. 이 기회를 놓치지 마세요!
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-4">
+                            <button class="btn-hover-scale px-8 py-4 bg-white text-black font-display shadow-lg hover:bg-gray-200 uppercase tracking-widest">Join Now</button>
+                            <button class="btn-hover-scale px-8 py-4 bg-transparent text-white font-display border border-white hover:bg-white hover:text-black uppercase tracking-widest">Compare Plans</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 배너 카드 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-normal text-black mb-6 uppercase tracking-wider font-display">3. Light Background Card</h2>
+                <div class="relative overflow-hidden shadow-2xl h-96 bg-white border border-black">
+                    <div class="relative h-full flex flex-col justify-between p-8 md:p-12 text-black">
+                        <div class="flex justify-start">
+                            <span class="text-sm font-normal text-black uppercase tracking-widest border-b-[0.5px] border-black pb-1 font-display">Featured</span>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-4xl md:text-5xl font-normal leading-tight text-black uppercase tracking-widest font-display">Transform Your English Skills</h3>
+                            <p class="text-lg md:text-xl text-gray-800 max-w-2xl font-sans font-light leading-relaxed tracking-wide">
+                                검증된 방법론과 개인 맞춤형 언어 학습 접근 방식을 통해<br>
+                                유창함을 달성한 수천 명의 학생들과 함께하세요.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-4">
+                            <button class="btn-hover-scale px-8 py-4 bg-black text-white font-display shadow-lg hover:bg-gray-800 uppercase tracking-widest">Get Started</button>
+                            <button class="btn-hover-scale px-8 py-4 bg-transparent text-black font-display border border-black hover:bg-black hover:text-white uppercase tracking-widest">View Success Stories</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 사용 가이드 -->
+            <section class="bg-gray-50 border border-black p-8 mt-12">
+                <h2 class="text-2xl font-normal text-black mb-4 uppercase tracking-wide">Global Design System</h2>
+                <div class="prose max-w-none font-sans">
+                    
+                    <h3 class="text-lg font-normal text-black mt-6 mb-2 font-display tracking-wide">1. Page Opening Interaction (Updated)</h3>
+                    <p class="text-gray-700 text-sm mb-4">페이지 진입 시 오프닝 시퀀스 규칙:</p>
+                    <ul class="space-y-2 text-gray-700 list-disc pl-5">
+                        <li><strong>시작:</strong> "ALLROUND" 로고가 화면 하단에서 사르르(Fade In) 나타남.</li>
+                        <li><strong>이동:</strong> 로고가 화면 상단으로 이동하며 작아짐 (헤더 로고 위치로).</li>
+                        <li><strong>전환:</strong> 로고가 상단에 도달할 즈음 배경막이 걷히고(Slide Up), 실제 헤더 로고가 나타남.</li>
+                    </ul>
+
+                    <h3 class="text-lg font-normal text-black mt-6 mb-2 font-display tracking-wide">2. Components</h3>
+                    <ul class="space-y-2 text-gray-700 list-disc pl-5">
+                        <li><strong>Font:</strong> Playfair Display (Regular), Noto Sans KR (Light).</li>
+                        <li><strong>Border:</strong> 모든 요소는 직각(0px), 테두리 두께는 얇게(1px, 0.5px).</li>
+                        <li><strong>Spacing:</strong> 타이틀 자간은 매우 넓게(Tracking Widest).</li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
     <script src="js/footer.js"></script>
+
+    <!-- Page Interaction Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tl = gsap.timeline();
+
+            // 1. 초기 세팅
+            gsap.set("#main-content", { opacity: 0 });
+            gsap.set(".loader-text", { opacity: 0 }); // 처음에 안보임
+
+            // 2. 애니메이션 시퀀스 (수정: 배경과 텍스트가 함께 올라감 + 헤더 하강)
+            tl.to(".loader-text", {
+                opacity: 1,          // 1. 텍스트 천천히 등장
+                duration: 2.0,
+                ease: "power2.out",
+                delay: 0.5
+            })
+            .to("#page-loader", {
+                y: "-100%",          // 2. 배경 전체가 위로 올라감
+                duration: 1.5,
+                ease: "power3.inOut",
+                delay: 0.5
+            })
+            
+            // 3. 콘텐츠 등장 및 헤더 하강
+            .to("#main-content", {
+                opacity: 1,
+                duration: 0.5
+            }, "-=0.5")
+            .fromTo("header", 
+                { y: "-100%" },
+                { 
+                    y: "0%",
+                    opacity: 1,
+                    duration: 1.0, 
+                    ease: "power3.out" 
+                }, 
+            "-=0.5")
+            .to(".header-logo", {     // 로고 등장 확인 사살
+                opacity: 1,
+                duration: 0.5
+            }, "<");
+        });
+    </script>
 </body>
 </html>
-

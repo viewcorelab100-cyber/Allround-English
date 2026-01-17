@@ -30,8 +30,8 @@ function loadGlobalFooter() {
     footer.id = 'allround-footer';
     // Added clear-both to ensure footer is below all floated/flexed content
     // Added left-0 right-0 to ensure full width even with sidebars
-    // CHANGED: bg-black -> bg-[#121212]
-    footer.className = 'bg-[#121212] text-white pt-20 border-t border-white/10 w-full flex flex-col justify-between overflow-hidden relative clear-both font-sans';
+    // CHANGED: bg-[#121212] -> bg-[#13372A] (Brand Green)
+    footer.className = 'bg-[#13372A] text-white pt-20 border-t border-white/10 w-full flex flex-col justify-between overflow-hidden relative clear-both font-sans';
     // Inline style to ensure full width positioning
     footer.style.cssText = 'position: relative; left: 0; right: 0; width: 100vw; margin-left: 0;';
     
@@ -53,20 +53,18 @@ function loadGlobalFooter() {
                             </div>
                             <div class="text-xs text-gray-500 space-y-1 font-light">
                                 <p>대표자: 배은영 | 개인정보보호책임자: 배은영</p>
-                                <p>사업자등록번호: 560-94-02154</p>
-                                <p>통신판매업신고: 발급 중</p>
+                                <div class="flex items-center gap-2">
+                                    <p>사업자등록번호: 560-94-02154</p>
+                                    <a href="#" onclick="openKBEscrowPopup(); return false;" class="inline-block opacity-60 hover:opacity-100 transition-opacity">
+                                        <img 
+                                            src="https://img1.kbstar.com/img/escrow/escrowcmark.gif" 
+                                            alt="KB에스크로 이체 인증마크" 
+                                            class="h-4">
+                                    </a>
+                                </div>
+                                <p>통신판매업신고: 2026-서울강남-00399</p>
                                 <p>주소: 서울 강남구 대치동 943-29 3층 3138호</p>
                                 <p class="pt-2">Email: unyoung15@gmail.com</p>
-                            </div>
-                            
-                            <!-- KB 에스크로 인증마크 -->
-                            <div class="pt-4">
-                                <a href="#" onclick="openKBEscrowPopup(); return false;" class="inline-block opacity-60 hover:opacity-100 transition-opacity">
-                                    <img 
-                                        src="https://img1.kbstar.com/img/escrow/escrowcmark.gif" 
-                                        alt="KB에스크로 이체 인증마크" 
-                                        class="h-8">
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -92,7 +90,8 @@ function loadGlobalFooter() {
                     <h4 class="font-bold mb-6 text-sm tracking-wider text-gray-500 uppercase font-[Poppins]">LEGAL</h4>
                     <ul class="space-y-3 text-sm font-light font-[Poppins] tracking-wider">
                         <li><a href="terms.html" class="hover:text-white text-gray-400 transition-colors">Terms of Service</a></li>
-                        <li><a href="privacy.html" class="hover:text-white text-gray-400 transition-colors font-semibold">Privacy Policy</a></li>
+                        <li><a href="privacy.html" class="hover:text-white text-gray-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="refund.html" class="hover:text-white text-gray-400 transition-colors">Refund Policy</a></li>
                     </ul>
                 </div>
                 
@@ -108,17 +107,17 @@ function loadGlobalFooter() {
             </div>
 
             <!-- Bottom Copyright Line (Moved up before the big text to avoid overlay issues) -->
-             <div class="flex flex-col md:flex-row justify-between items-center md:items-end border-t border-white/10 pt-6 pb-8 md:pb-12 font-[Poppins]">
+             <div class="flex flex-col md:flex-row justify-between items-center md:items-end border-t border-white/10 pt-4 pb-2 md:pb-4 font-[Poppins]">
                 <div class="flex flex-col gap-1">
                     <p class="text-[10px] text-gray-600 uppercase tracking-widest">&copy; 2025 ALLROUND. ALL RIGHTS RESERVED.</p>
                 </div>
-                <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-2 md:mt-0">ENGLISH COMMUNICATION TRAINING</p>
+                <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-1 md:mt-0">ENGLISH COMMUNICATION TRAINING</p>
             </div>
 
         </div>
 
         <!-- Huge Brand Name (At the very bottom, flush) -->
-        <div class="w-full leading-none select-none pointer-events-none mt-auto flex justify-end">
+        <div class="w-full leading-none select-none pointer-events-none mt-0 flex justify-end">
             <img src="logo.png" alt="ALLROUND" class="w-[70vw] h-auto brightness-0 invert opacity-90">
         </div>
     `;
