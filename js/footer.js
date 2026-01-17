@@ -64,7 +64,7 @@ function loadGlobalFooter() {
                                 </div>
                                 <p>통신판매업신고: 2026-서울강남-00399</p>
                                 <p>주소: 서울 강남구 대치동 943-29 3층 3138호</p>
-                                <p class="pt-2">Email: unyoung15@gmail.com</p>
+                                <p>Tel: 0507-1339-3823 | Email: unyoung15@gmail.com</p>
                             </div>
                         </div>
                     </div>
