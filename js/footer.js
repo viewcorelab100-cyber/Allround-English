@@ -52,6 +52,7 @@ function loadGlobalFooter() {
                                 <img src="logo.png" alt="ALLROUND" class="h-6 w-auto brightness-0 invert">
                             </div>
                             <div class="text-xs text-gray-500 space-y-1 font-light">
+                                <p>상호명: 올라운드원격학원</p>
                                 <p>대표자: 배은영 | 개인정보보호책임자: 배은영</p>
                                 <div class="flex items-center gap-2">
                                     <p>사업자등록번호: 560-94-02154</p>
@@ -63,7 +64,7 @@ function loadGlobalFooter() {
                                     </a>
                                 </div>
                                 <p>통신판매업신고: 2026-서울강남-00399</p>
-                                <p>주소: 서울 강남구 대치동 943-29 3층 3138호</p>
+                                <p>주소: 서울특별시 강남구 테헤란로86길 15, 3층 3138호(대치동, 동구빌딩)</p>
                                 <p>Tel: 0507-1339-3823 | Email: unyoung15@gmail.com</p>
                             </div>
                         </div>
