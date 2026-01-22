@@ -1142,12 +1142,13 @@
                             } else if (submission.status === 'returned') {
                                 imageStatus = 'returned';
                             } else {
-                                imageStatus = 'pending';
+                                imageStatus = 'submitted'; // 제출됨 (채점 전)
                             }
                         }
 
-                        // 전체 완료 여부 판단
-                        const isCompleted = checklistCount === 3 && imageStatus === 'graded' && watchRate >= 80 && (quizTotal === 0 || quizScore >= 60);
+                        // 전체 완료 여부 판단 (이미지는 제출만 해도 완료로 인정)
+                        const imageComplete = imageStatus === 'submitted' || imageStatus === 'graded';
+                        const isCompleted = checklistCount === 3 && imageComplete && watchRate >= 80 && (quizTotal === 0 || quizScore >= 60);
                         const hasActivity = submission || prog || quizzes.length > 0;
 
                         allSubmissions.push({
@@ -1217,8 +1218,8 @@
         }
 
         function updateAssignmentStats() {
-            const pending = allSubmissions.filter(s => 
-                (s.imageStatus === 'pending') || 
+            const pending = allSubmissions.filter(s =>
+                (s.imageStatus === 'submitted') ||
                 (s.hasActivity && !s.isCompleted && s.imageStatus !== 'graded')
             ).length;
             const graded = allSubmissions.filter(s => s.imageStatus === 'graded' || s.isCompleted).length;
@@ -1261,8 +1262,8 @@
 
             // 상태별 필터
             if (currentAssignmentFilter === 'pending') {
-                filtered = filtered.filter(s => 
-                    (s.imageStatus === 'pending') || 
+                filtered = filtered.filter(s =>
+                    (s.imageStatus === 'submitted') ||
                     (s.hasActivity && !s.isCompleted && s.imageStatus !== 'graded')
                 );
                 console.log('대기중 필터 후:', filtered.length, '건');
@@ -1379,8 +1380,8 @@
                     imageBadge = `<span class="inline-block px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">${score}점</span>`;
                 } else if (sub.imageStatus === 'returned') {
                     imageBadge = '<span class="inline-block px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs whitespace-nowrap">재제출</span>';
-                } else if (sub.imageStatus === 'pending') {
-                    imageBadge = '<span class="inline-block px-2 py-1 bg-orange-500 bg-opacity-20 text-orange-400 rounded text-xs whitespace-nowrap">대기</span>';
+                } else if (sub.imageStatus === 'submitted') {
+                    imageBadge = '<span class="inline-block px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-xs whitespace-nowrap">제출완료</span>';
                 }
 
                 const imageDisplay = `
