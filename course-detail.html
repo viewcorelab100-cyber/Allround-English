@@ -384,10 +384,23 @@
                                         </p>
                                     </div>
                                 ` : `
-                                    <div class="p-8 border border-white/10 rounded-lg space-y-8">
-                                        <div class="space-y-1">
-                                            <span class="text-[10px] uppercase tracking-widest text-gray-500 block mb-2">Investment</span>
-                                            <div class="text-4xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</div>
+                                    <div class="p-8 border border-white/10 rounded-lg space-y-6">
+                                        <div class="space-y-4">
+                                            <span class="text-[10px] uppercase tracking-widest text-gray-500 block">Investment</span>
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm text-gray-400">강의비</span>
+                                                    <span class="text-xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</span>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm text-gray-400">교재비</span>
+                                                    <span class="text-xl font-bold text-white">₩${(course.textbook_price || 0).toLocaleString()}</span>
+                                                </div>
+                                                <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                                                    <span class="text-sm text-gray-300">총 금액</span>
+                                                    <span class="text-2xl font-bold text-yellow-400">₩${((course.price || 0) + (course.textbook_price || 0)).toLocaleString()}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                         <button onclick="handlePurchase()" class="btn-primary w-full">
                                             Enroll Now
@@ -441,16 +454,65 @@
         async function loadCourseDetail() {
             const courseId = getCourseId();
             if (!courseId) { window.location.href = 'courses.html'; return; }
+            
             const courseResult = await getCourseById(courseId);
-            if (!courseResult.success) { document.getElementById('course-content').innerHTML = `<div class="text-center text-gray-500 py-20"><p class="text-xl mb-4">강의를 찾을 수 없습니다.</p><a href="courses.html" class="text-white underline">강의 목록으로 돌아가기</a></div>`; return; }
+            if (!courseResult.success) { 
+                document.getElementById('course-content').innerHTML = `<div class="text-center text-gray-500 py-20"><p class="text-xl mb-4">강의를 찾을 수 없습니다.</p><a href="courses.html" class="text-white underline">강의 목록으로 돌아가기</a></div>`; 
+                return; 
+            }
+            
             currentCourse = courseResult.data;
+            const visibility = currentCourse.visibility || 'public';
             const user = await getCurrentUser();
+            
+            // 비공개 강의 접근 권한 체크
+            if (visibility === 'private') {
+                if (!user) {
+                    // 로그인하지 않은 경우
+                    alert('이 강의는 비공개 강의입니다. 로그인이 필요합니다.');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                
+                // 접근 권한 확인
+                const { data: permission, error: permError } = await window.supabase
+                    .from('course_access_permissions')
+                    .select('id')
+                    .eq('course_id', courseId)
+                    .eq('user_id', user.id)
+                    .single();
+                
+                if (permError || !permission) {
+                    // 권한이 없는 경우
+                    document.getElementById('course-content').innerHTML = `
+                        <div class="text-center text-gray-500 py-20">
+                            <div class="mb-6">
+                                <svg class="w-12 h-12 mx-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-2xl mb-4 text-white">비공개 강의입니다</p>
+                            <p class="text-lg mb-6">이 강의는 관리자가 승인한 사용자만 접근할 수 있습니다.</p>
+                            <p class="text-sm mb-8">접근 권한이 필요하시다면 관리자에게 문의해주세요.</p>
+                            <a href="courses.html" class="inline-block px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition">
+                                강의 목록으로 돌아가기
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+            
             let progress = null;
             if (user) {
                 const accessResult = await hasAccessToCourse(user.id, courseId);
                 hasAccess = accessResult.hasAccess;
-                if (hasAccess) { const progressResult = await getCourseProgress(user.id, courseId); progress = progressResult.data; }
+                if (hasAccess) { 
+                    const progressResult = await getCourseProgress(user.id, courseId); 
+                    progress = progressResult.data; 
+                }
             }
+            
             renderCourseDetail(currentCourse, hasAccess, progress);
         }
 

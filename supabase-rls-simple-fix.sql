@@ -104,6 +104,7 @@ DROP POLICY IF EXISTS "Categories are viewable by everyone" ON categories;
 DROP POLICY IF EXISTS "Admins can insert categories" ON categories;
 DROP POLICY IF EXISTS "Admins can update categories" ON categories;
 DROP POLICY IF EXISTS "Admins can delete categories" ON categories;
+DROP POLICY IF EXISTS "Admins can manage categories" ON categories;
 
 CREATE POLICY "Categories are viewable by everyone"
 ON categories FOR SELECT TO authenticated, anon USING (true);
@@ -113,6 +114,7 @@ ON categories FOR ALL TO authenticated USING (public.is_admin());
 
 -- purchases 테이블
 DROP POLICY IF EXISTS "Users can insert their own purchases" ON purchases;
+DROP POLICY IF EXISTS "Users can insert own purchases" ON purchases;
 DROP POLICY IF EXISTS "Users can view own purchases" ON purchases;
 DROP POLICY IF EXISTS "Admins can manage all purchases" ON purchases;
 
@@ -161,6 +163,7 @@ ON quiz_responses FOR ALL TO authenticated USING (true);
 -- quizzes (공개)
 DROP POLICY IF EXISTS "Authenticated users have full access to quizzes" ON quizzes;
 DROP POLICY IF EXISTS "Quizzes are viewable by everyone" ON quizzes;
+DROP POLICY IF EXISTS "Admins can manage quizzes" ON quizzes;
 
 CREATE POLICY "Quizzes are viewable by everyone"
 ON quizzes FOR SELECT TO authenticated, anon USING (true);
@@ -171,6 +174,7 @@ ON quizzes FOR ALL TO authenticated USING (public.is_admin());
 -- url_redirects
 DROP POLICY IF EXISTS "Authenticated users have full access to url_redirects" ON url_redirects;
 DROP POLICY IF EXISTS "Everyone can view redirects" ON url_redirects;
+DROP POLICY IF EXISTS "Admins can manage redirects" ON url_redirects;
 
 CREATE POLICY "Everyone can view redirects"
 ON url_redirects FOR SELECT TO authenticated, anon USING (true);
@@ -184,7 +188,7 @@ ON url_redirects FOR ALL TO authenticated USING (public.is_admin());
 
 DO $$
 BEGIN
-    RAISE NOTICE '✅ RLS 정책 수정 완료 - 순환 참조 제거됨!';
+    RAISE NOTICE 'RLS 정책 수정 완료 - 순환 참조 제거됨!';
     RAISE NOTICE '   - is_admin() 함수 생성 (SECURITY DEFINER)';
     RAISE NOTICE '   - 모든 정책에서 함수 사용';
     RAISE NOTICE '   - 관리자는 모든 데이터 접근 가능';

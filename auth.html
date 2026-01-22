@@ -213,13 +213,13 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-300 mb-2">보호자 성함 <span class="text-red-400">*</span></label>
-                            <input type="text" id="signup-guardian-name" 
+                            <input type="text" id="signup-guardian-name"
                                    class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
                                    placeholder="보호자 이름">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-300 mb-2">보호자 전화번호 <span class="text-red-400">*</span></label>
-                            <input type="tel" id="signup-guardian-phone" 
+                            <input type="tel" id="signup-guardian-phone"
                                    class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
                                    placeholder="010-5678-1234"
                                    oninput="formatPhoneNumber(this)"
@@ -228,7 +228,28 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- 수강 유형 섹션 -->
+                <div class="pb-4 border-b border-white border-opacity-10">
+                    <h3 class="text-sm font-semibold text-white mb-4">수강 유형 <span class="text-red-400">*</span></h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="student-type" value="online" checked class="peer sr-only">
+                            <div class="px-4 py-3 border border-white border-opacity-20 rounded-xl text-center peer-checked:border-white peer-checked:bg-white peer-checked:bg-opacity-10 transition-all">
+                                <span class="text-white font-medium">온라인 학생</span>
+                                <p class="text-xs text-gray-500 mt-1">온라인 강의 수강</p>
+                            </div>
+                        </label>
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="student-type" value="offline" class="peer sr-only">
+                            <div class="px-4 py-3 border border-white border-opacity-20 rounded-xl text-center peer-checked:border-white peer-checked:bg-white peer-checked:bg-opacity-10 transition-all">
+                                <span class="text-white font-medium">오프라인 학생</span>
+                                <p class="text-xs text-gray-500 mt-1">학원 방문 수강</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- 비밀번호 섹션 -->
                 <div class="space-y-4">
                     <div>
@@ -400,6 +421,8 @@
             const fullAddress = address + (addressDetail ? ' ' + addressDetail : '');
             const guardianName = document.getElementById('signup-guardian-name').value.trim();
             const guardianPhone = document.getElementById('signup-guardian-phone').value.trim();
+            const studentTypeRadio = document.querySelector('input[name="student-type"]:checked');
+            const studentType = studentTypeRadio ? studentTypeRadio.value : 'online';
             const password = document.getElementById('signup-password').value;
             const passwordConfirm = document.getElementById('signup-password-confirm').value;
             const errorDiv = document.getElementById('signup-error');
@@ -450,7 +473,8 @@
                 postcode,
                 address: fullAddress,
                 guardian_name: guardianName,
-                guardian_phone: guardianPhone
+                guardian_phone: guardianPhone,
+                student_type: studentType
             });
             
             if (result.success) {

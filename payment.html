@@ -142,8 +142,39 @@
                             <p id="course-title" class="font-semibold text-white">-</p>
                             <p id="course-lessons" class="text-sm text-gray-400">-</p>
                         </div>
-                        <div id="course-price" class="text-xl font-bold text-white">-</div>
                     </div>
+                </div>
+
+                <!-- 결제 항목 선택 -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-semibold text-white">결제 항목 선택</h2>
+                    <div class="space-y-3">
+                        <label class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-xl cursor-pointer hover:bg-opacity-10 transition border-2 border-transparent has-[:checked]:border-yellow-400">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="pay-course" name="payment-item" value="course" checked
+                                       class="w-5 h-5 rounded text-yellow-400 bg-white bg-opacity-10 border-gray-600 focus:ring-yellow-400"
+                                       onchange="updateSelectedPayments()">
+                                <div>
+                                    <p class="font-semibold text-white">강의비</p>
+                                    <p class="text-xs text-gray-400">온라인 강의 수강료</p>
+                                </div>
+                            </div>
+                            <span id="course-fee-display" class="text-xl font-bold text-white">₩0</span>
+                        </label>
+                        <label class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-xl cursor-pointer hover:bg-opacity-10 transition border-2 border-transparent has-[:checked]:border-yellow-400">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="pay-textbook" name="payment-item" value="textbook" checked
+                                       class="w-5 h-5 rounded text-yellow-400 bg-white bg-opacity-10 border-gray-600 focus:ring-yellow-400"
+                                       onchange="updateSelectedPayments()">
+                                <div>
+                                    <p class="font-semibold text-white">교재비</p>
+                                    <p class="text-xs text-gray-400">교재 및 학습 자료</p>
+                                </div>
+                            </div>
+                            <span id="textbook-fee-display" class="text-xl font-bold text-white">₩0</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500">※ 강의비와 교재비는 별도 결제됩니다. (결제창이 2번 나타납니다)</p>
                 </div>
 
                 <!-- 구매자 정보 -->

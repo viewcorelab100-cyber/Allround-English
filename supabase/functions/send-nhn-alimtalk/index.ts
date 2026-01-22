@@ -5,10 +5,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// NHN Cloud 알림톡 API 키 (하드코딩 - 테스트용)
-const NHN_APP_KEY = 'g2A5M3Ingqykfg94'
-const NHN_SECRET_KEY = 'wXNer48RkCc9YyGOOvlFkPkjxyEtu9pX'
-const NHN_SENDER_KEY = '05bca9e77ae8957c3aa12d7f24dc6a9e7145754e'
+// NHN Cloud 알림톡 API 키
+const NHN_APP_KEY = 'zhZSielWtWCB3Uz8'
+const NHN_SECRET_KEY = 'aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'
+const NHN_SENDER_KEY = 'ea98b16e16f06e2dbc1eaf903cd26832d0633070'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

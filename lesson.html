@@ -838,6 +838,7 @@
     <script src="js/courses.js"></script>
     <script src="js/progress.js"></script>
     <script src="js/assignments.js"></script>
+    <script src="js/image-utils.js"></script>
     <script src="js/grading.js"></script>
     <script src="js/vimeo-custom-player.js"></script>
     <script>
@@ -2102,17 +2103,27 @@
             btn.textContent = '업로드 중...';
 
             try {
-                // 각 파일을 순차적으로 업로드
+                // 각 파일을 순차적으로 WebP 변환 후 업로드
                 for (let i = 0; i < selectedImageFiles.length; i++) {
                     const file = selectedImageFiles[i];
+                    btn.textContent = `변환 중... (${i + 1}/${selectedImageFiles.length})`;
+
+                    // WebP로 변환
+                    const { file: convertedFile } = await convertToWebP(file, {
+                        quality: 0.85,
+                        maxWidth: 1920,
+                        maxHeight: 1080
+                    });
+
                     btn.textContent = `업로드 중... (${i + 1}/${selectedImageFiles.length})`;
 
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${currentUser.id}/${currentLesson.id}/${Date.now()}_${i}.${fileExt}`;
+                    const fileName = `${currentUser.id}/${currentLesson.id}/${Date.now()}_${i}.webp`;
 
                     const { data, error } = await window.supabase.storage
                         .from('submissions')
-                        .upload(fileName, file);
+                        .upload(fileName, convertedFile, {
+                            contentType: 'image/webp'
+                        });
 
                     if (error) throw error;
 
@@ -2268,15 +2279,21 @@
 
                 } else {
                     // Fallback: grading.js가 로드되지 않은 경우 직접 처리
-                    // 1. Storage에 이미지 업로드
-                    const fileExt = selectedImageFile.name.split('.').pop();
-                    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+                    // 1. WebP로 변환 후 Storage에 업로드
+                    const { file: convertedFile } = await convertToWebP(selectedImageFile, {
+                        quality: 0.85,
+                        maxWidth: 1920,
+                        maxHeight: 1080
+                    });
+
+                    const fileName = `${currentUser.id}/${Date.now()}.webp`;
 
                     const { data: uploadData, error: uploadError } = await window.supabase.storage
                         .from('submissions')
-                        .upload(fileName, selectedImageFile, {
+                        .upload(fileName, convertedFile, {
                             cacheControl: '3600',
-                            upsert: false
+                            upsert: false,
+                            contentType: 'image/webp'
                         });
 
                     if (uploadError) throw uploadError;

@@ -403,14 +403,14 @@
 
         // 결제 승인 및 구매 완료 처리
         async function handlePaymentSuccess() {
-            console.log('[DEBUG] 🎯 payment-success.html VERSION: 2024-12-19-COUPON-FIX (쿠폰 할인 지원)');
+            console.log('[DEBUG] payment-success.html VERSION: 2024-12-19-COUPON-FIX');
             
             const { paymentKey, orderId, amount } = getPaymentResultParams();
             
-            console.log('[DEBUG] 📥 결제 파라미터:', { paymentKey, orderId, amount });
+            console.log('[DEBUG] 결제 파라미터:', { paymentKey, orderId, amount });
             
             if (!paymentKey || !orderId || !amount) {
-                console.log('[DEBUG] 🔴 Missing payment params');
+                console.log('[DEBUG] Missing payment params');
                 showError('결제 정보가 올바르지 않습니다.');
                 return;
             }
@@ -418,7 +418,7 @@
             try {
                 const user = await getCurrentUser();
                 if (!user) {
-                    console.log('[DEBUG] 🔴 User not logged in');
+                    console.log('[DEBUG] User not logged in');
                     showError('로그인이 필요합니다.');
                     return;
                 }
@@ -431,7 +431,7 @@
                     .single();
                 
                 if (orderError || !order) {
-                    console.log('[DEBUG] 🔴 Order not found');
+                    console.log('[DEBUG] Order not found');
                     showError('주문 정보를 찾을 수 없습니다.');
                     return;
                 }
@@ -446,7 +446,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const couponIdParam = urlParams.get('couponId');
                 
-                console.log('[DEBUG] 💰 금액 검증 시작:', {
+                console.log('[DEBUG] 금액 검증 시작:', {
                     orderAmount: order.amount,
                     receivedAmount: amount,
                     couponId: couponIdParam
@@ -487,7 +487,7 @@
                         expectedAmount = order.amount - discountAmount;
                         if (expectedAmount < 0) expectedAmount = 0;
                         
-                        console.log('[DEBUG] 💳 쿠폰 할인 적용:', {
+                        console.log('[DEBUG] 쿠폰 할인 적용:', {
                             couponCode: coupon.code,
                             discountType: coupon.discount_type,
                             discountValue: coupon.discount_value,
@@ -499,7 +499,7 @@
                 
                 // 금액 검증
                 if (parseInt(amount) !== expectedAmount) {
-                    console.log('[DEBUG] 🔴 Amount mismatch:', {
+                    console.log('[DEBUG] Amount mismatch:', {
                         expected: expectedAmount,
                         received: amount,
                         orderAmount: order.amount,
@@ -525,7 +525,7 @@
                 
                 // 이미 결제 완료된 주문인지 확인
                 if (order.status === 'DONE') {
-                    console.log('[DEBUG] 🟡 Order already DONE, showing success');
+                    console.log('[DEBUG] Order already DONE, showing success');
                     showSuccess(order, course, appliedCoupon, expectedAmount);
                     return;
                 }
@@ -556,7 +556,7 @@
                 
                 // 쿠폰 사용 처리
                 if (appliedCoupon) {
-                    console.log('[DEBUG] 🎟️ 쿠폰 사용 처리 시작:', appliedCoupon.id);
+                    console.log('[DEBUG] 쿠폰 사용 처리 시작:', appliedCoupon.id);
                     
                     const { error: couponUseError } = await window.supabase
                         .from('user_coupons')
@@ -587,7 +587,7 @@
                     purchased_at: new Date().toISOString()
                 };
                 
-                console.log('[DEBUG] 📦 구매 기록 생성:', purchaseData);
+                console.log('[DEBUG] 구매 기록 생성:', purchaseData);
                 
                 const { error: purchaseError } = await window.supabase
                     .from('purchases')
@@ -608,23 +608,51 @@
 
         // 성공 화면 표시
         async function showSuccess(order, course, appliedCoupon = null, finalAmount = null) {
+            // 대기 중인 결제가 있는지 확인
+            const pendingPaymentsStr = sessionStorage.getItem('pendingPayments');
+            if (pendingPaymentsStr) {
+                const pendingData = JSON.parse(pendingPaymentsStr);
+
+                // 다음 결제 안내 표시
+                document.getElementById('loading-state').innerHTML = `
+                    <div class="text-center space-y-6">
+                        <div class="flex justify-center">
+                            <svg class="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white">강의비 결제 완료!</h2>
+                        <p class="text-gray-400">교재비 결제를 진행합니다...</p>
+                        <div class="animate-pulse">
+                            <div class="h-2 bg-white bg-opacity-20 rounded w-48 mx-auto"></div>
+                        </div>
+                    </div>
+                `;
+
+                // 2초 후 결제 페이지로 리다이렉트
+                setTimeout(() => {
+                    window.location.href = 'payment.html';
+                }, 2000);
+                return;
+            }
+
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('success-content').classList.remove('hidden');
-            
+
             // 결제 정보 표시
             document.getElementById('order-id').textContent = order.id;
             document.getElementById('order-name').textContent = order.order_name;
-            
+
             // 쿠폰 적용 시 할인 정보 표시
             const displayAmount = finalAmount !== null ? finalAmount : order.amount;
             document.getElementById('order-amount').textContent = `₩${displayAmount.toLocaleString()}`;
-            
+
             if (appliedCoupon && finalAmount !== null && finalAmount < order.amount) {
                 const discountAmount = order.amount - finalAmount;
                 const couponInfo = `<span class="text-sm text-green-400">(${appliedCoupon.coupons.name} -₩${discountAmount.toLocaleString()} 할인 적용)</span>`;
                 document.getElementById('order-amount').innerHTML += ' ' + couponInfo;
             }
-            
+
             document.getElementById('order-date').textContent = new Date().toLocaleString('ko-KR');
             document.getElementById('go-to-course').href = `course-detail.html?id=${order.course_id}`;
             

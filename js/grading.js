@@ -1,6 +1,6 @@
 // 채점 관련 유틸리티 함수
 
-// 이미지 업로드 함수
+// 이미지 업로드 함수 (WebP 변환 적용)
 async function uploadSubmissionImage(file) {
     try {
         const currentUser = window.currentUser;
@@ -8,16 +8,31 @@ async function uploadSubmissionImage(file) {
             throw new Error('로그인이 필요합니다.');
         }
 
-        // 파일 확장자 추출
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
-        
+        // WebP로 변환 (image-utils.js의 convertToWebP 함수 사용)
+        let uploadFile = file;
+        let fileName = `${currentUser.id}/${Date.now()}`;
+
+        if (typeof convertToWebP === 'function') {
+            const { file: convertedFile } = await convertToWebP(file, {
+                quality: 0.85,
+                maxWidth: 1920,
+                maxHeight: 1080
+            });
+            uploadFile = convertedFile;
+            fileName += '.webp';
+        } else {
+            // convertToWebP가 없는 경우 원본 사용
+            const fileExt = file.name.split('.').pop();
+            fileName += '.' + fileExt;
+        }
+
         // Storage에 업로드
         const { data, error } = await window.supabase.storage
             .from('assignment-images')
-            .upload(fileName, file, {
+            .upload(fileName, uploadFile, {
                 cacheControl: '3600',
-                upsert: false
+                upsert: false,
+                contentType: uploadFile.type
             });
 
         if (error) {
@@ -29,7 +44,7 @@ async function uploadSubmissionImage(file) {
         const { data: { publicUrl } } = window.supabase.storage
             .from('assignment-images')
             .getPublicUrl(fileName);
-        
+
         return { success: true, url: publicUrl, path: fileName };
     } catch (error) {
         console.error('Image upload error:', error);

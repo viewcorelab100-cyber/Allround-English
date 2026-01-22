@@ -7,9 +7,9 @@ const corsHeaders = {
 }
 
 // NHN Cloud 알림톡 API 키
-const NHN_APP_KEY = 'g2A5M3Ingqykfg94'
-const NHN_SECRET_KEY = 'wXNer48RkCc9YyGOOvlFkPkjxyEtu9pX'
-const NHN_SENDER_KEY = '05bca9e77ae8957c3aa12d7f24dc6a9e7145754e'
+const NHN_APP_KEY = 'zhZSielWtWCB3Uz8'
+const NHN_SECRET_KEY = 'aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'
+const NHN_SENDER_KEY = 'ea98b16e16f06e2dbc1eaf903cd26832d0633070'
 
 // 테스트 모드 플래그 (환경변수로 설정 가능)
 const TEST_MODE = Deno.env.get('TEST_MODE') === 'true' || false

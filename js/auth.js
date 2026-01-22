@@ -249,6 +249,7 @@ async function signUp(email, password, userData) {
                 address: userData.address,
                 guardian_name: userData.guardian_name,
                 guardian_phone: userData.guardian_phone,
+                student_type: userData.student_type || 'online',
                 active_sessions: firstSession
             }).eq('id', data.user.id);
             
@@ -262,6 +263,7 @@ async function signUp(email, password, userData) {
                     address: userData.address,
                     guardian_name: userData.guardian_name,
                     guardian_phone: userData.guardian_phone,
+                    student_type: userData.student_type || 'online',
                     active_sessions: firstSession
                 }).eq('id', data.user.id);
                 

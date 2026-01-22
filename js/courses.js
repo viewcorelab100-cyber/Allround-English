@@ -1,8 +1,13 @@
 // 강의 관련 함수들
 
-// 모든 강의 가져오기 (레슨 시간 합계 포함)
+// 모든 강의 가져오기 (레슨 시간 합계 포함) - 권한 체크 포함
 async function getAllCourses() {
     try {
+        // 현재 사용자 확인
+        const { data: { user } } = await window.supabase.auth.getUser();
+        const currentUserId = user?.id;
+
+        // 기본 강의 조회 (공개된 강의만)
         const { data, error } = await window.supabase
             .from('courses')
             .select(`
@@ -16,9 +21,40 @@ async function getAllCourses() {
             .order('created_at', { ascending: false });
         
         if (error) throw error;
+
+        // 사용자가 로그인한 경우, 접근 권한 확인
+        let accessibleCourseIds = [];
+        if (currentUserId) {
+            const { data: permissions, error: permError } = await window.supabase
+                .from('course_access_permissions')
+                .select('course_id')
+                .eq('user_id', currentUserId);
+
+            if (!permError && permissions) {
+                accessibleCourseIds = permissions.map(p => p.course_id);
+            }
+        }
+
+        // 강의 필터링: 공개 강의 또는 권한이 있는 비공개 강의만
+        const filteredCourses = data.filter(course => {
+            const visibility = course.visibility || 'public';
+            
+            // 공개 강의는 모두 포함
+            if (visibility === 'public') {
+                return true;
+            }
+            
+            // 비공개 강의는 권한이 있는 경우만 포함
+            if (visibility === 'private' && currentUserId) {
+                return accessibleCourseIds.includes(course.id);
+            }
+            
+            // 비공개 강의인데 로그인 안 한 경우 제외
+            return false;
+        });
         
         // 각 강의의 총 시간 계산 (레슨 duration 합계)
-        const coursesWithDuration = data.map(course => {
+        const coursesWithDuration = filteredCourses.map(course => {
             const totalMinutes = course.lessons?.reduce((sum, lesson) => sum + (lesson.duration || 0), 0) || 0;
             const totalHours = Math.round(totalMinutes / 60 * 10) / 10; // 소수점 1자리까지
             return {

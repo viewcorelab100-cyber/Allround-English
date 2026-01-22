@@ -10,9 +10,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// NHN Cloud API 설정 (환경변수로 관리)
-const NHN_CLOUD_APP_KEY = Deno.env.get('NHN_CLOUD_APP_KEY') || ''
-const NHN_SENDER_PHONE = Deno.env.get('NHN_SENDER_PHONE') || ''
+// NHN Cloud API 설정
+const NHN_CLOUD_APP_KEY = 'xZBg2ycyyAv1RUyq'
+const NHN_SENDER_PHONE = '01063363823'
 
 serve(async (req) => {
   // CORS preflight 처리
@@ -33,10 +33,10 @@ serve(async (req) => {
       )
     }
 
-    // 환경변수 검증
+    // API 키 검증
     if (!NHN_CLOUD_APP_KEY || !NHN_SENDER_PHONE) {
       return new Response(
-        JSON.stringify({ success: false, error: 'NHN Cloud 환경변수가 설정되지 않았습니다.' }),
+        JSON.stringify({ success: false, error: 'NHN Cloud API 키가 설정되지 않았습니다.' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
