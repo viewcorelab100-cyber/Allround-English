@@ -1280,7 +1280,10 @@
             // 기존 QR 코드 제거
             qrContainer.innerHTML = '';
             
-            const uploadUrl = `${window.location.origin}/upload.html?lesson=${currentLesson.id}`;
+            // 현재 페이지 URL에 directSubmit 파라미터 추가 (같은 화면 표시)
+            const url = new URL(window.location.href);
+            url.searchParams.set('directSubmit', 'true');
+            const uploadUrl = url.toString();
             
             if (window.QRCode) {
                 new QRCode(qrContainer, {
@@ -2631,7 +2634,7 @@
                 : null;
             
             if (nextLesson) {
-                showAssignmentModal('🎉', '모든 과제 완료!', '다음 강의로 넘어가주세요.');
+                showAssignmentModal('', '모든 과제 완료!', '다음 강의로 넘어가주세요.');
                 // 모달 확인 버튼에 다음 강의로 이동 기능 추가
                 const modal = document.getElementById('assignment-complete-modal');
                 const btn = modal.querySelector('button');
@@ -2639,7 +2642,7 @@
                     window.location.href = `lesson.html?lesson=${nextLesson.id}`;
                 };
             } else {
-                showAssignmentModal('🎊', '축하합니다!', '이 강의의 모든 과제를 완료했습니다!');
+                showAssignmentModal('', '축하합니다!', '이 강의의 모든 과제를 완료했습니다!');
             }
         }
 

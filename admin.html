@@ -1020,17 +1020,28 @@
                 
                 console.log('과제 제출 데이터 (체크리스트):', submissions?.length || 0, '건');
 
-                // 5. 진도율 데이터
+                // 5. 진도율 데이터 (lesson_progress 테이블)
                 const { data: progress, error: progressError } = await window.supabase
-                    .from('progress')
+                    .from('lesson_progress')
                     .select('*');
 
                 if (progressError) {
                     console.error('진도율 데이터 로드 오류:', progressError);
                     throw progressError;
                 }
-                
+
                 console.log('진도율 데이터:', progress?.length || 0, '건');
+
+                // 5.5. 체크리스트 데이터 (assignments 테이블)
+                const { data: assignments, error: assignError } = await window.supabase
+                    .from('assignments')
+                    .select('*');
+
+                if (assignError) {
+                    console.error('체크리스트 데이터 로드 오류:', assignError);
+                }
+
+                console.log('체크리스트 데이터:', assignments?.length || 0, '건');
 
                 // 6. 퀴즈 결과 데이터
                 const { data: quizResults, error: quizError } = await window.supabase
@@ -1070,6 +1081,13 @@
                     progressMap.set(key, p);
                 });
 
+                // assignment 맵 (체크리스트)
+                const assignmentMap = new Map();
+                assignments?.forEach(a => {
+                    const key = `${a.user_id}_${a.lesson_id}`;
+                    assignmentMap.set(key, a);
+                });
+
                 // quiz 맵 (user_id + lesson_id로 집계)
                 const quizMap = new Map();
                 quizResultsData.forEach(q => {
@@ -1086,6 +1104,7 @@
                     lessons?.forEach(lesson => {
                         const key = `${profile.id}_${lesson.id}`;
                         const submission = submissionMap.get(key);
+                        const assignment = assignmentMap.get(key);
                         const prog = progressMap.get(key);
                         const quizzes = quizMap.get(key) || [];
                         const course = courseMap.get(lesson.course_id);
@@ -1108,10 +1127,10 @@
                         const totalSeconds = prog?.total_seconds || 0;
                         const watchRate = totalSeconds > 0 ? Math.round((watchedSeconds / totalSeconds) * 100) : 0;
 
-                        // 체크리스트 완료율
-                        const noteCompleted = submission?.note_completed || false;
-                        const blogCompleted = submission?.blog_completed || false;
-                        const kakaoCompleted = submission?.kakao_completed || false;
+                        // 체크리스트 완료율 (assignments 테이블에서)
+                        const noteCompleted = assignment?.note_completed || false;
+                        const blogCompleted = assignment?.blog_completed || false;
+                        const kakaoCompleted = assignment?.kakao_completed || false;
                         const checklistCount = [noteCompleted, blogCompleted, kakaoCompleted].filter(Boolean).length;
                         const checklistRate = Math.round((checklistCount / 3) * 100);
 
