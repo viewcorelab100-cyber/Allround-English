@@ -122,6 +122,8 @@ yarn.lock
 dist/
 build/
 .parcel-cache/
+supabase/.temp/
+.claude/
 
 # ============================================
 # ✅ Git에 올릴 파일들
