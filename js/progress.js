@@ -17,7 +17,7 @@ async function updateLessonProgress(userId, lessonId, progressData) {
             watched_seconds: progressData.watchedSeconds,
             total_seconds: progressData.totalSeconds,
             progress_percent: Math.round((progressData.watchedSeconds / progressData.totalSeconds) * 100),
-            is_completed: progressData.watchedSeconds >= progressData.totalSeconds * 0.9, // 90% 이상 시청 시 완료
+            is_completed: progressData.watchedSeconds >= progressData.totalSeconds * 0.95, // 95% 이상 시청 시 완료
             last_position: progressData.lastPosition,
             updated_at: new Date().toISOString()
         };
