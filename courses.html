@@ -206,10 +206,6 @@
     <script>
         // 강의 카드 렌더링
         function renderCourseCard(course) {
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'courses.html:176-v2',message:'renderCourseCard ENTRY v2',data:{courseId:course?.id,lessonsRaw:course?.lessons,lessonsType:typeof course?.lessons,lessonsIsArray:Array.isArray(course?.lessons),lessonCount:course?.lessonCount},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'F,G'})}).catch(()=>{});
-            // #endregion
-            
             // 시간 표시 포맷팅
             const totalMinutes = course.totalDuration || 0;
             let durationText = '';
@@ -224,10 +220,6 @@
             // 강의 수 표시 (lessonCount 또는 lessons 배열 길이 사용)
             const lessonCount = course.lessonCount || (Array.isArray(course.lessons) ? course.lessons.length : 0);
             const lessonsText = lessonCount > 0 ? `${lessonCount}강` : '';
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7243/ingest/89491bf6-bdf5-4b48-a2a1-bc20f57de44a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'courses.html:195-v2',message:'After variables computed',data:{lessonCount:lessonCount,lessonsText:lessonsText,lessonsTextType:typeof lessonsText,durationText:durationText},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'G,H'})}).catch(()=>{});
-            // #endregion
             
             return `
                 <a href="course-detail.html?id=${course.id}" class="course-card group">
