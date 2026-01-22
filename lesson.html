@@ -1308,13 +1308,15 @@
             const unsolvedQuiz = lessonQuizzes.find(quiz => !shownQuizIds.includes(quiz.id));
             
             if (!unsolvedQuiz) {
-                // 모든 퀴즈를 다 풀었음 - 상태를 완료로 변경
+                // 모든 퀴즈를 다 풀었음 - 상태를 완료로 변경하고 다음 과제로
                 const statusEl = document.getElementById('quiz-status');
                 if (statusEl) {
                     statusEl.textContent = '완료';
                     statusEl.className = 'text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400';
                 }
-                showAssignmentModal('', '퀴즈 완료', '이미 모든 퀴즈를 완료했습니다.');
+                showAssignmentModal('', '퀴즈 완료', '모든 퀴즈를 완료했습니다. 다음 과제를 진행해주세요.', function() {
+                    showNextAssignmentInSequence();
+                });
                 return;
             }
             
@@ -1390,12 +1392,20 @@
                         showNextAssignmentInSequence();
                     });
                     return;
+                } else {
+                    // 아직 남은 퀴즈가 있으면 다음 퀴즈 표시
+                    const nextQuiz = lessonQuizzes.find(quiz => !shownQuizIds.includes(quiz.id));
+                    if (nextQuiz) {
+                        displayQuizContent(nextQuiz);
+                        currentQuiz = nextQuiz;
+                        return;
+                    }
                 }
             } catch (error) {
                 console.error('퀴즈 결과 저장 오류:', error);
             }
 
-            // 퀴즈 모달만 닫고 비디오 재생 재개 (모든 퀴즈 완료 전까지는 메시지 없음)
+            // 퀴즈 모달 닫고 비디오 재생 재개
             closeQuizModal();
 
             // 비디오 재생 재개
@@ -1550,10 +1560,14 @@
         
         // 퀴즈 내용 표시
         function displayQuizContent(quiz) {
+            // 현재 퀴즈 번호 계산
+            const currentQuizIndex = lessonQuizzes.findIndex(q => q.id === quiz.id) + 1;
+            const totalQuizzes = lessonQuizzes.length;
+
             // 퀴즈 헤더 업데이트
             const headerTitle = document.querySelector('#quiz-modal h2');
             if (headerTitle) {
-                headerTitle.textContent = quiz.question_number ? `퀴즈 ${quiz.question_number}번` : '퀴즈';
+                headerTitle.textContent = `퀴즈 ${currentQuizIndex}/${totalQuizzes}`;
             }
             
             // 퀴즈 내용 영역
