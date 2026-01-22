@@ -207,7 +207,7 @@
     <!-- 상단 네비게이션 바 (간소화) -->
     <header class="fixed top-0 left-0 right-0 bg-black z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="index.html" class="text-xl font-bold text-white tracking-wider">ALLROUND</a>
+            <a href="index.html"><img src="/logo.png" alt="ALLROUND" class="h-4 w-auto"></a>
             <div id="course-title" class="text-sm text-gray-400 hidden md:block"></div>
             <div class="flex items-center space-x-4">
                 <a href="#" id="back-to-course" class="text-sm text-gray-400 hover:text-white">← 강의로 돌아가기</a>
@@ -852,6 +852,7 @@
         let progressInterval = null;
         let videoDuration = 0;
         let maxWatchedTime = 0; // 최대 시청 시간 추적
+        let lastPlaybackTime = 0; // 마지막 재생 위치 (건너뛰기 감지용)
         let currentProgress = 0; // 현재 진도율
 
         function getLessonId() {
@@ -930,10 +931,12 @@
                 const duration = data.duration;
                 videoDuration = duration;
 
-                // 최대 시청 시간 업데이트
-                if (currentTime > maxWatchedTime) {
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 2초 이내 변화만 인정)
+                const timeDiff = currentTime - lastPlaybackTime;
+                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime) {
                     maxWatchedTime = currentTime;
                 }
+                lastPlaybackTime = currentTime;
 
                 // UI 업데이트 (시청 진도 바)
                 const progress = (maxWatchedTime / duration) * 100;
@@ -1038,10 +1041,13 @@
 
             videoElement.addEventListener('timeupdate', function() {
                 const currentTime = videoElement.currentTime;
-                
-                if (currentTime > maxWatchedTime) {
+
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 2초 이내 변화만 인정)
+                const timeDiff = currentTime - lastPlaybackTime;
+                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime) {
                     maxWatchedTime = currentTime;
                 }
+                lastPlaybackTime = currentTime;
 
                 const progress = (maxWatchedTime / videoElement.duration) * 100;
                 document.getElementById('progress-bar').style.width = `${progress}%`;
