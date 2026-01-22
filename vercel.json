@@ -2,5 +2,18 @@
   "version": 2,
   "buildCommand": "",
   "outputDirectory": ".",
-  "framework": null
+  "framework": null,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "allroundedu.co.kr"
+        }
+      ],
+      "destination": "https://www.allroundedu.co.kr/:path*",
+      "permanent": true
+    }
+  ]
 }
