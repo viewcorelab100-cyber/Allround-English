@@ -148,6 +148,13 @@ class CustomVimeoPlayer {
             dnt: true,
         });
 
+        // 에러 핸들링
+        this.player.on('error', (error) => {
+            console.error('Vimeo Player Error:', error);
+            this.loadingIndicator.classList.add('hidden');
+            this.showError('영상을 불러올 수 없습니다. 관리자에게 문의해주세요.');
+        });
+
         // 이벤트 리스너
         this.player.on('loaded', () => {
             this.isReady = true;
@@ -311,6 +318,23 @@ class CustomVimeoPlayer {
     updateVolumeSliderStyle() {
         const percent = (this.isMuted ? 0 : this.volume) * 100;
         this.volumeSlider.style.setProperty('--volume-percent', `${percent}%`);
+    }
+
+    showError(message) {
+        this.videoWrapper.innerHTML = `
+            <div class="aspect-video flex items-center justify-center bg-gray-900">
+                <div class="text-center text-white p-4">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <p class="text-lg">${message}</p>
+                </div>
+            </div>
+        `;
+        // 컨트롤 바 숨기기
+        if (this.controlsBar) {
+            this.controlsBar.style.display = 'none';
+        }
     }
 
     // 외부 API

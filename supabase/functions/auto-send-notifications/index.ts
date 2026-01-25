@@ -142,9 +142,9 @@ serve(async (req) => {
           item.profiles.phone,
           'assignment_reminder',
           {
-            name: item.profiles.name,
-            courseName: item.lessons.courses.title,
-            lessonTitle: item.lessons.title,
+            학생명: item.profiles.name,
+            과정명: item.lessons.courses.title,
+            강의제목: item.lessons.title,
           }
         )
 
@@ -160,9 +160,9 @@ serve(async (req) => {
               template_code: 'assignment_reminder',
               success: true,
               template_params: {
-                name: item.profiles.name,
-                courseName: item.lessons.courses.title,
-                lessonTitle: item.lessons.title,
+                학생명: item.profiles.name,
+                과정명: item.lessons.courses.title,
+                강의제목: item.lessons.title,
               }
             })
           console.log(`✅ 과제 알림 ${TEST_MODE ? '시뮬레이션' : '발송'}: ${item.profiles.name}`)
@@ -225,9 +225,9 @@ serve(async (req) => {
             user.phone,
             'inactive_reminder',
             {
-              name: user.name,
-              courseName: user.enrollments[0]?.courses?.title || '강의',
-              days: '7'
+              학생명: user.name,
+              과정명: user.enrollments[0]?.courses?.title || '강의',
+              경과일수: '7'
             }
           )
 
@@ -242,9 +242,9 @@ serve(async (req) => {
                 template_code: 'inactive_reminder',
                 success: true,
                 template_params: {
-                  name: user.name,
-                  courseName: user.enrollments[0]?.courses?.title || '강의',
-                  days: '7'
+                  학생명: user.name,
+                  과정명: user.enrollments[0]?.courses?.title || '강의',
+                  경과일수: '7'
                 }
               })
             console.log(`✅ 미수강 알림 ${TEST_MODE ? '시뮬레이션' : '발송'}: ${user.name}`)
