@@ -224,6 +224,9 @@
                 <button onclick="showTab('courses')" id="tab-courses" class="tab-btn active px-6 py-2 text-white font-medium text-sm tracking-wider uppercase">
                     수강 강의
                 </button>
+                <button onclick="showTab('grades')" id="tab-grades" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
+                    성적표
+                </button>
                 <button onclick="showTab('orders')" id="tab-orders" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
                     주문/배송
                 </button>
@@ -243,6 +246,19 @@
                 <div id="my-courses" class="grid md:grid-cols-2 gap-6">
                     <div class="text-center text-gray-500 col-span-full py-20">
                         강의 정보를 불러오는 중...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Grades -->
+            <div id="content-grades" class="hidden space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">과제 성적표</h2>
+                    <p class="text-sm text-gray-400">제출한 과제의 채점 결과를 확인할 수 있습니다.</p>
+                </div>
+                <div id="my-grades" class="space-y-4">
+                    <div class="text-center text-gray-500 py-20">
+                        성적 정보를 불러오는 중...
                     </div>
                 </div>
             </div>
@@ -448,10 +464,10 @@
         // 탭 전환
         function showTab(tab) {
             // 모든 콘텐츠와 탭 숨기기
-            ['courses', 'orders', 'profile', 'devices', 'coupons'].forEach(t => {
+            ['courses', 'grades', 'orders', 'profile', 'devices', 'coupons'].forEach(t => {
                 const contentEl = document.getElementById(`content-${t}`);
                 const tabEl = document.getElementById(`tab-${t}`);
-                
+
                 if (contentEl) contentEl.classList.add('hidden');
                 if (tabEl) {
                     tabEl.classList.remove('active');
@@ -462,23 +478,28 @@
             // 선택된 탭 표시
             const selectedContent = document.getElementById(`content-${tab}`);
             const selectedTab = document.getElementById(`tab-${tab}`);
-            
+
             if (selectedContent) selectedContent.classList.remove('hidden');
             if (selectedTab) {
                 selectedTab.classList.add('active');
                 selectedTab.classList.remove('text-gray-400');
             }
 
+            // 성적표 탭 선택 시 데이터 로드
+            if (tab === 'grades') {
+                loadMyGrades();
+            }
+
             // 주문 탭 선택 시 데이터 로드
             if (tab === 'orders') {
                 loadMyOrders();
             }
-            
+
             // 기기 탭 선택 시 데이터 로드
             if (tab === 'devices') {
                 loadDevices();
             }
-            
+
             // 쿠폰 탭 선택 시 데이터 로드
             if (tab === 'coupons') {
                 loadCoupons();
@@ -1083,8 +1104,162 @@
             }
         }
 
+        // ========== 성적표 관리 ==========
+
+        // 성적표 불러오기
+        async function loadMyGrades() {
+            const container = document.getElementById('my-grades');
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) return;
+
+                // 제출한 과제와 피드백 조회
+                const { data: submissions, error } = await window.supabase
+                    .from('student_submissions')
+                    .select(`
+                        id,
+                        lesson_id,
+                        image_url,
+                        submitted_at,
+                        status,
+                        lessons (
+                            id,
+                            title,
+                            order_num,
+                            courses (
+                                id,
+                                title
+                            )
+                        ),
+                        teacher_feedback (
+                            score,
+                            grade,
+                            comment,
+                            feedback_image_url,
+                            is_passed,
+                            graded_at
+                        )
+                    `)
+                    .eq('user_id', user.id)
+                    .order('submitted_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!submissions || submissions.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-500 py-20">
+                            제출한 과제가 없습니다.
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 성적표 렌더링
+                container.innerHTML = submissions.map(sub => {
+                    const lesson = sub.lessons;
+                    const course = lesson?.courses;
+                    const feedback = sub.teacher_feedback?.[0];
+                    const isGraded = sub.status === 'graded' && feedback;
+
+                    const statusBadge = isGraded
+                        ? `<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-xs uppercase tracking-widest">Graded</span>`
+                        : `<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-xs uppercase tracking-widest">Pending</span>`;
+
+                    const passStatus = feedback?.is_passed === true
+                        ? `<span class="text-green-400 font-bold">PASS</span>`
+                        : feedback?.is_passed === false
+                            ? `<span class="text-red-400 font-bold">FAIL</span>`
+                            : `<span class="text-gray-500">-</span>`;
+
+                    return `
+                        <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <!-- 제출 이미지 -->
+                                <div class="w-full md:w-48 flex-shrink-0">
+                                    <div class="aspect-[4/5] bg-black border border-white border-opacity-10 overflow-hidden">
+                                        ${sub.image_url
+                                            ? `<img src="${sub.image_url}" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${sub.image_url}', '_blank')">`
+                                            : `<div class="w-full h-full flex items-center justify-center text-gray-600 text-xs">No Image</div>`
+                                        }
+                                    </div>
+                                    <p class="text-[10px] text-gray-600 text-center mt-2 uppercase tracking-widest">My Submission</p>
+                                </div>
+
+                                <!-- 정보 -->
+                                <div class="flex-1 space-y-4">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">${course?.title || 'Course'}</p>
+                                            <h3 class="text-lg font-bold text-white">${lesson?.order_num || ''}강. ${lesson?.title || 'Lesson'}</h3>
+                                        </div>
+                                        ${statusBadge}
+                                    </div>
+
+                                    <div class="text-sm text-gray-400">
+                                        제출일: ${sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('ko-KR') : '-'}
+                                    </div>
+
+                                    ${isGraded ? `
+                                        <div class="border-t border-white border-opacity-10 pt-4 space-y-3">
+                                            <div class="grid grid-cols-3 gap-4 text-center">
+                                                <div>
+                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Score</p>
+                                                    <p class="text-2xl font-bold text-white">${feedback.score ?? '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Grade</p>
+                                                    <p class="text-2xl font-bold text-white">${feedback.grade || '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Result</p>
+                                                    <p class="text-xl">${passStatus}</p>
+                                                </div>
+                                            </div>
+
+                                            ${feedback.comment ? `
+                                                <div class="bg-white bg-opacity-[0.02] p-4 border border-white border-opacity-5">
+                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Teacher's Comment</p>
+                                                    <p class="text-sm text-gray-300">${feedback.comment}</p>
+                                                </div>
+                                            ` : ''}
+
+                                            ${feedback.feedback_image_url ? `
+                                                <div>
+                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Feedback Image</p>
+                                                    <div class="w-48 aspect-[4/5] bg-black border border-white border-opacity-10 overflow-hidden">
+                                                        <img src="${feedback.feedback_image_url}" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${feedback.feedback_image_url}', '_blank')">
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+
+                                            <p class="text-[10px] text-gray-600">
+                                                채점일: ${feedback.graded_at ? new Date(feedback.graded_at).toLocaleDateString('ko-KR') : '-'}
+                                            </p>
+                                        </div>
+                                    ` : `
+                                        <div class="text-sm text-gray-500 py-4">
+                                            채점 대기 중입니다.
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('성적표 로드 오류:', error);
+                container.innerHTML = `
+                    <div class="text-center text-red-400 py-20">
+                        성적 정보를 불러오는 중 오류가 발생했습니다.
+                    </div>
+                `;
+            }
+        }
+
         // ========== 쿠폰 관리 ==========
-        
+
         // 쿠폰 목록 불러오기
         async function loadCoupons() {
             try {

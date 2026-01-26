@@ -1007,29 +1007,54 @@
                     </div>
                 </div>
 
+                <!-- 기간별/학생별 필터 -->
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Period</label>
+                        <input type="date" id="orders-date-from"
+                               class="bg-black border border-white border-opacity-10 text-white text-sm px-3 py-2 focus:outline-none focus:border-white focus:border-opacity-30 [color-scheme:dark]">
+                        <span class="text-gray-600">~</span>
+                        <input type="date" id="orders-date-to"
+                               class="bg-black border border-white border-opacity-10 text-white text-sm px-3 py-2 focus:outline-none focus:border-white focus:border-opacity-30 [color-scheme:dark]">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Student</label>
+                        <input type="text" id="orders-student-search" placeholder="Name or Email"
+                               class="bg-black border border-white border-opacity-10 text-white text-sm px-3 py-2 w-48 focus:outline-none focus:border-white focus:border-opacity-30 placeholder-gray-600">
+                    </div>
+                    <button onclick="applyOrderFilters()"
+                            class="px-6 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold hover:bg-gray-200 transition-colors">
+                        Apply
+                    </button>
+                    <button onclick="resetOrderFilters()"
+                            class="px-6 py-2 bg-transparent text-gray-400 text-[10px] uppercase tracking-widest font-bold border border-white border-opacity-10 hover:text-white transition-colors">
+                        Reset
+                    </button>
+                </div>
+
                 <!-- 필터 탭 -->
                 <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-8 w-fit">
-                    <button onclick="loadOrders('need_action')" id="filter-orders-need_action" 
+                    <button onclick="loadOrders('need_action')" id="filter-orders-need_action"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
                         Needs Action
                     </button>
-                    <button onclick="loadOrders('all')" id="filter-orders-all" 
+                    <button onclick="loadOrders('all')" id="filter-orders-all"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
                         All
                     </button>
-                    <button onclick="loadOrders('PENDING_ADDRESS')" id="filter-orders-PENDING_ADDRESS" 
+                    <button onclick="loadOrders('PENDING_ADDRESS')" id="filter-orders-PENDING_ADDRESS"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
                         No Address
                     </button>
-                    <button onclick="loadOrders('PREPARING')" id="filter-orders-PREPARING" 
+                    <button onclick="loadOrders('PREPARING')" id="filter-orders-PREPARING"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
                         Preparing
                     </button>
-                    <button onclick="loadOrders('SHIPPING')" id="filter-orders-SHIPPING" 
+                    <button onclick="loadOrders('SHIPPING')" id="filter-orders-SHIPPING"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
                         Shipping
                     </button>
-                    <button onclick="loadOrders('DELIVERED')" id="filter-orders-DELIVERED" 
+                    <button onclick="loadOrders('DELIVERED')" id="filter-orders-DELIVERED"
                             class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
                         Delivered
                     </button>
@@ -3642,10 +3667,30 @@
         let currentOrderFilter = 'need_action';
         let allOrders = [];
         let allOrdersRaw = []; // 전체 데이터 (통계용)
+        let ordersDateFrom = '';
+        let ordersDateTo = '';
+        let ordersStudentSearch = '';
+
+        function applyOrderFilters() {
+            ordersDateFrom = document.getElementById('orders-date-from').value;
+            ordersDateTo = document.getElementById('orders-date-to').value;
+            ordersStudentSearch = document.getElementById('orders-student-search').value.trim().toLowerCase();
+            loadOrders(currentOrderFilter);
+        }
+
+        function resetOrderFilters() {
+            document.getElementById('orders-date-from').value = '';
+            document.getElementById('orders-date-to').value = '';
+            document.getElementById('orders-student-search').value = '';
+            ordersDateFrom = '';
+            ordersDateTo = '';
+            ordersStudentSearch = '';
+            loadOrders(currentOrderFilter);
+        }
 
         async function loadOrders(status = 'need_action') {
             currentOrderFilter = status;
-            
+
             // 필터 버튼 UI 업데이트
             document.querySelectorAll('[id^="filter-orders-"]').forEach(btn => {
                 btn.classList.remove('bg-white', 'bg-opacity-10', 'text-white');
@@ -3659,21 +3704,45 @@
 
             try {
                 // orders 테이블에서 결제 완료된 주문 로드
-                const { data, error } = await window.supabase
+                let query = window.supabase
                     .from('orders')
                     .select('*')
                     .eq('status', 'DONE')
                     .order('created_at', { ascending: false });
 
+                // 기간 필터 적용
+                if (ordersDateFrom) {
+                    query = query.gte('created_at', ordersDateFrom + 'T00:00:00');
+                }
+                if (ordersDateTo) {
+                    query = query.lte('created_at', ordersDateTo + 'T23:59:59');
+                }
+
+                const { data, error } = await query;
+
                 if (error) throw error;
 
-                allOrdersRaw = data || [];
-                
-                // 필터링
+                let filteredData = data || [];
+
+                // 학생 검색 필터 적용 (이름 또는 이메일)
+                if (ordersStudentSearch) {
+                    filteredData = filteredData.filter(o => {
+                        const name = (o.customer_name || o.profiles?.name || '').toLowerCase();
+                        const email = (o.customer_email || o.profiles?.email || '').toLowerCase();
+                        const shippingName = (o.shipping_name || '').toLowerCase();
+                        return name.includes(ordersStudentSearch) ||
+                               email.includes(ordersStudentSearch) ||
+                               shippingName.includes(ordersStudentSearch);
+                    });
+                }
+
+                allOrdersRaw = filteredData;
+
+                // 상태 필터링
                 let filteredOrders = allOrdersRaw;
                 if (status === 'need_action') {
                     // 배송정보 미입력 + 배송준비중
-                    filteredOrders = allOrdersRaw.filter(o => 
+                    filteredOrders = allOrdersRaw.filter(o =>
                         o.shipping_status === 'PENDING_ADDRESS' || o.shipping_status === 'PREPARING'
                     );
                 } else if (status !== 'all') {
