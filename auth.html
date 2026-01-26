@@ -518,27 +518,13 @@
             });
             
             if (result.success) {
-                // 이메일 확인 안내 모달 (상세)
-                document.getElementById('modal-title').textContent = '📧 이메일 확인 필요';
-                document.getElementById('modal-message').innerHTML = `
-                    <div class="space-y-4 text-left">
-                        <p class="text-center"><strong>${email}</strong> 으로<br>회원가입 확인 이메일을 보냈습니다.</p>
-                        <div class="space-y-2 text-sm">
-                            <p><strong>1.</strong> 이메일 받은편지함을 확인하세요</p>
-                            <p><strong>2.</strong> "Confirm your mail" 링크를 클릭하세요</p>
-                            <p><strong>3.</strong> 확인 완료 후 로그인하세요</p>
-                        </div>
-                        <p class="text-xs text-gray-500 text-center pt-2">※ 이메일이 안 보이면 스팸함을 확인해주세요</p>
-                    </div>
-                `;
-                document.getElementById('custom-modal').classList.remove('hidden');
-                
+                // 회원가입 완료 - 바로 로그인 탭으로 이동
+                showModal('회원가입 완료', '회원가입이 완료되었습니다. 로그인해주세요.');
+
                 // 확인 버튼 클릭 시 로그인 탭으로 이동
                 document.getElementById('custom-modal').querySelector('button').onclick = () => {
                     closeModal();
                     showTab('login');
-                    // 모달 원래대로 복구
-                    document.getElementById('modal-message').innerHTML = '';
                 };
             } else {
                 // 중복 이메일 에러 처리
