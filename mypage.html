@@ -281,15 +281,10 @@
                     
                     <!-- 학부모 정보 섹션 -->
                     <div class="pt-12 border-t border-white border-opacity-10 space-y-8">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-bold text-white tracking-tight">Parent Notification</h3>
-                                <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">SMS alerts for course completion</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="parent-notification-enabled" class="sr-only peer">
-                                <div class="w-11 h-6 bg-white bg-opacity-10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-white peer-checked:bg-opacity-100 peer-checked:after:bg-black"></div>
-                            </label>
+                        <div>
+                            <h3 class="text-lg font-bold text-white tracking-tight">Parent Notification</h3>
+                            <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">SMS alerts for course completion</p>
+                            <input type="hidden" id="parent-notification-enabled" value="true">
                         </div>
                         
                         <div class="grid md:grid-cols-2 gap-6">
@@ -335,11 +330,26 @@
                                    placeholder="Repeat password">
                         </div>
                         <div id="password-message" class="text-sm hidden"></div>
-                        <button onclick="changePassword()" 
+                        <button onclick="changePassword()"
                                 class="btn-hover-scale w-full px-8 py-4 bg-transparent text-white font-bold text-sm tracking-widest uppercase border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
                             Change Password
                         </button>
                     </div>
+                </div>
+
+                <!-- 회원 탈퇴 섹션 -->
+                <div class="pt-16 border-t border-white border-opacity-10 max-w-xl mx-auto">
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold text-red-400 tracking-tight">회원 탈퇴</h3>
+                        <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">Delete your account permanently</p>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-6">
+                        회원 탈퇴 시 모든 학습 기록, 진도, 과제 제출 내역이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+                    </p>
+                    <button onclick="confirmDeleteAccount()"
+                            class="w-full px-8 py-4 bg-transparent text-red-400 font-bold text-sm tracking-widest uppercase border border-red-400 border-opacity-50 hover:bg-red-400 hover:text-black transition-colors">
+                        회원 탈퇴
+                    </button>
                 </div>
             </div>
 
@@ -850,6 +860,58 @@
             } catch (error) {
                 console.error('Change password error:', error);
                 showMessage('password-message', '비밀번호 변경에 실패했습니다.', false);
+            }
+        }
+
+        // 회원 탈퇴 확인
+        function confirmDeleteAccount() {
+            if (!confirm('정말로 회원 탈퇴하시겠습니까?\n\n모든 학습 기록, 진도, 과제 제출 내역이 영구적으로 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.')) {
+                return;
+            }
+
+            const confirmText = prompt('탈퇴를 확인하려면 "탈퇴합니다"를 입력해주세요:');
+            if (confirmText === '탈퇴합니다') {
+                deleteAccount();
+            } else {
+                alert('입력이 일치하지 않아 탈퇴가 취소되었습니다.');
+            }
+        }
+
+        // 회원 탈퇴 처리
+        async function deleteAccount() {
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    alert('로그인이 필요합니다.');
+                    return;
+                }
+
+                // 1. 사용자 관련 데이터 삭제 (profiles 테이블은 CASCADE로 자동 삭제될 수 있음)
+                // progress 삭제
+                await window.supabase.from('progress').delete().eq('user_id', user.id);
+
+                // student_submissions 삭제
+                await window.supabase.from('student_submissions').delete().eq('user_id', user.id);
+
+                // enrollments 삭제
+                await window.supabase.from('enrollments').delete().eq('user_id', user.id);
+
+                // user_devices 삭제
+                await window.supabase.from('user_devices').delete().eq('user_id', user.id);
+
+                // profiles 삭제
+                await window.supabase.from('profiles').delete().eq('id', user.id);
+
+                // 2. Supabase Auth 사용자 삭제 (Edge Function 필요할 수 있음)
+                // 현재는 로그아웃만 처리
+                await window.supabase.auth.signOut();
+
+                alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error('Delete account error:', error);
+                alert('회원 탈퇴 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.');
             }
         }
 

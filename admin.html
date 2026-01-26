@@ -1071,11 +1071,12 @@
     <script src="js/auth.js"></script>
     <script src="js/image-utils.js"></script>
     <script>
+        // 전역 변수
         let currentUser = null;
         let allStudents = [];
         let allCourses = [];
 
-        // 섹션 전환
+        // 섹션 전환 함수
         function showSection(section) {
             // 모든 섹션 숨기기
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
