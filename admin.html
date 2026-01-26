@@ -167,6 +167,31 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
         }
+
+        /* Date picker 스타일 (달력) */
+        input[type="date"] {
+            color-scheme: dark;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        /* Select/Dropdown 스타일 */
+        select {
+            color-scheme: dark;
+        }
+        select option {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 8px;
+        }
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background-color: #333333;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen">
