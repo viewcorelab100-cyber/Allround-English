@@ -17,18 +17,18 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <style>
         body {
-            font-family: "aileron", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Noto Sans KR', "Poppins", sans-serif;
             background-color: #000000;
         }
         
         /* 상단바 제외한 본문 영문 폰트 */
         .main-content {
-            font-family: 'Playfair Display', "aileron", serif;
+            font-family: "Poppins", 'Noto Sans KR', sans-serif;
         }
         
-        /* 상단바는 aileron 유지 */
+        /* 상단바 스타일 */
         header, header * {
-            font-family: "aileron", sans-serif;
+            font-family: "Poppins", sans-serif;
         }
         
         .btn-hover-scale {
@@ -62,6 +62,40 @@
             -webkit-text-fill-color: white;
             -webkit-box-shadow: 0 0 0px 1000px #111 inset;
             transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* Input Styles */
+        input, textarea, select {
+            border-radius: 0px !important;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: black;
+            border-radius: 0px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #e5e5e5;
+        }
+
+        /* Auth Specific Styles */
+        .auth-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            border-radius: 0px;
+        }
+
+        .radio-card {
+            transition: all 0.2s ease;
+            border-radius: 0px;
         }
     </style>
 </head>
@@ -127,10 +161,10 @@
             
             <!-- 탭 -->
             <div class="flex border-b border-white border-opacity-20 mb-8">
-                <button id="login-tab" class="flex-1 py-4 text-lg font-semibold text-white tab-active" onclick="showTab('login')">
+                <button id="login-tab" class="flex-1 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white tab-active" onclick="showTab('login')">
                     Login
                 </button>
-                <button id="signup-tab" class="flex-1 py-4 text-lg font-semibold text-gray-500" onclick="showTab('signup')">
+                <button id="signup-tab" class="flex-1 py-4 text-xs font-bold uppercase tracking-[0.2em] text-gray-500" onclick="showTab('signup')">
                     Sign Up
                 </button>
             </div>
@@ -138,157 +172,163 @@
             <!-- 로그인 폼 -->
             <div id="login-form" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">이메일</label>
+                    <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Email</label>
                     <input type="email" id="login-email" 
-                           class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                           class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
                            placeholder="your@email.com">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">비밀번호</label>
+                    <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Password</label>
                     <input type="password" id="login-password" 
-                           class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                           class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
                            placeholder="••••••••">
                 </div>
-                <div id="login-error" class="text-red-400 text-sm hidden"></div>
+                <div id="login-error" class="text-red-400 text-[10px] uppercase tracking-wider hidden"></div>
                 <button onclick="handleLogin()" 
-                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">
+                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
                     Login
                 </button>
-                <div class="text-center">
-                    <a href="#" onclick="showForgotPassword()" class="text-sm text-gray-400 hover:text-white">비밀번호를 잊으셨나요?</a>
+                <div class="text-center pt-4">
+                    <a href="#" onclick="showForgotPassword()" class="text-[10px] text-gray-500 uppercase tracking-widest hover:text-white transition-colors">Forgot Password?</a>
                 </div>
             </div>
 
             <!-- 회원가입 폼 -->
-            <div id="signup-form" class="space-y-5 hidden">
+            <div id="signup-form" class="space-y-8 hidden">
                 <!-- 기본 정보 섹션 -->
-                <div class="pb-4 border-b border-white border-opacity-10">
-                    <h3 class="text-sm font-semibold text-white mb-4">기본 정보</h3>
+                <div class="space-y-6">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold block border-b border-white border-opacity-5 pb-2">Primary Information</span>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">이름 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Name <span class="text-red-500">*</span></label>
                             <input type="text" id="signup-name" 
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                   placeholder="홍길동">
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="Your Name">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">이메일 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Email <span class="text-red-500">*</span></label>
                             <input type="email" id="signup-email" 
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
                                    placeholder="your@email.com">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">전화번호 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Phone <span class="text-red-500">*</span></label>
                             <input type="tel" id="signup-phone" 
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                   placeholder="010-1234-5678"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="010-0000-0000"
                                    oninput="formatPhoneNumber(this)"
                                    maxlength="13">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">주소 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Address <span class="text-red-500">*</span></label>
                             <div class="flex gap-2 mb-2">
                                 <input type="text" id="signup-postcode" 
-                                       class="w-28 px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                       placeholder="우편번호" readonly>
+                                       class="w-28 px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600"
+                                       placeholder="Zip" readonly>
                                 <button type="button" onclick="openPostcode()" 
-                                        class="px-4 py-3 bg-white bg-opacity-10 border border-white border-opacity-20 rounded-xl text-white text-sm hover:bg-opacity-20 transition-all">
-                                    주소 검색
+                                        class="px-6 py-3 bg-white bg-opacity-10 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-opacity-20 transition-all border border-white border-opacity-10">
+                                    Search
                                 </button>
                             </div>
                             <input type="text" id="signup-address" 
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white mb-2"
-                                   placeholder="기본 주소" readonly>
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 mb-2"
+                                   placeholder="Basic Address" readonly>
                             <input type="text" id="signup-address-detail" 
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                   placeholder="상세 주소 (동/호수 등)">
-                            <p class="text-xs text-gray-500 mt-2">※ 모든 교재는 해당 주소로 발송되니, 택배 수령이 가능한 주소를 입력해주세요.</p>
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="Detailed Address">
+                            <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-2">※ All textbooks will be shipped to this address.</p>
                         </div>
                     </div>
                 </div>
                 
                 <!-- 보호자 정보 섹션 -->
-                <div class="pb-4 border-b border-white border-opacity-10">
-                    <h3 class="text-sm font-semibold text-white mb-4">보호자 정보</h3>
+                <div class="space-y-6">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold block border-b border-white border-opacity-5 pb-2">Guardian Information</span>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">보호자 성함 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Guardian Name <span class="text-red-500">*</span></label>
                             <input type="text" id="signup-guardian-name"
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                   placeholder="보호자 이름">
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="Guardian's Name">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-300 mb-2">보호자 전화번호 <span class="text-red-400">*</span></label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Guardian Phone <span class="text-red-500">*</span></label>
                             <input type="tel" id="signup-guardian-phone"
-                                   class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                                   placeholder="010-5678-1234"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="010-0000-0000"
                                    oninput="formatPhoneNumber(this)"
                                    maxlength="13">
-                            <p class="text-xs text-gray-500 mt-2">※ 결제 링크가 해당 번호로 발송되니, 정확한 번호를 입력해주세요.</p>
+                            <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-2">※ Payment links will be sent to this number.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- 수강 유형 섹션 -->
-                <div class="pb-4 border-b border-white border-opacity-10">
-                    <h3 class="text-sm font-semibold text-white mb-4">수강 유형 <span class="text-red-400">*</span></h3>
+                <div class="space-y-6">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold block border-b border-white border-opacity-5 pb-2">Student Type <span class="text-red-500">*</span></span>
                     <div class="grid grid-cols-2 gap-3">
                         <label class="relative cursor-pointer">
                             <input type="radio" name="student-type" value="online" checked class="peer sr-only">
-                            <div class="px-4 py-3 border border-white border-opacity-20 rounded-xl text-center peer-checked:border-white peer-checked:bg-white peer-checked:bg-opacity-10 transition-all">
-                                <span class="text-white font-medium">온라인 학생</span>
-                                <p class="text-xs text-gray-500 mt-1">온라인 강의 수강</p>
+                            <div class="radio-card px-4 py-4 border border-white border-opacity-10 bg-white bg-opacity-5 text-center peer-checked:border-white peer-checked:bg-opacity-10 transition-all">
+                                <span class="text-[10px] text-white font-bold uppercase tracking-widest">Online</span>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-1">Self-Paced Learning</p>
                             </div>
                         </label>
                         <label class="relative cursor-pointer">
                             <input type="radio" name="student-type" value="offline" class="peer sr-only">
-                            <div class="px-4 py-3 border border-white border-opacity-20 rounded-xl text-center peer-checked:border-white peer-checked:bg-white peer-checked:bg-opacity-10 transition-all">
-                                <span class="text-white font-medium">오프라인 학생</span>
-                                <p class="text-xs text-gray-500 mt-1">학원 방문 수강</p>
+                            <div class="radio-card px-4 py-4 border border-white border-opacity-10 bg-white bg-opacity-5 text-center peer-checked:border-white peer-checked:bg-opacity-10 transition-all">
+                                <span class="text-[10px] text-white font-bold uppercase tracking-widest">Offline</span>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-1">In-Person Learning</p>
                             </div>
                         </label>
                     </div>
                 </div>
 
                 <!-- 비밀번호 섹션 -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">비밀번호 <span class="text-red-400">*</span></label>
-                        <input type="password" id="signup-password" 
-                               class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                               placeholder="8자 이상 입력해주세요">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-300 mb-2">비밀번호 확인 <span class="text-red-400">*</span></label>
-                        <input type="password" id="signup-password-confirm" 
-                               class="w-full px-4 py-3 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
-                               placeholder="비밀번호를 다시 입력해주세요">
+                <div class="space-y-6">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold block border-b border-white border-opacity-5 pb-2">Security</span>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Password <span class="text-red-500">*</span></label>
+                            <input type="password" id="signup-password" 
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="Min. 8 characters">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Confirm Password <span class="text-red-500">*</span></label>
+                            <input type="password" id="signup-password-confirm" 
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="Repeat your password">
+                        </div>
                     </div>
                 </div>
                 
-                <div id="signup-error" class="text-red-400 text-sm hidden"></div>
+                <div id="signup-error" class="text-red-400 text-[10px] uppercase tracking-wider hidden"></div>
                 <button type="button" onclick="handleSignup()" 
-                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">
-                    Sign Up
+                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
+                    Create Account
                 </button>
             </div>
 
             <!-- 비밀번호 찾기 폼 -->
-            <div id="forgot-form" class="space-y-6 hidden">
-                <p class="text-gray-400 text-sm mb-4">가입하신 이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다.</p>
+            <div id="forgot-form" class="space-y-8 hidden">
+                <div class="text-center space-y-2">
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Reset Password</h2>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">A reset link will be sent to your email.</p>
+                </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-300 mb-2">이메일</label>
+                    <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Email</label>
                     <input type="email" id="forgot-email" 
-                           class="w-full px-4 py-4 bg-transparent border border-white border-opacity-20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-white"
+                           class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
                            placeholder="your@email.com">
                 </div>
-                <div id="forgot-message" class="text-sm hidden"></div>
+                <div id="forgot-message" class="text-[10px] uppercase tracking-wider hidden"></div>
                 <button onclick="handleForgotPassword()" 
-                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">
-                    재설정 링크 보내기
+                        class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
+                    Send Reset Link
                 </button>
                 <div class="text-center">
-                    <a href="#" onclick="showTab('login')" class="text-sm text-gray-400 hover:text-white">← 로그인으로 돌아가기</a>
+                    <a href="#" onclick="showTab('login')" class="text-[10px] text-gray-500 uppercase tracking-widest hover:text-white transition-colors">← Back to Login</a>
                 </div>
             </div>
 
@@ -310,11 +350,11 @@
 
     <!-- 커스텀 모달 -->
     <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-6">
-        <div class="bg-black border border-white border-opacity-20 rounded-2xl w-full max-w-md p-8 space-y-6">
-            <h3 id="modal-title" class="text-2xl font-bold text-white text-center"></h3>
-            <p id="modal-message" class="text-gray-300 text-center"></p>
-            <button onclick="closeModal()" class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl">
-                확인
+        <div class="bg-neutral-900 border border-white border-opacity-10 w-full max-w-md p-12 space-y-8">
+            <h3 id="modal-title" class="text-xl font-bold text-white text-center uppercase tracking-widest"></h3>
+            <div id="modal-message" class="text-gray-400 text-center text-sm leading-relaxed"></div>
+            <button onclick="closeModal()" class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
+                Confirm
             </button>
         </div>
     </div>

@@ -18,8 +18,18 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         body {
-            font-family: "aileron", sans-serif;
+            font-family: 'Noto Sans KR', "Poppins", sans-serif;
             background-color: #000000;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: "Poppins", 'Noto Sans KR', sans-serif;
+        }
+        
+        /* 상단바 스타일 */
+        header, header * {
+            font-family: "Poppins", sans-serif;
         }
         
         .btn-hover-scale {
@@ -45,96 +55,172 @@
 
         .sidebar-link {
             transition: all 0.2s ease;
+            border-radius: 0px;
+            margin: 0px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 11px;
+            font-weight: 500;
+            color: #666;
         }
 
         .sidebar-link:hover, .sidebar-link.active {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .student-card {
             transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 0px;
         }
 
         .student-card:hover {
             background-color: rgba(255, 255, 255, 0.08);
         }
 
-        .progress-bar {
-            transition: width 0.3s ease;
+        /* Table Styles */
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .admin-table th {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #444;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .admin-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .admin-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Input Styles */
+        input, textarea, select {
+            border-radius: 0px !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            outline: none;
+        }
+
+        /* Button Styles */
+        .btn-admin-primary {
+            background-color: white;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 0px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+
+        .btn-admin-primary:hover {
+            background-color: #e5e5e5;
+        }
+
+        .btn-admin-outline {
+            background-color: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 0px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+
+        .btn-admin-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: white;
         }
 
         /* 스크롤바 스타일 */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-        }
-
-        /* 테이블 셀 텍스트 한 줄 처리 */
-        table td, table th {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 200px;
-        }
-
-        /* 버튼 텍스트 오버플로우 방지 */
-        table button, table .btn {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-width: fit-content;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
         }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen">
     
     <!-- 상단 헤더 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="px-6 py-4 flex items-center justify-between">
-            <a href="index.html"><img src="/logo.png" alt="ALLROUND" class="h-4 w-auto"></a>
-            <div class="flex items-center space-x-4">
-                <span class="text-sm text-gray-400">관리자</span>
-                <button onclick="handleSignOut()" class="nav-link text-gray-400 text-sm">로그아웃</button>
+    <header class="fixed top-0 left-0 right-0 bg-black z-50 border-b border-white border-opacity-5">
+        <div class="px-8 py-5 flex items-center justify-between">
+            <a href="index.html" class="flex items-center">
+                <img src="/logo.png" alt="ALLROUND" class="h-3.5 w-auto">
+            </a>
+            <div class="flex items-center space-x-6">
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Administrator</span>
+                    <span class="text-xs text-white font-medium">Admin Panel</span>
+                </div>
+                <div class="h-8 w-px bg-white bg-opacity-10"></div>
+                <button onclick="handleSignOut()" class="text-[10px] text-gray-400 hover:text-white uppercase tracking-widest font-bold transition-colors">Logout</button>
             </div>
         </div>
     </header>
 
-    <div class="flex pt-16">
+    <div class="flex pt-20">
         <!-- 사이드바 -->
-        <aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-56 bg-black overflow-y-auto">
-            <nav class="py-4 space-y-1">
-                <a href="#dashboard" onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    대시보드
+        <aside class="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 bg-black border-r border-white border-opacity-5 overflow-y-auto py-8">
+            <div class="px-8 mb-8">
+                <h2 class="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold">Management</h2>
+            </div>
+            <nav class="space-y-1">
+                <a href="#dashboard" onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link block px-8 py-3.5">
+                    Dashboard
                 </a>
-                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    강의 관리
+                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-8 py-3.5">
+                    Courses
                 </a>
-                <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    회원 관리
+                <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-8 py-3.5">
+                    Members
                 </a>
-                <a href="#payments" onclick="showSection('payments')" id="nav-payments" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    결제 관리
+                <a href="#payments" onclick="showSection('payments')" id="nav-payments" class="sidebar-link block px-8 py-3.5">
+                    Payments
                 </a>
-                <a href="#schedule" onclick="showSection('schedule')" id="nav-schedule" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    시간표 관리
+                <a href="#schedule" onclick="showSection('schedule')" id="nav-schedule" class="sidebar-link block px-8 py-3.5">
+                    Schedule
                 </a>
-                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-6 py-3 text-white text-sm">
-                    과제 관리
+                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-8 py-3.5">
+                    Assignments
                 </a>
-                <a href="#orders" onclick="showSection('orders')" id="nav-orders" class="sidebar-link block px-6 py-3 text-white text-sm">
-                    주문/배송 관리
+                <a href="#orders" onclick="showSection('orders')" id="nav-orders" class="sidebar-link block px-8 py-3.5">
+                    Orders & Shipping
                 </a>
             </nav>
         </aside>
 
         <!-- 메인 컨텐츠 -->
-        <main class="ml-56 flex-1 min-h-screen p-8">
+        <main class="ml-64 flex-1 min-h-screen p-12 main-content">
             
             <!-- 대시보드 섹션 -->
             <section id="section-dashboard" class="hidden">
@@ -147,51 +233,56 @@
             <!-- 강의 관리 섹션 -->
             <section id="section-courses" class="hidden">
                 <!-- 헤더 -->
-                <div class="flex items-center justify-between mb-8">
-                    <h1 class="text-2xl font-bold text-white">강의 관리</h1>
+                <div class="flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Content Management</span>
+                        <h1 class="text-4xl font-bold text-white tracking-tight">Courses</h1>
+                    </div>
                     <div class="flex space-x-3">
-                        <button onclick="openCategoryModal()" class="px-5 py-2.5 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
-                            카테고리 편집
+                        <button onclick="openCategoryModal()" class="btn-admin-outline">
+                            Categories
                         </button>
-                        <button onclick="openCourseModal()" class="px-5 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
-                            새 강의 추가
+                        <button onclick="openCourseModal()" class="btn-admin-primary">
+                            Add New Course
                         </button>
                     </div>
                 </div>
 
                 <!-- 강의 목록 테이블 -->
-                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
-                    <table class="w-full">
+                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-hidden">
+                    <table class="admin-table">
                         <thead>
-                            <tr class="border-b border-white border-opacity-10">
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">강의명</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">카테고리</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">가격</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">영상</th>
-                                <th class="text-right px-6 py-4 text-sm font-semibold text-gray-400">관리</th>
+                            <tr>
+                                <th>Course Title</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Lessons</th>
+                                <th class="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="course-table-body">
                             <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                                    강의 목록을 불러오는 중...
+                                <td colspan="5" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                                    Loading courses...
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <!-- 선택된 강의의 영상 목록 -->
-                <div id="lesson-list-section" class="hidden mt-8">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-white">
-                            <span id="selected-course-title"></span>의 영상 목록
-                        </h2>
-                        <button onclick="openLessonModal()" class="px-4 py-2 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition text-sm">
-                            + 새 영상 추가
+                <div id="lesson-list-section" class="hidden mt-16 pt-16 border-t border-white border-opacity-5">
+                    <div class="flex items-end justify-between mb-8">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Curriculum Management</span>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">
+                                <span id="selected-course-title"></span>
+                            </h2>
+                        </div>
+                        <button onclick="openLessonModal()" class="btn-admin-primary">
+                            Add New Lesson
                         </button>
                     </div>
-                    <div id="lesson-list" class="space-y-2">
+                    <div id="lesson-list" class="space-y-3">
                         <!-- 레슨 목록이 여기에 표시됩니다 -->
                     </div>
                 </div>
@@ -199,9 +290,9 @@
 
             <!-- 새 강의 추가/수정 모달 -->
             <div id="course-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                        <h3 id="course-modal-title" class="text-xl font-bold text-white">새 강의 추가</h3>
+                        <h3 id="course-modal-title" class="text-xl font-bold text-white tracking-tight">Add New Course</h3>
                         <button onclick="closeCourseModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
                     <form id="course-form" class="p-6 space-y-5">
@@ -294,9 +385,9 @@
 
             <!-- 새 영상(레슨) 추가/수정 모달 -->
             <div id="lesson-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                        <h3 id="lesson-modal-title" class="text-xl font-bold text-white">새 영상 추가</h3>
+                        <h3 id="lesson-modal-title" class="text-xl font-bold text-white tracking-tight">Add New Lesson</h3>
                         <button onclick="closeLessonModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
                     <form id="lesson-form" class="p-6 space-y-5">
@@ -412,9 +503,9 @@
 
             <!-- 카테고리 편집 모달 -->
             <div id="category-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 rounded-xl w-full max-w-md">
+                <div class="bg-neutral-900 w-full max-w-md">
                     <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                        <h3 class="text-xl font-bold text-white">카테고리 편집</h3>
+                        <h3 class="text-xl font-bold text-white tracking-tight">Edit Categories</h3>
                         <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
                     <div class="p-6 space-y-4">
@@ -434,48 +525,51 @@
 
             <!-- 회원 관리 섹션 -->
             <section id="section-members" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
-                    회원 관리
-                </h1>
+                <div class="mb-12">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">User Management</span>
+                    <h1 class="text-4xl font-bold text-white tracking-tight">Members</h1>
+                </div>
 
                 <!-- 통계 카드 -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-blue-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-blue-300">전체 회원</p>
-                        <p id="stat-total-members" class="text-2xl font-bold text-white mt-1">0</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Total Members</p>
+                        <p id="stat-total-members" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div class="bg-green-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-green-300">수강 중</p>
-                        <p id="stat-active-members" class="text-2xl font-bold text-white mt-1">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Active Students</p>
+                        <p id="stat-active-members" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div class="bg-purple-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-purple-300">이번 달 가입</p>
-                        <p id="stat-new-members" class="text-2xl font-bold text-white mt-1">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">New (This Month)</p>
+                        <p id="stat-new-members" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div class="bg-yellow-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-yellow-300">이번달 총 결제금액</p>
-                        <p id="stat-total-revenue" class="text-2xl font-bold text-white mt-1">₩0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Revenue (MTD)</p>
+                        <p id="stat-total-revenue" class="text-3xl font-bold text-white">₩0</p>
                     </div>
                 </div>
 
                 <!-- 검색 및 필터 -->
-                <div class="mb-6 flex flex-col md:flex-row gap-4">
-                    <input type="text" id="search-member"
-                           class="flex-1 max-w-md px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30"
-                           placeholder="이름, 이메일, 전화번호로 검색..."
-                           oninput="filterMembers()">
-                    <div class="flex gap-2">
+                <div class="mb-8 flex flex-col md:flex-row gap-6 items-center">
+                    <div class="relative flex-1 max-w-md">
+                        <input type="text" id="search-member"
+                               class="w-full px-6 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors text-sm"
+                               placeholder="Search by name, email, or phone..."
+                               oninput="filterMembers()">
+                    </div>
+                    <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1">
                         <button onclick="filterMembersByType('all')" id="filter-member-all"
-                                class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm">
-                            전체
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
+                            All
                         </button>
                         <button onclick="filterMembersByType('online')" id="filter-member-online"
-                                class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
-                            온라인 학생
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                            Online
                         </button>
                         <button onclick="filterMembersByType('offline')" id="filter-member-offline"
-                                class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5 text-sm">
-                            오프라인 학생
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                            Offline
                         </button>
                     </div>
                 </div>
@@ -483,17 +577,17 @@
                 <!-- 회원 목록 (카드 형식) -->
                 <div id="members-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- 로딩 메시지 -->
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        회원 목록을 불러오는 중...
+                    <div class="col-span-full text-center py-20 text-gray-600 uppercase tracking-widest text-[10px]">
+                        Loading members...
                     </div>
                 </div>
             </section>
 
             <!-- 회원 상세 모달 -->
             <div id="member-detail-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div class="bg-neutral-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                        <h3 class="text-xl font-bold text-white">회원 상세 정보</h3>
+                        <h3 class="text-xl font-bold text-white tracking-tight">Member Details</h3>
                         <button onclick="closeMemberModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
                     <div id="member-detail-content" class="p-6">
@@ -1350,7 +1444,7 @@
             console.log('과제 테이블 렌더링:', submissions?.length || 0, '건');
 
             if (!submissions || submissions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">과제 활동이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">No activity found.</td></tr>';
                 return;
             }
 
@@ -1360,50 +1454,50 @@
                 
                 // 진도율 표시
                 const watchRateDisplay = sub.watchRate > 0 
-                    ? `<div class="flex items-center space-x-2">
-                         <div class="w-16 h-2 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                    ? `<div class="flex items-center space-x-3">
+                         <div class="w-16 h-1 bg-white bg-opacity-10 overflow-hidden">
                              <div class="h-full bg-green-500" style="width: ${sub.watchRate}%"></div>
                          </div>
-                         <span class="text-xs text-green-400">${sub.watchRate}%</span>
+                         <span class="text-[10px] font-bold text-green-500">${sub.watchRate}%</span>
                        </div>
-                       <p class="text-xs text-gray-500 mt-1">${formatTime(sub.watched_seconds)} / ${formatTime(sub.total_seconds)}</p>`
-                    : '<span class="text-gray-500 text-sm">미수강</span>';
+                       <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-1">${formatTime(sub.watched_seconds)} / ${formatTime(sub.total_seconds)}</p>`
+                    : '<span class="text-[10px] text-gray-600 uppercase tracking-widest">Not Started</span>';
                 
                  // 체크리스트 상태
-                 const checkNote = sub.note_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
-                 const checkBlog = sub.blog_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
-                 const checkKakao = sub.kakao_completed ? '<span class="text-green-400">●</span>' : '<span class="text-gray-600">○</span>';
+                 const checkNote = sub.note_completed ? '<span class="text-green-500">●</span>' : '<span class="text-gray-800">○</span>';
+                 const checkBlog = sub.blog_completed ? '<span class="text-green-500">●</span>' : '<span class="text-gray-800">○</span>';
+                 const checkKakao = sub.kakao_completed ? '<span class="text-green-500">●</span>' : '<span class="text-gray-800">○</span>';
                  const checklistDisplay = `
-                     <div class="flex items-center space-x-2 text-sm">
-                         <span title="노트">${checkNote}</span>
-                         <span title="블로그">${checkBlog}</span>
-                         <span title="카톡">${checkKakao}</span>
+                     <div class="flex items-center space-x-2 text-[10px]">
+                         <span title="Note">${checkNote}</span>
+                         <span title="Blog">${checkBlog}</span>
+                         <span title="Kakao">${checkKakao}</span>
                      </div>
-                     <p class="text-xs text-gray-500 mt-1">${sub.checklistRate}%</p>
+                     <p class="text-[9px] text-gray-600 uppercase tracking-tight mt-1">${sub.checklistRate}%</p>
                  `;
 
                 // 퀴즈 결과
                 const quizDisplay = sub.quizScore !== null
                     ? `<div class="text-center">
-                         <p class="text-sm ${sub.quizScore >= 80 ? 'text-green-400' : sub.quizScore >= 60 ? 'text-yellow-400' : 'text-red-400'} font-bold">${sub.quizScore}점</p>
-                         <p class="text-xs text-gray-500">${sub.quizCorrect}/${sub.quizTotal}</p>
+                         <p class="text-xs ${sub.quizScore >= 80 ? 'text-green-500' : sub.quizScore >= 60 ? 'text-yellow-500' : 'text-red-500'} font-bold tracking-tighter">${sub.quizScore} PT</p>
+                         <p class="text-[9px] text-gray-600 uppercase tracking-tight">${sub.quizCorrect}/${sub.quizTotal}</p>
                        </div>`
-                    : '<span class="text-gray-500 text-sm">미응시</span>';
+                    : '<span class="text-[10px] text-gray-600 uppercase tracking-widest">N/A</span>';
 
                 // 이미지 미리보기
                 const imagePreview = sub.image_url 
-                    ? `<img src="${sub.image_url}" class="w-12 h-12 object-cover rounded cursor-pointer" onclick="viewFullImage('${sub.image_url}')">`
-                    : '<span class="text-gray-500 text-sm">없음</span>';
+                    ? `<img src="${sub.image_url}" class="w-10 h-10 object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer" onclick="viewFullImage('${sub.image_url}')">`
+                    : '<span class="text-[10px] text-gray-600 uppercase tracking-widest">None</span>';
 
                 // 이미지 과제 상태 뱃지
                 let imageBadge = '';
                 if (sub.imageStatus === 'graded') {
                     const score = sub.feedback?.score || '-';
-                    imageBadge = `<span class="inline-block px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">${score}점</span>`;
+                    imageBadge = `<span class="text-[9px] uppercase tracking-widest font-bold text-green-500">${score} PT</span>`;
                 } else if (sub.imageStatus === 'returned') {
-                    imageBadge = '<span class="inline-block px-2 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs whitespace-nowrap">재제출</span>';
+                    imageBadge = '<span class="text-[9px] uppercase tracking-widest font-bold text-red-500">Return</span>';
                 } else if (sub.imageStatus === 'submitted') {
-                    imageBadge = '<span class="inline-block px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-xs whitespace-nowrap">제출완료</span>';
+                    imageBadge = '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">New</span>';
                 }
 
                 const imageDisplay = `
@@ -1414,24 +1508,24 @@
                 `;
 
                 return `
-                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
-                        <td class="px-4 py-4 text-sm text-gray-300">${activityDate}</td>
-                        <td class="px-4 py-4">
-                            <p class="text-white">${sub.studentName}</p>
-                            <p class="text-xs text-gray-500">${sub.studentEmail}</p>
+                    <tr>
+                        <td class="text-[11px] text-gray-500">${activityDate}</td>
+                        <td>
+                            <p class="text-white font-medium">${sub.studentName}</p>
+                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${sub.studentEmail}</p>
                         </td>
-                        <td class="px-4 py-4">
-                            <p class="text-white">${sub.courseTitle}</p>
-                            <p class="text-xs text-gray-500">${sub.lessonOrder}강 ${sub.lessonTitle}</p>
+                        <td>
+                            <p class="text-white font-medium">${sub.courseTitle}</p>
+                            <p class="text-[10px] text-gray-600 uppercase tracking-tight">${sub.lessonOrder}강 ${sub.lessonTitle}</p>
                         </td>
-                        <td class="px-4 py-4">${watchRateDisplay}</td>
-                        <td class="px-4 py-4">${checklistDisplay}</td>
-                        <td class="px-4 py-4">${quizDisplay}</td>
-                        <td class="px-4 py-4">${imageDisplay}</td>
-                        <td class="px-4 py-4">
+                        <td>${watchRateDisplay}</td>
+                        <td>${checklistDisplay}</td>
+                        <td>${quizDisplay}</td>
+                        <td>${imageDisplay}</td>
+                        <td class="text-right">
                             <button onclick="openAssignmentDetailModal('${sub.user_id}', '${sub.lesson_id}', '${sub.studentName}', '${sub.studentEmail}', '${sub.lessonOrder}강 ${sub.lessonTitle}')" 
-                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
-                                상세
+                                    class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                                View
                             </button>
                         </td>
                     </tr>
@@ -1487,7 +1581,7 @@
             const studentsToRender = students || allStudents;
 
             if (studentsToRender.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-20">등록된 학생이 없습니다.</div>';
+                container.innerHTML = '<div class="text-center py-20 text-gray-600 uppercase tracking-widest text-[10px]">No students found.</div>';
                 return;
             }
 
@@ -1503,41 +1597,41 @@
                 });
 
                 return `
-                <div class="student-card rounded-xl bg-white bg-opacity-5 overflow-hidden">
+                <div class="student-card border border-white border-opacity-5 overflow-hidden mb-4">
                     <!-- 학생 헤더 -->
-                    <div class="p-5 cursor-pointer flex items-center justify-between" onclick="toggleStudentDetail('${student.id}')">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-lg">
-                                👤
+                    <div class="p-6 cursor-pointer flex items-center justify-between" onclick="toggleStudentDetail('${student.id}')">
+                        <div class="flex items-center space-x-6">
+                            <div class="w-10 h-10 bg-white bg-opacity-5 flex items-center justify-center text-xs text-gray-500 uppercase font-bold">
+                                ${student.name?.substring(0, 1) || 'U'}
                             </div>
                             <div>
-                                <p class="font-bold text-white">${student.name}</p>
-                                <p class="text-sm text-gray-500">${student.email}</p>
+                                <p class="font-bold text-white tracking-tight">${student.name}</p>
+                                <p class="text-[10px] text-gray-600 lowercase tracking-tight">${student.email}</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-12">
                             <div class="text-center">
-                                <p class="text-xs text-gray-500">수강</p>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-widest font-bold mb-1">Courses</p>
                                 <p class="text-lg font-bold text-white">${student.courses.length}</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-xs text-gray-500">진도율</p>
-                                <p class="text-lg font-bold text-green-400">${student.totalProgress}%</p>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-widest font-bold mb-1">Progress</p>
+                                <p class="text-lg font-bold text-green-500">${student.totalProgress}%</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-xs text-gray-500">체크리스트</p>
-                                <p class="text-lg font-bold text-pink-400">${student.totalAssignmentRate}%</p>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-widest font-bold mb-1">Tasks</p>
+                                <p class="text-lg font-bold text-pink-500">${student.totalAssignmentRate}%</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-xs text-gray-500">이미지과제</p>
-                                <p class="text-lg font-bold ${pendingCount > 0 ? 'text-orange-400' : 'text-cyan-400'}">${imageCount}건${pendingCount > 0 ? ` (${pendingCount}대기)` : ''}</p>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-widest font-bold mb-1">Images</p>
+                                <p class="text-lg font-bold ${pendingCount > 0 ? 'text-orange-500' : 'text-cyan-500'}">${imageCount}${pendingCount > 0 ? ` (${pendingCount})` : ''}</p>
                             </div>
                             <div class="text-center">
-                                <p class="text-xs text-gray-500">최근활동</p>
-                                <p class="text-sm text-gray-400">${student.lastActivity ? formatDate(student.lastActivity) : '-'}</p>
+                                <p class="text-[9px] text-gray-600 uppercase tracking-widest font-bold mb-1">Activity</p>
+                                <p class="text-[11px] text-gray-500 uppercase tracking-tight">${student.lastActivity ? formatDate(student.lastActivity) : '-'}</p>
                             </div>
-                            <div id="arrow-${student.id}" class="text-gray-500 transition-transform">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <div id="arrow-${student.id}" class="text-gray-700 transition-transform">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                     <polyline points="6 9 12 15 18 9"></polyline>
                                 </svg>
                             </div>
@@ -1545,111 +1639,100 @@
                     </div>
 
                     <!-- 학생 상세 (숨김) -->
-                    <div id="detail-${student.id}" class="hidden border-t border-white border-opacity-10">
-                        <div class="p-5 space-y-4">
+                    <div id="detail-${student.id}" class="hidden border-t border-white border-opacity-5 bg-white bg-opacity-[0.01]">
+                        <div class="p-8 space-y-8">
                             <!-- 리포트 버튼 -->
                             <div class="flex justify-end">
-                                <button onclick="generateReport('${student.id}')" class="px-4 py-2 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 text-sm">
-                                    📄 리포트 생성
+                                <button onclick="generateReport('${student.id}')" class="btn-admin-primary">
+                                    Generate Report
                                 </button>
                             </div>
 
                             ${student.courses.map(course => `
-                                <div class="rounded-xl bg-white bg-opacity-5 p-4 space-y-4">
-                                    <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-3">
-                                        <h4 class="font-bold text-white text-lg">${course.title}</h4>
-                                        <div class="flex items-center space-x-4 text-sm">
-                                            <span class="text-green-400">진도 ${course.progressRate}%</span>
-                                            <span class="text-pink-400">체크리스트 ${course.assignmentRate}%</span>
+                                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 p-6 space-y-6">
+                                    <div class="flex items-center justify-between border-b border-white border-opacity-5 pb-4">
+                                        <h4 class="font-bold text-white text-xl tracking-tight">${course.title}</h4>
+                                        <div class="flex items-center space-x-6 text-[10px] uppercase tracking-widest font-bold">
+                                            <span class="text-green-500">Progress ${course.progressRate}%</span>
+                                            <span class="text-pink-500">Tasks ${course.assignmentRate}%</span>
                                         </div>
                                     </div>
                                     
+                                    <div class="grid gap-4">
                                     ${course.lessons.map(lesson => `
-                                        <div class="rounded-lg bg-white bg-opacity-5 p-4 space-y-3">
+                                        <div class="bg-white bg-opacity-5 p-6 space-y-4">
                                             <div class="flex items-center justify-between">
                                                 <div>
-                                                    <p class="font-semibold text-white">${lesson.order}강 ${lesson.title || ''}</p>
-                                                    <p class="text-xs text-gray-500">수강시간: ${formatTime(lesson.watchedSeconds)} / ${formatTime(lesson.totalSeconds)}</p>
+                                                    <p class="font-bold text-white tracking-tight">${lesson.order}강 ${lesson.title || ''}</p>
+                                                    <p class="text-[10px] text-gray-600 uppercase tracking-widest mt-1">Time: ${formatTime(lesson.watchedSeconds)} / ${formatTime(lesson.totalSeconds)}</p>
                                                 </div>
-                                                <div class="flex items-center space-x-2">
-                                                    <span class="text-sm text-green-400 font-bold">${lesson.watchRate}%</span>
-                                                    ${lesson.completed ? '<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-xs whitespace-nowrap">완료</span>' : ''}
+                                                <div class="flex items-center space-x-4">
+                                                    <span class="text-xs font-bold text-green-500">${lesson.watchRate}%</span>
+                                                    ${lesson.completed ? '<span class="text-[9px] px-2 py-0.5 border border-green-500 text-green-500 uppercase tracking-widest font-bold">Done</span>' : ''}
                                                 </div>
                                             </div>
                                             
                                             <!-- 진도 바 -->
-                                            <div class="h-2 bg-white bg-opacity-10 rounded-full overflow-hidden">
-                                                <div class="h-full bg-green-500 progress-bar" style="width: ${lesson.watchRate}%"></div>
+                                            <div class="h-1 bg-white bg-opacity-10 overflow-hidden">
+                                                <div class="h-full bg-green-500" style="width: ${lesson.watchRate}%"></div>
                                             </div>
                                             
                                             <!-- 체크리스트 -->
-                                            <div class="flex flex-wrap items-center gap-4 text-sm pt-2">
-                                                <span class="text-gray-500">체크리스트:</span>
+                                            <div class="flex flex-wrap items-center gap-6 text-[10px] uppercase tracking-widest font-bold pt-2">
+                                                <span class="text-gray-600">Checklist:</span>
                                                 <label class="flex items-center space-x-2 cursor-pointer">
                                                     <input type="checkbox" ${lesson.noteCompleted ? 'checked' : ''} 
-                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           class="w-3 h-3 border-gray-700 bg-transparent text-green-500 focus:ring-0"
                                                            onchange="updateAssignment('${student.id}', '${lesson.id}', 'note', this.checked)">
-                                                    <span class="${lesson.noteCompleted ? 'text-green-400' : 'text-gray-500'}">노트 필기</span>
+                                                    <span class="${lesson.noteCompleted ? 'text-green-500' : 'text-gray-600'}">Note</span>
                                                 </label>
                                                 <label class="flex items-center space-x-2 cursor-pointer">
                                                     <input type="checkbox" ${lesson.blogCompleted ? 'checked' : ''} 
-                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           class="w-3 h-3 border-gray-700 bg-transparent text-green-500 focus:ring-0"
                                                            onchange="updateAssignment('${student.id}', '${lesson.id}', 'blog', this.checked)">
-                                                    <span class="${lesson.blogCompleted ? 'text-green-400' : 'text-gray-500'}">블로그 숙제</span>
+                                                    <span class="${lesson.blogCompleted ? 'text-green-500' : 'text-gray-600'}">Blog</span>
                                                 </label>
                                                 <label class="flex items-center space-x-2 cursor-pointer">
                                                     <input type="checkbox" ${lesson.kakaoCompleted ? 'checked' : ''} 
-                                                           class="w-4 h-4 rounded border-gray-600 bg-transparent text-green-500 focus:ring-green-500"
+                                                           class="w-3 h-3 border-gray-700 bg-transparent text-green-500 focus:ring-0"
                                                            onchange="updateAssignment('${student.id}', '${lesson.id}', 'kakao', this.checked)">
-                                                    <span class="${lesson.kakaoCompleted ? 'text-green-400' : 'text-gray-500'}">카톡 숙제</span>
+                                                    <span class="${lesson.kakaoCompleted ? 'text-green-500' : 'text-gray-600'}">Kakao</span>
                                                 </label>
                                             </div>
                                             
                                             <!-- 이미지 과제 -->
                                             ${lesson.imageSubmission ? `
-                                                <div class="flex items-center justify-between bg-white bg-opacity-5 rounded-lg p-3 mt-2">
-                                                    <div class="flex items-center space-x-3">
-                                                        <div class="w-12 h-12 bg-neutral-800 rounded overflow-hidden">
-                                                            <img src="${lesson.imageSubmission.image_url}" class="w-full h-full object-cover">
+                                                <div class="flex items-center justify-between bg-white bg-opacity-5 p-4 mt-4 border border-white border-opacity-5">
+                                                    <div class="flex items-center space-x-4">
+                                                        <div class="w-12 h-12 bg-black overflow-hidden">
+                                                            <img src="${lesson.imageSubmission.image_url}" class="w-full h-full object-cover grayscale opacity-50">
                                                         </div>
                                                         <div>
-                                                            <p class="text-sm text-white">이미지 과제</p>
-                                                            <p class="text-xs text-gray-500">${lesson.imageSubmission.submitted_at ? new Date(lesson.imageSubmission.submitted_at).toLocaleString('ko-KR') : ''}</p>
+                                                            <p class="text-[10px] text-white uppercase tracking-widest font-bold">Image Submission</p>
+                                                            <p class="text-[9px] text-gray-600 uppercase tracking-tight">${lesson.imageSubmission.submitted_at ? new Date(lesson.imageSubmission.submitted_at).toLocaleString('ko-KR') : ''}</p>
                                                         </div>
                                                     </div>
-                                                    <div class="flex items-center space-x-3">
+                                                    <div class="flex items-center space-x-4">
                                                         ${getImageSubmissionStatus(lesson.imageSubmission)}
                                                         <button onclick="openGradingModalDirect('${lesson.imageSubmission.id}', '${student.name}', '${student.email}', '${lesson.order}강 ${lesson.title || ''}')" 
-                                                                class="px-3 py-1.5 bg-white bg-opacity-10 rounded text-white text-sm hover:bg-opacity-20">
-                                                            ${lesson.imageSubmission.status === 'graded' ? '상세' : '채점'}
+                                                                class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                                                            ${lesson.imageSubmission.status === 'graded' ? 'Details' : 'Grade'}
                                                         </button>
                                                     </div>
                                                 </div>
                                             ` : ''}
-                                            
-                                            <!-- 모바일 과제 제출용 QR 코드 -->
-                                            <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg p-3 mt-2 flex items-center justify-between border border-blue-500/20">
-                                                <div class="flex-1">
-                                                    <p class="text-sm text-white font-semibold mb-1">핸드폰으로 제출하기</p>
-                                                    <p class="text-xs text-gray-400">QR 스캔 → 강의 페이지 → 이미지 업로드</p>
-                                                </div>
-                                                <div class="flex items-center space-x-2">
-                                                    <div id="qr-${student.id}-${lesson.id}" class="w-20 h-20 bg-white rounded p-1 shadow-lg"></div>
-                                                    <button onclick="copyLessonUrl('${course.id}', '${lesson.id}')" 
-                                                            class="px-2 py-1.5 bg-white bg-opacity-10 rounded text-white text-xs hover:bg-opacity-20 transition-all"
-                                                            title="링크 복사">
-                                                        🔗 복사
-                                                    </button>
-                                                </div>
-                                            </div>
                                         </div>
                                     `).join('')}
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
                 </div>
             `}).join('');
+            
+            // ... (QR 코드 생성 부분 동일)
+        }
             
             // QR 코드 생성 (렌더링 후 실행)
             setTimeout(() => {
@@ -2457,28 +2540,38 @@
                 tbody.innerHTML = courses.map(course => {
                     const visibility = course.visibility || 'public';
                     const isPublic = visibility === 'public';
+                    const lessonCount = lessonCounts[course.id] || 0;
                     
                     return `
-                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5 transition">
-                        <td class="px-6 py-4 text-white">
-                            ${course.title}
-                            ${!isPublic ? '<span class="ml-2 inline-block px-2 py-0.5 rounded text-xs bg-yellow-500 bg-opacity-20 text-yellow-400">승인제</span>' : ''}
+                    <tr>
+                        <td>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-8 bg-white bg-opacity-5 flex-shrink-0 overflow-hidden">
+                                    <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&q=80'}" 
+                                         class="w-full h-full object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">${course.title}</p>
+                                    ${!isPublic ? '<span class="text-[9px] uppercase tracking-widest font-bold text-yellow-500">Private</span>' : ''}
+                                </div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 text-gray-400">${course.category || '-'}</td>
-                        <td class="px-6 py-4 text-white">₩${(course.price || 0).toLocaleString()}</td>
-                        <td class="px-6 py-4">
-                            ${!isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
-                                    class="px-3 py-1.5 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-sm hover:bg-opacity-30 transition mr-2">
-                                권한 관리
-                            </button>` : ''}
-                            <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
-                                    class="px-3 py-1.5 bg-white bg-opacity-10 text-white rounded text-sm hover:bg-opacity-20 transition">
-                                영상 관리
-                            </button>
-                        </td>
-                        <td class="px-4 py-4 text-right whitespace-nowrap">
-                            <button onclick="editCourse('${course.id}')" class="text-gray-400 hover:text-white transition text-sm">수정</button>
-                            <button onclick="deleteCourse('${course.id}')" class="text-red-400 hover:text-red-300 transition text-sm ml-2">삭제</button>
+                        <td><span class="text-[10px] uppercase tracking-widest text-gray-500">${course.category || '-'}</span></td>
+                        <td class="text-white">₩${(course.price || 0).toLocaleString()}</td>
+                        <td class="text-gray-500 text-[10px] uppercase tracking-widest">${lessonCount} Lessons</td>
+                        <td class="text-right">
+                            <div class="flex justify-end space-x-4">
+                                ${!isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
+                                        class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
+                                    Access
+                                </button>` : ''}
+                                <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
+                                        class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                                    Manage
+                                </button>
+                                <button onclick="editCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
+                                <button onclick="deleteCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -2532,29 +2625,29 @@
 
                 if (!lessons || lessons.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center text-gray-500 py-8">
-                            등록된 영상이 없습니다. "+ 새 영상 추가" 버튼을 클릭하여 영상을 추가하세요.
+                        <div class="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">
+                            No lessons found.
                         </div>
                     `;
                     return;
                 }
 
                 container.innerHTML = lessons.map((lesson, index) => `
-                    <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-lg hover:bg-opacity-10 transition">
-                        <div class="flex items-center space-x-4">
-                            <span class="text-2xl font-bold text-gray-600">${String(index + 1).padStart(2, '0')}</span>
+                    <div class="flex items-center justify-between p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5 hover:bg-opacity-[0.05] transition-all">
+                        <div class="flex items-center space-x-6">
+                            <span class="text-3xl font-bold text-gray-800 tracking-tighter">${String(index + 1).padStart(2, '0')}</span>
                             <div>
-                                <p class="font-semibold text-white">${lesson.order_num}강</p>
-                                <p class="text-sm text-gray-500">
-                                    ${lesson.duration || 0}분
-                                    ${lesson.video_url ? '<span class="text-green-400 ml-2">✓ 영상 있음</span>' : '<span class="text-red-400 ml-2">✗ 영상 없음</span>'}
-                                    ${noticeMap.has(lesson.id) ? '<span class="text-yellow-400 ml-2">✓ 공지사항</span>' : ''}
-                                </p>
+                                <p class="text-white font-bold tracking-tight">${lesson.order_num}강: ${lesson.title || 'Untitled'}</p>
+                                <div class="flex items-center space-x-3 mt-1">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-widest">${lesson.duration || 0} MIN</span>
+                                    ${lesson.video_url ? '<span class="text-[9px] text-blue-400 uppercase tracking-widest font-bold">Video Ready</span>' : '<span class="text-[9px] text-red-500 uppercase tracking-widest font-bold">No Video</span>'}
+                                    ${noticeMap.has(lesson.id) ? '<span class="text-[9px] text-yellow-500 uppercase tracking-widest font-bold">Notice</span>' : ''}
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2 whitespace-nowrap">
-                            <button onclick="editLesson('${lesson.id}')" class="text-gray-400 hover:text-white transition text-sm">수정</button>
-                            <button onclick="deleteLesson('${lesson.id}')" class="text-red-400 hover:text-red-300 transition text-sm">삭제</button>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="editLesson('${lesson.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
+                            <button onclick="deleteLesson('${lesson.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
                         </div>
                     </div>
                 `).join('');
@@ -2963,9 +3056,9 @@
         function renderCategoryList() {
             const container = document.getElementById('category-list');
             container.innerHTML = categories.map(cat => `
-                <div class="flex items-center justify-between p-3 bg-white bg-opacity-5 rounded-lg">
-                    <span class="text-white">${cat}</span>
-                    <button onclick="removeCategory('${cat}')" class="text-red-400 hover:text-red-300 text-sm">삭제</button>
+                <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 border border-white border-opacity-5">
+                    <span class="text-white text-sm font-medium tracking-tight">${cat}</span>
+                    <button onclick="removeCategory('${cat}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
                 </div>
             `).join('');
         }
@@ -3101,31 +3194,29 @@
             const tbody = document.getElementById('payment-table-body');
 
             if (!allPayments || allPayments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">조회된 결제 내역이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">No payments found.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = allPayments.map(payment => {
                 const date = new Date(payment.created_at).toLocaleDateString('ko-KR');
                 const paymentType = payment.payment_type || 'course';
-                const typeBadge = paymentType === 'textbook'
-                    ? '<span class="px-2 py-1 bg-purple-500 bg-opacity-20 text-purple-400 text-xs rounded">교재비</span>'
-                    : '<span class="px-2 py-1 bg-blue-500 bg-opacity-20 text-blue-400 text-xs rounded">강의비</span>';
-                const statusBadge = payment.status === 'DONE'
-                    ? '<span class="px-2 py-1 bg-green-500 bg-opacity-20 text-green-400 text-xs rounded">완료</span>'
-                    : '<span class="px-2 py-1 bg-yellow-500 bg-opacity-20 text-yellow-400 text-xs rounded">' + payment.status + '</span>';
+                const typeLabel = paymentType === 'textbook' ? 'Textbook' : 'Course';
+                const typeColor = paymentType === 'textbook' ? 'text-purple-500' : 'text-blue-500';
+                const statusLabel = payment.status === 'DONE' ? 'Completed' : payment.status;
+                const statusColor = payment.status === 'DONE' ? 'text-green-500' : 'text-yellow-500';
 
                 return `
-                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
-                        <td class="px-6 py-4 text-gray-300">${date}</td>
-                        <td class="px-6 py-4">
-                            <p class="text-white">${payment.profile.name || payment.customer_name || '-'}</p>
-                            <p class="text-xs text-gray-500">${payment.profile.email || payment.customer_email || '-'}</p>
+                    <tr>
+                        <td class="text-[11px] text-gray-500">${date}</td>
+                        <td>
+                            <p class="text-white font-medium">${payment.profile.name || payment.customer_name || '-'}</p>
+                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${payment.profile.email || payment.customer_email || '-'}</p>
                         </td>
-                        <td class="px-6 py-4 text-white">${payment.course?.title || payment.order_name || '-'}</td>
-                        <td class="px-6 py-4">${typeBadge}</td>
-                        <td class="px-6 py-4 text-right text-white font-medium">₩${(payment.amount || 0).toLocaleString()}</td>
-                        <td class="px-6 py-4">${statusBadge}</td>
+                        <td class="text-white font-medium">${payment.course?.title || payment.order_name || '-'}</td>
+                        <td><span class="text-[9px] uppercase tracking-widest font-bold ${typeColor}">${typeLabel}</span></td>
+                        <td class="text-right text-white font-bold">₩${(payment.amount || 0).toLocaleString()}</td>
+                        <td><span class="text-[9px] uppercase tracking-widest font-bold ${statusColor}">${statusLabel}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -3368,8 +3459,8 @@
             
             if (!members || members.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-gray-500">
-                        등록된 회원이 없습니다.
+                    <div class="col-span-full text-center py-20 text-gray-600 uppercase tracking-widest text-[10px]">
+                        No members found.
                     </div>
                 `;
                 return;
@@ -3378,58 +3469,46 @@
             grid.innerHTML = members.map(member => {
                 const joinDate = member.created_at ? new Date(member.created_at).toLocaleDateString('ko-KR') : '-';
                 const phone = member.phone || member.student_phone || '-';
-                const courseTitles = member.orders.map(o => o.courseTitle).slice(0, 2).join(', ') || '수강 강의 없음';
-                const moreCoursesCount = member.courseCount > 2 ? `외 ${member.courseCount - 2}개` : '';
+                const courseTitles = member.orders.map(o => o.courseTitle).slice(0, 2).join(', ') || 'No courses';
+                const moreCoursesCount = member.courseCount > 2 ? `+${member.courseCount - 2}` : '';
                 const studentType = member.student_type || 'online';
-                const studentTypeBadge = studentType === 'offline'
-                    ? '<span class="px-2 py-0.5 bg-purple-500 bg-opacity-20 text-purple-400 text-xs rounded-full">오프라인</span>'
-                    : '<span class="px-2 py-0.5 bg-blue-500 bg-opacity-20 text-blue-400 text-xs rounded-full">온라인</span>';
+                const typeLabel = studentType === 'offline' ? 'Offline' : 'Online';
+                const typeColor = studentType === 'offline' ? 'text-purple-400' : 'text-blue-400';
 
                 return `
-                    <div class="bg-white bg-opacity-5 rounded-xl p-6 hover:bg-opacity-10 transition-all">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="text-lg font-bold text-white">${member.name || '이름 없음'}</h3>
-                                    ${studentTypeBadge}
+                    <div class="student-card p-6 flex flex-col justify-between border border-white border-opacity-5">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-start">
+                                <div class="space-y-1">
+                                    <h3 class="text-lg font-bold text-white tracking-tight">${member.name || 'No Name'}</h3>
+                                    <p class="text-[10px] text-gray-500 font-light truncate max-w-[150px] uppercase tracking-wider">${member.email || '-'}</p>
                                 </div>
-                                <p class="text-sm text-gray-400">${member.email || '-'}</p>
+                                <span class="text-[9px] uppercase tracking-widest font-bold ${typeColor}">${typeLabel}</span>
                             </div>
-                        </div>
-                        
-                        <div class="space-y-2 mb-4 text-sm">
-                            <div class="flex items-center text-gray-300">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                </svg>
-                                ${phone}
-                            </div>
-                            <div class="flex items-start text-gray-300">
-                                <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                </svg>
-                                <span class="truncate" title="${courseTitles}">
-                                    ${member.courseCount > 0 ? `수강 ${member.courseCount}개` : '수강 없음'}
-                                    ${moreCoursesCount ? ' (' + moreCoursesCount + ')' : ''}
-                                </span>
-                            </div>
-                            <div class="flex items-center text-green-400 font-semibold">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                ₩${member.totalPaid.toLocaleString()}
-                            </div>
-                            <div class="flex items-center text-gray-400 text-xs">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                가입일: ${joinDate}
+                            
+                            <div class="pt-4 border-t border-white border-opacity-5 space-y-3">
+                                <div class="flex justify-between text-[10px] uppercase tracking-wider">
+                                    <span class="text-gray-600">Phone</span>
+                                    <span class="text-gray-400">${phone}</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] uppercase tracking-wider">
+                                    <span class="text-gray-600">Courses</span>
+                                    <span class="text-gray-400">${member.courseCount > 0 ? `${member.courseCount} ${moreCoursesCount ? `(${moreCoursesCount})` : ''}` : 'None'}</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] uppercase tracking-wider">
+                                    <span class="text-gray-600">Revenue</span>
+                                    <span class="text-white font-bold">₩${member.totalPaid.toLocaleString()}</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] uppercase tracking-wider">
+                                    <span class="text-gray-600">Joined</span>
+                                    <span class="text-gray-500">${joinDate}</span>
+                                </div>
                             </div>
                         </div>
                         
                         <button onclick="openMemberModal('${member.id}')" 
-                                class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20 transition-all font-medium">
-                            상세 정보
+                                class="mt-6 w-full py-3 bg-white bg-opacity-5 text-white text-[10px] uppercase tracking-widest font-bold border border-white border-opacity-10 hover:bg-opacity-10 transition-all">
+                            View Details
                         </button>
                     </div>
                 `;
@@ -3647,8 +3726,8 @@
             
             if (!orders || orders.length === 0) {
                 tbody.innerHTML = `
-                    <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">
-                        주문 내역이 없습니다.
+                    <tr><td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                        No orders found.
                     </td></tr>
                 `;
                 return;
@@ -3662,31 +3741,31 @@
                 const customerName = order.profiles?.name || order.customer_name || '-';
                 const customerEmail = order.profiles?.email || order.customer_email || '-';
                 const shippingAddress = order.shipping_address 
-                    ? `${order.shipping_address} ${order.shipping_address_detail || ''}<br><span class="text-gray-500">${order.shipping_name || ''} / ${order.shipping_phone || ''}</span>`
+                    ? `${order.shipping_address} ${order.shipping_address_detail || ''}<br><span class="text-[10px] text-gray-600 uppercase tracking-tight">${order.shipping_name || ''} / ${order.shipping_phone || ''}</span>`
                     : '-';
                 const trackingInfo = order.tracking_number 
-                    ? `${order.shipping_carrier || ''}<br>${order.tracking_number}`
+                    ? `${order.shipping_carrier || ''}<br><span class="text-[10px] text-gray-600 tracking-wider">${order.tracking_number}</span>`
                     : '-';
 
                 return `
-                    <tr class="border-b border-white border-opacity-5 hover:bg-white hover:bg-opacity-5">
-                        <td class="px-4 py-4 text-sm text-gray-300">${orderDate}</td>
-                        <td class="px-4 py-4 text-sm text-gray-400">${orderId}</td>
-                        <td class="px-4 py-4">
-                            <p class="text-white">${productName}</p>
-                            <p class="text-sm text-gray-500">${amount}</p>
+                    <tr>
+                        <td class="text-[11px] text-gray-500">${orderDate}</td>
+                        <td class="text-[10px] font-mono text-gray-600">${orderId}</td>
+                        <td>
+                            <p class="text-white font-medium">${productName}</p>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-tight">${amount}</p>
                         </td>
-                        <td class="px-4 py-4">
-                            <p class="text-white">${customerName}</p>
-                            <p class="text-sm text-gray-500">${customerEmail}</p>
+                        <td>
+                            <p class="text-white font-medium">${customerName}</p>
+                            <p class="text-[10px] text-gray-500 lowercase tracking-tight">${customerEmail}</p>
                         </td>
-                        <td class="px-4 py-4">${getShippingStatusBadge(order.shipping_status)}</td>
-                        <td class="px-4 py-4 text-sm text-gray-300">${shippingAddress}</td>
-                        <td class="px-4 py-4 text-sm text-gray-300">${trackingInfo}</td>
-                        <td class="px-4 py-4 whitespace-nowrap">
+                        <td>${getShippingStatusBadge(order.shipping_status)}</td>
+                        <td class="text-[11px] text-gray-400">${shippingAddress}</td>
+                        <td class="text-[11px] text-gray-400">${trackingInfo}</td>
+                        <td class="text-right">
                             <button onclick="openOrderModal('${order.id}')" 
-                                    class="px-3 py-1 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20 whitespace-nowrap">
-                                수정
+                                    class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                                Edit
                             </button>
                         </td>
                     </tr>
@@ -3696,10 +3775,10 @@
 
         function getShippingStatusBadge(status) {
             const badges = {
-                'PENDING_ADDRESS': '<span class="inline-block px-3 py-1 bg-red-500 bg-opacity-20 text-red-400 rounded text-sm whitespace-nowrap">배송정보 미입력</span>',
-                'PREPARING': '<span class="inline-block px-3 py-1 bg-purple-500 bg-opacity-20 text-purple-400 rounded text-sm whitespace-nowrap">배송준비중</span>',
-                'SHIPPING': '<span class="inline-block px-3 py-1 bg-blue-500 bg-opacity-20 text-blue-400 rounded text-sm whitespace-nowrap">배송중</span>',
-                'DELIVERED': '<span class="inline-block px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 rounded text-sm whitespace-nowrap">배송완료</span>'
+                'PENDING_ADDRESS': '<span class="text-[9px] uppercase tracking-widest font-bold text-red-500">Pending Address</span>',
+                'PREPARING': '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Preparing</span>',
+                'SHIPPING': '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Shipping</span>',
+                'DELIVERED': '<span class="text-[9px] uppercase tracking-widest font-bold text-green-500">Delivered</span>'
             };
             return badges[status] || badges['PENDING_ADDRESS'];
         }
@@ -3710,9 +3789,9 @@
 
             const modalHtml = `
                 <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
-                    <div class="bg-gray-900 rounded-2xl max-w-lg w-full p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-xl font-bold text-white">📦 배송 정보 수정</h2>
+                    <div class="bg-gray-900 max-w-lg w-full p-8">
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-xl font-bold text-white tracking-tight uppercase">Edit Shipping Info</h2>
                             <button onclick="closeOrderModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                         </div>
                         
@@ -3740,14 +3819,14 @@
                             </div>
                         </div>
                         
-                        <div class="flex gap-3 mt-6">
+                        <div class="flex gap-3 mt-8">
                             <button onclick="closeOrderModal()" 
-                                    class="flex-1 px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white">
-                                취소
+                                    class="flex-1 px-4 py-4 bg-white bg-opacity-5 text-white text-[10px] uppercase tracking-widest font-bold">
+                                Cancel
                             </button>
                             <button onclick="saveOrderChanges('${orderId}')" 
-                                    class="flex-1 px-4 py-3 bg-white rounded-xl text-black font-semibold">
-                                저장
+                                    class="flex-1 px-4 py-4 bg-white text-black text-[10px] uppercase tracking-widest font-bold">
+                                Save Changes
                             </button>
                         </div>
                     </div>
@@ -3908,21 +3987,17 @@
             count.textContent = quizData.length;
 
             list.innerHTML = quizData.map(quiz => `
-                <div class="bg-white bg-opacity-5 rounded p-3">
+                <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex-1">
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="text-xs font-semibold text-blue-400">${quiz.questionNumber}번</span>
-                                <span class="inline-block text-xs px-3 py-1 rounded whitespace-nowrap ${
-                                    quiz.questionType === '객관식' ? 'bg-green-500 bg-opacity-20 text-green-400' :
-                                    quiz.questionType === 'OX' ? 'bg-yellow-500 bg-opacity-20 text-yellow-400' :
-                                    'bg-purple-500 bg-opacity-20 text-purple-400'
-                                }">${quiz.questionType}</span>
-                                <span class="text-xs text-cyan-400">⏰ ${quiz.appearMinute}분 ${quiz.appearSecond}초</span>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Q${quiz.questionNumber}</span>
+                                <span class="text-[9px] px-2 py-0.5 border border-white border-opacity-10 text-gray-400 uppercase tracking-widest">${quiz.questionType}</span>
+                                <span class="text-[9px] text-cyan-500 uppercase tracking-widest font-bold">${quiz.appearMinute}M ${quiz.appearSecond}S</span>
                             </div>
-                            <p class="text-sm text-white">${quiz.question}</p>
-                            ${quiz.option1 ? `<p class="text-xs text-gray-500 mt-1">① ${quiz.option1} ${quiz.option2 ? `② ${quiz.option2}` : ''} ${quiz.option3 ? `③ ${quiz.option3}` : ''} ${quiz.option4 ? `④ ${quiz.option4}` : ''}</p>` : ''}
-                            <p class="text-xs text-green-400 mt-1">정답: ${quiz.correctAnswer}</p>
+                            <p class="text-sm text-white font-medium tracking-tight mb-2">${quiz.question}</p>
+                            ${quiz.option1 ? `<p class="text-[10px] text-gray-500 uppercase tracking-tight">1. ${quiz.option1} | 2. ${quiz.option2} ${quiz.option3 ? `| 3. ${quiz.option3}` : ''} ${quiz.option4 ? `| 4. ${quiz.option4}` : ''}</p>` : ''}
+                            <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest mt-2">Answer: ${quiz.correctAnswer}</p>
                         </div>
                     </div>
                 </div>
@@ -4106,21 +4181,21 @@
                 resultsDiv.innerHTML = profiles.map(user => {
                     const studentType = user.student_type || 'online';
                     const typeBadge = studentType === 'offline'
-                        ? '<span class="px-1.5 py-0.5 bg-purple-500 bg-opacity-20 text-purple-400 text-xs rounded">오프라인</span>'
-                        : '<span class="px-1.5 py-0.5 bg-blue-500 bg-opacity-20 text-blue-400 text-xs rounded">온라인</span>';
+                        ? '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Offline</span>'
+                        : '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Online</span>';
 
                     return `
-                        <div class="flex items-center justify-between p-3 bg-white bg-opacity-5 rounded-lg">
+                        <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 border border-white border-opacity-5">
                             <div>
-                                <div class="flex items-center gap-2">
-                                    <p class="text-white text-sm font-medium">${user.name || '이름 없음'}</p>
+                                <div class="flex items-center gap-3">
+                                    <p class="text-white text-sm font-bold tracking-tight">${user.name || 'No Name'}</p>
                                     ${typeBadge}
                                 </div>
-                                <p class="text-gray-400 text-xs">${user.email}</p>
+                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${user.email}</p>
                             </div>
                             <button onclick="grantAccessToUser('${user.id}', '${user.email.replace(/'/g, "\\'")}')"
-                                    class="px-3 py-1.5 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded text-xs hover:bg-opacity-30 transition">
-                                권한 부여
+                                    class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
+                                Grant Access
                             </button>
                         </div>
                     `;
@@ -4205,23 +4280,23 @@
                     const grantedDate = new Date(perm.granted_at).toLocaleDateString('ko-KR');
                     const studentType = profile.student_type || 'online';
                     const typeBadge = studentType === 'offline'
-                        ? '<span class="px-1.5 py-0.5 bg-purple-500 bg-opacity-20 text-purple-400 text-xs rounded">오프라인</span>'
-                        : '<span class="px-1.5 py-0.5 bg-blue-500 bg-opacity-20 text-blue-400 text-xs rounded">온라인</span>';
+                        ? '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Offline</span>'
+                        : '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Online</span>';
 
                     return `
-                        <div class="flex items-center justify-between p-3 bg-white bg-opacity-5 rounded-lg">
+                        <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 border border-white border-opacity-5">
                             <div class="flex-1">
-                                <div class="flex items-center gap-2">
-                                    <p class="text-white text-sm font-medium">${profile.name || '이름 없음'}</p>
+                                <div class="flex items-center gap-3">
+                                    <p class="text-white text-sm font-bold tracking-tight">${profile.name || 'No Name'}</p>
                                     ${typeBadge}
                                 </div>
-                                <p class="text-gray-400 text-xs">${profile.email || '-'}</p>
-                                <p class="text-gray-500 text-xs mt-1">권한 부여일: ${grantedDate}</p>
-                                ${perm.notes ? `<p class="text-gray-600 text-xs mt-1">${perm.notes}</p>` : ''}
+                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${profile.email || '-'}</p>
+                                <p class="text-gray-600 text-[9px] uppercase tracking-widest mt-2">Granted: ${grantedDate}</p>
+                                ${perm.notes ? `<p class="text-gray-700 text-[9px] uppercase tracking-tight mt-1">${perm.notes}</p>` : ''}
                             </div>
                             <button onclick="revokeAccessFromUser('${perm.id}', '${courseId}', '${perm.user_id}', '${(profile.email || '').replace(/'/g, "\\'")}')"
-                                    class="px-3 py-1.5 bg-red-500 bg-opacity-20 text-red-400 rounded text-xs hover:bg-opacity-30 transition">
-                                권한 삭제
+                                    class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">
+                                Revoke
                             </button>
                         </div>
                     `;
