@@ -226,8 +226,11 @@ class CustomVimeoPlayer {
         // 전체화면
         this.fullscreenButton.addEventListener('click', () => this.toggleFullscreen());
 
-        // 전체화면 변경 감지
+        // 전체화면 변경 감지 (모든 브라우저 지원)
         document.addEventListener('fullscreenchange', () => this.updateFullscreenIcon());
+        document.addEventListener('webkitfullscreenchange', () => this.updateFullscreenIcon());
+        document.addEventListener('mozfullscreenchange', () => this.updateFullscreenIcon());
+        document.addEventListener('MSFullscreenChange', () => this.updateFullscreenIcon());
     }
 
     togglePlay() {
@@ -253,10 +256,37 @@ class CustomVimeoPlayer {
     }
 
     toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
+        const elem = this.container;
+        const isFullscreen = document.fullscreenElement ||
+                            document.webkitFullscreenElement ||
+                            document.mozFullScreenElement ||
+                            document.msFullscreenElement;
+
+        if (isFullscreen) {
+            // 전체화면 종료
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
         } else {
-            this.container.requestFullscreen();
+            // 전체화면 진입
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else if (this.player && this.player.requestFullscreen) {
+                // Vimeo Player API 사용
+                this.player.requestFullscreen();
+            }
         }
     }
 
@@ -306,7 +336,12 @@ class CustomVimeoPlayer {
     }
 
     updateFullscreenIcon() {
-        if (document.fullscreenElement) {
+        const isFullscreen = document.fullscreenElement ||
+                            document.webkitFullscreenElement ||
+                            document.mozFullScreenElement ||
+                            document.msFullscreenElement;
+
+        if (isFullscreen) {
             this.fullscreenEnterIcon.classList.add('hidden');
             this.fullscreenExitIcon.classList.remove('hidden');
         } else {
