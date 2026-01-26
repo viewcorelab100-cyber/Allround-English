@@ -598,63 +598,61 @@
 
             <!-- 강의 접근 권한 관리 모달 -->
             <div id="course-access-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                <div class="bg-neutral-900 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
                     <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
                         <div>
-                            <h3 class="text-xl font-bold text-white">비공개 강의 접근 권한 관리</h3>
-                            <p id="access-course-title" class="text-sm text-gray-400 mt-1">강의명</p>
+                            <h3 class="text-xl font-bold text-white tracking-tight uppercase">Access Control</h3>
+                            <p id="access-course-title" class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Course Title</p>
                         </div>
                         <button onclick="closeCourseAccessModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
                     
-                    <div class="p-6 space-y-6">
+                    <div class="p-8 space-y-8">
                         <input type="hidden" id="access-course-id">
                         
                         <!-- 사용자 검색 및 권한 부여 -->
-                        <div class="bg-white bg-opacity-5 rounded-xl p-4">
-                            <h4 class="text-white font-semibold mb-3">사용자 검색 및 권한 부여</h4>
+                        <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-6">
+                            <h4 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Search & Grant Access</h4>
                             <!-- 온/오프라인 필터 -->
-                            <div class="flex gap-2 mb-3">
+                            <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-4 w-fit">
                                 <button onclick="setAccessSearchFilter('all')" id="access-filter-all"
-                                        class="px-3 py-1.5 bg-white bg-opacity-10 text-white text-xs rounded-lg">
-                                    전체
+                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
+                                    All
                                 </button>
                                 <button onclick="setAccessSearchFilter('online')" id="access-filter-online"
-                                        class="px-3 py-1.5 text-gray-400 hover:bg-white hover:bg-opacity-5 text-xs rounded-lg">
-                                    온라인
+                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                                    Online
                                 </button>
                                 <button onclick="setAccessSearchFilter('offline')" id="access-filter-offline"
-                                        class="px-3 py-1.5 text-gray-400 hover:bg-white hover:bg-opacity-5 text-xs rounded-lg">
-                                    오프라인
+                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                                    Offline
                                 </button>
                             </div>
                             <div class="flex space-x-2">
                                 <input type="text" id="access-user-search"
-                                       placeholder="학생 이름으로 검색..."
-                                       class="flex-1 px-4 py-2 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                                       placeholder="SEARCH BY NAME..."
+                                       class="flex-1 px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors text-xs"
                                        onkeypress="if(event.key==='Enter') searchUsersForAccess()">
-                                <button onclick="searchUsersForAccess()"
-                                        class="px-4 py-2 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-lg hover:bg-opacity-30 transition">
-                                    검색
+                                <button onclick="searchUsersForAccess()" class="btn-admin-primary">
+                                    Search
                                 </button>
                             </div>
-                            <div id="user-search-results" class="mt-3 space-y-2 max-h-48 overflow-y-auto">
-                                <!-- 검색 결과가 여기에 표시됩니다 -->
+                            <div id="user-search-results" class="mt-4 space-y-2 max-h-48 overflow-y-auto">
+                                <!-- 검색 결과 -->
                             </div>
                         </div>
 
                         <!-- 권한이 있는 사용자 목록 -->
-                        <div class="bg-white bg-opacity-5 rounded-xl p-4">
-                            <h4 class="text-white font-semibold mb-3">접근 권한이 있는 사용자</h4>
+                        <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-6">
+                            <h4 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Granted Users</h4>
                             <div id="access-granted-users" class="space-y-2 max-h-96 overflow-y-auto">
-                                <p class="text-gray-500 text-sm py-4 text-center">권한이 있는 사용자를 불러오는 중...</p>
+                                <p class="text-gray-600 text-[10px] uppercase tracking-widest py-8 text-center">Loading users...</p>
                             </div>
                         </div>
 
                         <div class="flex justify-end">
-                            <button onclick="closeCourseAccessModal()" 
-                                    class="px-6 py-2.5 bg-white bg-opacity-10 text-white rounded-lg hover:bg-opacity-20 transition">
-                                닫기
+                            <button onclick="closeCourseAccessModal()" class="btn-admin-outline">
+                                Close
                             </button>
                         </div>
                     </div>
@@ -663,80 +661,83 @@
 
             <!-- 결제 관리 섹션 -->
             <section id="section-payments" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-8">결제 관리</h1>
+                <div class="mb-12">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Finance Management</span>
+                    <h1 class="text-4xl font-bold text-white tracking-tight">Payments</h1>
+                </div>
 
                 <!-- 기간 필터 -->
-                <div class="bg-white bg-opacity-5 rounded-xl p-4 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-8 mb-12">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-end">
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">시작일</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Start Date</label>
                             <input type="date" id="payment-start-date"
-                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none">
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white focus:outline-none focus:border-white transition-colors">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">종료일</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">End Date</label>
                             <input type="date" id="payment-end-date"
-                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none">
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white focus:outline-none focus:border-white transition-colors">
                         </div>
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">결제 유형</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Payment Type</label>
                             <select id="payment-type-filter"
-                                    class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none">
-                                <option value="all">전체</option>
-                                <option value="course">강의비</option>
-                                <option value="textbook">교재비</option>
+                                    class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white focus:outline-none focus:border-white transition-colors">
+                                <option value="all">ALL TYPES</option>
+                                <option value="course">COURSE ONLY</option>
+                                <option value="textbook">TEXTBOOK ONLY</option>
                             </select>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="filterPayments()"
-                                    class="flex-1 px-4 py-2 bg-yellow-500 bg-opacity-20 text-yellow-400 rounded-lg hover:bg-opacity-30">
-                                조회
+                                    class="btn-admin-primary flex-1">
+                                Filter
                             </button>
                             <button onclick="resetPaymentFilters()"
-                                    class="px-4 py-2 bg-white bg-opacity-10 text-gray-400 rounded-lg hover:bg-opacity-20">
-                                초기화
+                                    class="btn-admin-outline">
+                                Reset
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- 누계 카드 -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-blue-500 bg-opacity-20 rounded-xl p-5">
-                        <p class="text-xs text-blue-300 mb-1">전체 결제 건수</p>
-                        <p id="stat-payment-count" class="text-2xl font-bold text-white">0건</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Total Transactions</p>
+                        <p id="stat-payment-count" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div class="bg-green-500 bg-opacity-20 rounded-xl p-5">
-                        <p class="text-xs text-green-300 mb-1">강의비 누계</p>
-                        <p id="stat-course-total" class="text-2xl font-bold text-white">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Course Revenue</p>
+                        <p id="stat-course-total" class="text-3xl font-bold text-white">₩0</p>
                     </div>
-                    <div class="bg-purple-500 bg-opacity-20 rounded-xl p-5">
-                        <p class="text-xs text-purple-300 mb-1">교재비 누계</p>
-                        <p id="stat-textbook-total" class="text-2xl font-bold text-white">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Textbook Revenue</p>
+                        <p id="stat-textbook-total" class="text-3xl font-bold text-white">₩0</p>
                     </div>
-                    <div class="bg-yellow-500 bg-opacity-20 rounded-xl p-5">
-                        <p class="text-xs text-yellow-300 mb-1">총 결제 금액</p>
-                        <p id="stat-payment-total" class="text-2xl font-bold text-white">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Total Revenue</p>
+                        <p id="stat-payment-total" class="text-3xl font-bold text-white">₩0</p>
                     </div>
                 </div>
 
                 <!-- 결제 목록 -->
-                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
-                    <table class="w-full">
+                <div class="overflow-x-auto border-t border-white border-opacity-5">
+                    <table class="admin-table">
                         <thead>
-                            <tr class="border-b border-white border-opacity-10">
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">결제일</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">회원</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">강의명</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">유형</th>
-                                <th class="text-right px-6 py-4 text-sm font-semibold text-gray-400">금액</th>
-                                <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">상태</th>
+                            <tr>
+                                <th>Date</th>
+                                <th>Member</th>
+                                <th>Content</th>
+                                <th>Type</th>
+                                <th class="text-right">Amount</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="payment-table-body">
                             <tr>
-                                <td colspan="6" class="px-6 py-12 text-center text-gray-500">
-                                    기간을 선택하고 조회 버튼을 클릭하세요.
+                                <td colspan="6" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                                    Select range and click filter.
                                 </td>
                             </tr>
                         </tbody>
@@ -753,107 +754,107 @@
             </section>
 
             <!-- 과제 관리 섹션 -->
-            <section id="section-assignments" class="space-y-6">
-                <h1 class="text-2xl font-bold text-white mb-6">과제 관리</h1>
+            <section id="section-assignments" class="hidden">
+                <div class="mb-12">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Academics Management</span>
+                    <h1 class="text-4xl font-bold text-white tracking-tight">Assignments</h1>
+                </div>
 
                 <!-- 요약 카드들 -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="rounded-xl p-5" style="background-color: #2e1a1a;">
-                        <p class="text-xs text-orange-400 mb-1">채점 대기</p>
-                        <p id="stat-pending-grade" class="text-3xl font-bold text-orange-400">0</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Pending Grade</p>
+                        <p id="stat-pending-grade" class="text-3xl font-bold text-orange-500">0</p>
                     </div>
-                    <div class="rounded-xl p-5" style="background-color: #1a2e1a;">
-                        <p class="text-xs text-green-400 mb-1">채점 완료</p>
-                        <p id="stat-graded" class="text-3xl font-bold text-green-400">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Graded</p>
+                        <p id="stat-graded" class="text-3xl font-bold text-green-500">0</p>
                     </div>
-                    <div class="rounded-xl p-5" style="background-color: #1a2e2e;">
-                        <p class="text-xs text-cyan-400 mb-1">전체 제출</p>
-                        <p id="stat-total-submissions" class="text-3xl font-bold text-cyan-400">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Total Submissions</p>
+                        <p id="stat-total-submissions" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div class="rounded-xl p-5" style="background-color: #2e1a2e;">
-                        <p class="text-xs text-pink-400 mb-1">재제출 요청</p>
-                        <p id="stat-returned" class="text-3xl font-bold text-pink-400">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Returned</p>
+                        <p id="stat-returned" class="text-3xl font-bold text-red-500">0</p>
                     </div>
                 </div>
 
                 <!-- 검색 및 필터 -->
-                <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-4">
-                    <!-- 검색 및 기간 필터 -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-8 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                         <!-- 학생 이름 검색 -->
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">학생 이름</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Student Name</label>
                             <input type="text" id="assignment-student-search" 
-                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
-                                   placeholder="학생 이름 검색..."
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
+                                   placeholder="SEARCH BY NAME..."
                                    oninput="applyAssignmentFilters()">
                         </div>
                         
                         <!-- 시작일 -->
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">시작일</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Start Date</label>
                             <input type="date" id="assignment-start-date" 
-                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white focus:outline-none focus:border-white transition-colors"
                                    onchange="applyAssignmentFilters()">
                         </div>
                         
                         <!-- 종료일 -->
                         <div>
-                            <label class="block text-sm text-gray-400 mb-2">종료일</label>
+                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">End Date</label>
                             <input type="date" id="assignment-end-date" 
-                                   class="w-full px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white focus:outline-none focus:border-white transition-colors"
                                    onchange="applyAssignmentFilters()">
                         </div>
                     </div>
                     
-                    <!-- 필터 초기화 버튼 -->
                     <div class="flex justify-end">
-                        <button onclick="resetAssignmentFilters()" 
-                                class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-gray-400 hover:bg-opacity-20 hover:text-white text-sm">
-                            필터 초기화
+                        <button onclick="resetAssignmentFilters()" class="btn-admin-outline">
+                            Reset Filters
                         </button>
                     </div>
                 </div>
 
                 <!-- 필터 탭 -->
-                <div class="flex flex-wrap gap-2">
+                <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-8 w-fit">
                     <button onclick="filterAssignments('pending')" id="filter-assign-pending" 
-                            class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
-                        채점 대기
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
+                        Pending
                     </button>
                     <button onclick="filterAssignments('all')" id="filter-assign-all" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        전체
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        All
                     </button>
                     <button onclick="filterAssignments('graded')" id="filter-assign-graded" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        채점 완료
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        Graded
                     </button>
                     <button onclick="filterAssignments('returned')" id="filter-assign-returned" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        재제출 요청
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        Returned
                     </button>
                 </div>
 
                 <!-- 과제 목록 -->
-                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
-                    <table class="w-full">
-                        <thead class="bg-white bg-opacity-5">
+                <div class="overflow-x-auto border-t border-white border-opacity-5">
+                    <table class="admin-table">
+                        <thead>
                             <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">활동일</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">학생</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">강의/레슨</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">진도율</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">체크리스트</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">퀴즈</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">이미지</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Lesson</th>
+                                <th>Watch</th>
+                                <th>Checklist</th>
+                                <th>Quiz</th>
+                                <th>Work</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="assignments-table-body">
                             <tr>
-                                <td colspan="8" class="px-4 py-8 text-center text-gray-500">
-                                    데이터를 불러오는 중...
+                                <td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                                    Loading assignments...
                                 </td>
                             </tr>
                         </tbody>
@@ -862,114 +863,117 @@
             </section>
 
             <!-- 채점 모달 -->
-            <div id="grading-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden overflow-y-auto">
-                <div class="min-h-screen py-8 px-4 flex items-start justify-center">
-                    <div class="bg-neutral-900 rounded-2xl w-full max-w-4xl">
+            <div id="grading-modal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden overflow-y-auto">
+                <div class="min-h-screen py-12 px-4 flex items-start justify-center">
+                    <div class="bg-neutral-900 w-full max-w-4xl border border-white border-opacity-10">
                         <!-- 모달 헤더 -->
-                        <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                            <h2 class="text-xl font-bold text-white">과제 채점</h2>
+                        <div class="flex items-center justify-between p-8 border-b border-white border-opacity-10">
+                            <h2 class="text-2xl font-bold text-white tracking-tight uppercase">Grade Assignment</h2>
                             <button onclick="closeGradingModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                         </div>
 
-                        <div class="p-6 space-y-6">
-                            <!-- 학생 정보 -->
-                            <div class="text-center space-y-1">
-                                <p class="text-sm text-gray-400">STUDENT</p>
-                                <p id="grading-student-name" class="text-xl font-bold text-yellow-400">학생 이름</p>
-                                <p id="grading-student-email" class="text-sm text-gray-500">email@example.com</p>
-                            </div>
-
-                            <!-- 과제 정보 -->
-                            <div class="bg-white bg-opacity-5 rounded-xl p-4 text-center">
-                                <p class="text-sm text-gray-400">ASSIGNMENT</p>
-                                <p id="grading-assignment-title" class="text-lg font-bold text-white mt-1">과제 제목</p>
-                                <p id="grading-submitted-at" class="text-sm text-gray-500 mt-1">제출일: 2025. 00. 00</p>
+                        <div class="p-8 space-y-12">
+                            <!-- 학생 및 과제 정보 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div class="text-center md:text-left space-y-2">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block">Student</span>
+                                    <p id="grading-student-name" class="text-2xl font-bold text-white tracking-tight">Student Name</p>
+                                    <p id="grading-student-email" class="text-sm text-gray-500 lowercase tracking-tight">email@example.com</p>
+                                </div>
+                                <div class="text-center md:text-right space-y-2">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block">Assignment</span>
+                                    <p id="grading-assignment-title" class="text-xl font-bold text-white tracking-tight">Assignment Title</p>
+                                    <p id="grading-submitted-at" class="text-[10px] text-gray-600 uppercase tracking-widest">Submitted: 2025. 00. 00</p>
+                                </div>
                             </div>
 
                             <!-- 채점 입력 폼 -->
-                            <div class="bg-white bg-opacity-5 rounded-xl p-6 space-y-4">
-                                <p class="text-center text-sm text-gray-400 mb-4">GRADING RESULT</p>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-2">점수 (0-100)</label>
+                            <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-8 space-y-8">
+                                <div class="flex items-center justify-center space-x-12">
+                                    <div class="text-center space-y-4">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block">Score (0-100)</span>
                                         <input type="number" id="grading-score" min="0" max="100" 
-                                               class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white text-center text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
-                                               placeholder="90" oninput="updateAutoFeedback()">
+                                               class="w-32 bg-transparent text-white text-center text-5xl font-bold border-b border-white border-opacity-20 focus:border-opacity-100 focus:outline-none transition-all pb-2"
+                                               placeholder="00" oninput="updateAutoFeedback()">
                                     </div>
-                                    <div>
-                                        <label class="block text-sm text-gray-400 mb-2">등급</label>
+                                    <div class="text-center space-y-4">
+                                        <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block">Grade</span>
                                         <select id="grading-grade" 
-                                                class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white text-center text-2xl font-bold focus:outline-none cursor-pointer"
-                                                style="color: white;">
-                                            <option value="" style="background-color: #1a1a1a; color: white;">선택</option>
-                                            <option value="A+" style="background-color: #1a1a1a; color: #10b981;">A+</option>
-                                            <option value="A" style="background-color: #1a1a1a; color: #10b981;">A</option>
-                                            <option value="B+" style="background-color: #1a1a1a; color: #3b82f6;">B+</option>
-                                            <option value="B" style="background-color: #1a1a1a; color: #3b82f6;">B</option>
-                                            <option value="C+" style="background-color: #1a1a1a; color: #f59e0b;">C+</option>
-                                            <option value="C" style="background-color: #1a1a1a; color: #f59e0b;">C</option>
-                                            <option value="D" style="background-color: #1a1a1a; color: #ef4444;">D</option>
-                                            <option value="F" style="background-color: #1a1a1a; color: #ef4444;">F</option>
+                                                class="w-32 bg-transparent text-white text-center text-5xl font-bold border-b border-white border-opacity-20 focus:border-opacity-100 focus:outline-none transition-all pb-2 cursor-pointer">
+                                            <option value="" class="bg-black text-white text-sm">--</option>
+                                            <option value="A+" class="bg-black text-white text-sm">A+</option>
+                                            <option value="A" class="bg-black text-white text-sm">A</option>
+                                            <option value="B+" class="bg-black text-white text-sm">B+</option>
+                                            <option value="B" class="bg-black text-white text-sm">B</option>
+                                            <option value="C+" class="bg-black text-white text-sm">C+</option>
+                                            <option value="C" class="bg-black text-white text-sm">C</option>
+                                            <option value="D" class="bg-black text-white text-sm">D</option>
+                                            <option value="F" class="bg-black text-white text-sm">F</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="flex justify-center gap-4 pt-2">
-                                    <label class="flex items-center space-x-2 cursor-pointer">
-                                        <input type="radio" name="grading-pass" value="true" class="w-5 h-5 text-green-500">
-                                        <span class="text-green-400 font-semibold">채점완료</span>
+                                <div class="flex justify-center gap-8 pt-4">
+                                    <label class="relative flex items-center group cursor-pointer">
+                                        <input type="radio" name="grading-pass" value="true" class="peer sr-only">
+                                        <div class="px-6 py-2 border border-white border-opacity-10 text-[10px] uppercase tracking-widest font-bold text-gray-500 peer-checked:border-green-500 peer-checked:text-green-500 transition-all">
+                                            Approved
+                                        </div>
                                     </label>
-                                    <label class="flex items-center space-x-2 cursor-pointer">
-                                        <input type="radio" name="grading-pass" value="false" class="w-5 h-5 text-red-500">
-                                        <span class="text-red-400 font-semibold">재제출요청</span>
+                                    <label class="relative flex items-center group cursor-pointer">
+                                        <input type="radio" name="grading-pass" value="false" class="peer sr-only">
+                                        <div class="px-6 py-2 border border-white border-opacity-10 text-[10px] uppercase tracking-widest font-bold text-gray-500 peer-checked:border-red-500 peer-checked:text-red-500 transition-all">
+                                            Needs Revision
+                                        </div>
                                     </label>
                                 </div>
                             </div>
 
                             <!-- 선생님 코멘트 -->
-                            <div class="bg-white bg-opacity-5 rounded-xl p-6">
-                                <p class="text-center text-sm text-gray-400 mb-4">TEACHER'S COMMENT</p>
-                                <textarea id="grading-comment" rows="3" 
-                                          class="w-full px-4 py-3 bg-white bg-opacity-10 rounded-lg text-white placeholder-gray-500 focus:outline-none resize-none"
-                                          placeholder="학생에게 전달할 피드백을 입력하세요"></textarea>
+                            <div class="space-y-4">
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block">Feedback Message</span>
+                                <textarea id="grading-comment" rows="4" 
+                                          class="w-full px-6 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-700 focus:outline-none focus:border-white transition-all resize-none"
+                                          placeholder="Enter feedback for the student..."></textarea>
                             </div>
 
                             <!-- 이미지 비교 영역 -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <!-- 학생 제출 이미지 -->
-                                <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-3">
-                                    <p class="text-center text-sm text-gray-400">STUDENT'S WORK</p>
-                                    <div id="grading-student-image" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
-                                        <span class="text-gray-500">이미지 없음</span>
+                                <div class="space-y-4">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block text-center">Student Submission</span>
+                                    <div id="grading-student-image" class="aspect-[4/5] bg-white bg-opacity-[0.02] border border-white border-opacity-5 flex items-center justify-center overflow-hidden">
+                                        <span class="text-gray-700 uppercase tracking-widest text-[10px]">No Image</span>
                                     </div>
-                                    <button onclick="viewFullImage('student')" class="w-full py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
-                                        🔍 크게 보기
+                                    <button onclick="viewFullImage('student')" class="w-full py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-opacity-10 transition-all">
+                                        Enlarge
                                     </button>
                                 </div>
 
                                 <!-- 선생님 피드백 이미지 -->
-                                <div class="bg-white bg-opacity-5 rounded-xl p-4 space-y-3">
-                                    <p class="text-center text-sm text-gray-400">TEACHER'S FEEDBACK</p>
-                                    <div id="grading-feedback-image" class="aspect-[4/5] bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-gray-600 hover:border-gray-400 transition"
+                                <div class="space-y-4">
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-bold block text-center">Annotated Feedback</span>
+                                    <div id="grading-feedback-image" class="aspect-[4/5] bg-white bg-opacity-[0.02] border border-white border-opacity-10 border-dashed flex items-center justify-center overflow-hidden cursor-pointer hover:bg-opacity-5 transition-all"
                                          onclick="document.getElementById('feedback-image-input').click()">
-                                        <span class="text-gray-500 text-center px-4">클릭하여 첨삭 이미지 업로드<br><span class="text-xs">(빨간펜 첨삭 이미지)</span></span>
+                                        <span class="text-gray-600 text-center px-8 uppercase tracking-widest text-[10px] leading-relaxed">
+                                            Click to Upload<br>Marked Image
+                                        </span>
                                     </div>
                                     <input type="file" id="feedback-image-input" accept="image/*" class="hidden" onchange="handleFeedbackImageUpload(this)">
                                     <input type="hidden" id="grading-feedback-url">
-                                    <button onclick="viewFullImage('feedback')" class="w-full py-2 bg-white bg-opacity-10 rounded-lg text-white text-sm hover:bg-opacity-20">
-                                        🔍 크게 보기
+                                    <button onclick="viewFullImage('feedback')" class="w-full py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white text-[10px] uppercase tracking-widest font-bold hover:bg-opacity-10 transition-all">
+                                        Enlarge
                                     </button>
                                 </div>
                             </div>
 
                             <!-- 저장 버튼 -->
-                            <div class="flex gap-4 pt-4">
-                                <button onclick="closeGradingModal()" class="flex-1 py-3 bg-white bg-opacity-10 rounded-xl text-white font-semibold hover:bg-opacity-20">
-                                    취소
+                            <div class="flex gap-4 pt-8">
+                                <button onclick="closeGradingModal()" class="btn-admin-outline flex-1 py-4">
+                                    Cancel
                                 </button>
-                                <button onclick="saveGrading()" class="flex-1 py-3 bg-white rounded-xl text-black font-semibold hover:bg-gray-200">
-                                    채점 저장
+                                <button onclick="saveGrading()" class="btn-admin-primary flex-1 py-4">
+                                    Save Grading
                                 </button>
                             </div>
                         </div>
@@ -984,83 +988,82 @@
 
             <!-- 주문/배송 관리 섹션 -->
             <section id="section-orders" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-8 flex items-center">
-                    주문/배송 관리
-                </h1>
+                <div class="mb-12">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Logistics Management</span>
+                    <h1 class="text-4xl font-bold text-white tracking-tight">Shipping</h1>
+                </div>
 
                 <!-- 통계 카드 -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-red-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-red-300">배송정보 미입력</p>
-                        <p id="stat-pending-address" class="text-2xl font-bold text-white mt-1">0</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Address Pending</p>
+                        <p id="stat-pending-address" class="text-3xl font-bold text-red-500">0</p>
                     </div>
-                    <div class="bg-purple-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-purple-300">배송준비중</p>
-                        <p id="stat-preparing" class="text-2xl font-bold text-white mt-1">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Preparing</p>
+                        <p id="stat-preparing" class="text-3xl font-bold text-purple-500">0</p>
                     </div>
-                    <div class="bg-blue-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-blue-300">배송중</p>
-                        <p id="stat-shipping" class="text-2xl font-bold text-white mt-1">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Shipping</p>
+                        <p id="stat-shipping" class="text-3xl font-bold text-blue-500">0</p>
                     </div>
-                    <div class="bg-green-500 bg-opacity-20 rounded-xl p-4">
-                        <p class="text-sm text-green-300">배송완료</p>
-                        <p id="stat-delivered" class="text-2xl font-bold text-white mt-1">0</p>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Delivered</p>
+                        <p id="stat-delivered" class="text-3xl font-bold text-green-500">0</p>
                     </div>
                 </div>
 
                 <!-- 필터 탭 -->
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-8 w-fit">
                     <button onclick="loadOrders('need_action')" id="filter-orders-need_action" 
-                            class="px-4 py-2 bg-white bg-opacity-10 rounded-lg text-white">
-                        처리 필요
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
+                        Needs Action
                     </button>
                     <button onclick="loadOrders('all')" id="filter-orders-all" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        전체
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        All
                     </button>
                     <button onclick="loadOrders('PENDING_ADDRESS')" id="filter-orders-PENDING_ADDRESS" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        배송정보 미입력
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        No Address
                     </button>
                     <button onclick="loadOrders('PREPARING')" id="filter-orders-PREPARING" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        배송준비중
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        Preparing
                     </button>
                     <button onclick="loadOrders('SHIPPING')" id="filter-orders-SHIPPING" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        배송중
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        Shipping
                     </button>
                     <button onclick="loadOrders('DELIVERED')" id="filter-orders-DELIVERED" 
-                            class="px-4 py-2 rounded-lg text-gray-400 hover:bg-white hover:bg-opacity-5">
-                        배송완료
+                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                        Delivered
                     </button>
                 </div>
 
                 <!-- 주문 테이블 -->
-                <div class="bg-white bg-opacity-5 rounded-xl overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-white bg-opacity-5">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문일</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문번호</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">상품</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">주문자</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">배송상태</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">배송지</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">택배/송장</th>
-                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-400">관리</th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-table-body">
-                                <tr>
-                                    <td colspan="8" class="px-4 py-8 text-center text-gray-500">
-                                        데이터를 불러오는 중...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="overflow-x-auto border-t border-white border-opacity-5">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Address</th>
+                                <th>Tracking</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <tr>
+                                <td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                                    Loading orders...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
