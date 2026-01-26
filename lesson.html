@@ -1893,59 +1893,83 @@
             }
         }
         
-        // 코스 완료 알림 발송
+        // 코스 완료 알림 발송 (학생 + 학부모 둘 다)
         async function sendCourseCompleteNotification(reportUrl) {
             if (!currentUser || !currentCourse || !userProfile) {
                 return { success: false, error: 'Missing data' };
             }
-            
+
             try {
                 const studentName = userProfile?.name || '학생';
                 const courseTitle = currentCourse?.title || '과정';
-                
+
                 // SMS 메시지 생성
                 let message = `[올라운드영어] ${studentName} 학생이 "${courseTitle}" 과정을 수료했습니다!\n\n학습 리포트 확인:\n${reportUrl}`;
-                
-                // 알림 로그 저장
-                const { data: logData, error: logError } = await window.supabase
-                    .from('parent_notifications')
-                    .insert({
-                        user_id: currentUser.id,
-                        lesson_id: currentLesson?.id || courseLessons[courseLessons.length - 1]?.id,
-                        parent_phone: userProfile.parent_phone,
-                        message: message,
-                        status: 'pending'
-                    })
-                    .select()
-                    .single();
-                
-                if (logError) throw logError;
-                
-                // 카카오 알림톡 발송 Edge Function 호출
-                const smsResult = await sendSmsViaEdgeFunction({
-                    phone: userProfile.parent_phone,
-                    reportUrl: reportUrl,
-                    notificationId: logData.id
-                });
-                
-                return { success: true, data: smsResult };
+
+                // 발송할 전화번호 목록 수집 (학생 + 학부모)
+                const phoneNumbers = new Set();
+                const studentPhone = userProfile.phone || userProfile.student_phone;
+                const parentPhone = userProfile.parent_phone || userProfile.guardian_phone;
+
+                if (studentPhone) phoneNumbers.add(studentPhone.replace(/[^0-9]/g, ''));
+                if (parentPhone) phoneNumbers.add(parentPhone.replace(/[^0-9]/g, ''));
+
+                if (phoneNumbers.size === 0) {
+                    console.log('연락처가 없는 사용자입니다.');
+                    return { success: false, error: '연락처 없음' };
+                }
+
+                // 각 번호에 알림톡 발송
+                const results = [];
+                for (const phone of phoneNumbers) {
+                    // 알림 로그 저장
+                    const { data: logData, error: logError } = await window.supabase
+                        .from('parent_notifications')
+                        .insert({
+                            user_id: currentUser.id,
+                            lesson_id: currentLesson?.id || courseLessons[courseLessons.length - 1]?.id,
+                            parent_phone: phone,
+                            message: message,
+                            status: 'pending'
+                        })
+                        .select()
+                        .single();
+
+                    if (logError) {
+                        console.error('알림 로그 저장 오류:', logError);
+                        continue;
+                    }
+
+                    // 카카오 알림톡 발송 Edge Function 호출
+                    const smsResult = await sendSmsViaEdgeFunction({
+                        phone: phone,
+                        reportUrl: reportUrl,
+                        notificationId: logData.id
+                    });
+
+                    results.push({ phone, result: smsResult });
+                    console.log(`알림톡 발송 (${phone}):`, smsResult);
+                }
+
+                console.log(`총 ${phoneNumbers.size}명에게 알림톡 발송 완료`);
+                return { success: true, data: results };
             } catch (error) {
                 console.error('Send course complete notification error:', error);
                 return { success: false, error: error.message };
             }
         }
-        
+
         // NHN 알림톡 발송 함수
         async function sendSmsViaEdgeFunction(data) {
             try {
                 // 템플릿 파라미터 추출
                 const studentName = userProfile?.name || '학생';
                 const courseTitle = currentCourse?.title || '과정';
-                
+
                 // 통계 데이터 가져오기 (리포트에서)
                 let progressPercent = '0';
                 let assignmentPercent = '0';
-                
+
                 if (currentCourse) {
                     const reportResult = await generateCourseReport(currentUser.id, currentCourse.id);
                     if (reportResult.success) {
@@ -1953,7 +1977,7 @@
                         assignmentPercent = reportResult.data.assignment_rate.toString();
                     }
                 }
-                
+
                 // NHN 알림톡 발송 시도 (템플릿 사용)
                 const { data: result, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
                     body: {
@@ -1969,12 +1993,12 @@
                         fallbackMessage: `[올라운드영어] ${studentName}님, ${courseTitle} 과정을 완료하셨습니다! 진도율: ${progressPercent}%, 숙제완료율: ${assignmentPercent}%`
                     }
                 });
-                
+
                 if (error) {
                     console.warn('알림톡 발송 실패:', error);
                     return { success: false, error: error.message };
                 }
-                
+
                 console.log('알림톡 발송 결과:', result);
                 return result || { success: false, error: '알 수 없는 오류' };
             } catch (error) {

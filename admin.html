@@ -2306,19 +2306,11 @@
                 // 학생 프로필 조회
                 const { data: profile, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('name, parent_phone, phone, student_phone, notification_enabled')
+                    .select('name, parent_phone, guardian_phone, phone, student_phone, notification_enabled')
                     .eq('id', submission.user_id)
                     .single();
 
                 if (profileError) throw profileError;
-
-                // 연락처 확인 (우선순위: parent_phone → phone → student_phone)
-                const recipientPhone = profile.parent_phone || profile.phone || profile.student_phone;
-                
-                if (!recipientPhone) {
-                    console.log('연락처가 없는 사용자입니다.');
-                    return;
-                }
 
                 // 알림 비활성화 시 종료
                 if (profile.notification_enabled === false) {
@@ -2335,37 +2327,57 @@
 
                 if (lessonError) throw lessonError;
 
-                // 알림톡 발송 (도메인 없이 간단하게)
-                const { data, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
-                    body: {
-                        phone: recipientPhone,
-                        templateCode: 'grading_complete',
-                        templateParams: {
-                            '학생명': profile.name || '학생',
-                            '과제명': `${lesson.order_num}강`,
-                            '점수': feedbackData.score?.toString() || '0',
-                            '피드백': feedbackData.comment || '채점 완료'
-                        }
-                    }
-                });
+                // 발송할 전화번호 목록 수집 (학생 + 학부모)
+                const phoneNumbers = new Set();
+                const studentPhone = profile.phone || profile.student_phone;
+                const parentPhone = profile.parent_phone || profile.guardian_phone;
 
-                if (error) {
-                    console.error('알림톡 발송 오류:', error);
-                } else {
-                    console.log('알림톡 발송 성공:', data);
+                if (studentPhone) phoneNumbers.add(studentPhone.replace(/[^0-9]/g, ''));
+                if (parentPhone) phoneNumbers.add(parentPhone.replace(/[^0-9]/g, ''));
+
+                if (phoneNumbers.size === 0) {
+                    console.log('연락처가 없는 사용자입니다.');
+                    return;
                 }
 
-                // notification_logs에 기록
-                await window.supabase
-                    .from('notification_logs')
-                    .insert({
-                        user_id: submission.user_id,
-                        submission_id: submissionId,
-                        notification_type: 'grading_complete',
-                        recipient_phone: recipientPhone,
-                        status: error ? 'failed' : 'sent',
-                        error_message: error?.message || null
+                // 템플릿 파라미터
+                const templateParams = {
+                    '학생명': profile.name || '학생',
+                    '과제명': `${lesson.order_num}강`,
+                    '점수': feedbackData.score?.toString() || '0',
+                    '피드백': feedbackData.comment || '채점 완료'
+                };
+
+                // 각 번호에 알림톡 발송
+                for (const phone of phoneNumbers) {
+                    const { data, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
+                        body: {
+                            phone: phone,
+                            templateCode: 'grading_complete',
+                            templateParams: templateParams
+                        }
                     });
+
+                    if (error) {
+                        console.error(`알림톡 발송 오류 (${phone}):`, error);
+                    } else {
+                        console.log(`알림톡 발송 성공 (${phone}):`, data);
+                    }
+
+                    // notification_logs에 기록
+                    await window.supabase
+                        .from('notification_logs')
+                        .insert({
+                            user_id: submission.user_id,
+                            submission_id: submissionId,
+                            notification_type: 'grading_complete',
+                            recipient_phone: phone,
+                            status: error ? 'failed' : 'sent',
+                            error_message: error?.message || null
+                        });
+                }
+
+                console.log(`총 ${phoneNumbers.size}명에게 알림톡 발송 완료`);
 
             } catch (error) {
                 console.error('알림 처리 오류:', error);
@@ -3121,6 +3133,54 @@
 
         // ========== 결제 관리 함수 끝 ==========
 
+        // Vimeo 영상 길이 자동 가져오기
+        async function fetchVimeoDuration(url) {
+            if (!url || !url.includes('vimeo.com')) return null;
+
+            try {
+                // Vimeo ID 추출
+                const vimeoId = url.match(/vimeo\.com\/(\d+)/)?.[1];
+                if (!vimeoId) return null;
+
+                const response = await fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vimeoId}`);
+                if (!response.ok) return null;
+
+                const data = await response.json();
+                if (data.duration) {
+                    // 초 단위를 분 단위로 변환 (반올림)
+                    return Math.round(data.duration / 60);
+                }
+                return null;
+            } catch (error) {
+                console.error('Vimeo duration fetch error:', error);
+                return null;
+            }
+        }
+
+        // 영상 URL 입력 시 자동으로 길이 가져오기
+        function setupVideoDurationAutoFetch() {
+            const videoUrlInput = document.getElementById('lesson-video-url');
+            const durationInput = document.getElementById('lesson-duration');
+
+            if (videoUrlInput && durationInput) {
+                videoUrlInput.addEventListener('blur', async () => {
+                    const url = videoUrlInput.value.trim();
+                    if (url && url.includes('vimeo.com')) {
+                        durationInput.value = ''; // 로딩 표시
+                        durationInput.placeholder = '불러오는 중...';
+
+                        const duration = await fetchVimeoDuration(url);
+                        if (duration !== null) {
+                            durationInput.value = duration;
+                            durationInput.placeholder = '';
+                        } else {
+                            durationInput.placeholder = '자동 가져오기 실패';
+                        }
+                    }
+                });
+            }
+        }
+
         // 페이지 초기화
         async function init() {
             const hasAccess = await checkAdminAccess();
@@ -3128,6 +3188,9 @@
 
             // 기본 섹션 로드
             loadStudentAssignments();
+
+            // Vimeo 영상 길이 자동 가져오기 설정
+            setupVideoDurationAutoFetch();
         }
 
         // 섹션 전환 시 데이터 로드
