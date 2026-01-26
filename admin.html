@@ -168,12 +168,9 @@
             border-radius: 2px;
         }
 
-        /* Date picker 스타일 (달력) */
-        input[type="date"] {
-            color-scheme: dark;
-        }
+        /* Date picker 달력 아이콘만 흰색 */
         input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+            filter: brightness(0) invert(1);
             cursor: pointer;
         }
 
