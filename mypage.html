@@ -886,25 +886,16 @@
                     return;
                 }
 
-                // 1. 사용자 관련 데이터 삭제 (profiles 테이블은 CASCADE로 자동 삭제될 수 있음)
-                // progress 삭제
-                await window.supabase.from('progress').delete().eq('user_id', user.id);
+                // Database Function을 통해 사용자 완전 삭제
+                const { error } = await window.supabase.rpc('delete_user');
 
-                // student_submissions 삭제
-                await window.supabase.from('student_submissions').delete().eq('user_id', user.id);
+                if (error) {
+                    console.error('Delete user RPC error:', error);
+                    throw error;
+                }
 
-                // enrollments 삭제
-                await window.supabase.from('enrollments').delete().eq('user_id', user.id);
-
-                // user_devices 삭제
-                await window.supabase.from('user_devices').delete().eq('user_id', user.id);
-
-                // profiles 삭제
-                await window.supabase.from('profiles').delete().eq('id', user.id);
-
-                // 2. Supabase Auth 사용자 삭제 (Edge Function 필요할 수 있음)
-                // 현재는 로그아웃만 처리
-                await window.supabase.auth.signOut();
+                // 로컬 세션 정리
+                localStorage.removeItem('allround_session_id');
 
                 alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
                 window.location.href = 'index.html';
