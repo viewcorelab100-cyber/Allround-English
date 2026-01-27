@@ -235,15 +235,15 @@
                     <div id="video-end-overlay" class="absolute inset-0 bg-black bg-opacity-95 z-50 hidden flex items-center justify-center p-6">
                         <div class="text-center space-y-6 max-w-2xl">
                             <div class="space-y-4">
-                                <h2 class="text-3xl font-bold text-white uppercase tracking-widest">Lesson Completed</h2>
+                                <h2 class="text-3xl font-bold text-white uppercase tracking-widest">강의 시청 완료</h2>
                                 <p class="text-sm text-gray-400 uppercase tracking-widest leading-relaxed">
-                                    Please submit your assignments.<br>
-                                    Final submission is required for completion.
+                                    과제를 제출해주세요.<br>
+                                    최종 제출 완료 후 수강이 인정됩니다.
                                 </p>
                             </div>
-                            <button onclick="closeVideoEndOverlay()" 
+                            <button onclick="closeVideoEndOverlay()"
                                     class="px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs">
-                                Review Assignments
+                                과제 확인하기
                             </button>
                         </div>
                     </div>
@@ -254,7 +254,7 @@
                     <!-- Progress Bar -->
                     <div class="space-y-2">
                         <div class="flex justify-between text-[10px] uppercase tracking-widest">
-                            <span class="text-gray-500">Watching Progress</span>
+                            <span class="text-gray-500">시청 진도율</span>
                             <span id="progress-text" class="text-white">0%</span>
                         </div>
                         <div class="w-full h-[2px] bg-white bg-opacity-10 overflow-hidden">
@@ -271,10 +271,10 @@
                     <!-- Navigation Buttons -->
                     <div class="flex justify-between pt-4">
                         <button id="prev-lesson" class="px-6 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors disabled:opacity-10 disabled:cursor-not-allowed" disabled>
-                            ← Previous
+                            ← 이전 강의
                         </button>
                         <button id="next-lesson" class="px-6 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed" disabled>
-                            Next →
+                            다음 강의 →
                         </button>
                     </div>
                 </div>
@@ -284,84 +284,84 @@
             <div class="w-full lg:w-96 bg-white bg-opacity-[0.02] border-l border-white border-opacity-5 overflow-y-auto">
                 <div class="space-y-8 p-8">
                     <!-- 선생님 공지사항 -->
-                    <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5">
+                    <div class="p-6 bg-white bg-opacity-[0.03] border-2 border-white border-opacity-20">
                         <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
-                            Teacher's Note
+                            선생님 공지사항
                         </h3>
                         <div id="teacher-notice" class="text-sm text-gray-300 leading-relaxed font-light">
-                            <p class="text-gray-600">No announcements.</p>
+                            <p class="text-gray-600">공지사항이 없습니다.</p>
                         </div>
                     </div>
 
                     <!-- 과제 제출 현황 (카드 형식) -->
-                    <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5">
-                        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6">Assignments</h3>
-                        
+                    <div class="p-6 bg-white bg-opacity-[0.03] border-2 border-white border-opacity-20">
+                        <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6">과제 현황</h3>
+
                         <div id="assignment-cards-container" class="hidden space-y-4">
                             <!-- 1. 퀴즈 카드 -->
-                            <div id="quiz-card" class="assignment-card p-5 border border-white border-opacity-10 bg-white bg-opacity-[0.02] cursor-pointer hover:border-opacity-30 transition-all" onclick="openQuizModal()">
+                            <div id="quiz-card" class="assignment-card p-5 border-l-4 border-l-blue-500 border border-white border-opacity-10 bg-blue-500 bg-opacity-[0.05] cursor-pointer hover:bg-opacity-[0.1] transition-all" onclick="openQuizModal()">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-4">
-                                        <div class="w-8 h-8 bg-white bg-opacity-5 flex items-center justify-center">
-                                            <span class="text-white font-bold text-xs">01</span>
+                                        <div class="w-8 h-8 bg-blue-500 bg-opacity-20 flex items-center justify-center">
+                                            <span class="text-blue-400 font-bold text-xs">01</span>
                                         </div>
                                         <div>
-                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">Quiz</p>
+                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">퀴즈</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <span id="quiz-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">Pending</span>
+                                        <span id="quiz-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">대기중</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 2. 노트 필기 카드 -->
-                            <div id="note-card" class="assignment-card p-5 border border-white border-opacity-10 bg-white bg-opacity-[0.02] cursor-pointer hover:border-opacity-30 transition-all" onclick="openNoteModal()">
+                            <div id="note-card" class="assignment-card p-5 border-l-4 border-l-green-500 border border-white border-opacity-10 bg-green-500 bg-opacity-[0.05] cursor-pointer hover:bg-opacity-[0.1] transition-all" onclick="openNoteModal()">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-4">
-                                        <div class="w-8 h-8 bg-white bg-opacity-5 flex items-center justify-center">
-                                            <span class="text-white font-bold text-xs">02</span>
+                                        <div class="w-8 h-8 bg-green-500 bg-opacity-20 flex items-center justify-center">
+                                            <span class="text-green-400 font-bold text-xs">02</span>
                                         </div>
                                         <div>
-                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">Note Taking</p>
+                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">노트 필기</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <span id="note-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">Pending</span>
+                                        <span id="note-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">대기중</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 3. 블로그 과제 카드 -->
-                            <div id="blog-card" class="assignment-card p-5 border border-white border-opacity-10 bg-white bg-opacity-[0.02] cursor-pointer hover:border-opacity-30 transition-all" onclick="openBlogModal()">
+                            <div id="blog-card" class="assignment-card p-5 border-l-4 border-l-purple-500 border border-white border-opacity-10 bg-purple-500 bg-opacity-[0.05] cursor-pointer hover:bg-opacity-[0.1] transition-all" onclick="openBlogModal()">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-4">
-                                        <div class="w-8 h-8 bg-white bg-opacity-5 flex items-center justify-center">
-                                            <span class="text-white font-bold text-xs">03</span>
+                                        <div class="w-8 h-8 bg-purple-500 bg-opacity-20 flex items-center justify-center">
+                                            <span class="text-purple-400 font-bold text-xs">03</span>
                                         </div>
                                         <div>
-                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">Blog Post</p>
+                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">블로그 작성</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <span id="blog-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">Pending</span>
+                                        <span id="blog-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">대기중</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Final. 이미지 과제 카드 -->
-                            <div id="image-card" class="assignment-card p-5 border border-white border-opacity-10 bg-white bg-opacity-[0.02] cursor-pointer hover:border-opacity-30 transition-all" onclick="openImageModal()">
+                            <div id="image-card" class="assignment-card p-5 border-l-4 border-l-orange-500 border border-white border-opacity-10 bg-orange-500 bg-opacity-[0.05] cursor-pointer hover:bg-opacity-[0.1] transition-all" onclick="openImageModal()">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-4">
-                                        <div class="w-8 h-8 bg-white bg-opacity-10 flex items-center justify-center">
-                                            <span class="text-white font-bold text-[8px] uppercase">Final</span>
+                                        <div class="w-8 h-8 bg-orange-500 bg-opacity-20 flex items-center justify-center">
+                                            <span class="text-orange-400 font-bold text-[8px] uppercase">최종</span>
                                         </div>
                                         <div>
-                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">Image Submission</p>
+                                            <p class="text-white font-bold uppercase tracking-widest text-[10px]">인증 사진 제출</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2">
-                                        <span id="image-submission-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">Not Submitted</span>
+                                        <span id="image-submission-status" class="text-[9px] font-bold uppercase tracking-widest text-gray-600">미제출</span>
                                     </div>
                                 </div>
                             </div>
@@ -371,9 +371,9 @@
                     </div>
                     
                     <!-- 커리큘럼 -->
-                    <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5">
+                    <div class="p-6 bg-white bg-opacity-[0.03] border-2 border-white border-opacity-20">
                         <h3 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-6">
-                            Curriculum
+                            커리큘럼
                         </h3>
                         <div id="lesson-list" class="space-y-1">
                             <!-- 레슨 목록이 동적으로 로드됩니다 -->
@@ -445,7 +445,7 @@
     <div id="faq-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
         <div class="bg-black border border-white border-opacity-20 w-full max-w-lg max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center p-8 border-b border-white border-opacity-10">
-                <h3 class="text-xl font-bold text-white uppercase tracking-widest">FAQ</h3>
+                <h3 class="text-xl font-bold text-white uppercase tracking-widest">자주 묻는 질문</h3>
                 <button onclick="closeFaqModal()" class="text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -453,44 +453,44 @@
                     </svg>
                 </button>
             </div>
-            
+
             <div class="flex-1 overflow-y-auto p-8 space-y-4">
                 <!-- FAQ 1 -->
                 <div class="faq-item bg-white bg-opacity-[0.03] border border-white border-opacity-5 overflow-hidden">
                     <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex justify-between items-center">
-                        <span class="text-xs font-bold text-white uppercase tracking-widest">When is the textbook shipped?</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-widest">교재는 언제 배송되나요?</span>
                         <svg class="faq-arrow w-4 h-4 text-gray-600 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
                     <div class="faq-answer hidden px-6 pb-6">
-                        <p class="text-gray-400 text-xs font-light leading-relaxed">It will be shipped within 2-3 business days after enrollment. You can check the tracking information in My Page.</p>
+                        <p class="text-gray-400 text-xs font-light leading-relaxed">결제 완료 후 영업일 기준 2~3일 이내에 발송됩니다. 배송 현황은 마이페이지에서 확인하실 수 있습니다.</p>
                     </div>
                 </div>
 
                 <!-- FAQ 2 -->
                 <div class="faq-item bg-white bg-opacity-[0.03] border border-white border-opacity-5 overflow-hidden">
                     <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex justify-between items-center">
-                        <span class="text-xs font-bold text-white uppercase tracking-widest">When does my access expire?</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-widest">수강 기간은 언제까지인가요?</span>
                         <svg class="faq-arrow w-4 h-4 text-gray-600 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
                     <div class="faq-answer hidden px-6 pb-6">
-                        <p class="text-gray-400 text-xs font-light leading-relaxed">Access is valid for 180 days (6 months) from the date of purchase. You can check the remaining days in My Page.</p>
+                        <p class="text-gray-400 text-xs font-light leading-relaxed">결제일로부터 180일(6개월) 동안 수강 가능합니다. 남은 수강 기간은 마이페이지에서 확인하실 수 있습니다.</p>
                     </div>
                 </div>
 
                 <!-- FAQ 3 -->
                 <div class="faq-item bg-white bg-opacity-[0.03] border border-white border-opacity-5 overflow-hidden">
                     <button onclick="toggleFaq(this)" class="w-full p-6 text-left flex justify-between items-center">
-                        <span class="text-xs font-bold text-white uppercase tracking-widest">How do I submit assignments?</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-widest">과제는 어떻게 제출하나요?</span>
                         <svg class="faq-arrow w-4 h-4 text-gray-600 transition-transform" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </button>
                     <div class="faq-answer hidden px-6 pb-6">
-                        <p class="text-gray-400 text-xs font-light leading-relaxed">Please follow the instructions in the assignment section. For some assignments, you may need to submit via the provided QR code or link.</p>
+                        <p class="text-gray-400 text-xs font-light leading-relaxed">과제 섹션의 안내에 따라 제출해주세요. 일부 과제는 QR 코드 또는 링크를 통해 제출할 수 있습니다.</p>
                     </div>
                 </div>
             </div>
@@ -530,7 +530,7 @@
     <div id="qna-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
         <div class="bg-black border border-white border-opacity-20 w-full max-w-lg p-8 space-y-8">
             <div class="flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white uppercase tracking-widest">Ask Question</h3>
+                <h3 class="text-xl font-bold text-white uppercase tracking-widest">질문하기</h3>
                 <button onclick="closeQnaModal()" class="text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -541,28 +541,28 @@
             
             <div class="space-y-6">
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Title</label>
-                    <input type="text" id="qna-title" 
+                    <label class="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">제목</label>
+                    <input type="text" id="qna-title"
                            class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                           placeholder="Enter question title">
+                           placeholder="질문 제목을 입력하세요">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">Content</label>
+                    <label class="block text-[10px] font-bold text-gray-500 mb-2 uppercase tracking-widest">내용</label>
                     <textarea id="qna-content" rows="5"
                               class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors resize-none"
-                              placeholder="Enter your question in detail"></textarea>
+                              placeholder="질문 내용을 자세히 입력하세요"></textarea>
                 </div>
-                <p class="text-[9px] text-gray-600 uppercase tracking-tight">* Question will be registered for the current lesson.</p>
+                <p class="text-[9px] text-gray-600 uppercase tracking-tight">* 현재 강의에 대한 질문으로 등록됩니다.</p>
             </div>
             
             <div class="flex gap-4">
-                <button onclick="closeQnaModal()" 
+                <button onclick="closeQnaModal()"
                         class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                    Cancel
+                    취소
                 </button>
-                <button onclick="submitQna()" 
+                <button onclick="submitQna()"
                         class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                    Submit
+                    등록
                 </button>
             </div>
         </div>
@@ -572,7 +572,7 @@
     <div id="qna-list-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[200] hidden flex items-center justify-center p-6">
         <div class="bg-black border border-white border-opacity-20 w-full max-w-2xl max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center p-8 border-b border-white border-opacity-10">
-                <h3 class="text-xl font-bold text-white uppercase tracking-widest">Q&A List</h3>
+                <h3 class="text-xl font-bold text-white uppercase tracking-widest">Q&A 목록</h3>
                 <button onclick="closeQnaListModal()" class="text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -583,7 +583,7 @@
             
             <div id="qna-list-content" class="flex-1 overflow-y-auto p-8">
                 <!-- Q&A 목록이 여기에 로드됩니다 -->
-                <p class="text-[10px] text-gray-600 uppercase tracking-widest text-center py-12">Loading Q&A list...</p>
+                <p class="text-[10px] text-gray-600 uppercase tracking-widest text-center py-12">Q&A 목록을 불러오는 중...</p>
             </div>
         </div>
     </div>
@@ -595,17 +595,17 @@
                 <!-- 메시지 -->
                 <div class="space-y-4">
                     <h3 id="modal-title" class="text-2xl font-bold text-white uppercase tracking-widest">
-                        Assignment Completed
+                        과제 완료
                     </h3>
                     <p id="modal-message" class="text-sm text-gray-400 uppercase tracking-widest font-light">
-                        Great work.
+                        수고하셨습니다.
                     </p>
                 </div>
-                
+
                 <!-- 확인 버튼 -->
-                <button onclick="closeAssignmentModal()" 
+                <button onclick="closeAssignmentModal()"
                         class="w-full px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs">
-                    Confirm
+                    확인
                 </button>
             </div>
         </div>
@@ -617,7 +617,7 @@
             <div class="p-12 space-y-8">
                 <!-- 헤더 -->
                 <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Learning Report</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">학습 리포트</h2>
                     <button onclick="closeReportModal()" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -625,40 +625,40 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <!-- 컨텐츠 -->
                 <div class="text-center space-y-6">
                     <div class="space-y-4">
-                        <h3 class="text-lg font-bold text-white uppercase tracking-widest">Send Report</h3>
+                        <h3 class="text-lg font-bold text-white uppercase tracking-widest">리포트 발송</h3>
                         <p class="text-xs text-gray-500 uppercase tracking-widest leading-relaxed" id="report-modal-message">
-                            Would you like to generate and send the learning report to your parent?
+                            학습 리포트를 생성하여 부모님께 발송하시겠습니까?
                         </p>
                     </div>
-                    
+
                     <!-- 진행 상태 -->
                     <div id="report-progress" class="hidden space-y-4">
                         <div class="flex items-center justify-center space-x-3">
                             <div class="animate-spin h-4 w-4 border-b-2 border-white"></div>
-                            <span id="report-progress-text" class="text-[10px] text-white uppercase tracking-widest">Generating...</span>
+                            <span id="report-progress-text" class="text-[10px] text-white uppercase tracking-widest">생성중...</span>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- 버튼들 -->
                 <div id="report-buttons" class="space-y-4">
                     <div class="flex gap-4">
-                        <button onclick="closeReportModal()" 
+                        <button onclick="closeReportModal()"
                                 class="flex-1 px-6 py-4 bg-white bg-opacity-10 text-white font-bold uppercase tracking-widest text-xs hover:bg-opacity-20 transition-all">
-                            Cancel
+                            취소
                         </button>
-                        <button onclick="confirmSendReport()" 
+                        <button onclick="confirmSendReport()"
                                 class="flex-1 px-6 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs">
-                            Send
+                            발송
                         </button>
                     </div>
-                    <button onclick="hideReportForWeek()" 
+                    <button onclick="hideReportForWeek()"
                             class="w-full px-6 py-3 bg-transparent text-gray-600 font-bold uppercase tracking-widest text-[9px] hover:text-gray-400 transition-all">
-                        Don't show for a week
+                        일주일간 보지 않기
                     </button>
                 </div>
             </div>
@@ -670,7 +670,7 @@
         <div class="bg-black border border-white border-opacity-10 w-full max-w-2xl">
             <div class="p-12 space-y-8">
                 <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Quiz</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">퀴즈</h2>
                     <button onclick="closeQuizModal()" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -678,37 +678,37 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div id="quiz-content" class="space-y-8">
                     <div class="space-y-6">
-                        <p class="text-lg text-white font-light leading-relaxed">Question will appear here</p>
+                        <p class="text-lg text-white font-light leading-relaxed">문제가 여기에 표시됩니다</p>
                         <div class="space-y-3">
                             <label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all">
                                 <input type="radio" name="quiz-answer" value="1" class="w-4 h-4 accent-white">
-                                <span class="text-sm text-gray-400 uppercase tracking-widest">Option 1</span>
+                                <span class="text-sm text-gray-400 uppercase tracking-widest">보기 1</span>
                             </label>
                             <label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all">
                                 <input type="radio" name="quiz-answer" value="2" class="w-4 h-4 accent-white">
-                                <span class="text-sm text-gray-400 uppercase tracking-widest">Option 2</span>
+                                <span class="text-sm text-gray-400 uppercase tracking-widest">보기 2</span>
                             </label>
                             <label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all">
                                 <input type="radio" name="quiz-answer" value="3" class="w-4 h-4 accent-white">
-                                <span class="text-sm text-gray-400 uppercase tracking-widest">Option 3</span>
+                                <span class="text-sm text-gray-400 uppercase tracking-widest">보기 3</span>
                             </label>
                             <label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all">
                                 <input type="radio" name="quiz-answer" value="4" class="w-4 h-4 accent-white">
-                                <span class="text-sm text-gray-400 uppercase tracking-widest">Option 4</span>
+                                <span class="text-sm text-gray-400 uppercase tracking-widest">보기 4</span>
                             </label>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-4">
                     <button onclick="closeQuizModal()" class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                        Cancel
+                        취소
                     </button>
                     <button onclick="submitQuiz()" class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                        Submit
+                        제출
                     </button>
                 </div>
             </div>
@@ -720,7 +720,7 @@
         <div class="bg-black border border-white border-opacity-20 w-full max-w-md">
             <div class="p-12 space-y-8">
                 <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Note Taking</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">노트 필기</h2>
                     <button onclick="closeNoteModal()" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -728,20 +728,20 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div class="space-y-6">
-                    <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">Complete your notes and send a photo via KakaoTalk</p>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">노트 필기 후 카카오톡으로 사진을 보내주세요</p>
                     <a href="https://open.kakao.com/o/allround" target="_blank" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                        Send via KakaoTalk
+                        카카오톡으로 보내기
                     </a>
                 </div>
-                
+
                 <div class="flex gap-4">
                     <button onclick="closeNoteModal()" class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                        Cancel
+                        취소
                     </button>
                     <button onclick="completeNote()" class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                        Mark Complete
+                        완료 표시
                     </button>
                 </div>
             </div>
@@ -753,7 +753,7 @@
         <div class="bg-black border border-white border-opacity-20 w-full max-w-md">
             <div class="p-12 space-y-8">
                 <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Blog Post</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">블로그 작성</h2>
                     <button onclick="closeBlogModal()" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -761,26 +761,26 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div class="space-y-6">
                     <div id="blog-link-display-modal" class="hidden">
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">Blog URL</p>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2">블로그 주소</p>
                         <a id="blog-link-btn-modal" href="#" target="_blank" class="block p-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white hover:text-gray-300 text-xs break-all">
-                            Blog Link
+                            블로그 링크
                         </a>
                     </div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">Complete your blog post and send a photo via KakaoTalk</p>
+                    <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">블로그 작성 후 카카오톡으로 사진을 보내주세요</p>
                     <a href="https://open.kakao.com/o/allround" target="_blank" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                        Send via KakaoTalk
+                        카카오톡으로 보내기
                     </a>
                 </div>
-                
+
                 <div class="flex gap-4">
                     <button onclick="closeBlogModal()" class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                        Cancel
+                        취소
                     </button>
                     <button onclick="completeBlog()" class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
-                        Mark Complete
+                        완료 표시
                     </button>
                 </div>
             </div>
@@ -792,7 +792,7 @@
         <div class="bg-black border border-white border-opacity-20 w-full max-w-2xl">
             <div class="p-12 space-y-8">
                 <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Image Submission</h2>
+                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">인증 사진 제출</h2>
                     <button onclick="closeImageModal()" class="text-gray-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -800,49 +800,49 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div class="space-y-6">
                     <!-- QR 코드 -->
                     <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6 flex items-center gap-6">
                         <div class="flex-1">
-                            <p class="text-xs font-bold text-white uppercase tracking-widest mb-1">Submit via Mobile</p>
-                            <p class="text-[10px] text-gray-600 uppercase tracking-tight">Scan QR and submit image</p>
+                            <p class="text-xs font-bold text-white uppercase tracking-widest mb-1">모바일로 제출하기</p>
+                            <p class="text-[10px] text-gray-600 uppercase tracking-tight">QR 스캔 후 이미지 제출</p>
                         </div>
                         <div id="lesson-qr-code-modal" class="w-20 h-20 bg-white p-1 flex-shrink-0"></div>
                     </div>
-                    
+
                     <!-- 이미지 미리보기 영역 -->
                     <div id="image-previews-container" class="flex gap-3 overflow-x-auto pb-2">
                         <!-- 선택된 이미지들이 여기 표시됩니다 -->
                     </div>
-                    
+
                     <!-- 이미지 선택 -->
                     <div class="border-2 border-dashed border-white border-opacity-20 p-8 text-center hover:border-opacity-40 cursor-pointer transition-colors" onclick="document.getElementById('image-files-input').click()">
                         <input type="file" id="image-files-input" accept="image/*" multiple class="hidden" onchange="handleMultipleImageSelect(event)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p class="text-[10px] text-white uppercase tracking-widest font-bold mb-2">Click to Select Images</p>
-                        <p class="text-[9px] text-gray-600 uppercase tracking-tight">Multiple files supported (JPG, PNG, Auto-compressed)</p>
+                        <p class="text-[10px] text-white uppercase tracking-widest font-bold mb-2">클릭하여 이미지 선택</p>
+                        <p class="text-[9px] text-gray-600 uppercase tracking-tight">여러 파일 지원 (JPG, PNG, 자동 압축)</p>
                     </div>
-                    
+
                     <!-- 채점 결과 -->
                     <div id="grading-result-modal" class="hidden p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10">
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-[10px] text-white font-bold uppercase tracking-widest">Graded</span>
+                            <span class="text-[10px] text-white font-bold uppercase tracking-widest">채점 완료</span>
                             <span id="grading-score-modal" class="text-white font-bold text-xl"></span>
                         </div>
                         <p id="grading-comment-modal" class="text-xs text-gray-400"></p>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-4">
                     <button onclick="closeImageModal()" class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                        Cancel
+                        취소
                     </button>
                     <button id="submit-images-btn" onclick="submitMultipleImages()" disabled
                             class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
-                        Submit
+                        제출
                     </button>
                 </div>
             </div>
@@ -1336,10 +1336,10 @@
                 // 모든 퀴즈를 다 풀었음 - 상태를 완료로 변경하고 다음 과제로
                 const statusEl = document.getElementById('quiz-status');
                 if (statusEl) {
-                    statusEl.textContent = 'COMPLETED';
+                    statusEl.textContent = '완료';
                     statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                 }
-                showAssignmentModal('', 'QUIZ COMPLETED', 'All quizzes have been completed. Please proceed to the next step.', function() {
+                showAssignmentModal('', '퀴즈 완료', '모든 퀴즈를 완료했습니다. 다음 과제를 진행하세요.', function() {
                     showNextAssignmentInSequence();
                 });
                 return;
@@ -1372,7 +1372,7 @@
             }
             
             if (!userAnswer) {
-                alert('Please provide an answer.');
+                alert('답을 입력해주세요.');
                 return;
             }
             
@@ -1408,7 +1408,7 @@
                 if (allCompleted) {
                     const statusEl = document.getElementById('quiz-status');
                     if (statusEl) {
-                        statusEl.textContent = 'COMPLETED';
+                        statusEl.textContent = '완료';
                         statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                     }
                 }
@@ -1546,7 +1546,7 @@
                         if (allCompleted) {
                             const statusEl = document.getElementById('quiz-status');
                             if (statusEl) {
-                                statusEl.textContent = 'COMPLETED';
+                                statusEl.textContent = '완료';
                                 statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                             }
                         }
@@ -1668,11 +1668,11 @@
             if (result.success) {
                 const statusEl = document.getElementById('note-status');
                 if (statusEl) {
-                    statusEl.textContent = 'COMPLETED';
+                    statusEl.textContent = '완료';
                     statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                 }
                 closeNoteModal();
-                showAssignmentModal('', 'NOTE COMPLETED', 'Please proceed to the next assignment.', function() {
+                showAssignmentModal('', '노트 필기 완료', '다음 과제를 진행하세요.', function() {
                     showNextAssignmentInSequence();
                 });
                 updateAssignmentCardStatus();
@@ -1695,11 +1695,11 @@
             if (saveResult.success) {
                 const statusEl = document.getElementById('blog-status');
                 if (statusEl) {
-                    statusEl.textContent = 'COMPLETED';
+                    statusEl.textContent = '완료';
                     statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                 }
                 closeBlogModal();
-                showAssignmentModal('', 'BLOG POST COMPLETED', 'Please proceed to the next assignment.', function() {
+                showAssignmentModal('', '블로그 작성 완료', '다음 과제를 진행하세요.', function() {
                     showNextAssignmentInSequence();
                 });
                 updateAssignmentCardStatus();
@@ -2680,19 +2680,19 @@
                 : null;
             
             if (nextLesson) {
-                showAssignmentModal('', 'ALL ASSIGNMENTS COMPLETED', 'Ready for the next lesson?');
+                showAssignmentModal('', '모든 과제 완료', '다음 강의로 이동하시겠습니까?');
                 // 모달 확인 버튼에 다음 강의로 이동 기능 추가
                 const modal = document.getElementById('assignment-complete-modal');
                 const btn = modal.querySelector('button');
-                btn.textContent = 'Next Lesson';
+                btn.textContent = '다음 강의';
                 btn.onclick = function() {
                     window.location.href = `lesson.html?id=${nextLesson.id}`;
                 };
             } else {
-                showAssignmentModal('', 'COURSE COMPLETED', 'Congratulations. You have finished all lessons in this course.');
+                showAssignmentModal('', '코스 완료', '축하합니다! 모든 강의를 완료했습니다.');
                 const modal = document.getElementById('assignment-complete-modal');
                 const btn = modal.querySelector('button');
-                btn.textContent = 'Back to Course';
+                btn.textContent = '코스로 돌아가기';
                 btn.onclick = function() {
                     window.location.href = `course-detail.html?id=${currentLesson.course.id}`;
                 };

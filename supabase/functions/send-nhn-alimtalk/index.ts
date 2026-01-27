@@ -63,11 +63,13 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     } else {
+      console.error('❌ NHN API 오류:', JSON.stringify(result))
       return new Response(
-        JSON.stringify({ 
-          success: false, 
+        JSON.stringify({
+          success: false,
           error: result.header?.resultMessage || 'NHN API 오류',
-          code: result.header?.resultCode
+          code: result.header?.resultCode,
+          detail: result
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
