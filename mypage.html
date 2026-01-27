@@ -239,6 +239,9 @@
                 <button onclick="showTab('coupons')" id="tab-coupons" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
                     쿠폰
                 </button>
+                <button onclick="showTab('qna')" id="tab-qna" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
+                    내 질문
+                </button>
             </div>
 
             <!-- Tab Content: Courses -->
@@ -436,6 +439,20 @@
                 </div>
             </div>
 
+            <!-- Tab Content: Q&A -->
+            <div id="content-qna" class="hidden space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">내 질문</h2>
+                    <p class="text-sm text-gray-400">강의에서 질문한 내역과 답변을 확인할 수 있습니다.</p>
+                </div>
+
+                <div id="my-qna-list" class="space-y-4">
+                    <div class="text-center text-gray-500 py-12">
+                        질문 내역을 불러오는 중...
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
     </main>
@@ -503,6 +520,11 @@
             // 쿠폰 탭 선택 시 데이터 로드
             if (tab === 'coupons') {
                 loadCoupons();
+            }
+
+            // Q&A 탭 선택 시 데이터 로드
+            if (tab === 'qna') {
+                loadMyQnaList();
             }
         }
 
@@ -1492,7 +1514,7 @@
             const params = new URLSearchParams(window.location.search);
             const tab = params.get('tab');
             
-            if (tab && ['courses', 'orders', 'profile', 'devices', 'coupons'].includes(tab)) {
+            if (tab && ['courses', 'orders', 'profile', 'devices', 'coupons', 'qna'].includes(tab)) {
                 showTab(tab);
             } else {
                 await Promise.all([
@@ -1593,6 +1615,87 @@
             } catch (error) {
                 console.error('Save shipping error:', error);
                 alert('배송 정보 저장에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // 내 Q&A 목록 로드
+        async function loadMyQnaList() {
+            const container = document.getElementById('my-qna-list');
+            container.innerHTML = '<div class="text-center text-gray-500 py-12">질문 내역을 불러오는 중...</div>';
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-12">로그인이 필요합니다.</div>';
+                    return;
+                }
+
+                // 내 질문 조회
+                const { data, error } = await window.supabase
+                    .from('qna')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-12">등록한 질문이 없습니다.</div>';
+                    return;
+                }
+
+                // 코스/레슨 정보 조회
+                const lessonIds = [...new Set(data.map(q => q.lesson_id).filter(Boolean))];
+                const courseIds = [...new Set(data.map(q => q.course_id).filter(Boolean))];
+
+                let lessonsMap = {};
+                let coursesMap = {};
+
+                if (lessonIds.length > 0) {
+                    const { data: lessons } = await window.supabase.from('lessons').select('id, title, order_num').in('id', lessonIds);
+                    if (lessons) lessons.forEach(l => lessonsMap[l.id] = l);
+                }
+                if (courseIds.length > 0) {
+                    const { data: courses } = await window.supabase.from('courses').select('id, title').in('id', courseIds);
+                    if (courses) courses.forEach(c => coursesMap[c.id] = c);
+                }
+
+                container.innerHTML = data.map(qna => {
+                    const date = new Date(qna.created_at).toLocaleDateString('ko-KR');
+                    const lesson = lessonsMap[qna.lesson_id];
+                    const course = coursesMap[qna.course_id];
+                    const lessonInfo = lesson ? `${lesson.order_num}강. ${lesson.title}` : (course?.title || '');
+                    const statusBadge = qna.is_answered
+                        ? '<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-[10px] font-bold uppercase tracking-widest">답변완료</span>'
+                        : '<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-[10px] font-bold uppercase tracking-widest">대기중</span>';
+
+                    return `
+                        <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10 space-y-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        ${statusBadge}
+                                        <span class="text-[10px] text-gray-600">${date}</span>
+                                        ${lessonInfo ? `<span class="text-[10px] text-gray-600">| ${lessonInfo}</span>` : ''}
+                                    </div>
+                                    <h3 class="text-white font-bold text-sm mb-2">${qna.title}</h3>
+                                    <p class="text-gray-400 text-xs leading-relaxed">${qna.content}</p>
+                                </div>
+                            </div>
+                            ${qna.answer ? `
+                                <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-green-500">
+                                    <p class="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-2">답변</p>
+                                    <p class="text-gray-400 text-xs leading-relaxed">${qna.answer}</p>
+                                    ${qna.answered_at ? `<p class="text-[10px] text-gray-600 mt-2">${new Date(qna.answered_at).toLocaleDateString('ko-KR')}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Q&A 목록 로드 오류:', error);
+                container.innerHTML = '<div class="text-center text-red-400 py-12">질문 내역을 불러오는데 실패했습니다.</div>';
             }
         }
 
