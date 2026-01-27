@@ -4485,14 +4485,10 @@
             document.getElementById('qna-filter-answered').className = filter === 'answered' ? 'btn-admin-primary' : 'btn-admin-outline';
 
             try {
+                // QnA 데이터 조회 (조인 없이)
                 let query = window.supabase
                     .from('qna')
-                    .select(`
-                        *,
-                        profiles(name, phone),
-                        lessons(title, order_num),
-                        courses(title)
-                    `)
+                    .select('*')
                     .order('created_at', { ascending: false });
 
                 if (filter === 'pending') {
@@ -4511,6 +4507,35 @@
                     </p>`;
                     return;
                 }
+
+                // 관련 데이터 별도 조회
+                const userIds = [...new Set(data.map(q => q.user_id).filter(Boolean))];
+                const lessonIds = [...new Set(data.map(q => q.lesson_id).filter(Boolean))];
+                const courseIds = [...new Set(data.map(q => q.course_id).filter(Boolean))];
+
+                let profilesMap = {};
+                let lessonsMap = {};
+                let coursesMap = {};
+
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase.from('profiles').select('id, name, phone').in('id', userIds);
+                    if (profiles) profiles.forEach(p => profilesMap[p.id] = p);
+                }
+                if (lessonIds.length > 0) {
+                    const { data: lessons } = await window.supabase.from('lessons').select('id, title, order_num').in('id', lessonIds);
+                    if (lessons) lessons.forEach(l => lessonsMap[l.id] = l);
+                }
+                if (courseIds.length > 0) {
+                    const { data: courses } = await window.supabase.from('courses').select('id, title').in('id', courseIds);
+                    if (courses) courses.forEach(c => coursesMap[c.id] = c);
+                }
+
+                // 데이터 병합
+                data.forEach(qna => {
+                    qna.profiles = profilesMap[qna.user_id] || null;
+                    qna.lessons = lessonsMap[qna.lesson_id] || null;
+                    qna.courses = coursesMap[qna.course_id] || null;
+                });
 
                 container.innerHTML = data.map(qna => {
                     const date = new Date(qna.created_at).toLocaleString('ko-KR');
@@ -4564,26 +4589,36 @@
             currentQnaId = qnaId;
 
             try {
+                // QnA 데이터 조회
                 const { data: qna, error } = await window.supabase
                     .from('qna')
-                    .select(`
-                        *,
-                        profiles(name),
-                        lessons(title, order_num),
-                        courses(title)
-                    `)
+                    .select('*')
                     .eq('id', qnaId)
                     .single();
 
                 if (error) throw error;
 
+                // 관련 데이터 별도 조회
+                let profileName = '알 수 없음';
+                let lessonInfo = '미지정';
+
+                if (qna.user_id) {
+                    const { data: profile } = await window.supabase.from('profiles').select('name').eq('id', qna.user_id).single();
+                    if (profile) profileName = profile.name;
+                }
+                if (qna.lesson_id) {
+                    const { data: lesson } = await window.supabase.from('lessons').select('title, order_num').eq('id', qna.lesson_id).single();
+                    if (lesson) lessonInfo = `${lesson.order_num}강. ${lesson.title}`;
+                } else if (qna.course_id) {
+                    const { data: course } = await window.supabase.from('courses').select('title').eq('id', qna.course_id).single();
+                    if (course) lessonInfo = course.title;
+                }
+
                 document.getElementById('qna-modal-title').textContent = qna.title;
                 document.getElementById('qna-modal-content').textContent = qna.content;
                 document.getElementById('qna-modal-date').textContent = new Date(qna.created_at).toLocaleString('ko-KR');
-                document.getElementById('qna-modal-author').textContent = qna.profiles?.name || '알 수 없음';
-                document.getElementById('qna-modal-lesson').textContent = qna.lessons
-                    ? `${qna.lessons.order_num}강. ${qna.lessons.title}`
-                    : (qna.courses?.title || '미지정');
+                document.getElementById('qna-modal-author').textContent = profileName;
+                document.getElementById('qna-modal-lesson').textContent = lessonInfo;
                 document.getElementById('qna-answer-input').value = qna.answer || '';
 
                 document.getElementById('qna-answer-modal').classList.remove('hidden');

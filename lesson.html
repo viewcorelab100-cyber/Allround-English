@@ -2814,7 +2814,7 @@
                 // 현재 강의 또는 레슨의 Q&A 불러오기
                 let query = window.supabase
                     .from('qna')
-                    .select('*, profiles(name)')
+                    .select('*')
                     .order('created_at', { ascending: false });
 
                 if (currentCourse?.id) {
@@ -2830,13 +2830,21 @@
                     return;
                 }
 
+                // 사용자 정보 별도 조회
+                const userIds = [...new Set(data.map(q => q.user_id).filter(Boolean))];
+                let profilesMap = {};
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase.from('profiles').select('id, name').in('id', userIds);
+                    if (profiles) profiles.forEach(p => profilesMap[p.id] = p);
+                }
+
                 container.innerHTML = data.map(qna => {
-                    const date = new Date(qna.created_at).toLocaleDateString('en-US');
-                    const userName = qna.profiles?.name || 'Anonymous';
-                    const statusBadge = qna.is_answered 
-                        ? '<span class="text-[9px] text-white font-bold uppercase tracking-widest">ANSWERED</span>'
-                        : '<span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">PENDING</span>';
-                    
+                    const date = new Date(qna.created_at).toLocaleDateString('ko-KR');
+                    const userName = profilesMap[qna.user_id]?.name || '익명';
+                    const statusBadge = qna.is_answered
+                        ? '<span class="text-[9px] text-white font-bold uppercase tracking-widest">답변완료</span>'
+                        : '<span class="text-[9px] text-gray-600 font-bold uppercase tracking-widest">대기중</span>';
+
                     return `
                         <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5 space-y-4 mb-4">
                             <div class="flex items-center justify-between">
@@ -2850,7 +2858,7 @@
                             </div>
                             ${qna.answer ? `
                                 <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-white border-opacity-20">
-                                    <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-2">Answer</p>
+                                    <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-2">답변</p>
                                     <p class="text-gray-400 text-xs font-light">${qna.answer}</p>
                                 </div>
                             ` : ''}
