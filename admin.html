@@ -436,6 +436,11 @@
                             <input type="text" id="lesson-blog-link" placeholder="https://..."
                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
                         </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-2">카톡 과제 링크</label>
+                            <input type="text" id="lesson-kakao-link" placeholder="https://..."
+                                   class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                        </div>
 
                         <!-- 공지사항 섹션 -->
                         <div class="border-t border-white border-opacity-10 pt-5 mt-5">
@@ -3017,6 +3022,7 @@
                 document.getElementById('lesson-order').value = lesson.order_num || 1;
                 document.getElementById('lesson-duration').value = lesson.duration || '';
                 document.getElementById('lesson-blog-link').value = lesson.blog_link || '';
+                document.getElementById('lesson-kakao-link').value = lesson.kakao_link || '';
 
                 // 공지사항 로드
                 await loadNoticeForLessonInModal(lessonId);
@@ -3055,6 +3061,7 @@
                 order_num: parseInt(document.getElementById('lesson-order').value) || 1,
                 duration: parseInt(document.getElementById('lesson-duration').value) || 0,
                 blog_link: document.getElementById('lesson-blog-link').value,
+                kakao_link: document.getElementById('lesson-kakao-link').value,
                 updated_at: new Date().toISOString()
             };
 
