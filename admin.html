@@ -281,6 +281,44 @@
                     </table>
                 </div>
 
+                <!-- 강의 진도 데이터 섹션 -->
+                <div id="course-data-section" class="hidden mt-16 pt-16 border-t border-white border-opacity-5">
+                    <div class="flex items-end justify-between mb-8">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Student Progress</span>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">
+                                <span id="course-data-title"></span>
+                            </h2>
+                        </div>
+                        <button onclick="closeCourseData()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                            Close
+                        </button>
+                    </div>
+                    <!-- 요약 카드 -->
+                    <div id="course-data-summary" class="grid grid-cols-3 gap-4 mb-8">
+                    </div>
+                    <!-- 학생 검색 -->
+                    <div class="mb-4">
+                        <input type="text" id="course-data-search" placeholder="학생 이름 검색..."
+                               oninput="filterCourseDataTable()"
+                               class="w-full max-w-xs px-4 py-2.5 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                    </div>
+                    <!-- 학생 진도 테이블 -->
+                    <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-x-auto">
+                        <table class="admin-table w-full">
+                            <thead id="course-data-thead">
+                            </thead>
+                            <tbody id="course-data-tbody">
+                                <tr>
+                                    <td colspan="10" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
+                                        Loading data...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="lesson-list-section" class="hidden mt-16 pt-16 border-t border-white border-opacity-5">
                     <div class="flex items-end justify-between mb-8">
                         <div>
@@ -2655,11 +2693,15 @@
                         <td class="text-gray-500 text-[10px] uppercase tracking-widest">${lessonCount} Lessons</td>
                         <td class="text-right">
                             <div class="flex justify-end space-x-4">
-                                ${!isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
+                                ${!isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
                                         class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
                                     Access
                                 </button>` : ''}
-                                <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')" 
+                                <button onclick="showCourseData('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
+                                        class="text-[10px] uppercase tracking-widest font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                    Data
+                                </button>
+                                <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
                                         class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
                                     Manage
                                 </button>
@@ -4674,6 +4716,187 @@
             }
         }
         // ========== Q&A 관리 함수 끝 ==========
+
+        // ========== 강의 진도 데이터 함수들 ==========
+
+        function closeCourseData() {
+            document.getElementById('course-data-section').classList.add('hidden');
+            document.getElementById('course-data-search').value = '';
+        }
+
+        function filterCourseDataTable() {
+            const query = document.getElementById('course-data-search').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('#course-data-tbody tr[data-student-name]');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-student-name') || '';
+                row.style.display = name.includes(query) ? '' : 'none';
+            });
+        }
+
+        async function showCourseData(courseId, courseTitle) {
+            // 레슨 관리 섹션 숨기기
+            document.getElementById('lesson-list-section').classList.add('hidden');
+
+            const section = document.getElementById('course-data-section');
+            section.classList.remove('hidden');
+            document.getElementById('course-data-title').textContent = courseTitle;
+
+            // 로딩 표시
+            document.getElementById('course-data-summary').innerHTML = '';
+            document.getElementById('course-data-thead').innerHTML = '';
+            document.getElementById('course-data-tbody').innerHTML = `
+                <tr><td colspan="10" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">Loading data...</td></tr>
+            `;
+
+            try {
+                // 1. 해당 강의의 레슨 목록
+                const { data: lessons, error: lessonErr } = await window.supabase
+                    .from('lessons')
+                    .select('id, title, order_num, duration')
+                    .eq('course_id', courseId)
+                    .order('order_num', { ascending: true });
+
+                if (lessonErr) throw lessonErr;
+
+                // 2. 해당 강의를 구매한 학생 목록
+                const { data: purchases, error: purchaseErr } = await window.supabase
+                    .from('purchases')
+                    .select('user_id')
+                    .eq('course_id', courseId)
+                    .eq('status', 'completed');
+
+                if (purchaseErr) throw purchaseErr;
+
+                const studentIds = [...new Set(purchases?.map(p => p.user_id) || [])];
+
+                if (studentIds.length === 0 || !lessons || lessons.length === 0) {
+                    document.getElementById('course-data-summary').innerHTML = `
+                        <div class="col-span-3 text-center py-8 text-gray-500 text-sm">
+                            ${!lessons || lessons.length === 0 ? '등록된 레슨이 없습니다.' : '수강생이 없습니다.'}
+                        </div>
+                    `;
+                    document.getElementById('course-data-tbody').innerHTML = '';
+                    return;
+                }
+
+                // 3. 학생 프로필 정보
+                const { data: profiles, error: profileErr } = await window.supabase
+                    .from('profiles')
+                    .select('id, name, email')
+                    .in('id', studentIds);
+
+                if (profileErr) throw profileErr;
+
+                const profileMap = {};
+                profiles?.forEach(p => { profileMap[p.id] = p; });
+
+                // 4. 해당 강의 레슨들의 진도 데이터
+                const lessonIds = lessons.map(l => l.id);
+                const { data: progressData, error: progressErr } = await window.supabase
+                    .from('lesson_progress')
+                    .select('*')
+                    .in('user_id', studentIds)
+                    .in('lesson_id', lessonIds);
+
+                if (progressErr) throw progressErr;
+
+                // 진도 데이터를 user_id + lesson_id 로 매핑
+                const progressMap = {};
+                progressData?.forEach(p => {
+                    progressMap[`${p.user_id}_${p.lesson_id}`] = p;
+                });
+
+                // 요약 계산
+                let totalCompleted = 0;
+                let totalRecords = studentIds.length * lessons.length;
+                studentIds.forEach(sid => {
+                    lessons.forEach(l => {
+                        const prog = progressMap[`${sid}_${l.id}`];
+                        if (prog && prog.is_completed) totalCompleted++;
+                    });
+                });
+
+                // 요약 카드 렌더링
+                document.getElementById('course-data-summary').innerHTML = `
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-[0.15em] font-bold mb-2">Students</p>
+                        <p class="text-3xl font-bold text-white">${studentIds.length}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-[0.15em] font-bold mb-2">Lessons</p>
+                        <p class="text-3xl font-bold text-white">${lessons.length}</p>
+                    </div>
+                    <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-[0.15em] font-bold mb-2">Avg Completion</p>
+                        <p class="text-3xl font-bold text-white">${totalRecords > 0 ? Math.round((totalCompleted / totalRecords) * 100) : 0}%</p>
+                    </div>
+                `;
+
+                // 테이블 헤더 렌더링
+                document.getElementById('course-data-thead').innerHTML = `
+                    <tr>
+                        <th class="sticky left-0 bg-black z-10">Student</th>
+                        <th>Overall</th>
+                        ${lessons.map(l => `<th class="text-center whitespace-nowrap">${l.order_num}강</th>`).join('')}
+                    </tr>
+                `;
+
+                // 테이블 바디 렌더링
+                const rows = studentIds.map(sid => {
+                    const profile = profileMap[sid] || {};
+                    let completed = 0;
+
+                    const lessonCells = lessons.map(l => {
+                        const prog = progressMap[`${sid}_${l.id}`];
+                        if (!prog) {
+                            return `<td class="text-center"><span class="text-gray-700">—</span></td>`;
+                        }
+                        if (prog.is_completed) {
+                            completed++;
+                            return `<td class="text-center"><span class="text-emerald-400 font-bold text-xs">✓</span></td>`;
+                        }
+                        const pct = prog.progress_percent || 0;
+                        const color = pct >= 50 ? 'text-yellow-400' : 'text-gray-400';
+                        return `<td class="text-center"><span class="${color} text-[10px] font-bold">${pct}%</span></td>`;
+                    }).join('');
+
+                    const overallPct = lessons.length > 0 ? Math.round((completed / lessons.length) * 100) : 0;
+                    const barColor = overallPct === 100 ? 'bg-emerald-400' : overallPct >= 50 ? 'bg-yellow-400' : 'bg-gray-500';
+
+                    return `
+                        <tr data-student-name="${(profile.name || '').toLowerCase()}">
+                            <td class="sticky left-0 bg-neutral-950 z-10">
+                                <p class="text-white font-medium text-sm">${profile.name || '이름없음'}</p>
+                                <p class="text-[10px] text-gray-600">${profile.email || ''}</p>
+                            </td>
+                            <td>
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-16 h-1.5 bg-white bg-opacity-10 rounded-full overflow-hidden">
+                                        <div class="${barColor} h-full rounded-full" style="width: ${overallPct}%"></div>
+                                    </div>
+                                    <span class="text-white font-bold text-sm">${completed}<span class="text-gray-600">/${lessons.length}강</span></span>
+                                </div>
+                            </td>
+                            ${lessonCells}
+                        </tr>
+                    `;
+                }).join('');
+
+                document.getElementById('course-data-tbody').innerHTML = rows || `
+                    <tr><td colspan="${2 + lessons.length}" class="px-6 py-12 text-center text-gray-500">데이터가 없습니다.</td></tr>
+                `;
+
+                // 스크롤하여 보이게
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                console.error('Course data load error:', error);
+                document.getElementById('course-data-tbody').innerHTML = `
+                    <tr><td colspan="10" class="px-6 py-12 text-center text-red-400">데이터를 불러오는 중 오류가 발생했습니다: ${error.message}</td></tr>
+                `;
+            }
+        }
+        // ========== 강의 진도 데이터 함수 끝 ==========
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
