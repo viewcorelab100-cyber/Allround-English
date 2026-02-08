@@ -108,6 +108,14 @@
             background-color: rgba(255, 255, 255, 0.02);
         }
 
+        .admin-table .inline-detail-row > td {
+            padding: 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+        .admin-table .inline-detail-row:hover > td {
+            background-color: transparent !important;
+        }
+
         /* Input Styles */
         input, textarea, select {
             border-radius: 0px !important;
@@ -260,7 +268,7 @@
                 </div>
 
                 <!-- 강의 목록 테이블 -->
-                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-hidden">
+                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5">
                     <table class="admin-table">
                         <thead>
                             <tr>
@@ -281,60 +289,7 @@
                     </table>
                 </div>
 
-                <!-- 강의 진도 데이터 섹션 -->
-                <div id="course-data-section" class="hidden mt-16 pt-16 border-t border-white border-opacity-5">
-                    <div class="flex items-end justify-between mb-8">
-                        <div>
-                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Student Progress</span>
-                            <h2 class="text-3xl font-bold text-white tracking-tight">
-                                <span id="course-data-title"></span>
-                            </h2>
-                        </div>
-                        <button onclick="closeCourseData()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
-                            Close
-                        </button>
-                    </div>
-                    <!-- 요약 카드 -->
-                    <div id="course-data-summary" class="grid grid-cols-3 gap-4 mb-8">
-                    </div>
-                    <!-- 학생 검색 -->
-                    <div class="mb-4">
-                        <input type="text" id="course-data-search" placeholder="학생 이름 검색..."
-                               oninput="filterCourseDataTable()"
-                               class="w-full max-w-xs px-4 py-2.5 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
-                    </div>
-                    <!-- 학생 진도 테이블 -->
-                    <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-x-auto">
-                        <table class="admin-table w-full">
-                            <thead id="course-data-thead">
-                            </thead>
-                            <tbody id="course-data-tbody">
-                                <tr>
-                                    <td colspan="10" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
-                                        Loading data...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="lesson-list-section" class="hidden mt-16 pt-16 border-t border-white border-opacity-5">
-                    <div class="flex items-end justify-between mb-8">
-                        <div>
-                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Curriculum Management</span>
-                            <h2 class="text-3xl font-bold text-white tracking-tight">
-                                <span id="selected-course-title"></span>
-                            </h2>
-                        </div>
-                        <button onclick="openLessonModal()" class="btn-admin-primary">
-                            Add New Lesson
-                        </button>
-                    </div>
-                    <div id="lesson-list" class="space-y-3">
-                        <!-- 레슨 목록이 여기에 표시됩니다 -->
-                    </div>
-                </div>
+                <!-- Data/Manage/Access 인라인 패널은 JS로 동적 생성됨 -->
             </section>
 
             <!-- 새 강의 추가/수정 모달 -->
@@ -644,68 +599,7 @@
                 </div>
             </div>
 
-            <!-- 강의 접근 권한 관리 모달 -->
-            <div id="course-access-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
-                        <div>
-                            <h3 class="text-xl font-bold text-white tracking-tight uppercase">Access Control</h3>
-                            <p id="access-course-title" class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Course Title</p>
-                        </div>
-                        <button onclick="closeCourseAccessModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-                    </div>
-                    
-                    <div class="p-8 space-y-8">
-                        <input type="hidden" id="access-course-id">
-                        
-                        <!-- 사용자 검색 및 권한 부여 -->
-                        <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-6">
-                            <h4 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Search & Grant Access</h4>
-                            <!-- 온/오프라인 필터 -->
-                            <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-4 w-fit">
-                                <button onclick="setAccessSearchFilter('all')" id="access-filter-all"
-                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
-                                    All
-                                </button>
-                                <button onclick="setAccessSearchFilter('online')" id="access-filter-online"
-                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
-                                    Online
-                                </button>
-                                <button onclick="setAccessSearchFilter('offline')" id="access-filter-offline"
-                                        class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
-                                    Offline
-                                </button>
-                            </div>
-                            <div class="flex space-x-2">
-                                <input type="text" id="access-user-search"
-                                       placeholder="SEARCH BY NAME..."
-                                       class="flex-1 px-4 py-3 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors text-xs"
-                                       onkeypress="if(event.key==='Enter') searchUsersForAccess()">
-                                <button onclick="searchUsersForAccess()" class="btn-admin-primary">
-                                    Search
-                                </button>
-                            </div>
-                            <div id="user-search-results" class="mt-4 space-y-2 max-h-48 overflow-y-auto">
-                                <!-- 검색 결과 -->
-                            </div>
-                        </div>
-
-                        <!-- 권한이 있는 사용자 목록 -->
-                        <div class="bg-white bg-opacity-5 border border-white border-opacity-5 p-6">
-                            <h4 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-4">Granted Users</h4>
-                            <div id="access-granted-users" class="space-y-2 max-h-96 overflow-y-auto">
-                                <p class="text-gray-600 text-[10px] uppercase tracking-widest py-8 text-center">Loading users...</p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end">
-                            <button onclick="closeCourseAccessModal()" class="btn-admin-outline">
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Access Control은 인라인 패널로 동적 생성됨 -->
 
             <!-- 결제 관리 섹션 -->
             <section id="section-payments" class="hidden">
@@ -2637,6 +2531,111 @@
         let categories = ['Business', 'English', 'Korean', 'Conversation'];
 
         // 강의 목록 로드
+        // ========== 인라인 패널 관리 ==========
+        let activeInlinePanel = null; // { courseId, type }
+
+        function closeInlinePanel() {
+            const row = document.getElementById('inline-detail-row');
+            if (row) row.remove();
+            activeInlinePanel = null;
+        }
+
+        function createInlinePanel(courseId, type, contentHTML) {
+            const isSame = activeInlinePanel &&
+                           activeInlinePanel.courseId === courseId &&
+                           activeInlinePanel.type === type;
+            closeInlinePanel();
+            if (isSame) return null;
+
+            const courseRow = document.querySelector(`tr[data-course-id="${courseId}"]`);
+            if (!courseRow) return null;
+
+            const panelRow = document.createElement('tr');
+            panelRow.id = 'inline-detail-row';
+            panelRow.className = 'inline-detail-row';
+            const td = document.createElement('td');
+            td.colSpan = 5;
+            td.innerHTML = `<div class="bg-neutral-950 border-t border-white border-opacity-5">${contentHTML}</div>`;
+            panelRow.appendChild(td);
+            courseRow.after(panelRow);
+            activeInlinePanel = { courseId, type };
+            setTimeout(() => panelRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+            return panelRow;
+        }
+
+        function getDataPanelHTML(courseTitle) {
+            return `
+                <div class="p-8">
+                    <div class="flex items-end justify-between mb-8">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Student Progress</span>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">${courseTitle}</h2>
+                        </div>
+                        <button onclick="closeInlinePanel()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Close</button>
+                    </div>
+                    <div id="course-data-summary" class="grid grid-cols-3 gap-4 mb-8"></div>
+                    <div class="mb-4">
+                        <input type="text" id="course-data-search" placeholder="학생 이름 검색..."
+                               oninput="filterCourseDataTable()"
+                               class="w-full max-w-xs px-4 py-2.5 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                    </div>
+                    <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-x-auto">
+                        <table class="admin-table w-full">
+                            <thead id="course-data-thead"></thead>
+                            <tbody id="course-data-tbody">
+                                <tr><td colspan="10" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">Loading data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+
+        function getManagePanelHTML(courseTitle) {
+            return `
+                <div class="p-8">
+                    <div class="flex items-end justify-between mb-8">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Curriculum Management</span>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">${courseTitle}</h2>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="openLessonModal()" class="btn-admin-primary">Add New Lesson</button>
+                            <button onclick="closeInlinePanel()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Close</button>
+                        </div>
+                    </div>
+                    <div id="lesson-list" class="space-y-3">
+                        <div class="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">Loading lessons...</div>
+                    </div>
+                </div>`;
+        }
+
+        function getAccessPanelHTML(courseTitle) {
+            return `
+                <div class="p-8">
+                    <div class="flex items-end justify-between mb-8">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Access Control</span>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">${courseTitle}</h2>
+                        </div>
+                        <button onclick="closeInlinePanel()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Close</button>
+                    </div>
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1">
+                            <button onclick="setAccessFilter('all')" id="access-filter-all" class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">All</button>
+                            <button onclick="setAccessFilter('online')" id="access-filter-online" class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">Online</button>
+                            <button onclick="setAccessFilter('offline')" id="access-filter-offline" class="px-4 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">Offline</button>
+                        </div>
+                        <input type="text" id="access-filter-search" placeholder="이름 검색..."
+                               oninput="filterAccessList()"
+                               class="flex-1 max-w-xs px-4 py-2.5 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-opacity-30">
+                    </div>
+                    <div id="access-student-list" class="space-y-1 max-h-[60vh] overflow-y-auto">
+                        <div class="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">Loading students...</div>
+                    </div>
+                </div>`;
+        }
+        // ========== 인라인 패널 관리 끝 ==========
+
         async function loadCourses() {
             try {
                 const { data: courses, error } = await window.supabase
@@ -2673,9 +2672,9 @@
                     const visibility = course.visibility || 'public';
                     const isPublic = visibility === 'public';
                     const lessonCount = lessonCounts[course.id] || 0;
-                    
+
                     return `
-                    <tr>
+                    <tr data-course-id="${course.id}">
                         <td>
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-8 bg-white bg-opacity-5 flex-shrink-0 overflow-hidden">
@@ -2725,11 +2724,11 @@
             }
         }
 
-        // 강의 선택 (영상 관리)
+        // 강의 선택 (영상 관리) - 인라인 패널로 표시
         async function selectCourse(courseId, courseTitle) {
             selectedCourseId = courseId;
-            document.getElementById('selected-course-title').textContent = courseTitle;
-            document.getElementById('lesson-list-section').classList.remove('hidden');
+            const panel = createInlinePanel(courseId, 'manage', getManagePanelHTML(courseTitle));
+            if (!panel) return;
             await loadLessons(courseId);
         }
 
@@ -2992,7 +2991,7 @@
                 if (error) throw error;
 
                 loadCourses();
-                document.getElementById('lesson-list-section').classList.add('hidden');
+                closeInlinePanel();
                 alert('강의가 삭제되었습니다.');
             } catch (error) {
                 console.error('Delete course error:', error);
@@ -4284,236 +4283,154 @@
         }
         // ========== 퀴즈 관리 함수 끝 ==========
 
-        // ========== 강의 접근 권한 관리 함수 ==========
+        // ========== 강의 접근 권한 관리 함수 (체크리스트 방식) ==========
+        let accessCurrentFilter = 'all';
+        let accessCourseId = null;
+        let accessGrantedSet = new Set();
+        let accessAllProfiles = [];
 
-        // 권한 관리 모달 열기
         async function manageCourseAccess(courseId, courseTitle) {
-            document.getElementById('course-access-modal').classList.remove('hidden');
-            document.getElementById('access-course-id').value = courseId;
-            document.getElementById('access-course-title').textContent = courseTitle;
-            document.getElementById('user-search-results').innerHTML = '';
-            
-            // 현재 권한이 있는 사용자 목록 로드
-            await loadGrantedUsers(courseId);
+            accessCourseId = courseId;
+            accessCurrentFilter = 'all';
+            const panel = createInlinePanel(courseId, 'access', getAccessPanelHTML(courseTitle));
+            if (!panel) return;
+            await loadAccessStudentList(courseId);
         }
 
-        // 권한 관리 모달 닫기
-        function closeCourseAccessModal() {
-            document.getElementById('course-access-modal').classList.add('hidden');
+        // 하위 호환용
+        function closeCourseAccessModal() { closeInlinePanel(); }
+
+        async function loadAccessStudentList(courseId) {
+            const listDiv = document.getElementById('access-student-list');
+            if (!listDiv) return;
+            listDiv.innerHTML = '<div class="text-center py-12 text-gray-600 uppercase tracking-widest text-[10px]">Loading students...</div>';
+
+            try {
+                const { data: profiles, error: profileError } = await window.supabase
+                    .from('profiles')
+                    .select('id, name, email, student_type, role')
+                    .order('name');
+                if (profileError) throw profileError;
+                accessAllProfiles = (profiles || []).filter(p => p.role !== 'admin');
+
+                const { data: permissions, error: permError } = await window.supabase
+                    .from('course_access_permissions')
+                    .select('user_id')
+                    .eq('course_id', courseId);
+                if (permError) throw permError;
+                accessGrantedSet = new Set((permissions || []).map(p => p.user_id));
+
+                renderAccessList();
+            } catch (error) {
+                console.error('Load access list error:', error);
+                if (listDiv) listDiv.innerHTML = '<div class="text-center py-8 text-red-400 text-sm">학생 목록을 불러오는 중 오류가 발생했습니다.</div>';
+            }
         }
 
-        // 접근권한 검색 필터
-        let accessSearchFilter = 'all';
+        function renderAccessList() {
+            const listDiv = document.getElementById('access-student-list');
+            if (!listDiv) return;
+            const searchQuery = document.getElementById('access-filter-search')?.value.toLowerCase().trim() || '';
 
-        function setAccessSearchFilter(type) {
-            accessSearchFilter = type;
+            let filtered = accessAllProfiles;
+            if (accessCurrentFilter !== 'all') {
+                filtered = filtered.filter(p => (p.student_type || 'online') === accessCurrentFilter);
+            }
+            if (searchQuery) {
+                filtered = filtered.filter(p =>
+                    (p.name || '').toLowerCase().includes(searchQuery) ||
+                    (p.email || '').toLowerCase().includes(searchQuery)
+                );
+            }
 
-            // 버튼 스타일 업데이트
+            if (filtered.length === 0) {
+                listDiv.innerHTML = '<div class="text-center py-8 text-gray-500 text-sm">표시할 학생이 없습니다.</div>';
+                return;
+            }
+
+            // 권한 있는 학생 우선, 그 다음 이름순
+            filtered.sort((a, b) => {
+                const aG = accessGrantedSet.has(a.id) ? 0 : 1;
+                const bG = accessGrantedSet.has(b.id) ? 0 : 1;
+                if (aG !== bG) return aG - bG;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+
+            const grantedCount = filtered.filter(p => accessGrantedSet.has(p.id)).length;
+            listDiv.innerHTML = `
+                <div class="mb-3 text-[10px] text-gray-500 uppercase tracking-widest font-bold">${grantedCount} / ${filtered.length} Granted</div>
+            ` + filtered.map(user => {
+                const isGranted = accessGrantedSet.has(user.id);
+                const studentType = user.student_type || 'online';
+                const typeBadge = studentType === 'offline'
+                    ? '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Offline</span>'
+                    : '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Online</span>';
+
+                return `
+                    <label class="flex items-center justify-between p-3 bg-white ${isGranted ? 'bg-opacity-[0.06] border-yellow-500 border-opacity-20' : 'bg-opacity-[0.02] border-white border-opacity-5'} border cursor-pointer hover:bg-opacity-[0.08] transition-all">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" ${isGranted ? 'checked' : ''}
+                                   onchange="toggleStudentAccess('${user.id}', this.checked)"
+                                   class="w-4 h-4 accent-yellow-500 cursor-pointer">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-white text-sm font-bold tracking-tight">${user.name || 'No Name'}</p>
+                                    ${typeBadge}
+                                </div>
+                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${user.email || ''}</p>
+                            </div>
+                        </div>
+                        ${isGranted ? '<span class="text-[9px] uppercase tracking-widest font-bold text-yellow-500">Granted</span>' : ''}
+                    </label>`;
+            }).join('');
+        }
+
+        function setAccessFilter(type) {
+            accessCurrentFilter = type;
             ['all', 'online', 'offline'].forEach(t => {
                 const btn = document.getElementById(`access-filter-${t}`);
                 if (btn) {
                     if (t === type) {
                         btn.classList.add('bg-white', 'bg-opacity-10', 'text-white');
-                        btn.classList.remove('text-gray-400');
+                        btn.classList.remove('text-gray-500');
                     } else {
                         btn.classList.remove('bg-white', 'bg-opacity-10', 'text-white');
-                        btn.classList.add('text-gray-400');
+                        btn.classList.add('text-gray-500');
                     }
                 }
             });
-
-            // 검색어가 있으면 다시 검색
-            const searchQuery = document.getElementById('access-user-search').value.trim();
-            if (searchQuery) {
-                searchUsersForAccess();
-            }
+            renderAccessList();
         }
 
-        // 사용자 검색 (이름으로 검색)
-        async function searchUsersForAccess() {
-            const searchQuery = document.getElementById('access-user-search').value.trim();
+        function filterAccessList() {
+            renderAccessList();
+        }
 
-            if (!searchQuery) {
-                alert('검색할 학생 이름을 입력하세요.');
-                return;
-            }
-
+        async function toggleStudentAccess(userId, grant) {
             try {
-                let query = window.supabase
-                    .from('profiles')
-                    .select('id, email, name, student_type')
-                    .ilike('name', `%${searchQuery}%`);
-
-                // 온/오프라인 필터 적용
-                if (accessSearchFilter !== 'all') {
-                    query = query.eq('student_type', accessSearchFilter);
+                if (grant) {
+                    const { error } = await window.supabase
+                        .rpc('grant_course_access', {
+                            p_course_id: accessCourseId,
+                            p_user_id: userId,
+                            p_notes: `관리자가 수동으로 권한 부여 (${new Date().toLocaleString('ko-KR')})`
+                        });
+                    if (error) throw error;
+                    accessGrantedSet.add(userId);
+                } else {
+                    const { error } = await window.supabase
+                        .rpc('revoke_course_access', {
+                            p_course_id: accessCourseId,
+                            p_user_id: userId
+                        });
+                    if (error) throw error;
+                    accessGrantedSet.delete(userId);
                 }
-
-                const { data: profiles, error } = await query.limit(10);
-
-                if (error) throw error;
-
-                const resultsDiv = document.getElementById('user-search-results');
-
-                if (!profiles || profiles.length === 0) {
-                    resultsDiv.innerHTML = '<p class="text-gray-500 text-sm py-2">검색 결과가 없습니다.</p>';
-                    return;
-                }
-
-                resultsDiv.innerHTML = profiles.map(user => {
-                    const studentType = user.student_type || 'online';
-                    const typeBadge = studentType === 'offline'
-                        ? '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Offline</span>'
-                        : '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Online</span>';
-
-                    return `
-                        <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 border border-white border-opacity-5">
-                            <div>
-                                <div class="flex items-center gap-3">
-                                    <p class="text-white text-sm font-bold tracking-tight">${user.name || 'No Name'}</p>
-                                    ${typeBadge}
-                                </div>
-                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${user.email}</p>
-                            </div>
-                            <button onclick="grantAccessToUser('${user.id}', '${user.email.replace(/'/g, "\\'")}')"
-                                    class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
-                                Grant Access
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-
+                renderAccessList();
             } catch (error) {
-                console.error('Search users error:', error);
-                alert('사용자 검색 중 오류가 발생했습니다.');
-            }
-        }
-
-        // 사용자에게 권한 부여
-        async function grantAccessToUser(userId, userEmail) {
-            const courseId = document.getElementById('access-course-id').value;
-            const courseTitle = document.getElementById('access-course-title').textContent;
-
-            if (!confirm(`${userEmail} 사용자에게 "${courseTitle}" 강의 접근 권한을 부여하시겠습니까?`)) {
-                return;
-            }
-
-            try {
-                const { data, error } = await window.supabase
-                    .rpc('grant_course_access', {
-                        p_course_id: courseId,
-                        p_user_id: userId,
-                        p_notes: `관리자가 수동으로 권한 부여 (${new Date().toLocaleString('ko-KR')})`
-                    });
-
-                if (error) throw error;
-
-                alert('권한이 부여되었습니다.');
-                
-                // 권한 목록 새로고침
-                await loadGrantedUsers(courseId);
-                
-                // 검색 결과 초기화
-                document.getElementById('access-user-search').value = '';
-                document.getElementById('user-search-results').innerHTML = '';
-
-            } catch (error) {
-                console.error('Grant access error:', error);
-                alert('권한 부여 중 오류가 발생했습니다: ' + error.message);
-            }
-        }
-
-        // 권한이 있는 사용자 목록 로드
-        async function loadGrantedUsers(courseId) {
-            try {
-                // 권한 목록 조회
-                const { data: permissions, error: permError } = await window.supabase
-                    .from('course_access_permissions')
-                    .select('*')
-                    .eq('course_id', courseId)
-                    .order('granted_at', { ascending: false });
-
-                if (permError) throw permError;
-
-                const listDiv = document.getElementById('access-granted-users');
-
-                if (!permissions || permissions.length === 0) {
-                    listDiv.innerHTML = '<p class="text-gray-500 text-sm py-4 text-center">접근 권한이 있는 사용자가 없습니다.</p>';
-                    return;
-                }
-
-                // 사용자 ID 목록 추출
-                const userIds = permissions.map(p => p.user_id);
-
-                // 프로필 정보 조회
-                const { data: profiles, error: profileError } = await window.supabase
-                    .from('profiles')
-                    .select('id, email, name, student_type')
-                    .in('id', userIds);
-
-                if (profileError) throw profileError;
-
-                // 프로필 맵 생성
-                const profileMap = new Map();
-                profiles?.forEach(p => profileMap.set(p.id, p));
-
-                listDiv.innerHTML = permissions.map(perm => {
-                    const profile = profileMap.get(perm.user_id) || {};
-                    const grantedDate = new Date(perm.granted_at).toLocaleDateString('ko-KR');
-                    const studentType = profile.student_type || 'online';
-                    const typeBadge = studentType === 'offline'
-                        ? '<span class="text-[9px] uppercase tracking-widest font-bold text-purple-500">Offline</span>'
-                        : '<span class="text-[9px] uppercase tracking-widest font-bold text-blue-500">Online</span>';
-
-                    return `
-                        <div class="flex items-center justify-between p-4 bg-white bg-opacity-5 border border-white border-opacity-5">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3">
-                                    <p class="text-white text-sm font-bold tracking-tight">${profile.name || 'No Name'}</p>
-                                    ${typeBadge}
-                                </div>
-                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${profile.email || '-'}</p>
-                                <p class="text-gray-600 text-[9px] uppercase tracking-widest mt-2">Granted: ${grantedDate}</p>
-                                ${perm.notes ? `<p class="text-gray-700 text-[9px] uppercase tracking-tight mt-1">${perm.notes}</p>` : ''}
-                            </div>
-                            <button onclick="revokeAccessFromUser('${perm.id}', '${courseId}', '${perm.user_id}', '${(profile.email || '').replace(/'/g, "\\'")}')"
-                                    class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">
-                                Revoke
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-
-            } catch (error) {
-                console.error('Load granted users error:', error);
-                document.getElementById('access-granted-users').innerHTML = 
-                    '<p class="text-red-400 text-sm py-4 text-center">권한 목록을 불러오는 중 오류가 발생했습니다.</p>';
-            }
-        }
-
-        // 사용자 권한 삭제
-        async function revokeAccessFromUser(permissionId, courseId, userId, userEmail) {
-            if (!confirm(`${userEmail} 사용자의 접근 권한을 삭제하시겠습니까?`)) {
-                return;
-            }
-
-            try {
-                const { data, error } = await window.supabase
-                    .rpc('revoke_course_access', {
-                        p_course_id: courseId,
-                        p_user_id: userId
-                    });
-
-                if (error) throw error;
-
-                alert('권한이 삭제되었습니다.');
-                
-                // 권한 목록 새로고침
-                await loadGrantedUsers(courseId);
-
-            } catch (error) {
-                console.error('Revoke access error:', error);
-                alert('권한 삭제 중 오류가 발생했습니다: ' + error.message);
+                console.error('Toggle access error:', error);
+                alert('권한 변경 중 오류가 발생했습니다: ' + error.message);
+                renderAccessList();
             }
         }
 
@@ -4720,8 +4637,7 @@
         // ========== 강의 진도 데이터 함수들 ==========
 
         function closeCourseData() {
-            document.getElementById('course-data-section').classList.add('hidden');
-            document.getElementById('course-data-search').value = '';
+            closeInlinePanel();
         }
 
         function filterCourseDataTable() {
@@ -4734,19 +4650,8 @@
         }
 
         async function showCourseData(courseId, courseTitle) {
-            // 레슨 관리 섹션 숨기기
-            document.getElementById('lesson-list-section').classList.add('hidden');
-
-            const section = document.getElementById('course-data-section');
-            section.classList.remove('hidden');
-            document.getElementById('course-data-title').textContent = courseTitle;
-
-            // 로딩 표시
-            document.getElementById('course-data-summary').innerHTML = '';
-            document.getElementById('course-data-thead').innerHTML = '';
-            document.getElementById('course-data-tbody').innerHTML = `
-                <tr><td colspan="10" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">Loading data...</td></tr>
-            `;
+            const panel = createInlinePanel(courseId, 'data', getDataPanelHTML(courseTitle));
+            if (!panel) return;
 
             try {
                 // 1. 해당 강의의 레슨 목록
@@ -4886,8 +4791,7 @@
                     <tr><td colspan="${2 + lessons.length}" class="px-6 py-12 text-center text-gray-500">데이터가 없습니다.</td></tr>
                 `;
 
-                // 스크롤하여 보이게
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // 스크롤은 createInlinePanel에서 처리됨
 
             } catch (error) {
                 console.error('Course data load error:', error);
