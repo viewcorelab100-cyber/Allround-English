@@ -466,25 +466,23 @@
             const visibility = currentCourse.visibility || 'public';
             const user = await getCurrentUser();
             
-            // 비공개 강의 접근 권한 체크
-            if (visibility === 'private') {
+            // 비공개 강의 접근 권한 체크 (관리자는 우회)
+            const userIsAdmin = user ? await isAdmin() : false;
+            if (visibility === 'private' && !userIsAdmin) {
                 if (!user) {
-                    // 로그인하지 않은 경우
                     alert('이 강의는 비공개 강의입니다. 로그인이 필요합니다.');
                     window.location.href = 'auth.html';
                     return;
                 }
-                
-                // 접근 권한 확인
+
                 const { data: permission, error: permError } = await window.supabase
                     .from('course_access_permissions')
                     .select('id')
                     .eq('course_id', courseId)
                     .eq('user_id', user.id)
                     .single();
-                
+
                 if (permError || !permission) {
-                    // 권한이 없는 경우
                     document.getElementById('course-content').innerHTML = `
                         <div class="text-center text-gray-500 py-20">
                             <div class="mb-6">

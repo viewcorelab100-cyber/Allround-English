@@ -7,8 +7,11 @@ async function getAllCourses() {
         const { data: { user } } = await window.supabase.auth.getUser();
         const currentUserId = user?.id;
 
-        // 기본 강의 조회 (공개된 강의만)
-        const { data, error } = await window.supabase
+        // 관리자 여부 확인
+        const adminCheck = currentUserId ? await isAdmin() : false;
+
+        // 강의 조회 (관리자는 미발행 포함 전체, 일반 사용자는 발행된 강의만)
+        let query = window.supabase
             .from('courses')
             .select(`
                 *,
@@ -17,41 +20,42 @@ async function getAllCourses() {
                     duration
                 )
             `)
-            .eq('is_published', true)
             .order('created_at', { ascending: false });
-        
-        if (error) throw error;
 
-        // 사용자가 로그인한 경우, 접근 권한 확인
-        let accessibleCourseIds = [];
-        if (currentUserId) {
-            const { data: permissions, error: permError } = await window.supabase
-                .from('course_access_permissions')
-                .select('course_id')
-                .eq('user_id', currentUserId);
-
-            if (!permError && permissions) {
-                accessibleCourseIds = permissions.map(p => p.course_id);
-            }
+        if (!adminCheck) {
+            query = query.eq('is_published', true);
         }
 
-        // 강의 필터링: 공개 강의 또는 권한이 있는 비공개 강의만
-        const filteredCourses = data.filter(course => {
-            const visibility = course.visibility || 'public';
-            
-            // 공개 강의는 모두 포함
-            if (visibility === 'public') {
-                return true;
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // 관리자는 모든 강의 표시, 일반 사용자는 권한 필터링
+        let filteredCourses;
+        if (adminCheck) {
+            filteredCourses = data;
+        } else {
+            // 사용자가 로그인한 경우, 접근 권한 확인
+            let accessibleCourseIds = [];
+            if (currentUserId) {
+                const { data: permissions, error: permError } = await window.supabase
+                    .from('course_access_permissions')
+                    .select('course_id')
+                    .eq('user_id', currentUserId);
+
+                if (!permError && permissions) {
+                    accessibleCourseIds = permissions.map(p => p.course_id);
+                }
             }
-            
-            // 비공개 강의는 권한이 있는 경우만 포함
-            if (visibility === 'private' && currentUserId) {
-                return accessibleCourseIds.includes(course.id);
-            }
-            
-            // 비공개 강의인데 로그인 안 한 경우 제외
-            return false;
-        });
+
+            filteredCourses = data.filter(course => {
+                const visibility = course.visibility || 'public';
+                if (visibility === 'public') return true;
+                if (visibility === 'private' && currentUserId) {
+                    return accessibleCourseIds.includes(course.id);
+                }
+                return false;
+            });
+        }
         
         // 각 강의의 총 시간 계산 (레슨 duration 합계)
         const coursesWithDuration = filteredCourses.map(course => {
@@ -133,9 +137,13 @@ async function getUserPurchasedCourses(userId) {
     }
 }
 
-// 강의 구매 권한 확인
+// 강의 구매 권한 확인 (관리자는 모든 강의 접근 가능)
 async function hasAccessToCourse(userId, courseId) {
     try {
+        // 관리자는 모든 강의에 접근 가능
+        const adminCheck = await isAdmin();
+        if (adminCheck) return { success: true, hasAccess: true };
+
         const { data, error } = await window.supabase
             .from('purchases')
             .select('id')
@@ -143,9 +151,9 @@ async function hasAccessToCourse(userId, courseId) {
             .eq('course_id', courseId)
             .eq('status', 'completed')
             .single();
-        
+
         if (error && error.code !== 'PGRST116') throw error;
-        
+
         return { success: true, hasAccess: !!data };
     } catch (error) {
         console.error('Check access error:', error);
@@ -327,13 +335,7 @@ async function generateCourseReport(userId, courseId) {
         
         return { success: true, data: result };
     } catch (error) {
-        console.error('Generate report error:', error);
-        console.error('Error details:', {
-            message: error.message,
-            code: error.code,
-            details: error.details,
-            hint: error.hint
-        });
+        console.error('Generate report error');
         return { success: false, error: error.message };
     }
 }
