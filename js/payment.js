@@ -1,7 +1,7 @@
 // 토스페이먼츠 결제 관련 함수들 (v2 SDK - 결제창 방식)
 
 // 토스페이먼츠 클라이언트 키 (라이브 - API 개별 연동 키)
-const TOSS_CLIENT_KEY = 'live_gck_PBal2vxj814O2RlQ4dQJr5RQgOAN';
+const TOSS_CLIENT_KEY = 'live_ck_26DlbXAaV0LZO9Yb0YQxVqY50Q9R';
 
 // 전역 변수
 let tossPayment = null;
