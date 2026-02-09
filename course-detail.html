@@ -404,7 +404,7 @@
                                             </div>
                                         </div>
                                         <button onclick="handlePurchase()" class="btn-primary w-full">
-                                            Enroll Now
+                                            ${((course.price || 0) + (course.textbook_price || 0)) === 0 ? 'Start Free Course' : 'Enroll Now'}
                                         </button>
                                         <p class="text-[10px] text-gray-600 text-center leading-relaxed uppercase tracking-wider">
                                             6 months unlimited access<br>from date of purchase
@@ -442,14 +442,69 @@
 
         async function handlePurchase() {
             const user = await getCurrentUser();
-            if (!user) { 
-                showModal('로그인 필요', '로그인이 필요한 서비스입니다.', () => { 
-                    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href); 
-                }); 
-                return; 
+            if (!user) {
+                showModal('로그인 필요', '로그인이 필요한 서비스입니다.', () => {
+                    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+                });
+                return;
             }
-            // 토스페이먼츠 결제 페이지로 이동 (주문 생성은 payment.js에서 처리)
+
+            const totalPrice = (currentCourse.price || 0) + (currentCourse.textbook_price || 0);
+
+            // 무료 강의: 결제 없이 바로 구매 처리
+            if (totalPrice === 0) {
+                await handleFreePurchase(user);
+                return;
+            }
+
+            // 유료 강의: 토스페이먼츠 결제 페이지로 이동
             window.location.href = `payment.html?courseId=${currentCourse.id}`;
+        }
+
+        async function handleFreePurchase(user) {
+            try {
+                const orderId = `free-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+                // 주문 생성 (DONE 상태로 바로)
+                const { error: orderError } = await window.supabase
+                    .from('orders')
+                    .insert({
+                        id: orderId,
+                        user_id: user.id,
+                        course_id: currentCourse.id,
+                        amount: 0,
+                        order_name: `${currentCourse.title} (무료)`,
+                        customer_name: user.email?.split('@')[0] || '',
+                        customer_email: user.email || '',
+                        status: 'DONE',
+                        payment_type: 'course',
+                        shipping_status: 'NO_SHIPPING'
+                    });
+
+                if (orderError) throw orderError;
+
+                // 구매 기록 생성
+                const { error: purchaseError } = await window.supabase
+                    .from('purchases')
+                    .insert({
+                        user_id: user.id,
+                        course_id: currentCourse.id,
+                        order_id: orderId,
+                        status: 'completed',
+                        payment_method: 'free',
+                        amount: 0,
+                        purchased_at: new Date().toISOString()
+                    });
+
+                if (purchaseError && purchaseError.code !== '23505') throw purchaseError;
+
+                showModal('수강 신청 완료', '무료 강의가 등록되었습니다. 바로 수강하실 수 있습니다.', () => {
+                    window.location.reload();
+                });
+            } catch (error) {
+                console.error('Free purchase error:', error);
+                showModal('오류', '수강 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
         }
 
         async function loadCourseDetail() {
