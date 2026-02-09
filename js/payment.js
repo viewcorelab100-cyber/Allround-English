@@ -1,7 +1,7 @@
 // 토스페이먼츠 결제 관련 함수들 (v2 SDK - 결제창 방식)
 
-// 토스페이먼츠 클라이언트 키 (테스트용 - API 개별 연동 키)
-const TOSS_CLIENT_KEY = 'test_ck_GePWvyJnrKJ5kWnko4KbVgLzN97E';
+// 토스페이먼츠 클라이언트 키 (라이브 - API 개별 연동 키)
+const TOSS_CLIENT_KEY = 'live_gck_PBal2vxj814O2RlQ4dQJr5RQgOAN';
 
 // 전역 변수
 let tossPayment = null;
@@ -291,8 +291,12 @@ async function processPayment(amount, orderName, customerName, customerEmail, cu
 
         // 성공 URL 설정
         let successUrl = `${window.location.origin}/payment-success.html?_t=${Date.now()}`;
+
+        // 쿠폰 ID는 URL 대신 sessionStorage에 저장 (보안)
         if (currentPaymentType === 'course' && appliedCouponData) {
-            successUrl += `&couponId=${appliedCouponData.id}`;
+            sessionStorage.setItem('appliedCouponId', appliedCouponData.id);
+        } else {
+            sessionStorage.removeItem('appliedCouponId');
         }
 
         // 기본 결제 요청 파라미터
@@ -625,8 +629,7 @@ async function applyCoupon() {
     
     try {
         const user = await getCurrentUser();
-        console.log('[사용자 확인]', { userId: user?.id, email: user?.email });
-        
+
         if (!user) {
             showCouponMessage('로그인이 필요합니다.', false);
             return;

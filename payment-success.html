@@ -401,20 +401,20 @@
             }
         }
 
-        // 결제 승인 및 구매 완료 처리
+        // 결제 승인 및 구매 완료 처리 (서버 사이드 승인)
         async function handlePaymentSuccess() {
-            console.log('[DEBUG] payment-success.html VERSION: 2024-12-19-COUPON-FIX');
-            
+            console.log('[DEBUG] payment-success.html VERSION: 2025-02-09-SERVER-CONFIRM');
+
             const { paymentKey, orderId, amount } = getPaymentResultParams();
-            
+
             console.log('[DEBUG] 결제 파라미터:', { paymentKey, orderId, amount });
-            
+
             if (!paymentKey || !orderId || !amount) {
                 console.log('[DEBUG] Missing payment params');
                 showError('결제 정보가 올바르지 않습니다.');
                 return;
             }
-            
+
             try {
                 const user = await getCurrentUser();
                 if (!user) {
@@ -422,184 +422,56 @@
                     showError('로그인이 필요합니다.');
                     return;
                 }
-                
-                // 주문 정보 조회
-                const { data: order, error: orderError } = await window.supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('id', orderId)
-                    .single();
-                
-                if (orderError || !order) {
-                    console.log('[DEBUG] Order not found');
-                    showError('주문 정보를 찾을 수 없습니다.');
+
+                // sessionStorage에서 쿠폰 ID 가져오기
+                const couponId = sessionStorage.getItem('appliedCouponId');
+                if (couponId) {
+                    sessionStorage.removeItem('appliedCouponId');
+                }
+
+                console.log('[DEBUG] Edge Function 호출:', { paymentKey, orderId, amount, couponId });
+
+                // Edge Function으로 결제 승인 요청 (서버에서 토스 API 승인 + DB 처리)
+                const { data, error } = await window.supabase.functions.invoke('confirm-payment', {
+                    body: {
+                        paymentKey,
+                        orderId,
+                        amount: parseInt(amount),
+                        couponId: couponId || null
+                    }
+                });
+
+                if (error) {
+                    console.error('Edge Function 호출 오류:', error);
+                    showError('결제 승인 처리 중 오류가 발생했습니다.');
                     return;
                 }
-                
+
+                if (!data.success) {
+                    console.error('결제 승인 실패:', data.error);
+                    showError(data.error || '결제 승인에 실패했습니다.');
+                    return;
+                }
+
+                console.log('[DEBUG] 결제 승인 성공:', data);
+
+                const order = data.order;
+                const course = data.course;
                 currentOrder = order;
-                
-                // 금액 검증 (쿠폰 할인 고려)
-                let expectedAmount = order.amount;
-                let appliedCoupon = null;
-                
-                // URL에서 쿠폰 ID 가져오기
-                const urlParams = new URLSearchParams(window.location.search);
-                const couponIdParam = urlParams.get('couponId');
-                
-                console.log('[DEBUG] 금액 검증 시작:', {
-                    orderAmount: order.amount,
-                    receivedAmount: amount,
-                    couponId: couponIdParam
-                });
-                
-                // 쿠폰이 적용된 경우, 할인 재계산
-                if (couponIdParam) {
-                    const { data: userCoupon, error: couponError } = await window.supabase
-                        .from('user_coupons')
-                        .select(`
-                            *,
-                            coupons (
-                                code,
-                                name,
-                                discount_type,
-                                discount_value,
-                                min_purchase_amount,
-                                max_discount_amount
-                            )
-                        `)
-                        .eq('id', couponIdParam)
-                        .single();
-                    
-                    if (!couponError && userCoupon && userCoupon.coupons) {
-                        appliedCoupon = userCoupon;
-                        const coupon = userCoupon.coupons;
-                        
-                        let discountAmount = 0;
-                        if (coupon.discount_type === 'percentage') {
-                            discountAmount = Math.floor(order.amount * (coupon.discount_value / 100));
-                            if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
-                                discountAmount = coupon.max_discount_amount;
-                            }
-                        } else {
-                            discountAmount = coupon.discount_value;
-                        }
-                        
-                        expectedAmount = order.amount - discountAmount;
-                        if (expectedAmount < 0) expectedAmount = 0;
-                        
-                        console.log('[DEBUG] 쿠폰 할인 적용:', {
-                            couponCode: coupon.code,
-                            discountType: coupon.discount_type,
-                            discountValue: coupon.discount_value,
-                            discountAmount: discountAmount,
-                            finalAmount: expectedAmount
-                        });
-                    }
-                }
-                
-                // 금액 검증
-                if (parseInt(amount) !== expectedAmount) {
-                    console.log('[DEBUG] Amount mismatch:', {
-                        expected: expectedAmount,
-                        received: amount,
-                        orderAmount: order.amount,
-                        hasCoupon: !!appliedCoupon
-                    });
-                    showError('결제 금액이 일치하지 않습니다.');
-                    return;
-                }
-                
-                console.log('[DEBUG] 금액 검증 성공:', {
-                    expectedAmount: expectedAmount,
-                    receivedAmount: amount
-                });
-                
-                // 강의 정보 조회 (교재 포함 여부 확인)
-                const { data: course } = await window.supabase
-                    .from('courses')
-                    .select('*, has_textbook')
-                    .eq('id', order.course_id)
-                    .single();
-                
                 currentCourse = course;
-                
-                // 이미 결제 완료된 주문인지 확인
-                if (order.status === 'DONE') {
-                    console.log('[DEBUG] Order already DONE, showing success');
-                    showSuccess(order, course, appliedCoupon, expectedAmount);
-                    return;
+
+                // 쿠폰 정보 재구성 (showSuccess용)
+                let appliedCoupon = null;
+                if (data.appliedCoupon) {
+                    appliedCoupon = {
+                        coupons: { name: data.appliedCoupon.name }
+                    };
                 }
-                
-                // 주문 상태 업데이트 (DONE)
-                const updateData = {
-                    status: 'DONE',
-                    payment_key: paymentKey,
-                    updated_at: new Date().toISOString(),
-                    has_textbook: course?.has_textbook || false
-                };
-                
-                // 교재가 없는 강의면 배송 불필요
-                if (!course?.has_textbook) {
-                    updateData.shipping_status = 'NO_SHIPPING';
-                }
-                
-                const { error: updateError } = await window.supabase
-                    .from('orders')
-                    .update(updateData)
-                    .eq('id', orderId);
-                
-                if (updateError) {
-                    console.error('Order update error:', updateError);
-                    showError('주문 상태 업데이트에 실패했습니다.');
-                    return;
-                }
-                
-                // 쿠폰 사용 처리
-                if (appliedCoupon) {
-                    console.log('[DEBUG] 쿠폰 사용 처리 시작:', appliedCoupon.id);
-                    
-                    const { error: couponUseError } = await window.supabase
-                        .from('user_coupons')
-                        .update({
-                            is_used: true,
-                            used_at: new Date().toISOString(),
-                            order_id: orderId
-                        })
-                        .eq('id', appliedCoupon.id);
-                    
-                    if (couponUseError) {
-                        console.error('Coupon use error:', couponUseError);
-                        // 쿠폰 사용 처리 실패해도 결제는 계속 진행
-                    } else {
-                        console.log('[DEBUG] 쿠폰 사용 처리 완료');
-                    }
-                }
-                
-                // 구매 기록 생성 (purchases 테이블)
-                const purchaseData = {
-                    user_id: user.id,
-                    course_id: order.course_id,
-                    order_id: orderId,
-                    payment_key: paymentKey,
-                    status: 'completed',
-                    payment_method: 'tosspayments',
-                    amount: parseInt(amount),
-                    purchased_at: new Date().toISOString()
-                };
-                
-                console.log('[DEBUG] 구매 기록 생성:', purchaseData);
-                
-                const { error: purchaseError } = await window.supabase
-                    .from('purchases')
-                    .insert(purchaseData);
-                
-                if (purchaseError && purchaseError.code !== '23505') {
-                    console.error('Purchase insert error:', purchaseError);
-                }
-                
-                // 성공 화면 표시 (쿠폰 정보 전달)
-                showSuccess(order, course, appliedCoupon, expectedAmount);
-                
+
+                const finalAmount = data.finalAmount !== undefined ? data.finalAmount : order.amount;
+
+                showSuccess(order, course, appliedCoupon, finalAmount);
+
             } catch (error) {
                 console.error('Payment success handling error:', error);
                 showError('결제 처리 중 오류가 발생했습니다.');
