@@ -918,9 +918,9 @@
                 const duration = data.duration;
                 videoDuration = duration;
 
-                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 2초 이내 변화만 인정)
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime) {
+                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 2) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
@@ -929,10 +929,10 @@
                 const progress = (maxWatchedTime / duration) * 100;
                 document.getElementById('progress-bar').style.width = `${progress}%`;
                 document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
-                
+
                 // 퀴즈 시간 체크
                 checkQuizTime(currentTime);
-                
+
                 // 95% 이상이면 과제 섹션 표시
                 checkAndShowAssignment(Math.round(progress));
             });
@@ -1029,9 +1029,9 @@
             videoElement.addEventListener('timeupdate', function() {
                 const currentTime = videoElement.currentTime;
 
-                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 2초 이내 변화만 인정)
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime) {
+                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 2) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
