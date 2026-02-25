@@ -30,8 +30,8 @@
         return onlineCategories.map(cat => {
             const isActive = active === cat.label;
             const cls = isActive
-                ? 'sidebar-link block text-[#2F2725] font-bold text-[18px]'
-                : 'sidebar-link block text-[#9FA0A0] text-[18px]';
+                ? 'sidebar-link block text-[#2F2725] font-bold text-[15px] leading-relaxed'
+                : 'sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed';
             return `<a href="${cat.href}" class="${cls}">${cat.label}</a>`;
         }).join('\n');
     }
@@ -43,35 +43,35 @@
         const isCourses = activePage === 'courses' || onlineCategories.some(c => c.label === activePage);
 
         const aboutCls = isAbout
-            ? 'sidebar-link block text-[#2F2725] font-bold text-[22px] leading-tight'
-            : 'sidebar-link block text-[#9FA0A0] font-semibold text-[22px] leading-tight';
+            ? 'sidebar-link block text-[#2F2725] font-bold text-[18px] leading-relaxed'
+            : 'sidebar-link block text-[#9FA0A0] font-semibold text-[18px] leading-relaxed';
 
         const classTitleCls = isClass
-            ? 'text-[#2F2725] font-bold text-[22px] leading-tight mb-2'
-            : 'text-[#9FA0A0] font-semibold text-[22px] leading-tight mb-2';
+            ? 'text-[#2F2725] font-bold text-[18px] leading-relaxed mb-2'
+            : 'text-[#9FA0A0] font-semibold text-[18px] leading-relaxed mb-2';
 
         const onlineTitleCls = isCourses
-            ? 'text-[#2F2725] font-bold text-[22px] leading-tight'
-            : 'text-[#2F2725] font-semibold text-[22px] leading-tight';
+            ? 'text-[#2F2725] font-bold text-[18px] leading-relaxed'
+            : 'text-[#2F2725] font-semibold text-[18px] leading-relaxed';
 
         const classLinks = classPages.map(p => {
             const isActiveClass = activePage === p.key;
             const cls = isActiveClass
-                ? 'sidebar-link block text-[#2F2725] font-bold text-[18px]'
-                : 'sidebar-link block text-[#9FA0A0] text-[18px]';
+                ? 'sidebar-link block text-[#2F2725] font-bold text-[15px] leading-relaxed'
+                : 'sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed';
             return `<a href="${p.href}" class="${cls}">${p.label}</a>`;
         }).join('\n');
 
         const categoryLinks = buildCategoryLinks(isCourses ? activePage : '');
 
         return `
-        <nav class="text-right space-y-5">
+        <nav class="text-right space-y-6">
             <div>
                 <a href="about.html" class="${aboutCls}">학원 소개</a>
             </div>
             <div>
                 <p class="${classTitleCls}">수업 안내</p>
-                <div class="space-y-1">
+                <div class="space-y-2">
                     ${classLinks}
                 </div>
             </div>
@@ -80,23 +80,23 @@
                     <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
                     <span class="${onlineTitleCls}">온라인 강의</span>
                 </div>
-                <div class="space-y-1">
+                <div class="space-y-2">
                     ${categoryLinks}
                 </div>
             </div>
             <div>
-                <p class="text-[#2F2725] font-semibold text-[22px] leading-tight mb-2">학원 소식</p>
-                <div class="space-y-1">
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Instagram</a>
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Youtube</a>
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Blog</a>
+                <p class="text-[#2F2725] font-semibold text-[18px] leading-relaxed mb-2">학원 소식</p>
+                <div class="space-y-2">
+                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Instagram</a>
+                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Youtube</a>
+                    <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Blog</a>
                 </div>
             </div>
             <div>
-                <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[22px] leading-tight">상담 예약</a>
+                <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">상담 예약</a>
             </div>
             <div>
-                <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[22px] leading-tight">강사 채용</a>
+                <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">강사 채용</a>
             </div>
         </nav>`;
     }
