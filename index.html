@@ -4,31 +4,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="refresh" content="0; url=courses.html">
     <title>ALLROUND — English Communication</title>
-    <script>
-        // 즉시 리다이렉트
-        window.location.replace('courses.html');
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #ffffff;
-            font-family: sans-serif;
+        :root {
+            --page-right: 7vw;
+            --header-h: 70px;
+            /* 사이드바 우측 정렬 기준선: 좌측에서 이 거리만큼 */
+            --sidebar-right-edge: 20vw;
+            --sidebar-gap: 4vw; /* 사이드바 텍스트 ~ 배경 사이 여백 */
+            /* Sign up 우측 기준선: page-right + 햄버거버튼(24px) + gap(56px) */
+            --signup-right: calc(var(--page-right) + 80px);
         }
-        .loading {
-            text-align: center;
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .kakao-btn { display: inline-block; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
+
+        /* 슬로건 */
+        .slogan-bracket {
+            font-family: 'SUIT Variable', 'SUIT', serif;
+            font-weight: 200;
+            font-size: clamp(60px, 8vh, 100px);
+            line-height: 1;
+            color: rgba(255,255,255,0.85);
+        }
+        .slogan-text {
+            font-family: 'SUIT Variable', 'SUIT', serif;
+            font-weight: 300;
+            font-size: clamp(24px, 3.5vh, 42px);
+            letter-spacing: 0.15em;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.5;
         }
     </style>
 </head>
-<body>
-    <div class="loading">
-        <p>강의 페이지로 이동 중...</p>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
+        <!-- 좌측: 로고 (사이드바 우측 정렬 기준에 맞춤) -->
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+
+        <!-- 우측: Auth + 햄버거 (우측 정렬) -->
+        <div class="ml-auto flex items-center gap-10 lg:gap-14" style="padding-right: var(--page-right);">
+            <div id="auth-buttons" class="flex items-center gap-10 lg:gap-14">
+                <a href="auth.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
+            </button>
+            <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6">
+                    <div><a href="about.html" class="block text-[#2F2725] font-medium text-lg mb-2">학원 소개</a></div>
+                    <div>
+                        <p class="text-[#2F2725] font-medium text-lg mb-2">수업 안내</p>
+                        <div class="pl-4 space-y-2">
+                            <a href="firstee.html" class="block text-[#9FA0A0] text-sm">ALLROUND firstee</a>
+                            <a href="original.html" class="block text-[#9FA0A0] text-sm">ALLROUND original</a>
+                            <a href="#" class="block text-[#9FA0A0] text-sm">ALLROUND strategy</a>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-medium text-lg mb-2">온라인 강의</p>
+                        <div class="pl-4 space-y-2">
+                            <a href="courses.html" class="block text-[#9FA0A0] text-sm">정규 강의</a>
+                            <a href="courses.html" class="block text-[#9FA0A0] text-sm">내신 강의</a>
+                            <a href="courses.html" class="block text-[#9FA0A0] text-sm">외고·국제고</a>
+                            <a href="courses.html" class="block text-[#9FA0A0] text-sm">과고·영재고</a>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-medium text-lg mb-2">학원 소식</p>
+                        <div class="pl-4 space-y-2">
+                            <a href="#" class="block text-[#9FA0A0] text-sm">Instagram</a>
+                            <a href="#" class="block text-[#9FA0A0] text-sm">Youtube</a>
+                            <a href="#" class="block text-[#9FA0A0] text-sm">Blog</a>
+                        </div>
+                    </div>
+                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">상담 예약</a></div>
+                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">강사 채용</a></div>
+                </nav>
+            </div>
+        </div>
     </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+
+            <!-- Left Sidebar (Desktop) -->
+            <!-- 우측 정렬: 로고/푸터와 같은 우측 기준선 (--sidebar-right-edge) -->
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-5">
+                    <div>
+                        <a href="about.html" class="sidebar-link block text-[#2F2725] font-semibold text-[22px] leading-tight">학원 소개</a>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-semibold text-[22px] leading-tight mb-2">수업 안내</p>
+                        <div class="space-y-1">
+                            <a href="firstee.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">ALLROUND firstee</a>
+                            <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">ALLROUND original</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">ALLROUND strategy</a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-end gap-2 mb-2">
+                            <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
+                            <span class="text-[#2F2725] font-semibold text-[22px] leading-tight">온라인 강의</span>
+                        </div>
+                        <div class="space-y-1">
+                            <a href="courses.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">정규 강의</a>
+                            <a href="courses.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">내신 강의</a>
+                            <a href="courses.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">외고·국제고</a>
+                            <a href="courses.html" class="sidebar-link block text-[#9FA0A0] text-[18px]">과고·영재고</a>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-semibold text-[22px] leading-tight mb-2">학원 소식</p>
+                        <div class="space-y-1">
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Instagram</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Youtube</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px]">Blog</a>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[22px] leading-tight">상담 예약</a>
+                    </div>
+                    <div>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[22px] leading-tight">강사 채용</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- 배경 + 비주얼 영역 -->
+            <div class="flex-1 relative overflow-hidden">
+                <!-- 배경 텍스처 -->
+                <img src="asset/main/backgraound.png" alt="" class="absolute inset-0 w-full h-full object-cover">
+
+                <!-- main_line 기준선 (배경 선이 두 겹으로 보이는 원인이므로 숨김/삭제 처리) -->
+                <!-- <img src="asset/main/main_line.png" alt="" class="absolute inset-0 w-full h-full object-fill pointer-events-none" style="opacity: 0.5;"> -->
+
+                <!-- 그룹 12 비주얼 -->
+                <div class="absolute inset-0 flex items-center justify-center" style="padding: 1% 10% 3% 0;">
+                    <img src="asset/main/그룹 12.png" alt="ALLROUND Visual"
+                         class="max-w-full max-h-full object-contain"
+                         style="width: auto; height: 96%;">
+                </div>
+
+                <!-- 슬로건: 두 줄 + 얇은 괄호 -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none" style="padding: 1% 10% 3% 0;">
+                    <div class="flex items-center gap-3 md:gap-5">
+                        <span class="slogan-bracket select-none">[</span>
+                        <div class="text-center">
+                            <p class="slogan-text">STRUCTURE</p>
+                            <p class="slogan-text">CREATES RESULTS</p>
+                        </div>
+                        <span class="slogan-bracket select-none">]</span>
+                    </div>
+                </div>
+
+                <!-- 카톡 문의 (우측 정렬: Sign up 기준, 상단: 좌측 사각형과 높이 맞춤) -->
+                <div class="hidden lg:block absolute z-10" style="right: var(--signup-right); top: 5%;">
+                    <a href="https://pf.kakao.com/_ALLROUND" target="_blank" rel="noopener"
+                       class="kakao-btn relative inline-block">
+                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-12 md:h-14 w-auto object-contain block">
+                        <!-- TALK 아이콘이 좌측에 있으므로, 텍스트를 우측으로 치우치게 배치 -->
+                        <div class="absolute inset-0 flex items-center justify-end pr-[18%] md:pr-[22%] pointer-events-none">
+                            <span class="text-[#2F2725] text-[11px] md:text-[13px] font-bold tracking-wide">카톡 문의</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 우측 3텍스트 (우측 정렬: Sign up 우측 기준선) -->
+                <div class="hidden lg:block absolute z-10" style="right: var(--signup-right); top: 20%;">
+                    <div class="text-right">
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">PERSPECTIVE IN</p>
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">STRUCTURE</p>
+                    </div>
+                </div>
+                <div class="hidden lg:block absolute z-10" style="right: var(--signup-right); top: 48%;">
+                    <div class="text-right">
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">DISCIPLINE IN</p>
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">LANGUAGE</p>
+                    </div>
+                </div>
+                <div class="hidden lg:block absolute z-10" style="right: var(--signup-right); top: 76%;">
+                    <div class="text-right">
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">FREEDOM IN</p>
+                        <p class="text-[#2F2725] text-[13px] tracking-[0.15em] leading-relaxed">EXPRESSION</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_ALLROUND" target="_blank" rel="noopener"
+           class="lg:hidden kakao-btn fixed bottom-6 right-6 z-40 relative inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-12 w-auto object-contain drop-shadow-lg block">
+            <!-- TALK 아이콘 우측에 텍스트가 위치하도록 패딩 설정 -->
+            <div class="absolute inset-0 flex items-center justify-end pr-[20%] pointer-events-none">
+                <span class="text-[#2F2725] text-[11px] font-bold tracking-wide">카톡 문의</span>
+            </div>
+        </a>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
 </body>
 </html>
