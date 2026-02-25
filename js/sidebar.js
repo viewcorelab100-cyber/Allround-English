@@ -1,16 +1,7 @@
-// Global Sidebar Component
-// Injects consistent sidebar nav + mobile menu across all pages
-// Active page is determined by data-active-page attribute on <body> or <main>
+// Global Sidebar Component - Shared across all pages
+// Active page is determined by data-active-page on <body>
 
 (function() {
-    // 온라인 강의 카테고리 목록 (변경 시 여기만 수정)
-    const onlineCategories = [
-        { label: '정규 강의', href: 'courses.html' },
-        { label: '내신 강의', href: 'courses.html?category=내신 강의' },
-        { label: '외고·국제고', href: 'courses.html?category=외고·국제고' },
-        { label: '과고·영재고', href: 'courses.html?category=과고·영재고' }
-    ];
-
     // 수업 안내 목록
     const classPages = [
         { label: 'ALLROUND firstee', href: 'firstee.html', key: 'firstee' },
@@ -25,22 +16,11 @@
         return (body && body.dataset.activePage) || (main && main.dataset.activePage) || '';
     }
 
-    // 사이드바 카테고리 링크 생성
-    function buildCategoryLinks(active) {
-        return onlineCategories.map(cat => {
-            const isActive = active === cat.label;
-            const cls = isActive
-                ? 'sidebar-link block text-[#2F2725] font-bold text-[15px] leading-relaxed'
-                : 'sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed';
-            return `<a href="${cat.href}" class="${cls}">${cat.label}</a>`;
-        }).join('\n');
-    }
-
     // 데스크탑 사이드바 HTML 생성
     function buildDesktopSidebar(activePage) {
         const isAbout = activePage === 'about';
         const isClass = ['firstee', 'original', 'strategy'].includes(activePage);
-        const isCourses = activePage === 'courses' || onlineCategories.some(c => c.label === activePage);
+        const isCourses = activePage === 'courses';
 
         const aboutCls = isAbout
             ? 'sidebar-link block text-[#2F2725] font-bold text-[18px] leading-relaxed'
@@ -52,7 +32,7 @@
 
         const onlineTitleCls = isCourses
             ? 'text-[#2F2725] font-bold text-[18px] leading-relaxed'
-            : 'text-[#2F2725] font-semibold text-[18px] leading-relaxed';
+            : 'text-[#9FA0A0] font-semibold text-[18px] leading-relaxed';
 
         const classLinks = classPages.map(p => {
             const isActiveClass = activePage === p.key;
@@ -61,8 +41,6 @@
                 : 'sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed';
             return `<a href="${p.href}" class="${cls}">${p.label}</a>`;
         }).join('\n');
-
-        const categoryLinks = buildCategoryLinks(isCourses ? activePage : '');
 
         return `
         <nav class="text-right space-y-6">
@@ -76,13 +54,10 @@
                 </div>
             </div>
             <div>
-                <div class="flex items-center justify-end gap-2 mb-2">
+                <a href="courses.html" class="sidebar-link flex items-center justify-end gap-2">
                     <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
                     <span class="${onlineTitleCls}">온라인 강의</span>
-                </div>
-                <div class="space-y-2">
-                    ${categoryLinks}
-                </div>
+                </a>
             </div>
             <div>
                 <p class="text-[#2F2725] font-semibold text-[18px] leading-relaxed mb-2">학원 소식</p>
@@ -103,10 +78,6 @@
 
     // 모바일 메뉴 HTML 생성
     function buildMobileMenu() {
-        const catLinks = onlineCategories.map(cat =>
-            `<a href="${cat.href}" class="block text-[#9FA0A0] text-sm">${cat.label}</a>`
-        ).join('\n');
-
         return `
         <nav class="space-y-6">
             <div><a href="about.html" class="block text-[#2F2725] font-medium text-lg mb-2">학원 소개</a></div>
@@ -118,12 +89,7 @@
                     <a href="strategy.html" class="block text-[#9FA0A0] text-sm">ALLROUND strategy</a>
                 </div>
             </div>
-            <div>
-                <p class="text-[#2F2725] font-medium text-lg mb-2">온라인 강의</p>
-                <div class="pl-4 space-y-2">
-                    ${catLinks}
-                </div>
-            </div>
+            <div><a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a></div>
             <div>
                 <p class="text-[#2F2725] font-medium text-lg mb-2">학원 소식</p>
                 <div class="pl-4 space-y-2">

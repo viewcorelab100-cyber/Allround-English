@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -NoProfile -Command \"cd 'C:\\Users\\이현수\\Documents\\GitHub\\Allround-English'; git add -A; git commit -m 'auto: update files' --allow-empty; git push 2>$null\"",
+            "command": "bash .claude/auto-push.sh",
             "timeout": 30,
             "statusMessage": "Auto commit & push...",
             "async": true
