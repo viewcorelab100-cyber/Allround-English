@@ -247,7 +247,16 @@
         </aside>
 
         <!-- 메인 컨텐츠 -->
-        <main class="ml-64 flex-1 min-h-screen p-12 main-content">
+        <main class="ml-64 flex-1 min-h-screen main-content">
+            <!-- 데모 모드 배너 -->
+            <div id="demo-banner" class="hidden bg-amber-500 bg-opacity-10 border-b border-amber-500 border-opacity-30 px-8 py-3">
+                <div class="flex items-center space-x-3">
+                    <span class="text-amber-400 text-lg">&#x1f512;</span>
+                    <span class="text-amber-400 text-[11px] uppercase tracking-widest font-bold">Demo Mode</span>
+                    <span class="text-amber-400 text-opacity-60 text-[10px]">읽기 전용 — 데이터 수정이 제한됩니다</span>
+                </div>
+            </div>
+            <div class="p-12">
             
             <!-- 강의 관리 섹션 -->
             <section id="section-courses" class="hidden">
@@ -258,10 +267,10 @@
                         <h1 class="text-4xl font-bold text-white tracking-tight">Courses</h1>
                     </div>
                     <div class="flex space-x-3">
-                        <button onclick="openCategoryModal()" class="btn-admin-outline">
+                        <button onclick="openCategoryModal()" class="btn-admin-outline demo-restricted">
                             Categories
                         </button>
-                        <button onclick="openCourseModal()" class="btn-admin-primary">
+                        <button onclick="openCourseModal()" class="btn-admin-primary demo-restricted">
                             Add New Course
                         </button>
                     </div>
@@ -906,7 +915,7 @@
                                 <button onclick="closeGradingModal()" class="btn-admin-outline flex-1 py-4">
                                     Cancel
                                 </button>
-                                <button onclick="saveGrading()" class="btn-admin-primary flex-1 py-4">
+                                <button onclick="saveGrading()" class="btn-admin-primary flex-1 py-4 demo-restricted">
                                     Save Grading
                                 </button>
                             </div>
@@ -1047,6 +1056,7 @@
                 </div>
             </section>
 
+            </div><!-- end p-12 wrapper -->
         </main>
     </div>
 
@@ -1088,7 +1098,7 @@
                 <!-- 버튼 -->
                 <div class="flex gap-4">
                     <button onclick="closeQnaAnswerModal()" class="flex-1 btn-admin-outline">취소</button>
-                    <button onclick="submitQnaAnswer()" class="flex-1 btn-admin-primary">답변 등록</button>
+                    <button onclick="submitQnaAnswer()" class="flex-1 btn-admin-primary demo-restricted">답변 등록</button>
                 </div>
             </div>
         </div>
@@ -1102,6 +1112,66 @@
         let currentUser = null;
         let allStudents = [];
         let allCourses = [];
+        let isDemoMode = false;
+
+        // ========== 데모 모드 함수 ==========
+
+        function checkDemoWriteAccess(action = '수정') {
+            if (isDemoMode) {
+                alert(`데모 모드에서는 ${action}할 수 없습니다.`);
+                return false;
+            }
+            return true;
+        }
+
+        function applyDemoMode() {
+            // 데모 배너 표시
+            const banner = document.getElementById('demo-banner');
+            if (banner) banner.classList.remove('hidden');
+
+            // 정적 쓰기 버튼 숨기기
+            document.querySelectorAll('.demo-restricted').forEach(el => {
+                el.classList.add('hidden');
+            });
+        }
+
+        // ========== 데모 모드 마스킹 유틸리티 ==========
+
+        function maskName(name) {
+            if (!name || name.length <= 1) return name || '-';
+            return name.charAt(0) + '*'.repeat(name.length - 1);
+        }
+
+        function maskEmail(email) {
+            if (!email) return '-';
+            const [local, domain] = email.split('@');
+            if (!domain) return email;
+            const visible = local.substring(0, Math.min(3, local.length));
+            return visible + '***@' + domain;
+        }
+
+        function maskPhone(phone) {
+            if (!phone) return '-';
+            return phone.replace(/(\d{2,3}[-.]?)(\d{3,4})([-.]?\d{4})/, '$1****$3');
+        }
+
+        function maskAddress(address) {
+            if (!address) return '-';
+            const parts = address.split(' ');
+            if (parts.length <= 2) return address;
+            return parts.slice(0, 2).join(' ') + ' ***';
+        }
+
+        function demoMask(value, type) {
+            if (!isDemoMode) return value;
+            switch (type) {
+                case 'name': return maskName(value);
+                case 'email': return maskEmail(value);
+                case 'phone': return maskPhone(value);
+                case 'address': return maskAddress(value);
+                default: return value;
+            }
+        }
 
         // 섹션 전환 함수
         function showSection(section) {
@@ -1541,8 +1611,8 @@
                     <tr>
                         <td class="text-[11px] text-gray-500">${activityDate}</td>
                         <td>
-                            <p class="text-white font-medium">${sub.studentName}</p>
-                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${sub.studentEmail}</p>
+                            <p class="text-white font-medium">${demoMask(sub.studentName, 'name')}</p>
+                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${demoMask(sub.studentEmail, 'email')}</p>
                         </td>
                         <td>
                             <p class="text-white font-medium">${sub.courseTitle}</p>
@@ -1632,11 +1702,11 @@
                     <div class="p-6 cursor-pointer flex items-center justify-between" onclick="toggleStudentDetail('${student.id}')">
                         <div class="flex items-center space-x-6">
                             <div class="w-10 h-10 bg-white bg-opacity-5 flex items-center justify-center text-xs text-gray-500 uppercase font-bold">
-                                ${student.name?.substring(0, 1) || 'U'}
+                                ${(demoMask(student.name, 'name') || 'U').substring(0, 1)}
                             </div>
                             <div>
-                                <p class="font-bold text-white tracking-tight">${student.name}</p>
-                                <p class="text-[10px] text-gray-600 lowercase tracking-tight">${student.email}</p>
+                                <p class="font-bold text-white tracking-tight">${demoMask(student.name, 'name')}</p>
+                                <p class="text-[10px] text-gray-600 lowercase tracking-tight">${demoMask(student.email, 'email')}</p>
                             </div>
                         </div>
                         <div class="flex items-center space-x-12">
@@ -2335,6 +2405,7 @@
 
         // 채점 저장
         async function saveGrading() {
+            if (!checkDemoWriteAccess('채점 저장')) return;
             if (!currentSubmissionId) return;
 
             const score = parseInt(document.getElementById('grading-score').value) || null;
@@ -2505,23 +2576,33 @@
             await signOut();
         }
 
-        // 관리자 권한 확인
+        // 관리자 권한 확인 (데모 계정 포함)
         async function checkAdminAccess() {
             currentUser = await getCurrentUser();
-            
+
             if (!currentUser) {
                 window.location.href = 'auth.html';
                 return false;
             }
 
-            // profiles 테이블의 role 컬럼으로 관리자 권한 확인
-            const adminCheck = await isAdmin();
-            if (!adminCheck) {
+            // profiles 테이블의 role 컬럼으로 권한 확인
+            const profile = await getUserProfile(currentUser.id);
+            if (!profile.success) {
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            const role = profile.data.role;
+            if (role !== 'admin' && role !== 'demo') {
                 alert('관리자 권한이 없습니다.');
                 window.location.href = 'index.html';
                 return false;
             }
 
+            isDemoMode = (role === 'demo');
+            if (isDemoMode) {
+                applyDemoMode();
+            }
             return true;
         }
 
@@ -2599,7 +2680,7 @@
                             <h2 class="text-3xl font-bold text-white tracking-tight">${courseTitle}</h2>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <button onclick="openLessonModal()" class="btn-admin-primary">Add New Lesson</button>
+                            ${!isDemoMode ? '<button onclick="openLessonModal()" class="btn-admin-primary">Add New Lesson</button>' : ''}
                             <button onclick="closeInlinePanel()" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Close</button>
                         </div>
                     </div>
@@ -2692,7 +2773,7 @@
                         <td class="text-gray-500 text-[10px] uppercase tracking-widest">${lessonCount} Lessons</td>
                         <td class="text-right">
                             <div class="flex justify-end space-x-4">
-                                ${!isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
+                                ${!isDemoMode && !isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
                                         class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
                                     Access
                                 </button>` : ''}
@@ -2700,12 +2781,14 @@
                                         class="text-[10px] uppercase tracking-widest font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
                                     Data
                                 </button>
+                                ${!isDemoMode ? `
                                 <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
                                         class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
                                     Manage
                                 </button>
                                 <button onclick="editCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
                                 <button onclick="deleteCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
+                                ` : ''}
                             </div>
                         </td>
                     </tr>
@@ -2780,10 +2863,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-4">
+                        ${!isDemoMode ? `<div class="flex items-center space-x-4">
                             <button onclick="editLesson('${lesson.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
                             <button onclick="deleteLesson('${lesson.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
-                        </div>
+                        </div>` : ''}
                     </div>
                 `).join('');
 
@@ -2797,6 +2880,7 @@
 
         // 강의 모달 열기
         function openCourseModal(courseId = null) {
+            if (!checkDemoWriteAccess('강의 관리')) return;
             document.getElementById('course-modal').classList.remove('hidden');
             document.getElementById('course-modal-title').textContent = courseId ? '강의 수정' : '새 강의 추가';
             document.getElementById('course-form').reset();
@@ -2980,6 +3064,7 @@
 
         // 강의 삭제
         async function deleteCourse(courseId) {
+            if (!checkDemoWriteAccess('강의 삭제')) return;
             if (!confirm('정말로 이 강의를 삭제하시겠습니까? 관련된 모든 영상도 함께 삭제됩니다.')) return;
 
             try {
@@ -3001,6 +3086,7 @@
 
         // 레슨 모달 열기
         function openLessonModal(lessonId = null) {
+            if (!checkDemoWriteAccess('레슨 관리')) return;
             if (!selectedCourseId) {
                 alert('먼저 강의를 선택해주세요.');
                 return;
@@ -3157,6 +3243,7 @@
 
         // 레슨 삭제
         async function deleteLesson(lessonId) {
+            if (!checkDemoWriteAccess('레슨 삭제')) return;
             if (!confirm('정말로 이 영상을 삭제하시겠습니까?')) return;
 
             try {
@@ -3202,6 +3289,7 @@
 
         // 카테고리 추가
         function addCategory() {
+            if (!checkDemoWriteAccess('카테고리 추가')) return;
             const input = document.getElementById('new-category-input');
             const newCat = input.value.trim();
             
@@ -3347,8 +3435,8 @@
                     <tr>
                         <td class="text-[11px] text-gray-500">${date}</td>
                         <td>
-                            <p class="text-white font-medium">${payment.profile.name || payment.customer_name || '-'}</p>
-                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${payment.profile.email || payment.customer_email || '-'}</p>
+                            <p class="text-white font-medium">${demoMask(payment.profile.name || payment.customer_name, 'name') || '-'}</p>
+                            <p class="text-[10px] text-gray-600 lowercase tracking-tight">${demoMask(payment.profile.email || payment.customer_email, 'email') || '-'}</p>
                         </td>
                         <td class="text-white font-medium">${payment.course?.title || payment.order_name || '-'}</td>
                         <td><span class="text-[9px] uppercase tracking-widest font-bold ${typeColor}">${typeLabel}</span></td>
@@ -3605,7 +3693,10 @@
 
             grid.innerHTML = members.map(member => {
                 const joinDate = member.created_at ? new Date(member.created_at).toLocaleDateString('ko-KR') : '-';
-                const phone = member.phone || member.student_phone || '-';
+                const rawPhone = member.phone || member.student_phone || '-';
+                const phone = demoMask(rawPhone, 'phone');
+                const displayName = demoMask(member.name, 'name') || 'No Name';
+                const displayEmail = demoMask(member.email, 'email') || '-';
                 const courseTitles = member.orders.map(o => o.courseTitle).slice(0, 2).join(', ') || 'No courses';
                 const moreCoursesCount = member.courseCount > 2 ? `+${member.courseCount - 2}` : '';
                 const studentType = member.student_type || 'online';
@@ -3617,12 +3708,12 @@
                         <div class="space-y-4">
                             <div class="flex justify-between items-start">
                                 <div class="space-y-1">
-                                    <h3 class="text-lg font-bold text-white tracking-tight">${member.name || 'No Name'}</h3>
-                                    <p class="text-[10px] text-gray-500 font-light truncate max-w-[150px] uppercase tracking-wider">${member.email || '-'}</p>
+                                    <h3 class="text-lg font-bold text-white tracking-tight">${displayName}</h3>
+                                    <p class="text-[10px] text-gray-500 font-light truncate max-w-[150px] uppercase tracking-wider">${displayEmail}</p>
                                 </div>
                                 <span class="text-[9px] uppercase tracking-widest font-bold ${typeColor}">${typeLabel}</span>
                             </div>
-                            
+
                             <div class="pt-4 border-t border-white border-opacity-5 space-y-3">
                                 <div class="flex justify-between text-[10px] uppercase tracking-wider">
                                     <span class="text-gray-600">Phone</span>
@@ -3697,7 +3788,10 @@
             if (!member) return;
 
             const joinDate = member.created_at ? new Date(member.created_at).toLocaleDateString('ko-KR') : '-';
-            
+            const mName = demoMask(member.name, 'name') || '-';
+            const mEmail = demoMask(member.email, 'email') || '-';
+            const mPhone = demoMask(member.phone || member.student_phone, 'phone') || '-';
+
             const content = `
                 <div class="space-y-6">
                     <!-- 기본 정보 -->
@@ -3706,15 +3800,15 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <p class="text-xs text-gray-500">이름</p>
-                                <p class="text-white">${member.name || '-'}</p>
+                                <p class="text-white">${mName}</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">이메일</p>
-                                <p class="text-white">${member.email || '-'}</p>
+                                <p class="text-white">${mEmail}</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">전화번호</p>
-                                <p class="text-white">${member.phone || member.student_phone || '-'}</p>
+                                <p class="text-white">${mPhone}</p>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">수강 유형</p>
@@ -3760,11 +3854,11 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <p class="text-xs text-gray-500">보호자 이름</p>
-                                    <p class="text-white">${member.parent_name || '-'}</p>
+                                    <p class="text-white">${demoMask(member.parent_name, 'name') || '-'}</p>
                                 </div>
                                 <div>
                                     <p class="text-xs text-gray-500">보호자 연락처</p>
-                                    <p class="text-white">${member.parent_phone || '-'}</p>
+                                    <p class="text-white">${demoMask(member.parent_phone, 'phone') || '-'}</p>
                                 </div>
                             </div>
                         </div>
@@ -3919,10 +4013,10 @@
                 const orderId = order.id.substring(0, 12) + '...';
                 const productName = order.courses?.title || order.order_name || '-';
                 const amount = order.amount ? `₩${order.amount.toLocaleString()}` : '-';
-                const customerName = order.profiles?.name || order.customer_name || '-';
-                const customerEmail = order.profiles?.email || order.customer_email || '-';
-                const shippingAddress = order.shipping_address 
-                    ? `${order.shipping_address} ${order.shipping_address_detail || ''}<br><span class="text-[10px] text-gray-600 uppercase tracking-tight">${order.shipping_name || ''} / ${order.shipping_phone || ''}</span>`
+                const customerName = demoMask(order.profiles?.name || order.customer_name, 'name') || '-';
+                const customerEmail = demoMask(order.profiles?.email || order.customer_email, 'email') || '-';
+                const shippingAddress = order.shipping_address
+                    ? `${demoMask(order.shipping_address, 'address')} ${isDemoMode ? '' : (order.shipping_address_detail || '')}<br><span class="text-[10px] text-gray-600 uppercase tracking-tight">${demoMask(order.shipping_name, 'name') || ''} / ${demoMask(order.shipping_phone, 'phone') || ''}</span>`
                     : '-';
                 const trackingInfo = order.tracking_number 
                     ? `${order.shipping_carrier || ''}<br><span class="text-[10px] text-gray-600 tracking-wider">${order.tracking_number}</span>`
@@ -3944,10 +4038,10 @@
                         <td class="text-[11px] text-gray-400">${shippingAddress}</td>
                         <td class="text-[11px] text-gray-400">${trackingInfo}</td>
                         <td class="text-right">
-                            <button onclick="openOrderModal('${order.id}')" 
+                            ${!isDemoMode ? `<button onclick="openOrderModal('${order.id}')"
                                     class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
                                 Edit
-                            </button>
+                            </button>` : ''}
                         </td>
                     </tr>
                 `;
@@ -4023,6 +4117,7 @@
         }
 
         async function saveOrderChanges(orderId) {
+            if (!checkDemoWriteAccess('주문 상태 변경')) return;
             const shippingStatus = document.getElementById('modal-shipping-status').value;
             const carrier = document.getElementById('modal-carrier').value;
             const trackingNumber = document.getElementById('modal-tracking').value;
@@ -4374,10 +4469,10 @@
                                    class="w-4 h-4 accent-yellow-500 cursor-pointer">
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <p class="text-white text-sm font-bold tracking-tight">${user.name || 'No Name'}</p>
+                                    <p class="text-white text-sm font-bold tracking-tight">${demoMask(user.name, 'name') || 'No Name'}</p>
                                     ${typeBadge}
                                 </div>
-                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${user.email || ''}</p>
+                                <p class="text-gray-500 text-[10px] lowercase tracking-tight">${demoMask(user.email, 'email') || ''}</p>
                             </div>
                         </div>
                         ${isGranted ? '<span class="text-[9px] uppercase tracking-widest font-bold text-yellow-500">Granted</span>' : ''}
@@ -4407,6 +4502,7 @@
         }
 
         async function toggleStudentAccess(userId, grant) {
+            if (!checkDemoWriteAccess('접근 권한 변경')) return;
             try {
                 if (grant) {
                     const { error } = await window.supabase
@@ -4505,8 +4601,8 @@
 
                 container.innerHTML = data.map(qna => {
                     const date = new Date(qna.created_at).toLocaleString('ko-KR');
-                    const userName = qna.profiles?.name || '알 수 없음';
-                    const userPhone = qna.profiles?.phone || '';
+                    const userName = demoMask(qna.profiles?.name, 'name') || '알 수 없음';
+                    const userPhone = demoMask(qna.profiles?.phone, 'phone') || '';
                     const lessonTitle = qna.lessons ? `${qna.lessons.order_num}강. ${qna.lessons.title}` : '';
                     const courseTitle = qna.courses?.title || '';
                     const statusBadge = qna.is_answered
@@ -4524,9 +4620,9 @@
                                     <h3 class="text-white font-bold text-sm mb-2">${qna.title}</h3>
                                     <p class="text-gray-400 text-xs leading-relaxed line-clamp-2">${qna.content}</p>
                                 </div>
-                                <button onclick="openQnaAnswerModal(${qna.id})" class="btn-admin-outline text-xs px-4 py-2 ml-4">
+                                ${!isDemoMode ? `<button onclick="openQnaAnswerModal(${qna.id})" class="btn-admin-outline text-xs px-4 py-2 ml-4">
                                     ${qna.is_answered ? '수정' : '답변'}
-                                </button>
+                                </button>` : ''}
                             </div>
                             <div class="flex items-center gap-6 text-[10px] text-gray-600">
                                 <span>작성자: <span class="text-gray-400">${userName}</span></span>
@@ -4601,6 +4697,7 @@
         }
 
         async function submitQnaAnswer() {
+            if (!checkDemoWriteAccess('Q&A 답변 등록')) return;
             if (!currentQnaId) return;
 
             const answer = document.getElementById('qna-answer-input').value.trim();
@@ -4771,8 +4868,8 @@
                     return `
                         <tr data-student-name="${(profile.name || '').toLowerCase()}">
                             <td class="sticky left-0 bg-neutral-950 z-10">
-                                <p class="text-white font-medium text-sm">${profile.name || '이름없음'}</p>
-                                <p class="text-[10px] text-gray-600">${profile.email || ''}</p>
+                                <p class="text-white font-medium text-sm">${demoMask(profile.name || '이름없음', 'name')}</p>
+                                <p class="text-[10px] text-gray-600">${demoMask(profile.email || '', 'email')}</p>
                             </td>
                             <td>
                                 <div class="flex items-center space-x-3">

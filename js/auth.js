@@ -111,7 +111,13 @@ async function validateSession() {
         }
         const user = await getCurrentUser();
         if (!user) return { valid: true }; // 로그인 안 된 상태는 검증 불필요
-        
+
+        // 데모 계정은 세션 제한 없이 여러 기기에서 접속 허용
+        const demoCheck = await getUserProfile(user.id);
+        if (demoCheck.success && demoCheck.data.role === 'demo') {
+            return { valid: true };
+        }
+
         // localStorage에서 현재 세션 ID 가져오기
         const localSessionId = localStorage.getItem('allround_session_id');
         if (!localSessionId) {
@@ -446,14 +452,26 @@ async function getUserProfile(userId) {
 async function isAdmin() {
     const user = await getCurrentUser();
     if (!user) return false;
-    
-    // ✅ 특정 이메일은 무조건 관리자로 인식
-    if (user.email === 'admin@allround.com') {
-        return true;
-    }
-    
+
+    // DB의 role 컬럼만 신뢰
     const profile = await getUserProfile(user.id);
     return profile.success && profile.data.role === 'admin';
+}
+
+// 데모 사용자 확인
+async function isDemoUser() {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    const profile = await getUserProfile(user.id);
+    return profile.success && profile.data.role === 'demo';
+}
+
+// 관리자 또는 데모 사용자 확인 (관리자 페이지 접근용)
+async function isAdminOrDemo() {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    const profile = await getUserProfile(user.id);
+    return profile.success && (profile.data.role === 'admin' || profile.data.role === 'demo');
 }
 
 // ========== UI 업데이트 함수 ==========
@@ -471,10 +489,10 @@ async function updateAuthUI() {
             userMenu.classList.remove('hidden');
             userMenu.classList.add('flex', 'flex-row');
             
-            // 관리자 권한 확인 및 관리자 링크 표시
-            const adminStatus = await isAdmin();
+            // 관리자 또는 데모 계정 확인 및 관리자 링크 표시
+            const adminOrDemoStatus = await isAdminOrDemo();
             if (adminLink) {
-                if (adminStatus) {
+                if (adminOrDemoStatus) {
                     adminLink.classList.remove('hidden');
                 } else {
                     adminLink.classList.add('hidden');

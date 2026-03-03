@@ -138,13 +138,7 @@ async function issueCoupon(userId, courseId) {
             });
 
         if (error) {
-            console.error('Coupon issue error:', error);
-            console.error('Error details:', {
-                message: error.message,
-                code: error.code,
-                details: error.details,
-                hint: error.hint
-            });
+            console.error('Coupon issue error');
             // 쿠폰 발급 실패해도 리포트는 보여줌
             const couponCodeEl = document.getElementById('coupon-code');
             if (couponCodeEl) couponCodeEl.textContent = '발급 실패: ' + (error.message || '알 수 없는 오류');

@@ -12,13 +12,14 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --page-right: 4vw;
-            --header-h: 70px;
-            --sidebar-right-edge: 20vw;
-            --sidebar-gap: 4vw;
-            --signup-right: calc(var(--page-right) + 20px);
+            --page-right: 8.3vw;
+            --header-h: 126px;
+            --sidebar-right-edge: 21.8vw;
+            --sidebar-gap: 3.75vw;
+            --signup-right: 13.44vw;
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
@@ -97,10 +98,10 @@
                 <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
             </a>
         </div>
-        <div class="ml-auto flex items-center gap-10 lg:gap-14" style="padding-right: var(--page-right);">
-            <div id="auth-buttons" class="flex items-center gap-10 lg:gap-14">
-                <a href="auth.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Sign up</a>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
             </div>
             <div id="user-menu" class="hidden items-center gap-6">
                 <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
@@ -193,37 +194,31 @@
             <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
 
                 <!-- 카톡 상담 -->
-                <div class="hidden lg:block fixed z-50" style="right: var(--signup-right); top: calc(var(--header-h) + 3vh);">
+                <div class="hidden lg:block fixed z-50" style="right: var(--signup-right); top: calc(var(--header-h) + 38px);">
                     <a href="https://pf.kakao.com/_ALLROUND" target="_blank" rel="noopener"
                        class="kakao-btn relative inline-block">
-                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-9 md:h-10 w-auto object-contain block">
-                        <div class="absolute inset-0 flex items-center justify-end pr-[16%] md:pr-[18%] pointer-events-none">
-                            <span class="text-[#2F2725] text-[9px] md:text-[11px] font-bold tracking-wide">카톡 상담</span>
+                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-12 md:h-14 w-auto object-contain block">
+                        <div class="absolute inset-0 flex items-center justify-end pr-[18%] md:pr-[22%] pointer-events-none">
+                            <span class="text-[#2F2725] text-[11px] md:text-[13px] font-bold tracking-wide">카톡 문의</span>
                         </div>
                     </a>
                 </div>
 
                 <!-- 타이틀 영역 -->
-                <div class="px-6 md:px-12 pt-16 pb-8 text-[#2F2725]">
-                    <div class="flex items-center gap-3 w-full max-w-[900px] md:ml-12 lg:ml-24">
-                        <span class="text-xl font-light text-gray-400">|</span>
-                        <h1 class="text-[28px] tracking-wide" style="font-family: 'cabrito-didone', Georgia, serif; font-style: normal; font-weight: 600;">Online class</h1>
-                        <span class="bg-[#C9A96E] text-white text-[11px] px-3 py-1 rounded-full font-bold ml-2">정규 강의</span>
+                <div class="px-6 md:px-12 pt-12 pb-6 text-[#2F2725]">
+                    <div class="flex items-center gap-4 max-w-[1320px] ml-[24px]">
+                        <div class="w-[2px] h-[22px] bg-[#2F2725]"></div>
+                        <h1 class="text-[35px] leading-[35px] tracking-[-0.35px]" style="font-family: 'Libre Bodoni', serif; font-weight: 400;">Online class</h1>
+                        <span class="bg-[#2F2725] text-white text-[14px] md:text-[20px] px-4 py-1 font-normal ml-2 whitespace-nowrap rounded-md">정규 강의</span>
                     </div>
                 </div>
 
                 <!-- 컨텐츠 컨테이너 -->
                 <div class="w-full max-w-[900px] md:ml-12 lg:ml-24 px-6 md:px-16 py-12 text-[#2F2725] bg-white mb-20 shadow-sm relative z-10">
 
-                    <!-- 카테고리 탭 -->
-                    <div class="flex items-center gap-4 mb-12 flex-wrap">
+                    <!-- 카테고리 탭 (DB에서 실제 카테고리를 동적으로 생성) -->
+                    <div id="category-tabs" class="flex items-center gap-4 mb-12 flex-wrap">
                         <button class="category-tab active" data-category="all">전체</button>
-                        <span class="text-gray-300 text-[11px]">|</span>
-                        <button class="category-tab" data-category="ALLROUND READING">ALLROUND READING</button>
-                        <span class="text-gray-300 text-[11px]">|</span>
-                        <button class="category-tab" data-category="ALLROUND STRUCTURE">ALLROUND STRUCTURE</button>
-                        <span class="text-gray-300 text-[11px]">|</span>
-                        <button class="category-tab" data-category="ALLROUND GRAMMAR">ALLROUND GRAMMAR</button>
                     </div>
 
                     <!-- 강의 리스트 -->
@@ -372,18 +367,15 @@
                 allCourses = result.data;
                 filteredCourses = [...allCourses];
 
-                // 카테고리 탭 + 사이드바 동적 생성 (데이터에 있는 카테고리 기준)
+                // 카테고리 탭 동적 생성 (DB 실제 카테고리 기준)
                 const categories = [...new Set(allCourses.map(c => c.category).filter(Boolean))];
-                if (categories.length > 0) {
-                    // 본문 탭
-                    const tabContainer = document.querySelector('.flex.items-center.gap-4');
-                    let tabsHtml = '<button class="category-tab active" data-category="all">전체</button>';
-                    categories.forEach(cat => {
-                        tabsHtml += `<span class="text-gray-300 text-[11px]">|</span>`;
-                        tabsHtml += `<button class="category-tab" data-category="${cat}">${cat}</button>`;
-                    });
-                    tabContainer.innerHTML = tabsHtml;
-                }
+                const tabContainer = document.getElementById('category-tabs');
+                let tabsHtml = '<button class="category-tab active" data-category="all">전체</button>';
+                categories.forEach(cat => {
+                    tabsHtml += `<span class="text-gray-300 text-[11px]">|</span>`;
+                    tabsHtml += `<button class="category-tab" data-category="${cat}">${cat}</button>`;
+                });
+                tabContainer.innerHTML = tabsHtml;
 
                 // 탭 이벤트 바인딩
                 document.querySelectorAll('.category-tab').forEach(tab => {

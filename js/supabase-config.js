@@ -19,10 +19,8 @@ async function getCurrentUser() {
 // 세션 변경 감지
 supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN') {
-        console.log('User signed in:', session.user);
         updateUIForLoggedInUser(session.user);
     } else if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
         updateUIForLoggedOutUser();
     }
 });
