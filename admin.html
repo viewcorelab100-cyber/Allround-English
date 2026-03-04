@@ -42,6 +42,8 @@
 
         html {
             scroll-behavior: smooth;
+        }
+        body {
             overflow-x: hidden;
         }
 
@@ -303,12 +305,12 @@
 
             <!-- 새 강의 추가/수정 모달 -->
             <div id="course-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] flex flex-col">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10 flex-shrink-0">
                         <h3 id="course-modal-title" class="text-xl font-bold text-white tracking-tight">Add New Course</h3>
                         <button onclick="closeCourseModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
-                    <form id="course-form" class="p-6 space-y-5">
+                    <form id="course-form" class="p-6 space-y-5 overflow-y-auto flex-1">
                         <input type="hidden" id="course-id">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">강의명</label>
@@ -384,26 +386,26 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end space-x-3 pt-4">
-                            <button type="button" onclick="closeCourseModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
-                                취소
-                            </button>
-                            <button type="submit" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
-                                저장
-                            </button>
-                        </div>
                     </form>
+                    <div class="flex justify-end space-x-3 p-6 border-t border-white border-opacity-10 flex-shrink-0">
+                        <button type="button" onclick="closeCourseModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
+                            취소
+                        </button>
+                        <button type="submit" form="course-form" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                            저장
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- 새 영상(레슨) 추가/수정 모달 -->
             <div id="lesson-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                <div class="bg-neutral-900 w-full max-w-lg max-h-[90vh] flex flex-col">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10 flex-shrink-0">
                         <h3 id="lesson-modal-title" class="text-xl font-bold text-white tracking-tight">Add New Lesson</h3>
                         <button onclick="closeLessonModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
-                    <form id="lesson-form" class="p-6 space-y-5">
+                    <form id="lesson-form" class="p-6 space-y-5 overflow-y-auto flex-1">
                         <input type="hidden" id="lesson-id">
                         <div>
                             <label class="block text-sm text-gray-400 mb-2">영상 제목</label>
@@ -501,15 +503,15 @@
                             </div>
                         </div>
                         
-                        <div class="flex justify-end space-x-3 pt-4">
-                            <button type="button" onclick="closeLessonModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
-                                취소
-                            </button>
-                            <button type="submit" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
-                                저장
-                            </button>
-                        </div>
                     </form>
+                    <div class="flex justify-end space-x-3 p-6 border-t border-white border-opacity-10 flex-shrink-0">
+                        <button type="button" onclick="closeLessonModal()" class="px-6 py-2.5 text-gray-400 hover:text-white transition">
+                            취소
+                        </button>
+                        <button type="submit" form="lesson-form" class="px-6 py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 transition font-semibold">
+                            저장
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -597,12 +599,12 @@
 
             <!-- 회원 상세 모달 -->
             <div id="member-detail-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-neutral-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10">
+                <div class="bg-neutral-900 w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    <div class="flex items-center justify-between p-6 border-b border-white border-opacity-10 flex-shrink-0">
                         <h3 class="text-xl font-bold text-white tracking-tight">Member Details</h3>
                         <button onclick="closeMemberModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
-                    <div id="member-detail-content" class="p-6">
+                    <div id="member-detail-content" class="p-6 overflow-y-auto flex-1">
                         <!-- 동적으로 채워짐 -->
                     </div>
                 </div>
@@ -807,7 +809,7 @@
 
             <!-- 채점 모달 -->
             <div id="grading-modal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden overflow-y-auto">
-                <div class="min-h-screen py-12 px-4 flex items-start justify-center">
+                <div class="py-12 px-4 flex items-start justify-center">
                     <div class="bg-neutral-900 w-full max-w-4xl border border-white border-opacity-10">
                         <!-- 모달 헤더 -->
                         <div class="flex items-center justify-between p-8 border-b border-white border-opacity-10">
@@ -1062,18 +1064,18 @@
 
     <!-- Q&A 답변 모달 -->
     <div id="qna-answer-modal" class="fixed inset-0 bg-black bg-opacity-90 z-[200] hidden flex items-center justify-center p-6">
-        <div class="bg-black border border-white border-opacity-20 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-8 space-y-6">
-                <div class="flex items-center justify-between border-b border-white border-opacity-10 pb-6">
-                    <h2 class="text-xl font-bold text-white uppercase tracking-widest">Q&A 답변</h2>
-                    <button onclick="closeQnaAnswerModal()" class="text-gray-400 hover:text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
+        <div class="bg-black border border-white border-opacity-20 w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between p-8 border-b border-white border-opacity-10 flex-shrink-0">
+                <h2 class="text-xl font-bold text-white uppercase tracking-widest">Q&A 답변</h2>
+                <button onclick="closeQnaAnswerModal()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
 
+            <div class="p-8 space-y-6 overflow-y-auto flex-1">
                 <!-- 질문 내용 -->
                 <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10 space-y-4">
                     <div class="flex items-center justify-between">
@@ -1094,12 +1096,12 @@
                               class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors resize-none"
                               placeholder="답변을 입력하세요..."></textarea>
                 </div>
+            </div>
 
-                <!-- 버튼 -->
-                <div class="flex gap-4">
-                    <button onclick="closeQnaAnswerModal()" class="flex-1 btn-admin-outline">취소</button>
-                    <button onclick="submitQnaAnswer()" class="flex-1 btn-admin-primary demo-restricted">답변 등록</button>
-                </div>
+            <!-- 버튼 -->
+            <div class="flex gap-4 p-8 border-t border-white border-opacity-10 flex-shrink-0">
+                <button onclick="closeQnaAnswerModal()" class="flex-1 btn-admin-outline">취소</button>
+                <button onclick="submitQnaAnswer()" class="flex-1 btn-admin-primary demo-restricted">답변 등록</button>
             </div>
         </div>
     </div>
@@ -1176,7 +1178,7 @@
         // 섹션 전환 함수
         function showSection(section) {
             // 모든 섹션 숨기기
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('main section[id^="section-"]').forEach(s => s.classList.add('hidden'));
             // 모든 네비게이션 활성화 해제
             document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
             
@@ -2352,7 +2354,7 @@
 문제를 읽은 후 '이 문제에서 묻는 개념이 무엇인지'를 말로 정리하는 연습을 병행하겠습니다.`
                 },
                 {
-                    min: 95, max: 100,
+                    min: 95, max: 101,
                     text: `개념을 이해하려는 과정은 잘 진행되었지만, 핵심이 아직 또렷하게 정리되지 않아 과제에서 어려움이 나타났습니다.
 강의를 한 번 더 천천히 복습하면서 핵심 개념을 정리한 뒤, 오늘 과제 중 틀린 문제만 다시 고쳐서 보내주세요. 이 과정을 통해 다음 학습이 훨씬 편안해질 거예요.`
                 }
@@ -2738,6 +2740,12 @@
                     `;
                     return;
                 }
+
+                // DB에서 고유 카테고리 추출하여 병합
+                const dbCategories = [...new Set(courses.map(c => c.category).filter(Boolean))];
+                const defaultCategories = ['Business', 'English', 'Korean', 'Conversation'];
+                categories = [...new Set([...defaultCategories, ...dbCategories])];
+                loadCategoryDropdown();
 
                 // 각 강의의 레슨 수 가져오기
                 const { data: lessons } = await window.supabase
@@ -3567,7 +3575,8 @@
             const hasAccess = await checkAdminAccess();
             if (!hasAccess) return;
 
-            // 기본 섹션 로드
+            // 기본 섹션 표시 및 로드
+            showSection('assignments');
             loadStudentAssignments();
 
             // Vimeo 영상 길이 자동 가져오기 설정
@@ -3652,10 +3661,10 @@
 
             } catch (error) {
                 console.error('회원 로드 오류:', error);
-                document.getElementById('members-table-body').innerHTML = `
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-red-400">
+                document.getElementById('members-grid').innerHTML = `
+                    <div class="col-span-full px-4 py-8 text-center text-red-400">
                         회원 데이터를 불러오는 중 오류가 발생했습니다.
-                    </td></tr>
+                    </div>
                 `;
             }
         }
@@ -3934,6 +3943,24 @@
                 if (error) throw error;
 
                 let filteredData = data || [];
+
+                // user_id로 profiles 조회하여 고객명/이메일 매핑
+                const userIds = [...new Set(filteredData.map(o => o.user_id).filter(Boolean))];
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase
+                        .from('profiles')
+                        .select('id, name, email')
+                        .in('id', userIds);
+
+                    if (profiles) {
+                        const profileMap = {};
+                        profiles.forEach(p => { profileMap[p.id] = p; });
+                        filteredData = filteredData.map(o => ({
+                            ...o,
+                            profiles: profileMap[o.user_id] || null
+                        }));
+                    }
+                }
 
                 // 학생 검색 필터 적용 (이름 또는 이메일)
                 if (ordersStudentSearch) {
