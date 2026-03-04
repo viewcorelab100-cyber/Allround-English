@@ -1178,7 +1178,7 @@
         // 섹션 전환 함수
         function showSection(section) {
             // 모든 섹션 숨기기
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('main section[id^="section-"]').forEach(s => s.classList.add('hidden'));
             // 모든 네비게이션 활성화 해제
             document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
             
