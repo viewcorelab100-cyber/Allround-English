@@ -227,7 +227,7 @@
                 <h2 class="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold">Management</h2>
             </div>
             <nav class="space-y-1">
-                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-8 py-3.5">
+                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link active block px-8 py-3.5">
                     Courses
                 </a>
                 <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-8 py-3.5">
@@ -236,7 +236,7 @@
                 <a href="#payments" onclick="showSection('payments')" id="nav-payments" class="sidebar-link block px-8 py-3.5">
                     Payments
                 </a>
-                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-8 py-3.5">
+                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link block px-8 py-3.5">
                     Assignments
                 </a>
                 <a href="#orders" onclick="showSection('orders')" id="nav-orders" class="sidebar-link block px-8 py-3.5">
@@ -3567,7 +3567,7 @@
         // 페이지 초기화
         async function init() {
             // 기본 섹션을 먼저 표시
-            showSection('assignments');
+            showSection('courses');
 
             try {
                 const hasAccess = await checkAdminAccess();
