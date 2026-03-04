@@ -3566,14 +3566,21 @@
 
         // 페이지 초기화
         async function init() {
-            const hasAccess = await checkAdminAccess();
-            if (!hasAccess) return;
+            // 기본 섹션을 먼저 표시
+            showSection('assignments');
 
-            // 기본 섹션 로드
-            loadStudentAssignments();
+            try {
+                const hasAccess = await checkAdminAccess();
+                if (!hasAccess) return;
 
-            // Vimeo 영상 길이 자동 가져오기 설정
-            setupVideoDurationAutoFetch();
+                // 데이터 로드
+                loadStudentAssignments();
+
+                // Vimeo 영상 길이 자동 가져오기 설정
+                setupVideoDurationAutoFetch();
+            } catch (error) {
+                console.error('Admin init error:', error);
+            }
         }
 
         // 섹션 전환 시 데이터 로드
