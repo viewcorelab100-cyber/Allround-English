@@ -54,11 +54,11 @@ function loadGlobalFooter() {
                             <a href="privacy.html" class="hover:text-[#2F2725] transition-colors">[개인정보 처리 방침]</a>
                         </div>
                         <div class="flex items-center gap-1.5 ml-2">
-                            <a href="#" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Instagram">
-                                <img src="asset/main/인스타그램.png" alt="Instagram" class="w-full h-full object-contain">
+                            <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Blog">
+                                <img src="asset/main/인스타그램.png" alt="Blog" class="w-full h-full object-contain">
                             </a>
-                            <a href="#" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Blog">
-                                <img src="asset/main/블로그.png" alt="Blog" class="w-full h-full object-contain">
+                            <a href="#" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Instagram">
+                                <img src="asset/main/블로그.png" alt="Instagram" class="w-full h-full object-contain">
                             </a>
                             <a href="#" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Youtube">
                                 <img src="asset/main/유투브.png" alt="Youtube" class="w-full h-full object-contain">
@@ -86,11 +86,11 @@ function loadGlobalFooter() {
                         <a href="privacy.html" class="hover:text-[#2F2725]">[개인정보 처리 방침]</a>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Instagram">
-                            <img src="asset/main/인스타그램.png" alt="Instagram" class="w-full h-full object-contain">
+                        <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Blog">
+                            <img src="asset/main/인스타그램.png" alt="Blog" class="w-full h-full object-contain">
                         </a>
-                        <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Blog">
-                            <img src="asset/main/블로그.png" alt="Blog" class="w-full h-full object-contain">
+                        <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Instagram">
+                            <img src="asset/main/블로그.png" alt="Instagram" class="w-full h-full object-contain">
                         </a>
                         <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Youtube">
                             <img src="asset/main/유투브.png" alt="Youtube" class="w-full h-full object-contain">

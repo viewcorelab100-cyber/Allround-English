@@ -4,9 +4,9 @@
 (function() {
     // 수업 안내 목록
     const classPages = [
-        { label: 'ALLROUND firstee', href: 'firstee.html', key: 'firstee' },
-        { label: 'ALLROUND original', href: 'original.html', key: 'original' },
-        { label: 'ALLROUND strategy', href: 'strategy.html', key: 'strategy' }
+        { label: 'firstee', href: 'firstee.html', key: 'firstee' },
+        { label: 'original', href: 'original.html', key: 'original' },
+        { label: 'strategy', href: 'strategy.html', key: 'strategy' }
     ];
 
     // 현재 활성 페이지 감지
@@ -39,7 +39,7 @@
             const cls = isActiveClass
                 ? 'sidebar-link block text-[#2F2725] font-bold text-[18px] leading-[40px] tracking-[-0.18px]'
                 : 'sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]';
-            return `<a href="${p.href}" class="${cls}">${p.label}</a>`;
+            return `<a href="${p.href}" class="${cls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">${p.label}</span></a>`;
         }).join('\n');
 
         return `
@@ -64,7 +64,7 @@
                 <div style="margin-top:20px;">
                     <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Instagram</a>
                     <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Youtube</a>
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Blog</a>
+                    <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Blog</a>
                 </div>
             </div>
             <div style="margin-top:72px;">
@@ -84,9 +84,9 @@
             <div>
                 <p class="text-[#2F2725] font-medium text-lg mb-2">수업 안내</p>
                 <div class="pl-4 space-y-2">
-                    <a href="firstee.html" class="block text-[#9FA0A0] text-sm">ALLROUND firstee</a>
-                    <a href="original.html" class="block text-[#9FA0A0] text-sm">ALLROUND original</a>
-                    <a href="strategy.html" class="block text-[#9FA0A0] text-sm">ALLROUND strategy</a>
+                    <a href="firstee.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
+                    <a href="original.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
+                    <a href="strategy.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
                 </div>
             </div>
             <div><a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a></div>
@@ -95,7 +95,7 @@
                 <div class="pl-4 space-y-2">
                     <a href="#" class="block text-[#9FA0A0] text-sm">Instagram</a>
                     <a href="#" class="block text-[#9FA0A0] text-sm">Youtube</a>
-                    <a href="#" class="block text-[#9FA0A0] text-sm">Blog</a>
+                    <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block text-[#9FA0A0] text-sm">Blog</a>
                 </div>
             </div>
             <div><a href="#" class="block text-[#2F2725] font-medium text-lg">상담 예약</a></div>

@@ -3093,7 +3093,7 @@
         }
 
         // 레슨 모달 열기
-        function openLessonModal(lessonId = null) {
+        async function openLessonModal(lessonId = null) {
             if (!checkDemoWriteAccess('레슨 관리')) return;
             if (!selectedCourseId) {
                 alert('먼저 강의를 선택해주세요.');
@@ -3112,6 +3112,23 @@
 
             if (lessonId) {
                 loadLessonData(lessonId);
+            } else {
+                // 새 레슨: 자동으로 마지막 순서+1 부여
+                try {
+                    const { data, error } = await window.supabase
+                        .from('lessons')
+                        .select('order_num')
+                        .eq('course_id', selectedCourseId)
+                        .order('order_num', { ascending: false })
+                        .limit(1);
+                    if (!error && data && data.length > 0) {
+                        document.getElementById('lesson-order').value = data[0].order_num + 1;
+                    } else {
+                        document.getElementById('lesson-order').value = 1;
+                    }
+                } catch (e) {
+                    document.getElementById('lesson-order').value = 1;
+                }
             }
         }
 
@@ -3572,15 +3589,21 @@
 
         // 페이지 초기화
         async function init() {
-            const hasAccess = await checkAdminAccess();
-            if (!hasAccess) return;
-
-            // 기본 섹션 표시 및 로드
+            // 기본 섹션을 먼저 표시 (인증 확인 전에 UI를 보여줌)
             showSection('assignments');
-            loadStudentAssignments();
 
-            // Vimeo 영상 길이 자동 가져오기 설정
-            setupVideoDurationAutoFetch();
+            try {
+                const hasAccess = await checkAdminAccess();
+                if (!hasAccess) return;
+
+                // 데이터 로드
+                loadStudentAssignments();
+
+                // Vimeo 영상 길이 자동 가져오기 설정
+                setupVideoDurationAutoFetch();
+            } catch (error) {
+                console.error('Admin init error:', error);
+            }
         }
 
         // 섹션 전환 시 데이터 로드
