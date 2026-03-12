@@ -6,10 +6,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// NHN Cloud 알림톡 API 키
-const NHN_APP_KEY = 'zhZSielWtWCB3Uz8'
-const NHN_SECRET_KEY = 'aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'
-const NHN_SENDER_KEY = 'ea98b16e16f06e2dbc1eaf903cd26832d0633070'
+// NHN Cloud 알림톡 API 키 (Supabase Dashboard > Edge Functions > Secrets 에서 설정)
+const NHN_APP_KEY = Deno.env.get('NHN_APP_KEY') || ''
+const NHN_SECRET_KEY = Deno.env.get('NHN_SECRET_KEY') || ''
+const NHN_SENDER_KEY = Deno.env.get('NHN_SENDER_KEY') || ''
 
 // 테스트 모드 플래그 (환경변수로 설정 가능)
 const TEST_MODE = Deno.env.get('TEST_MODE') === 'true' || false
@@ -123,11 +123,11 @@ serve(async (req) => {
       for (const item of unsubmittedAssignments) {
         // 이미 알림을 보냈는지 체크 (중복 방지)
         const { data: existingNotification } = await supabase
-          .from('notification_log')
+          .from('notification_logs')
           .select('id')
           .eq('user_id', item.user_id)
           .eq('lesson_id', item.lesson_id)
-          .eq('type', 'assignment_reminder')
+          .eq('notification_type', 'assignment_reminder')
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .single()
 
@@ -151,19 +151,13 @@ serve(async (req) => {
         if (result.success) {
           // 발송 로그 저장
           await supabase
-            .from('notification_log')
+            .from('notification_logs')
             .insert({
               user_id: item.user_id,
-              lesson_id: item.lesson_id,
-              type: 'assignment_reminder',
-              phone: item.profiles.phone,
-              template_code: 'assignment_reminder',
-              success: true,
-              template_params: {
-                학생명: item.profiles.name,
-                과정명: item.lessons.courses.title,
-                강의제목: item.lessons.title,
-              }
+              notification_type: 'assignment_reminder',
+              recipient_type: 'student',
+              phone_number: item.profiles.phone,
+              status: 'sent'
             })
           console.log(`✅ 과제 알림 ${TEST_MODE ? '시뮬레이션' : '발송'}: ${item.profiles.name}`)
           stats.sentCount++
@@ -207,10 +201,10 @@ serve(async (req) => {
           
           // 이미 알림을 보냈는지 체크
           const { data: existingNotification } = await supabase
-            .from('notification_log')
+            .from('notification_logs')
             .select('id')
             .eq('user_id', user.id)
-            .eq('type', 'inactive_reminder')
+            .eq('notification_type', 'inactive_reminder')
             .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
             .single()
 
@@ -234,18 +228,13 @@ serve(async (req) => {
           if (result.success) {
             // 발송 로그 저장
             await supabase
-              .from('notification_log')
+              .from('notification_logs')
               .insert({
                 user_id: user.id,
-                type: 'inactive_reminder',
-                phone: user.phone,
-                template_code: 'inactive_reminder',
-                success: true,
-                template_params: {
-                  학생명: user.name,
-                  과정명: user.enrollments[0]?.courses?.title || '강의',
-                  경과일수: '7'
-                }
+                notification_type: 'inactive_reminder',
+                recipient_type: 'student',
+                phone_number: user.phone,
+                status: 'sent'
               })
             console.log(`✅ 미수강 알림 ${TEST_MODE ? '시뮬레이션' : '발송'}: ${user.name}`)
             stats.sentCount++

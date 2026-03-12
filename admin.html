@@ -19,23 +19,23 @@
     <style>
         body {
             font-family: 'Noto Sans KR', "Poppins", sans-serif;
-            background-color: #000000;
+            background-color: #EAECF0;
         }
-        
+
         /* 상단바 제외한 본문 영문 폰트 */
         .main-content {
             font-family: "Poppins", 'Noto Sans KR', sans-serif;
         }
-        
+
         /* 상단바 스타일 */
         header, header * {
             font-family: "Poppins", sans-serif;
         }
-        
+
         .btn-hover-scale {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        
+
         .btn-hover-scale:hover {
             transform: translateY(-2px);
         }
@@ -52,7 +52,7 @@
         }
 
         .nav-link:hover {
-            color: #999;
+            color: #6B7280;
         }
 
         .sidebar-link {
@@ -63,22 +63,29 @@
             letter-spacing: 0.05em;
             font-size: 11px;
             font-weight: 500;
-            color: #666;
+            color: #9CA3AF;
         }
 
-        .sidebar-link:hover, .sidebar-link.active {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: white;
+        .sidebar-link:hover {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+        .sidebar-link.active {
+            background-color: rgba(17, 24, 39, 0.06);
+            color: #111827;
+            border-right: 2px solid #111827;
+            font-weight: 700;
         }
 
         .student-card {
             transition: all 0.2s ease;
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
             border-radius: 0px;
         }
 
         .student-card:hover {
-            background-color: rgba(255, 255, 255, 0.08);
+            background-color: #F9FAFB;
         }
 
         /* Table Styles */
@@ -92,27 +99,28 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #444;
+            color: #6B7280;
             padding: 16px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #E5E7EB;
             text-align: left;
             font-weight: 600;
+            background-color: #F9FAFB;
         }
 
         .admin-table td {
             padding: 16px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid #F3F4F6;
             font-size: 13px;
-            color: #ccc;
+            color: #374151;
         }
 
         .admin-table tr:hover td {
-            background-color: rgba(255, 255, 255, 0.02);
+            background-color: #F9FAFB;
         }
 
         .admin-table .inline-detail-row > td {
             padding: 0 !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-bottom: 1px solid #E5E7EB !important;
         }
         .admin-table .inline-detail-row:hover > td {
             background-color: transparent !important;
@@ -121,20 +129,26 @@
         /* Input Styles */
         input, textarea, select {
             border-radius: 0px !important;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background-color: #FFFFFF !important;
+            border: 1px solid #D1D5DB !important;
+            color: #1F2937 !important;
             transition: all 0.2s ease;
         }
 
         input:focus, textarea:focus, select:focus {
-            border-color: rgba(255, 255, 255, 0.3) !important;
+            border-color: #9CA3AF !important;
             outline: none;
+            box-shadow: 0 0 0 2px rgba(156, 163, 175, 0.2) !important;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #9CA3AF !important;
         }
 
         /* Button Styles */
         .btn-admin-primary {
-            background-color: white;
-            color: black;
+            background-color: #111827;
+            color: #FFFFFF;
             padding: 10px 20px;
             border-radius: 0px;
             font-size: 12px;
@@ -145,13 +159,13 @@
         }
 
         .btn-admin-primary:hover {
-            background-color: #e5e5e5;
+            background-color: #374151;
         }
 
         .btn-admin-outline {
             background-color: transparent;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #374151;
+            border: 1px solid #D1D5DB;
             padding: 10px 20px;
             border-radius: 0px;
             font-size: 12px;
@@ -162,8 +176,8 @@
         }
 
         .btn-admin-outline:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: white;
+            background-color: #F3F4F6;
+            border-color: #9CA3AF;
         }
 
         /* 스크롤바 스타일 */
@@ -174,60 +188,123 @@
             background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: #D1D5DB;
             border-radius: 2px;
         }
 
-        /* Date picker 달력 아이콘만 흰색 */
+        /* Date picker */
         input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: brightness(0) invert(1);
             cursor: pointer;
         }
 
         /* Select/Dropdown 스타일 */
         select {
-            color-scheme: dark;
+            color-scheme: light;
         }
         select option {
-            background-color: #1a1a1a;
-            color: #ffffff;
+            background-color: #FFFFFF;
+            color: #1F2937;
             padding: 8px;
         }
         select option:hover,
         select option:focus,
         select option:checked {
-            background-color: #333333;
-            color: #ffffff;
+            background-color: #F3F4F6;
+            color: #1F2937;
         }
+
+        /* ===== Light Theme Overrides for Tailwind classes ===== */
+        /* ===== Light Theme: Tailwind class overrides ===== */
+        .bg-black { background-color: #EAECF0 !important; }
+        .bg-neutral-900 { background-color: #FFFFFF !important; }
+        .bg-neutral-800 { background-color: #F9FAFB !important; }
+        .text-white { color: #111111 !important; }
+        .text-gray-300 { color: #4B5563 !important; }
+        .text-gray-400 { color: #6B7280 !important; }
+        .text-gray-500 { color: #6B7280 !important; }
+        .text-gray-600 { color: #9CA3AF !important; }
+        .text-gray-800 { color: #374151 !important; }
+        .placeholder-gray-500::placeholder, .placeholder-gray-600::placeholder { color: #9CA3AF !important; }
+        .border-white { border-color: #E5E7EB !important; }
+        .border-gray-600, .border-gray-700, .border-gray-800 { border-color: #E5E7EB !important; }
+        .divide-gray-800 > :not([hidden]) ~ :not([hidden]) { border-color: #E5E7EB !important; }
+
+        /* bg-white: contextual - buttons get accent, panels get white */
+        .bg-white:not(button):not(a):not([type="submit"]) { background-color: #FFFFFF !important; }
+        button.bg-white, a.bg-white, [type="submit"].bg-white { background-color: #111827 !important; color: #FFFFFF !important; }
+        button.bg-white:hover, a.bg-white:hover { background-color: #374151 !important; }
+        .hover\:bg-gray-200:hover { background-color: #374151 !important; color: #FFFFFF !important; }
+        .text-black { color: #FFFFFF !important; }
+
+        /* Header & Sidebar */
+        body > header { background-color: #F0F1F3 !important; border-bottom: 1px solid #D1D5DB !important; }
+        body > div > aside { background-color: #F0F1F3 !important; border-right: 1px solid #D1D5DB !important; }
+        header img[alt="ALLROUND"] { filter: none; }
+
+        /* Card & panel backgrounds */
+        .bg-opacity-\[0\.02\], .bg-opacity-\[0\.03\] { background-color: #FFFFFF !important; }
+        [class*="bg-white"][class*="bg-opacity-5"],
+        [class*="bg-white"][class*="bg-opacity-\[0.02\]"],
+        [class*="bg-white"][class*="bg-opacity-\[0.03\]"],
+        [class*="bg-white"][class*="bg-opacity-\[0.05\]"] {
+            background-color: #F9FAFB !important;
+        }
+        [class*="border-white"][class*="border-opacity"] { border-color: #E5E7EB !important; }
+        [class*="bg-white"][class*="bg-opacity-10"] { background-color: #E5E7EB !important; }
+
+        /* Modal overlay */
+        .fixed.inset-0.bg-black.bg-opacity-80,
+        .fixed.inset-0.bg-black.bg-opacity-90 { background-color: rgba(0,0,0,0.4) !important; }
+        .fixed.inset-0 .bg-neutral-900,
+        .fixed.inset-0 .bg-black:not(.bg-opacity-80):not(.bg-opacity-90) {
+            background-color: #FFFFFF !important;
+        }
+
+        /* Buttons */
+        .btn-admin-primary { background-color: #111827 !important; color: #FFFFFF !important; }
+        .btn-admin-primary:hover { background-color: #374151 !important; }
+        .btn-admin-outline { color: #374151 !important; border-color: #D1D5DB !important; }
+        .btn-admin-outline:hover { background-color: #F3F4F6 !important; border-color: #9CA3AF !important; }
+
+        /* Status badges - preserve original */
+        .bg-green-500, .bg-red-500, .bg-yellow-500, .bg-blue-500,
+        .bg-green-400, .bg-red-400, .bg-yellow-400, .bg-blue-400 { color: #FFFFFF !important; }
+        .text-green-500, .text-red-500, .text-yellow-500, .text-blue-500,
+        .text-green-400, .text-red-400, .text-yellow-400, .text-blue-400,
+        .text-amber-500, .text-amber-400, .text-yellow-400 { /* keep */ }
+
+        /* Ring & focus */
+        .focus\:ring-white:focus { --tw-ring-color: #93C5FD !important; }
+        .ring-white { --tw-ring-color: #E5E7EB !important; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
+<body class="bg-[#EAECF0] text-gray-900 min-h-screen">
     
     <!-- 상단 헤더 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50 border-b border-white border-opacity-5">
+    <header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-300" style="background-color:#F0F1F3;">
         <div class="px-8 py-5 flex items-center justify-between">
             <a href="index.html" class="flex items-center">
                 <img src="/logo.png" alt="ALLROUND" class="h-3.5 w-auto">
             </a>
             <div class="flex items-center space-x-6">
                 <div class="flex flex-col items-end">
-                    <span class="text-[10px] text-gray-500 uppercase tracking-widest font-semibold">Administrator</span>
-                    <span class="text-xs text-white font-medium">Admin Panel</span>
+                    <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Administrator</span>
+                    <span class="text-xs text-gray-800 font-medium">Admin Panel</span>
                 </div>
-                <div class="h-8 w-px bg-white bg-opacity-10"></div>
-                <button onclick="handleSignOut()" class="text-[10px] text-gray-400 hover:text-white uppercase tracking-widest font-bold transition-colors">Logout</button>
+                <div class="h-8 w-px bg-gray-200"></div>
+                <button onclick="handleSignOut()" class="text-[10px] text-gray-500 hover:text-gray-900 uppercase tracking-widest font-bold transition-colors">Logout</button>
             </div>
         </div>
     </header>
 
     <div class="flex pt-20">
         <!-- 사이드바 -->
-        <aside class="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 bg-black border-r border-white border-opacity-5 overflow-y-auto py-8">
+        <aside class="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 border-r border-gray-300 overflow-y-auto py-8" style="background-color:#F0F1F3;">
             <div class="px-8 mb-8">
                 <h2 class="text-[10px] text-gray-600 uppercase tracking-[0.2em] font-bold">Management</h2>
             </div>
             <nav class="space-y-1">
-                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link active block px-8 py-3.5">
+                <a href="#courses" onclick="showSection('courses')" id="nav-courses" class="sidebar-link block px-8 py-3.5">
                     Courses
                 </a>
                 <a href="#members" onclick="showSection('members')" id="nav-members" class="sidebar-link block px-8 py-3.5">
@@ -236,14 +313,17 @@
                 <a href="#payments" onclick="showSection('payments')" id="nav-payments" class="sidebar-link block px-8 py-3.5">
                     Payments
                 </a>
-                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link block px-8 py-3.5">
+                <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-8 py-3.5">
                     Assignments
                 </a>
                 <a href="#orders" onclick="showSection('orders')" id="nav-orders" class="sidebar-link block px-8 py-3.5">
                     Orders & Shipping
                 </a>
                 <a href="#qna" onclick="showSection('qna')" id="nav-qna" class="sidebar-link block px-8 py-3.5">
-                    Q&A 관리
+                    QnA
+                </a>
+                <a href="#notifications" onclick="showSection('notifications')" id="nav-notifications" class="sidebar-link block px-8 py-3.5">
+                    Notifications
                 </a>
             </nav>
         </aside>
@@ -1043,7 +1123,7 @@
                 <div class="flex items-end justify-between mb-12">
                     <div>
                         <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Support</span>
-                        <h1 class="text-4xl font-bold text-white tracking-tight">Q&A 관리</h1>
+                        <h1 class="text-4xl font-bold text-white tracking-tight">QnA</h1>
                     </div>
                     <div class="flex gap-3">
                         <button onclick="loadQnaListAdmin('all')" class="btn-admin-outline" id="qna-filter-all">전체</button>
@@ -1055,6 +1135,69 @@
                 <!-- Q&A 목록 -->
                 <div id="qna-list-admin" class="space-y-4">
                     <p class="text-gray-500 text-center py-12">Q&A 목록을 불러오는 중...</p>
+                </div>
+            </section>
+
+            <!-- 알림톡 발송 내역 섹션 -->
+            <section id="section-notifications" class="hidden">
+                <div class="flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Communication</span>
+                        <h1 class="text-4xl font-bold tracking-tight" style="color:#111;">알림톡 발송 내역</h1>
+                    </div>
+                    <div class="flex gap-3 items-center">
+                        <select id="notif-filter-status" onchange="loadNotifications()" class="text-sm px-3 py-2">
+                            <option value="all">전체</option>
+                            <option value="sent">발송 성공</option>
+                            <option value="failed">발송 실패</option>
+                        </select>
+                        <select id="notif-filter-days" onchange="loadNotifications()" class="text-sm px-3 py-2">
+                            <option value="7">최근 7일</option>
+                            <option value="30" selected>최근 30일</option>
+                            <option value="90">최근 90일</option>
+                            <option value="all">전체 기간</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 통계 카드 -->
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Total Sent</div>
+                        <div class="text-3xl font-bold" style="color:#111;" id="notif-stat-total">-</div>
+                    </div>
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Success</div>
+                        <div class="text-3xl font-bold text-green-600" id="notif-stat-success">-</div>
+                    </div>
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Failed</div>
+                        <div class="text-3xl font-bold text-red-500" id="notif-stat-failed">-</div>
+                    </div>
+                </div>
+
+                <!-- 알림톡 테이블 -->
+                <div class="bg-white border border-gray-200 overflow-hidden" style="background:#fff !important;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>발송일시</th>
+                                <th>학생</th>
+                                <th>수신번호</th>
+                                <th>유형</th>
+                                <th>상태</th>
+                                <th>오류</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notif-table-body">
+                            <tr><td colspan="6" class="text-center py-12" style="color:#9CA3AF;">탭을 선택하면 데이터를 불러옵니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 더 보기 -->
+                <div id="notif-load-more" class="hidden text-center mt-6">
+                    <button onclick="loadMoreNotifications()" class="btn-admin-outline">더 보기</button>
                 </div>
             </section>
 
@@ -1195,6 +1338,8 @@
                 loadMembers();
             } else if (section === 'qna') {
                 loadQnaListAdmin('pending');
+            } else if (section === 'notifications') {
+                loadNotifications();
             }
         }
 
@@ -2354,7 +2499,7 @@
 문제를 읽은 후 '이 문제에서 묻는 개념이 무엇인지'를 말로 정리하는 연습을 병행하겠습니다.`
                 },
                 {
-                    min: 95, max: 100,
+                    min: 95, max: 101,
                     text: `개념을 이해하려는 과정은 잘 진행되었지만, 핵심이 아직 또렷하게 정리되지 않아 과제에서 어려움이 나타났습니다.
 강의를 한 번 더 천천히 복습하면서 핵심 개념을 정리한 뒤, 오늘 과제 중 틀린 문제만 다시 고쳐서 보내주세요. 이 과정을 통해 다음 학습이 훨씬 편안해질 거예요.`
                 }
@@ -2537,7 +2682,9 @@
                 };
 
                 // 각 번호에 알림톡 발송
+                const studentPhoneFormatted = studentPhone ? studentPhone.replace(/[^0-9]/g, '') : '';
                 for (const phone of phoneNumbers) {
+                    const isStudent = phone === studentPhoneFormatted;
                     const { data, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
                         body: {
                             phone: phone,
@@ -2559,7 +2706,8 @@
                             user_id: submission.user_id,
                             submission_id: submissionId,
                             notification_type: 'grading_complete',
-                            recipient_phone: phone,
+                            recipient_type: isStudent ? 'student' : 'parent',
+                            phone_number: phone,
                             status: error ? 'failed' : 'sent',
                             error_message: error?.message || null
                         });
@@ -2570,6 +2718,132 @@
             } catch (error) {
                 console.error('알림 처리 오류:', error);
                 // 오류 발생해도 채점은 저장됨
+            }
+        }
+
+        // ========== 알림톡 내역 ==========
+        let notifOffset = 0;
+        const NOTIF_PAGE_SIZE = 30;
+
+        async function loadNotifications(append = false) {
+            try {
+                if (!append) notifOffset = 0;
+
+                const statusFilter = document.getElementById('notif-filter-status').value;
+                const daysFilter = document.getElementById('notif-filter-days').value;
+
+                let query = window.supabase
+                    .from('notification_logs')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .range(notifOffset, notifOffset + NOTIF_PAGE_SIZE - 1);
+
+                if (statusFilter !== 'all') {
+                    query = query.eq('status', statusFilter);
+                }
+
+                if (daysFilter !== 'all') {
+                    const since = new Date();
+                    since.setDate(since.getDate() - parseInt(daysFilter));
+                    query = query.gte('created_at', since.toISOString());
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                // user_id로 이름 매칭
+                const userIds = [...new Set(data.map(d => d.user_id).filter(Boolean))];
+                let profileMap = {};
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase
+                        .from('profiles')
+                        .select('id, name')
+                        .in('id', userIds);
+                    if (profiles) {
+                        profiles.forEach(p => { profileMap[p.id] = p.name; });
+                    }
+                }
+
+                if (!append) loadNotifStats(daysFilter);
+                renderNotifRows(data, profileMap, append);
+
+            } catch (err) {
+                console.error('알림톡 내역 로드 오류:', err);
+                document.getElementById('notif-table-body').innerHTML =
+                    '<tr><td colspan="6" class="text-center py-12" style="color:#EF4444;">데이터 로드 중 오류가 발생했습니다.</td></tr>';
+            }
+        }
+
+        function renderNotifRows(data, profileMap, append) {
+            const tbody = document.getElementById('notif-table-body');
+            if (!append) tbody.innerHTML = '';
+
+            if (data.length === 0 && !append) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-12" style="color:#9CA3AF;">발송 내역이 없습니다.</td></tr>';
+                document.getElementById('notif-load-more').classList.add('hidden');
+                return;
+            }
+
+            const typeLabels = {
+                'grading_complete': '채점 완료',
+                'assignment_reminder': '과제 알림',
+                'inactive_reminder': '미활동 알림',
+                'payment_confirm': '결제 확인'
+            };
+
+            data.forEach(log => {
+                const date = new Date(log.created_at);
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+                const rawName = profileMap[log.user_id] || '-';
+                const name = isDemoMode ? maskName(rawName) : rawName;
+                const phone = isDemoMode ? maskPhone(log.phone_number || '-') : (log.phone_number || '-');
+                const statusBadge = log.status === 'sent'
+                    ? '<span class="text-green-600 font-semibold">성공</span>'
+                    : '<span class="text-red-500 font-semibold">실패</span>';
+                const typeLabel = typeLabels[log.notification_type] || log.notification_type || '-';
+
+                tbody.innerHTML += `<tr>
+                    <td style="color:#374151;">${dateStr}</td>
+                    <td style="color:#111; font-weight:500;">${name}</td>
+                    <td style="color:#374151;">${phone}</td>
+                    <td style="color:#374151;">${typeLabel}</td>
+                    <td>${statusBadge}</td>
+                    <td style="color:#9CA3AF; font-size:12px;">${log.error_message || '-'}</td>
+                </tr>`;
+            });
+
+            notifOffset += data.length;
+            document.getElementById('notif-load-more').classList.toggle('hidden', data.length < NOTIF_PAGE_SIZE);
+        }
+
+        function loadMoreNotifications() {
+            loadNotifications(true);
+        }
+
+        async function loadNotifStats(daysFilter) {
+            try {
+                let query = window.supabase
+                    .from('notification_logs')
+                    .select('status');
+
+                if (daysFilter !== 'all') {
+                    const since = new Date();
+                    since.setDate(since.getDate() - parseInt(daysFilter));
+                    query = query.gte('created_at', since.toISOString());
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                const total = data.length;
+                const success = data.filter(d => d.status === 'sent').length;
+                const failed = data.filter(d => d.status === 'failed').length;
+
+                document.getElementById('notif-stat-total').textContent = total.toLocaleString();
+                document.getElementById('notif-stat-success').textContent = success.toLocaleString();
+                document.getElementById('notif-stat-failed').textContent = failed.toLocaleString();
+            } catch (err) {
+                console.error('알림톡 통계 로드 오류:', err);
             }
         }
 
@@ -2740,6 +3014,12 @@
                     `;
                     return;
                 }
+
+                // DB에서 고유 카테고리 추출하여 병합
+                const dbCategories = [...new Set(courses.map(c => c.category).filter(Boolean))];
+                const defaultCategories = ['Business', 'English', 'Korean', 'Conversation'];
+                categories = [...new Set([...defaultCategories, ...dbCategories])];
+                loadCategoryDropdown();
 
                 // 각 강의의 레슨 수 가져오기
                 const { data: lessons } = await window.supabase
@@ -3087,7 +3367,7 @@
         }
 
         // 레슨 모달 열기
-        function openLessonModal(lessonId = null) {
+        async function openLessonModal(lessonId = null) {
             if (!checkDemoWriteAccess('레슨 관리')) return;
             if (!selectedCourseId) {
                 alert('먼저 강의를 선택해주세요.');
@@ -3106,6 +3386,23 @@
 
             if (lessonId) {
                 loadLessonData(lessonId);
+            } else {
+                // 새 레슨: 자동으로 마지막 순서+1 부여
+                try {
+                    const { data, error } = await window.supabase
+                        .from('lessons')
+                        .select('order_num')
+                        .eq('course_id', selectedCourseId)
+                        .order('order_num', { ascending: false })
+                        .limit(1);
+                    if (!error && data && data.length > 0) {
+                        document.getElementById('lesson-order').value = data[0].order_num + 1;
+                    } else {
+                        document.getElementById('lesson-order').value = 1;
+                    }
+                } catch (e) {
+                    document.getElementById('lesson-order').value = 1;
+                }
             }
         }
 
@@ -3566,8 +3863,8 @@
 
         // 페이지 초기화
         async function init() {
-            // 기본 섹션을 먼저 표시
-            showSection('courses');
+            // 기본 섹션을 먼저 표시 (인증 확인 전에 UI를 보여줌)
+            showSection('assignments');
 
             try {
                 const hasAccess = await checkAdminAccess();
@@ -3661,10 +3958,10 @@
 
             } catch (error) {
                 console.error('회원 로드 오류:', error);
-                document.getElementById('members-table-body').innerHTML = `
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-red-400">
+                document.getElementById('members-grid').innerHTML = `
+                    <div class="col-span-full px-4 py-8 text-center text-red-400">
                         회원 데이터를 불러오는 중 오류가 발생했습니다.
-                    </td></tr>
+                    </div>
                 `;
             }
         }
@@ -3943,6 +4240,24 @@
                 if (error) throw error;
 
                 let filteredData = data || [];
+
+                // user_id로 profiles 조회하여 고객명/이메일 매핑
+                const userIds = [...new Set(filteredData.map(o => o.user_id).filter(Boolean))];
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase
+                        .from('profiles')
+                        .select('id, name, email')
+                        .in('id', userIds);
+
+                    if (profiles) {
+                        const profileMap = {};
+                        profiles.forEach(p => { profileMap[p.id] = p; });
+                        filteredData = filteredData.map(o => ({
+                            ...o,
+                            profiles: profileMap[o.user_id] || null
+                        }));
+                    }
+                }
 
                 // 학생 검색 필터 적용 (이름 또는 이메일)
                 if (ordersStudentSearch) {
