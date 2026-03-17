@@ -14,16 +14,17 @@
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <style>
         :root {
-            --page-right: 8.3vw;
+            --page-right: 8.3%;
             --header-h: 126px;
-            --sidebar-right-edge: 21.8vw;
-            --sidebar-gap: 3.75vw;
-            --signup-right: 13.44vw;
+            --sidebar-right-edge: 21.8%;
+            --sidebar-gap: 3.75%;
+            --signup-right: 13.44%;
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
-            margin: 0;
+            max-width: 1920px;
+            margin: 0 auto;
             overflow-x: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
@@ -37,7 +38,7 @@
 <body class="min-h-screen flex flex-col" data-active-page="original">
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h); max-width: 1920px; left: 50%; transform: translateX(-50%);">
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
             <a href="index.html">
                 <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
@@ -139,7 +140,7 @@
             <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
                 
                 <!-- 카톡 상담 (firstee 기준) -->
-                <div class="hidden lg:block fixed z-50" style="right: 13.44vw; top: 143px;">
+                <div class="hidden lg:block fixed z-50" style="right: 258px; top: 143px;">
                     <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                        class="kakao-btn relative inline-block">
                         <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
