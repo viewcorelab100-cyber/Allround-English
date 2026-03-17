@@ -15,14 +15,13 @@
         :root {
             --page-right: 8.28%;
             --header-h: 126px;
-            --sidebar-w: 21.77%;
-            --sidebar-gap: 3.75%;
+            --sidebar-w: 21.77vw;
+            --sidebar-gap: 3.75vw;
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
-            max-width: 1920px;
-            margin: 0 auto;
+            margin: 0;
             overflow-x: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
@@ -36,7 +35,7 @@
 <body class="min-h-screen flex flex-col" data-active-page="about">
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h); max-width: 1920px; left: 50%; transform: translateX(-50%);">
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
         <!-- 좌측: 로고 (사이드바 우측 정렬 기준에 맞춤) -->
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
             <a href="index.html">
@@ -143,7 +142,7 @@
             <div class="flex-1 relative overflow-y-auto" style="background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), url('asset/학원소개/background.png') center/cover no-repeat fixed; background-color: #F5F5F5;">
                 
                 <!-- 카톡 문의 -->
-                <div class="hidden lg:block fixed z-50" style="right: 258px; top: 143px;">
+                <div class="hidden lg:block fixed z-50" style="right: 13.44vw; top: 143px;">
                     <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                        class="kakao-btn relative inline-block">
                         <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">

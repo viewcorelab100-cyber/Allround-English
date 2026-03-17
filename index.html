@@ -14,15 +14,14 @@
     <style>
         :root {
             --header-h: 126px;
-            --sidebar-w: 21.77%;     /* 418/1920 */
-            --sidebar-gap: 3.75%;    /* 72/1920 */
+            --sidebar-w: 21.77vw;     /* 418/1920 */
+            --sidebar-gap: 3.75vw;    /* 72/1920 */
             --page-right: 8.28%;      /* 159/1920 */
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
-            max-width: 1920px;
-            margin: 0 auto;
+            margin: 0;
             overflow: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
@@ -36,10 +35,8 @@
         #allround-footer {
             position: fixed !important;
             bottom: 0 !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 100% !important;
-            max-width: 1920px !important;
+            left: 0 !important;
+            width: 100vw !important;
             z-index: 20 !important;
             border-top: 1px solid #e5e7eb;
         }
@@ -48,7 +45,7 @@
 <body data-active-page="index">
 
     <!-- Header (fixed overlay, 변경 없음) -->
-    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h); max-width: 1920px; left: 50%; transform: translateX(-50%);">
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
         <!-- 좌측: 로고 -->
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
             <a href="index.html">
@@ -118,7 +115,7 @@
 
         <!-- Layer 1: 사이드바 (Desktop) — 흰색 배경으로 이미지 좌측을 가림 -->
         <aside class="hidden lg:flex flex-col justify-center absolute z-10 bg-white"
-               style="left: 0; top: 0; width: 21.77%; height: 100vh; padding-right: 3.75%;">
+               style="left: 0; top: 0; width: 21.77vw; height: 100vh; padding-right: 3.75vw;">
             <nav class="text-right space-y-6">
                 <div>
                     <a href="about.html" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">학원 소개</a>
@@ -155,7 +152,7 @@
         </aside>
 
         <!-- Layer 2: 카톡 상담 Desktop (Figma: right=12.92vw, top=17.04vh) -->
-        <div class="hidden lg:block absolute z-20" style="right: 12.92%; top: 17.04vh;">
+        <div class="hidden lg:block absolute z-20" style="right: 12.92vw; top: 17.04vh;">
             <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                class="kakao-btn relative inline-block">
                 <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
