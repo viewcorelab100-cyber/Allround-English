@@ -47,9 +47,9 @@
             <div>
                 <a href="about.html" class="${aboutCls}">학원 소개</a>
             </div>
-            <div style="margin-top:39px;">
-                <p class="${classTitleCls}">수업 안내</p>
-                <div style="margin-top:15px;">
+            <div style="margin-top:39px;" class="sidebar-group sidebar-group-class">
+                <p class="${classTitleCls} cursor-pointer">수업 안내</p>
+                <div class="sidebar-submenu${isClass ? '' : ' sidebar-submenu-hidden'}" style="margin-top:15px;">
                     ${classLinks}
                 </div>
             </div>
@@ -59,9 +59,9 @@
                     <span class="${onlineTitleCls}">온라인 강의</span>
                 </a>
             </div>
-            <div style="margin-top:76px;">
-                <p class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">학원 소식</p>
-                <div style="margin-top:20px;">
+            <div style="margin-top:76px;" class="sidebar-group sidebar-group-news">
+                <p class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px] cursor-pointer">학원 소식</p>
+                <div class="sidebar-submenu sidebar-submenu-hidden" style="margin-top:20px;">
                     <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Instagram</a>
                     <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Youtube</a>
                     <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Blog</a>
@@ -103,8 +103,40 @@
         </nav>`;
     }
 
+    // 사이드바 호버 스타일 주입
+    function injectStyles() {
+        if (document.getElementById('sidebar-hover-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'sidebar-hover-styles';
+        style.textContent = `
+            .sidebar-submenu {
+                overflow: hidden;
+                max-height: 200px;
+                opacity: 1;
+                transition: max-height 0.3s ease, opacity 0.2s ease, margin 0.3s ease;
+            }
+            .sidebar-submenu-hidden {
+                max-height: 0;
+                opacity: 0;
+                margin-top: 0 !important;
+            }
+            .sidebar-group:hover .sidebar-submenu-hidden {
+                max-height: 200px;
+                opacity: 1;
+            }
+            .sidebar-group-class:hover .sidebar-submenu-hidden {
+                margin-top: 15px !important;
+            }
+            .sidebar-group-news:hover .sidebar-submenu-hidden {
+                margin-top: 20px !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     // 사이드바 주입
     function injectSidebar() {
+        injectStyles();
         const activePage = getActivePage();
 
         // 데스크탑 사이드바
