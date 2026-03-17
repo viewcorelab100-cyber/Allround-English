@@ -3,28 +3,32 @@
 // 레슨 진도 저장/업데이트
 async function updateLessonProgress(userId, lessonId, progressData) {
     try {
-        // 기존 진도 확인
-        const { data: existing } = await window.supabase
+        // 기존 진도 확인 (.maybeSingle()로 중복 레코드 안전 처리)
+        const { data: rows, error: fetchError } = await window.supabase
             .from('lesson_progress')
             .select('*')
             .eq('user_id', userId)
             .eq('lesson_id', lessonId)
-            .single();
-        
+            .order('watched_seconds', { ascending: false })
+            .limit(1);
+
+        if (fetchError) throw fetchError;
+        const existing = rows && rows.length > 0 ? rows[0] : null;
+
         const progressRecord = {
             user_id: userId,
             lesson_id: lessonId,
             watched_seconds: progressData.watchedSeconds,
             total_seconds: progressData.totalSeconds,
-            progress_percent: Math.round((progressData.watchedSeconds / progressData.totalSeconds) * 100),
-            is_completed: progressData.watchedSeconds >= progressData.totalSeconds * 0.95, // 95% 이상 시청 시 완료
+            progress_percent: progressData.totalSeconds > 0 ? Math.round((progressData.watchedSeconds / progressData.totalSeconds) * 100) : 0,
+            is_completed: progressData.totalSeconds > 0 && progressData.watchedSeconds >= progressData.totalSeconds * 0.95,
             last_position: progressData.lastPosition,
             updated_at: new Date().toISOString()
         };
-        
+
         let result;
         if (existing) {
-            // 업데이트 (더 높은 진도만 저장)
+            // 업데이트 (더 높은 진도만 저장, last_position은 항상 갱신)
             if (progressData.watchedSeconds > existing.watched_seconds) {
                 const { data, error } = await window.supabase
                     .from('lesson_progress')
@@ -32,11 +36,23 @@ async function updateLessonProgress(userId, lessonId, progressData) {
                     .eq('id', existing.id)
                     .select()
                     .single();
-                
+
                 if (error) throw error;
                 result = data;
             } else {
-                result = existing;
+                // 진도는 낮지만 last_position은 갱신
+                const { data, error } = await window.supabase
+                    .from('lesson_progress')
+                    .update({
+                        last_position: progressData.lastPosition,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', existing.id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                result = data;
             }
         } else {
             // 새로 생성
@@ -46,11 +62,11 @@ async function updateLessonProgress(userId, lessonId, progressData) {
                 .insert(progressRecord)
                 .select()
                 .single();
-            
+
             if (error) throw error;
             result = data;
         }
-        
+
         return { success: true, data: result };
     } catch (error) {
         console.error('Update progress error:', error);
@@ -61,16 +77,17 @@ async function updateLessonProgress(userId, lessonId, progressData) {
 // 레슨 진도 가져오기
 async function getLessonProgress(userId, lessonId) {
     try {
-        const { data, error } = await window.supabase
+        const { data: rows, error } = await window.supabase
             .from('lesson_progress')
             .select('*')
             .eq('user_id', userId)
             .eq('lesson_id', lessonId)
-            .single();
-        
-        if (error && error.code !== 'PGRST116') throw error;
-        
-        return { success: true, data: data || null };
+            .order('watched_seconds', { ascending: false })
+            .limit(1);
+
+        if (error) throw error;
+
+        return { success: true, data: (rows && rows.length > 0) ? rows[0] : null };
     } catch (error) {
         console.error('Get progress error:', error);
         return { success: false, error: error.message };
@@ -156,23 +173,25 @@ async function getAllCourseProgress(userId) {
 // 마지막 시청 위치 저장
 async function saveLastPosition(userId, lessonId, position) {
     try {
-        const { data: existing } = await window.supabase
+        const { data: rows, error: fetchError } = await window.supabase
             .from('lesson_progress')
             .select('id')
             .eq('user_id', userId)
             .eq('lesson_id', lessonId)
-            .single();
-        
-        if (existing) {
+            .limit(1);
+
+        if (fetchError) throw fetchError;
+
+        if (rows && rows.length > 0) {
             await window.supabase
                 .from('lesson_progress')
-                .update({ 
+                .update({
                     last_position: position,
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', existing.id);
+                .eq('id', rows[0].id);
         }
-        
+
         return { success: true };
     } catch (error) {
         console.error('Save position error:', error);

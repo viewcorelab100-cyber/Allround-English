@@ -10,6 +10,7 @@ let currentCourse = null;
 let selectedPaymentMethod = 'CARD'; // 기본값: 카드/간편결제
 let appliedCouponData = null; // 적용된 쿠폰 정보
 let currentPaymentType = null; // 현재 결제 중인 유형 (course/textbook)
+let _paymentInFlight = false; // 결제 중복 요청 방지 플래그
 
 // 결제 수단 선택
 function selectPaymentMethod(method) {
@@ -127,32 +128,9 @@ async function getOrderById(orderId) {
     }
 }
 
-// 구매 완료 처리 (purchases 테이블에 저장)
-async function completePurchase(userId, courseId, orderId, paymentKey, amount) {
-    try {
-        const { data, error } = await window.supabase
-            .from('purchases')
-            .insert({
-                user_id: userId,
-                course_id: courseId,
-                order_id: orderId,
-                payment_key: paymentKey,
-                status: 'completed',
-                payment_method: 'tosspayments',
-                amount: amount,
-                purchased_at: new Date().toISOString()
-            })
-            .select()
-            .single();
-        
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('Complete purchase error:', error);
-        return { success: false, error: error.message };
-    }
-}
+// 구매 완료 처리 - 보안: 클라이언트 직접 INSERT 차단
+// purchases INSERT는 confirm-payment Edge Function에서만 수행됩니다.
+// completePurchase() 함수는 보안상 제거되었습니다.
 
 // 결제창 초기화 (v2 SDK - 결제창 방식)
 async function initPayment() {
@@ -174,8 +152,12 @@ async function initPayment() {
 
 // 결제 요청
 async function requestPayment() {
+    if (_paymentInFlight) return;
+    _paymentInFlight = true;
+
     if (!tossPayment || !currentCourse) {
         alert('결제 정보가 올바르지 않습니다. 다시 시도해주세요.');
+        _paymentInFlight = false;
         return;
     }
 
@@ -186,11 +168,13 @@ async function requestPayment() {
 
     if (!customerName) {
         alert('이름을 입력해주세요.');
+        _paymentInFlight = false;
         return;
     }
 
     if (!customerEmail) {
         alert('이메일을 입력해주세요.');
+        _paymentInFlight = false;
         return;
     }
 
@@ -200,6 +184,7 @@ async function requestPayment() {
 
     if (!payCourse && !payTextbook) {
         alert('결제할 항목을 선택해주세요.');
+        _paymentInFlight = false;
         return;
     }
 
@@ -214,6 +199,7 @@ async function requestPayment() {
 
     if (paymentQueue.length === 0) {
         alert('결제할 금액이 없습니다.');
+        _paymentInFlight = false;
         return;
     }
 
@@ -246,6 +232,7 @@ async function requestPayment() {
 
     if (!orderResult.success) {
         alert('주문 생성에 실패했습니다.');
+        _paymentInFlight = false;
         return;
     }
 
@@ -340,6 +327,7 @@ async function processPayment(amount, orderName, customerName, customerEmail, cu
 
     } catch (error) {
         console.error('Payment request error:', error);
+        _paymentInFlight = false;
 
         // 결제 버튼 복원
         const paymentButton = document.getElementById('payment-button');

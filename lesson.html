@@ -702,7 +702,7 @@
 
                 <div class="space-y-6">
                     <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">노트 필기 후 카카오톡으로 사진을 보내주세요</p>
-                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
+                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" onclick="completeKakaoTask()" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
                         카카오톡으로 보내기
                     </a>
                 </div>
@@ -741,7 +741,7 @@
                         </a>
                     </div>
                     <p class="text-xs text-gray-400 uppercase tracking-wider leading-relaxed">블로그 작성 후 카카오톡으로 사진을 보내주세요</p>
-                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
+                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" onclick="completeKakaoTask()" class="block px-8 py-4 bg-white text-black text-center font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors">
                         카카오톡으로 보내기
                     </a>
                 </div>
@@ -832,6 +832,14 @@
         let currentLesson = null;
         let currentCourse = null;
         let courseLessons = [];
+        // XSS 방지용 HTML 이스케이프
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
         let currentUser = null;
         let userProfile = null; // 사용자 프로필 (학부모 정보 포함)
         let videoElement = null;
@@ -841,6 +849,14 @@
         let maxWatchedTime = 0; // 최대 시청 시간 추적
         let lastPlaybackTime = 0; // 마지막 재생 위치 (건너뛰기 감지용)
         let currentProgress = 0; // 현재 진도율
+        let progressInitialized = false; // DB에서 진도 복원 완료 여부
+        // 과제 완료 상태 (DOM 텍스트 비교 대신 변수로 관리)
+        let _quizCompleted = false;
+        let _noteCompleted = false;
+        let _blogCompleted = false;
+        let _imageSubmitted = false;
+        let _noteInFlight = false;
+        let _blogInFlight = false;
 
         function getLessonId() {
             const params = new URLSearchParams(window.location.search);
@@ -855,16 +871,26 @@
             if (lesson.video_url) {
                 if (lesson.video_url.includes('youtube.com') || lesson.video_url.includes('youtu.be')) {
                     const videoId = extractYouTubeId(lesson.video_url);
+                    // YouTube ID 검증 (영숫자, -, _ 만 허용)
+                    if (!/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+                        container.innerHTML = '<p class="text-red-400 text-center py-8">유효하지 않은 영상입니다.</p>';
+                        return;
+                    }
                     container.innerHTML = `<div class="aspect-video"><iframe id="youtube-player" class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-                    // YouTube API 로드
                     loadYouTubeAPI();
                 } else if (lesson.video_url.includes('vimeo.com')) {
                     const vimeoId = extractVimeoId(lesson.video_url);
-                    // 커스텀 Vimeo 플레이어 사용
+                    // Vimeo ID 검증 (숫자만 허용)
+                    if (!/^\d+$/.test(vimeoId)) {
+                        container.innerHTML = '<p class="text-red-400 text-center py-8">유효하지 않은 영상입니다.</p>';
+                        return;
+                    }
                     container.innerHTML = '<div id="custom-vimeo-container"></div>';
                     initCustomVimeoPlayer(vimeoId);
                 } else {
-                    container.innerHTML = `<div class="aspect-video"><video id="video-player" class="w-full h-full" controls><source src="${lesson.video_url}" type="video/mp4">브라우저가 비디오를 지원하지 않습니다.</video></div>`;
+                    // Native video URL은 encodeURI로 이스케이프
+                    const safeUrl = encodeURI(lesson.video_url);
+                    container.innerHTML = `<div class="aspect-video"><video id="video-player" class="w-full h-full" controls><source src="${safeUrl}" type="video/mp4">브라우저가 비디오를 지원하지 않습니다.</video></div>`;
                     videoElement = document.getElementById('video-player');
                     setupNativeVideoTracking();
                 }
@@ -888,20 +914,33 @@
         // 커스텀 Vimeo Player 초기화 및 진도 추적
         function initCustomVimeoPlayer(vimeoId) {
             customVimeoPlayer = new CustomVimeoPlayer('custom-vimeo-container', vimeoId);
-            
-            // 플레이어가 준비될 때까지 대기
+
+            // 플레이어가 준비될 때까지 대기 (30초 타임아웃)
+            let pollCount = 0;
+            const maxPolls = 300; // 100ms * 300 = 30초
             const checkPlayer = setInterval(() => {
+                pollCount++;
                 if (customVimeoPlayer.player && customVimeoPlayer.isReady) {
                     clearInterval(checkPlayer);
                     vimeoPlayer = customVimeoPlayer.player;
                     setupVimeoProgressTracking();
+                } else if (pollCount >= maxPolls) {
+                    clearInterval(checkPlayer);
+                    console.error('Vimeo 플레이어 로드 타임아웃');
+                    const container = document.getElementById('video-container');
+                    if (container) container.innerHTML = '<p class="text-red-400 text-center py-8">영상을 불러올 수 없습니다. 페이지를 새로고침해 주세요.</p>';
                 }
             }, 100);
         }
 
         // Vimeo 진도 추적 설정
+        let _boundBeforeUnloadHandler = null; // beforeunload 리스너 참조 보관
         function setupVimeoProgressTracking() {
             if (!vimeoPlayer) return;
+
+            // 기존 interval/listener 정리
+            if (progressInterval) clearInterval(progressInterval);
+            if (_boundBeforeUnloadHandler) window.removeEventListener('beforeunload', _boundBeforeUnloadHandler);
 
             // 영상 길이 자동 감지
             vimeoPlayer.getDuration().then(function(duration) {
@@ -917,6 +956,12 @@
                 const currentTime = data.seconds;
                 const duration = data.duration;
                 videoDuration = duration;
+
+                // DB에서 진도 복원이 완료될 때까지 스킵 감지 비활성화
+                if (!progressInitialized) {
+                    lastPlaybackTime = currentTime;
+                    return;
+                }
 
                 // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
@@ -959,7 +1004,8 @@
             }, 30000);
 
             // 페이지 나갈 때 진도 저장
-            window.addEventListener('beforeunload', saveVimeoProgress);
+            _boundBeforeUnloadHandler = saveVimeoProgress;
+            window.addEventListener('beforeunload', _boundBeforeUnloadHandler);
         }
 
         // 기존 initVimeoPlayer (하위 호환성)
@@ -974,24 +1020,26 @@
             const result = await getLessonProgress(currentUser.id, currentLesson.id);
             
             if (result.success && result.data) {
-                if (result.data.last_position) {
-                    // Fix: Only seek if position is within valid range
+                if (result.data.watched_seconds) {
+                    maxWatchedTime = result.data.watched_seconds;
+                }
+                if (result.data.last_position && videoDuration > 0) {
                     const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
                     if (safePosition > 0 && safePosition < videoDuration) {
                         player.setCurrentTime(safePosition);
                     }
-                }
-                if (result.data.watched_seconds) {
-                    maxWatchedTime = result.data.watched_seconds;
+                    // lastPlaybackTime도 복원 위치로 설정 (스킵 감지 오작동 방지)
+                    lastPlaybackTime = result.data.last_position;
                 }
                 // 저장된 진도율 표시
                 if (result.data.progress_percent) {
                     document.getElementById('progress-bar').style.width = `${result.data.progress_percent}%`;
                     document.getElementById('progress-text').textContent = `${result.data.progress_percent}%`;
-                    // 95% 이상이면 과제 섹션 표시
                     checkAndShowAssignment(result.data.progress_percent);
                 }
             }
+            // DB 복원 완료 → timeupdate 스킵 감지 활성화
+            progressInitialized = true;
         }
 
         async function saveVimeoProgress() {
@@ -1016,7 +1064,11 @@
         // Native Video 추적 설정
         function setupNativeVideoTracking() {
             if (!videoElement) return;
-            
+
+            // 기존 interval/listener 정리
+            if (progressInterval) clearInterval(progressInterval);
+            if (_boundBeforeUnloadHandler) window.removeEventListener('beforeunload', _boundBeforeUnloadHandler);
+
             videoElement.addEventListener('loadedmetadata', function() {
                 videoDuration = videoElement.duration;
                 console.log('영상 길이:', videoDuration, '초');
@@ -1028,6 +1080,12 @@
 
             videoElement.addEventListener('timeupdate', function() {
                 const currentTime = videoElement.currentTime;
+
+                // DB에서 진도 복원이 완료될 때까지 스킵 감지 비활성화
+                if (!progressInitialized) {
+                    lastPlaybackTime = currentTime;
+                    return;
+                }
 
                 // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
@@ -1062,7 +1120,8 @@
                 if (!videoElement.paused) saveNativeProgress();
             }, 30000);
 
-            window.addEventListener('beforeunload', saveNativeProgress);
+            _boundBeforeUnloadHandler = saveNativeProgress;
+            window.addEventListener('beforeunload', _boundBeforeUnloadHandler);
         }
 
         async function loadLastPositionForNative() {
@@ -1070,23 +1129,23 @@
             
             const result = await getLessonProgress(currentUser.id, currentLesson.id);
             if (result.success && result.data) {
+                if (result.data.watched_seconds) {
+                    maxWatchedTime = result.data.watched_seconds;
+                }
                 if (result.data.last_position && videoElement.duration) {
-                    // Fix: Only seek if position is within valid range
                     const safePosition = Math.min(result.data.last_position, videoElement.duration - 0.5);
                     if (safePosition > 0 && safePosition < videoElement.duration) {
                         videoElement.currentTime = safePosition;
                     }
-                }
-                if (result.data.watched_seconds) {
-                    maxWatchedTime = result.data.watched_seconds;
+                    lastPlaybackTime = result.data.last_position;
                 }
                 if (result.data.progress_percent) {
                     document.getElementById('progress-bar').style.width = `${result.data.progress_percent}%`;
                     document.getElementById('progress-text').textContent = `${result.data.progress_percent}%`;
-                    // 95% 이상이면 과제 섹션 표시
                     checkAndShowAssignment(result.data.progress_percent);
                 }
             }
+            progressInitialized = true;
         }
 
         async function saveNativeProgress() {
@@ -1179,7 +1238,7 @@
                 }
                 
                 if (data && data.content) {
-                    noticeEl.innerHTML = `<p class="text-xs text-white leading-relaxed font-light whitespace-pre-line">${data.content}</p>`;
+                    noticeEl.innerHTML = `<p class="text-xs text-white leading-relaxed font-light whitespace-pre-line">${escapeHTML(data.content)}</p>`;
                 } else {
                     noticeEl.innerHTML = '<p class="text-[10px] text-gray-600 uppercase tracking-widest">No announcements.</p>';
                 }
@@ -1305,9 +1364,10 @@
             
             if (!unsolvedQuiz) {
                 // 모든 퀴즈를 다 풀었음 - 상태를 완료로 변경하고 다음 과제로
+                _quizCompleted = true;
                 const statusEl = document.getElementById('quiz-status');
                 if (statusEl) {
-                    statusEl.textContent = '완료';
+                    statusEl.textContent = 'COMPLETED';
                     statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                 }
                 showAssignmentModal('', '퀴즈 완료', '모든 퀴즈를 완료했습니다. 다음 과제를 진행하세요.', function() {
@@ -1515,9 +1575,10 @@
                         
                         // 모든 퀴즈를 풀었을 때만 상태를 "완료"로 변경
                         if (allCompleted) {
+                            _quizCompleted = true;
                             const statusEl = document.getElementById('quiz-status');
                             if (statusEl) {
-                                statusEl.textContent = '완료';
+                                statusEl.textContent = 'COMPLETED';
                                 statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                             }
                         }
@@ -1588,15 +1649,15 @@
             let quizHTML = `<div class="space-y-4">`;
             
             // 문제
-            quizHTML += `<p class="text-lg text-white font-semibold">${quiz.question}</p>`;
-            
+            quizHTML += `<p class="text-lg text-white font-semibold">${escapeHTML(quiz.question)}</p>`;
+
             // 문제 유형에 따라 선택지 표시
             if (quiz.question_type === '객관식' && quiz.option1) {
                 quizHTML += '<div class="space-y-3">';
-                if (quiz.option1) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="1" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">① ${quiz.option1}</span></label>`;
-                if (quiz.option2) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="2" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">② ${quiz.option2}</span></label>`;
-                if (quiz.option3) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="3" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">③ ${quiz.option3}</span></label>`;
-                if (quiz.option4) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="4" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">④ ${quiz.option4}</span></label>`;
+                if (quiz.option1) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="1" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">① ${escapeHTML(quiz.option1)}</span></label>`;
+                if (quiz.option2) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="2" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">② ${escapeHTML(quiz.option2)}</span></label>`;
+                if (quiz.option3) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="3" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">③ ${escapeHTML(quiz.option3)}</span></label>`;
+                if (quiz.option4) quizHTML += `<label class="flex items-center space-x-4 p-4 bg-white bg-opacity-[0.03] border border-white border-opacity-5 cursor-pointer hover:bg-opacity-[0.05] transition-all"><input type="radio" name="quiz-answer" value="4" class="w-4 h-4 accent-white"><span class="text-sm text-gray-400 uppercase tracking-widest">④ ${escapeHTML(quiz.option4)}</span></label>`;
                 quizHTML += '</div>';
             } else if (quiz.question_type === 'OX') {
                 quizHTML += `
@@ -1627,53 +1688,86 @@
         // 노트 필기 완료
         async function completeNote() {
             if (!currentUser || !currentLesson) return;
+            if (_noteInFlight) return;
+            _noteInFlight = true;
 
-            const assignmentData = {
-                note_completed: true,
-                blog_completed: false,
-                kakao_completed: false
-            };
+            try {
+                // 기존 과제 상태를 먼저 조회하여 보존
+                const existing = await getAssignment(currentUser.id, currentLesson.id);
+                const assignmentData = {
+                    note_completed: true,
+                    blog_completed: existing.data?.blog_completed || false,
+                    kakao_completed: existing.data?.kakao_completed || false
+                };
 
-            const result = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
-            
-            if (result.success) {
-                const statusEl = document.getElementById('note-status');
-                if (statusEl) {
-                    statusEl.textContent = '완료';
-                    statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
+                const result = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+
+                if (result.success) {
+                    _noteCompleted = true;
+                    const statusEl = document.getElementById('note-status');
+                    if (statusEl) {
+                        statusEl.textContent = 'COMPLETED';
+                        statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
+                    }
+                    closeNoteModal();
+                    showAssignmentModal('', '노트 필기 완료', '다음 과제를 진행하세요.', function() {
+                        showNextAssignmentInSequence();
+                    });
+                    updateAssignmentCardStatus();
                 }
-                closeNoteModal();
-                showAssignmentModal('', '노트 필기 완료', '다음 과제를 진행하세요.', function() {
-                    showNextAssignmentInSequence();
-                });
-                updateAssignmentCardStatus();
+            } finally {
+                _noteInFlight = false;
             }
         }
 
         // 블로그 과제 완료
         async function completeBlog() {
             if (!currentUser || !currentLesson) return;
+            if (_blogInFlight) return;
+            _blogInFlight = true;
 
-            const result = await getAssignment(currentUser.id, currentLesson.id);
-            const assignmentData = {
-                note_completed: result.data?.note_completed || false,
-                blog_completed: true,
-                kakao_completed: result.data?.kakao_completed || false
-            };
+            try {
+                const result = await getAssignment(currentUser.id, currentLesson.id);
+                const assignmentData = {
+                    note_completed: result.data?.note_completed || false,
+                    blog_completed: true,
+                    kakao_completed: result.data?.kakao_completed || false
+                };
 
-            const saveResult = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
-            
-            if (saveResult.success) {
-                const statusEl = document.getElementById('blog-status');
-                if (statusEl) {
-                    statusEl.textContent = '완료';
-                    statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
+                const saveResult = await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+
+                if (saveResult.success) {
+                    _blogCompleted = true;
+                    const statusEl = document.getElementById('blog-status');
+                    if (statusEl) {
+                        statusEl.textContent = 'COMPLETED';
+                        statusEl.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
+                    }
+                    closeBlogModal();
+                    showAssignmentModal('', '블로그 작성 완료', '다음 과제를 진행하세요.', function() {
+                        showNextAssignmentInSequence();
+                    });
+                    updateAssignmentCardStatus();
                 }
-                closeBlogModal();
-                showAssignmentModal('', '블로그 작성 완료', '다음 과제를 진행하세요.', function() {
-                    showNextAssignmentInSequence();
-                });
-                updateAssignmentCardStatus();
+            } finally {
+                _blogInFlight = false;
+            }
+        }
+
+        // 카카오톡 링크 클릭 시 자동완료
+        async function completeKakaoTask() {
+            if (!currentUser || !currentLesson) return;
+
+            try {
+                const existing = await getAssignment(currentUser.id, currentLesson.id);
+                const assignmentData = {
+                    note_completed: existing.data?.note_completed || false,
+                    blog_completed: existing.data?.blog_completed || false,
+                    kakao_completed: true
+                };
+                await saveAssignment(currentUser.id, currentLesson.id, assignmentData);
+            } catch (error) {
+                console.error('Kakao task complete error:', error);
             }
         }
 
@@ -1691,15 +1785,17 @@
             if (result.success && result.data) {
                 // 노트 필기 상태
                 if (result.data.note_completed) {
+                    _noteCompleted = true;
                     const noteStatus = document.getElementById('note-status');
                     if (noteStatus) {
                         noteStatus.textContent = 'COMPLETED';
                         noteStatus.className = 'text-[9px] font-bold uppercase tracking-widest text-white';
                     }
                 }
-                
+
                 // 블로그 과제 상태
                 if (result.data.blog_completed) {
+                    _blogCompleted = true;
                     const blogStatus = document.getElementById('blog-status');
                     if (blogStatus) {
                         blogStatus.textContent = 'COMPLETED';
@@ -1859,8 +1955,12 @@
                         .maybeSingle();
                     
                     if (!existingNotif) {
-                        await sendCourseCompleteNotification(reportUrl);
-                        document.getElementById('report-modal-message').textContent = '학부모님께 리포트가 발송되었습니다!';
+                        const notifResult = await sendCourseCompleteNotification(reportUrl);
+                        if (notifResult.success) {
+                            document.getElementById('report-modal-message').textContent = '학부모님께 리포트가 발송되었습니다!';
+                        } else {
+                            document.getElementById('report-modal-message').textContent = '리포트는 생성되었으나 알림톡 발송에 실패했습니다.';
+                        }
                     } else {
                         document.getElementById('report-modal-message').textContent = '리포트가 이미 발송되었습니다.';
                     }
@@ -1898,8 +1998,10 @@
                 const studentPhone = userProfile.phone || userProfile.student_phone;
                 const parentPhone = userProfile.parent_phone || userProfile.guardian_phone;
 
-                if (studentPhone) phoneNumbers.add(studentPhone.replace(/[^0-9]/g, ''));
-                if (parentPhone) phoneNumbers.add(parentPhone.replace(/[^0-9]/g, ''));
+                const cleanStudentPhone = studentPhone?.replace(/[^0-9]/g, '') || '';
+                const cleanParentPhone = parentPhone?.replace(/[^0-9]/g, '') || '';
+                if (cleanStudentPhone && /^01[016789]\d{7,8}$/.test(cleanStudentPhone)) phoneNumbers.add(cleanStudentPhone);
+                if (cleanParentPhone && /^01[016789]\d{7,8}$/.test(cleanParentPhone)) phoneNumbers.add(cleanParentPhone);
 
                 if (phoneNumbers.size === 0) {
                     console.log('연락처가 없는 사용자입니다.');
@@ -1949,21 +2051,12 @@
         // NHN 알림톡 발송 함수
         async function sendSmsViaEdgeFunction(data) {
             try {
-                // 템플릿 파라미터 추출
                 const studentName = userProfile?.name || '학생';
                 const courseTitle = currentCourse?.title || '과정';
 
-                // 통계 데이터 가져오기 (리포트에서)
-                let progressPercent = '0';
-                let assignmentPercent = '0';
-
-                if (currentCourse) {
-                    const reportResult = await generateCourseReport(currentUser.id, currentCourse.id);
-                    if (reportResult.success) {
-                        progressPercent = reportResult.data.total_progress.toString();
-                        assignmentPercent = reportResult.data.assignment_rate.toString();
-                    }
-                }
+                // 통계 데이터: 이미 생성된 리포트에서 가져오기 (중복 생성 방지)
+                let progressPercent = data.progressPercent || '0';
+                let assignmentPercent = data.assignmentPercent || '0';
 
                 // NHN 알림톡 발송 시도 (템플릿 사용)
                 const { data: result, error } = await window.supabase.functions.invoke('send-nhn-alimtalk', {
@@ -2120,7 +2213,7 @@
                     previewDiv.innerHTML = `
                         <div class="flex flex-col items-center gap-2">
                             <img src="${e.target.result}" alt="미리보기 ${index + 1}" class="w-full h-24 object-cover">
-                            <p class="text-white text-[9px] uppercase tracking-tight truncate w-full text-center">${file.name}</p>
+                            <p class="text-white text-[9px] uppercase tracking-tight truncate w-full text-center">${escapeHTML(file.name)}</p>
                             <p class="text-gray-600 text-[9px]">${(file.size / 1024).toFixed(1)} KB</p>
                             <button onclick="removeImagePreview(${index})" class="w-full px-2 py-1 bg-white text-black text-[9px] font-bold uppercase tracking-widest hover:bg-gray-200 transition-colors">
                                 Delete
@@ -2205,6 +2298,7 @@
                 btn.disabled = true;
 
                 // 즉시 상태 업데이트
+                _imageSubmitted = true;
                 const statusEl = document.getElementById('image-submission-status');
                 if (statusEl) {
                     statusEl.textContent = 'SUBMITTED';
@@ -2419,6 +2513,11 @@
                     const submission = submissions[0];
                     const feedback = submission.teacher_feedback?.[0];
 
+                    // 이미지 제출 플래그 갱신
+                    if (['submitted', 'reviewing', 'graded'].includes(submission.status)) {
+                        _imageSubmitted = true;
+                    }
+
                     // 상태 배지 업데이트
                     const statusMap = {
                         'pending': { text: 'PENDING', class: 'text-gray-600' },
@@ -2499,14 +2598,7 @@
             }
         }
 
-        // 페이지 로드 시 제출 상태 확인
-        document.addEventListener('DOMContentLoaded', function() {
-            // 기존 init 후에 제출 상태 로드
-            setTimeout(() => {
-                updateSubmissionStatus();
-                loadSubmissionHistory();
-            }, 1000);
-        });
+        // 제출 상태 확인은 통합 DOMContentLoaded에서 처리
 
         // 비디오 종료 오버레이 표시
         function showVideoEndOverlay() {
@@ -2529,6 +2621,7 @@
 
         function showAssignmentSequence() {
             // 시간을 충분히 시청했는지 확인 (95% 이상)
+            if (!videoDuration || videoDuration <= 0) return;
             const watchedPercent = (maxWatchedTime / videoDuration) * 100;
             if (watchedPercent < 95) {
                 showAssignmentModal('', '강의를 끝까지 시청해주세요', `현재 시청률: ${Math.round(watchedPercent)}%\n95% 이상 시청해야 과제를 진행할 수 있습니다.`);
@@ -2559,33 +2652,28 @@
 
             switch(currentAssignment) {
                 case 'quiz':
-                    // 퀴즈가 있고 완료되지 않았으면 퀴즈 모달 바로 열기
-                    const quizStatus = document.getElementById('quiz-status');
-                    if (lessonQuizzes.length > 0 && quizStatus && quizStatus.textContent !== 'COMPLETED') {
+                    if (lessonQuizzes.length > 0 && !_quizCompleted) {
                         openQuizModal();
                     } else {
                         showNextAssignmentInSequence();
                     }
                     break;
                 case 'note':
-                    const noteStatus = document.getElementById('note-status');
-                    if (noteStatus && noteStatus.textContent !== 'COMPLETED') {
+                    if (!_noteCompleted) {
                         openNoteModal();
                     } else {
                         showNextAssignmentInSequence();
                     }
                     break;
                 case 'blog':
-                    const blogStatus = document.getElementById('blog-status');
-                    if (blogStatus && blogStatus.textContent !== 'COMPLETED') {
+                    if (!_blogCompleted) {
                         openBlogModal();
                     } else {
                         showNextAssignmentInSequence();
                     }
                     break;
                 case 'image':
-                    const imageStatus = document.getElementById('image-submission-status');
-                    if (!imageStatus || (imageStatus.textContent !== 'SUBMITTED' && imageStatus.textContent !== 'GRADED' && imageStatus.textContent !== 'REVIEWING')) {
+                    if (!_imageSubmitted) {
                         openImageModal();
                     } else {
                         showNextAssignmentInSequence();
@@ -2611,15 +2699,15 @@
                     .select('id')
                     .eq('lesson_id', currentLesson.id);
                 
-                const quizComplete = allQuizzes && quizResults && 
-                                    allQuizzes.length > 0 && 
-                                    quizResults.length >= allQuizzes.length;
+                const quizComplete = !allQuizzes || allQuizzes.length === 0 ||
+                                    (quizResults && quizResults.length >= allQuizzes.length);
                 
-                // 2. 노트 필기 확인 (임시로 항상 true - 실제로는 체크 필요)
-                const noteComplete = true;
-                
-                // 3. 블로그 과제 확인 (임시로 항상 true - 실제로는 체크 필요)
-                const blogComplete = true;
+                // 2. 노트 필기 확인
+                const assignmentResult = await getAssignment(currentUser.id, currentLesson.id);
+                const noteComplete = assignmentResult.success && assignmentResult.data?.note_completed;
+
+                // 3. 블로그 과제 확인
+                const blogComplete = assignmentResult.success && assignmentResult.data?.blog_completed;
                 
                 // 4. 이미지 제출 확인 (제출됨 또는 채점 대기 상태면 완료로 인정)
                 const { data: submissions } = await window.supabase
@@ -2676,18 +2764,22 @@
             // 각 카드는 독립적으로 상태를 표시함
         }
         
-        document.addEventListener('DOMContentLoaded', loadLesson);
-
-        // ========== QR 코드 생성 ==========
+        // ========== 통합 DOMContentLoaded ==========
         document.addEventListener('DOMContentLoaded', function() {
-            // 현재 페이지 URL로 QR 코드 생성 (과제 제출용 파라미터 추가)
+            loadLesson();
+
+            // 제출 상태 확인 (레슨 로드 후)
+            setTimeout(() => {
+                updateSubmissionStatus();
+                loadSubmissionHistory();
+            }, 1000);
+
+            // QR 코드 생성
             setTimeout(() => {
                 const qrContainer = document.getElementById('lesson-qr-code');
                 if (qrContainer && window.QRCode) {
-                    // 현재 URL에 directSubmit=true 파라미터 추가
                     const url = new URL(window.location.href);
                     url.searchParams.set('directSubmit', 'true');
-                    
                     new QRCode(qrContainer, {
                         text: url.toString(),
                         width: 80,
@@ -2698,7 +2790,7 @@
                     });
                 }
             }, 500);
-            
+
             // URL에 directSubmit 파라미터가 있으면 과제 섹션 강제 표시
             const params = new URLSearchParams(window.location.search);
             if (params.get('directSubmit') === 'true') {
@@ -2706,7 +2798,6 @@
                     const assignmentSection = document.getElementById('assignment-section');
                     if (assignmentSection) {
                         assignmentSection.classList.remove('hidden');
-                        // 이미지 제출 섹션으로 스크롤
                         const imageSection = document.querySelector('.bg-gradient-to-br.from-blue-500\\/10');
                         if (imageSection) {
                             imageSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2848,18 +2939,18 @@
                     return `
                         <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-5 space-y-4 mb-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-white uppercase tracking-widest">${qna.title}</span>
+                                <span class="text-xs font-bold text-white uppercase tracking-widest">${escapeHTML(qna.title)}</span>
                                 ${statusBadge}
                             </div>
-                            <p class="text-gray-400 text-xs font-light line-clamp-2">${qna.content}</p>
+                            <p class="text-gray-400 text-xs font-light line-clamp-2">${escapeHTML(qna.content)}</p>
                             <div class="flex items-center justify-between text-[10px] text-gray-600 uppercase tracking-tight">
-                                <span>${userName}</span>
+                                <span>${escapeHTML(userName)}</span>
                                 <span>${date}</span>
                             </div>
                             ${qna.answer ? `
                                 <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-white border-opacity-20">
                                     <p class="text-[10px] text-gray-600 uppercase tracking-widest font-bold mb-2">답변</p>
-                                    <p class="text-gray-400 text-xs font-light">${qna.answer}</p>
+                                    <p class="text-gray-400 text-xs font-light">${escapeHTML(qna.answer)}</p>
                                 </div>
                             ` : ''}
                         </div>

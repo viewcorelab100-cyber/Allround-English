@@ -19,6 +19,28 @@ serve(async (req) => {
   try {
     const { phone, templateCode, templateParams, userId, submissionId, recipientType } = await req.json()
 
+    // 중복 발송 방지: submissionId가 있으면 이미 발송된 건인지 확인
+    if (submissionId) {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+        const checkClient = createClient(supabaseUrl, supabaseKey)
+
+        const { data: existing } = await checkClient
+            .from('notification_logs')
+            .select('id')
+            .eq('submission_id', submissionId)
+            .eq('status', 'sent')
+            .maybeSingle()
+
+        if (existing) {
+            console.log('⏭️ 이미 발송된 알림:', { submissionId })
+            return new Response(
+                JSON.stringify({ success: true, message: '이미 발송된 알림입니다.', duplicate: true }),
+                { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            )
+        }
+    }
+
     console.log('📱 알림톡 발송 시작:', { phone, templateCode })
 
     // 전화번호 포맷팅
@@ -27,6 +49,14 @@ serve(async (req) => {
     if (formattedPhone.length < 10) {
       return new Response(
         JSON.stringify({ success: false, error: '유효하지 않은 전화번호' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // 한국 휴대폰 번호 형식 검증
+    if (!/^01[016789]\d{7,8}$/.test(formattedPhone)) {
+      return new Response(
+        JSON.stringify({ success: false, error: '유효하지 않은 휴대폰 번호 형식' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }

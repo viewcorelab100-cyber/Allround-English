@@ -297,6 +297,18 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
     <script>
+        // XSS 방지: 사용자 입력 데이터 이스케이프
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // Prevent back button from returning to payment page
+        history.replaceState(null, '', location.href);
+        window.addEventListener('popstate', function() {
+            history.replaceState(null, '', location.href);
+        });
+
         let currentOrder = null;
         let currentCourse = null;
 
@@ -390,8 +402,8 @@
                 document.getElementById('shipping-section').classList.add('hidden');
                 document.getElementById('shipping-complete-section').classList.remove('hidden');
                 document.getElementById('shipping-info-display').innerHTML = `
-                    <p>${shippingName} / ${shippingPhone}</p>
-                    <p>(${shippingZipcode}) ${shippingAddress} ${shippingAddressDetail}</p>
+                    <p>${escapeHTML(shippingName)} / ${escapeHTML(shippingPhone)}</p>
+                    <p>(${escapeHTML(shippingZipcode)}) ${escapeHTML(shippingAddress)} ${escapeHTML(shippingAddressDetail)}</p>
                 `;
 
                 alert('배송 정보가 저장되었습니다.');
@@ -521,7 +533,7 @@
 
             if (appliedCoupon && finalAmount !== null && finalAmount < order.amount) {
                 const discountAmount = order.amount - finalAmount;
-                const couponInfo = `<span class="text-sm text-green-400">(${appliedCoupon.coupons.name} -₩${discountAmount.toLocaleString()} 할인 적용)</span>`;
+                const couponInfo = `<span class="text-sm text-green-400">(${escapeHTML(appliedCoupon.coupons.name)} -₩${discountAmount.toLocaleString()} 할인 적용)</span>`;
                 document.getElementById('order-amount').innerHTML += ' ' + couponInfo;
             }
 
@@ -544,8 +556,8 @@
                     // 이미 배송 정보 입력 완료
                     document.getElementById('shipping-complete-section').classList.remove('hidden');
                     document.getElementById('shipping-info-display').innerHTML = `
-                        <p>${order.shipping_name || '-'} / ${order.shipping_phone || '-'}</p>
-                        <p>(${order.shipping_zipcode || ''}) ${order.shipping_address || ''} ${order.shipping_address_detail || ''}</p>
+                        <p>${escapeHTML(order.shipping_name) || '-'} / ${escapeHTML(order.shipping_phone) || '-'}</p>
+                        <p>(${escapeHTML(order.shipping_zipcode)}) ${escapeHTML(order.shipping_address)} ${escapeHTML(order.shipping_address_detail)}</p>
                     `;
                 } else {
                     // 배송 정보 입력 필요 - 무조건 표시

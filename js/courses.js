@@ -161,30 +161,9 @@ async function hasAccessToCourse(userId, courseId) {
     }
 }
 
-// 강의 구매 처리
-async function purchaseCourse(userId, courseId, paymentInfo) {
-    try {
-        const { data, error } = await window.supabase
-            .from('purchases')
-            .insert({
-                user_id: userId,
-                course_id: courseId,
-                status: 'completed',
-                payment_method: paymentInfo.method,
-                amount: paymentInfo.amount,
-                purchased_at: new Date().toISOString()
-            })
-            .select()
-            .single();
-        
-        if (error) throw error;
-        
-        return { success: true, data };
-    } catch (error) {
-        console.error('Purchase error:', error);
-        return { success: false, error: error.message };
-    }
-}
+// 강의 구매 처리 - 보안: 클라이언트 직접 INSERT 차단
+// purchases INSERT는 confirm-payment Edge Function에서만 수행됩니다.
+// purchaseCourse() 함수는 보안상 제거되었습니다.
 
 // 레슨 정보 가져오기
 async function getLessonById(lessonId) {
@@ -280,7 +259,8 @@ async function generateCourseReport(userId, courseId) {
         
         // 과제 완료율 계산
         const completedAssignments = assignmentData ? assignmentData.filter(a => a.status === 'submitted' || a.status === 'graded').length : 0;
-        const assignmentRate = totalLessons > 0 ? Math.round((completedAssignments / totalLessons) * 100) : 0;
+        const uniqueAssignmentLessons = assignmentData ? [...new Set(assignmentData.map(a => a.lesson_id))].length : 0;
+        const assignmentRate = uniqueAssignmentLessons > 0 ? Math.round((completedAssignments / uniqueAssignmentLessons) * 100) : 0;
         
         // 6. 기존 리포트 확인 (있으면 업데이트, 없으면 생성)
         const { data: existingReport } = await window.supabase
@@ -335,7 +315,7 @@ async function generateCourseReport(userId, courseId) {
         
         return { success: true, data: result };
     } catch (error) {
-        console.error('Generate report error');
+        console.error('Generate report error:', error);
         return { success: false, error: error.message };
     }
 }
