@@ -14,9 +14,9 @@
     <style>
         :root {
             --header-h: 126px;
-            --sidebar-w: 21.77vw;     /* 418/1920 */
-            --sidebar-gap: 3.75vw;    /* 72/1920 */
-            --page-right: 8.28%;      /* 159/1920 */
+            --sidebar-w: min(21.77vw, 418px);     /* 418/1920 */
+            --sidebar-gap: min(3.75vw, 72px);     /* 72/1920 */
+            --page-right: min(8.28vw, 159px);     /* 159/1920 */
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
@@ -115,7 +115,7 @@
 
         <!-- Layer 1: 사이드바 (Desktop) — 흰색 배경으로 이미지 좌측을 가림 -->
         <aside class="hidden lg:flex flex-col justify-center absolute z-10 bg-white"
-               style="left: 0; top: 0; width: 21.77vw; height: 100vh; padding-right: 3.75vw;">
+               style="left: 0; top: 0; width: min(21.77vw, 418px); height: 100vh; padding-right: min(3.75vw, 72px);">
             <nav class="text-right space-y-6">
                 <div>
                     <a href="about.html" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">학원 소개</a>
@@ -152,7 +152,7 @@
         </aside>
 
         <!-- Layer 2: 카톡 상담 Desktop (Figma: right=12.92vw, top=17.04vh) -->
-        <div class="hidden lg:block absolute z-20" style="right: 12.92vw; top: 17.04vh;">
+        <div class="hidden lg:block absolute z-20" style="right: min(12.92vw, 248px); top: 17.04vh;">
             <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                class="kakao-btn relative inline-block">
                 <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">

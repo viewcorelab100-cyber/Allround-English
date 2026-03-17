@@ -14,11 +14,11 @@
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <style>
         :root {
-            --page-right: 8.3vw;
+            --page-right: min(8.3vw, 159px);
             --header-h: 126px;
-            --sidebar-right-edge: 21.8vw;
-            --sidebar-gap: 3.75vw;
-            --signup-right: 13.44vw;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+            --signup-right: min(13.44vw, 258px);
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
@@ -139,7 +139,7 @@
             <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
                 
                 <!-- 카톡 상담 (firstee 기준) -->
-                <div class="hidden lg:block fixed z-50" style="right: 13.44vw; top: 143px;">
+                <div class="hidden lg:block fixed z-50" style="right: min(13.44vw, 258px); top: 143px;">
                     <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                        class="kakao-btn relative inline-block">
                         <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
