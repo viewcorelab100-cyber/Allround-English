@@ -2735,9 +2735,13 @@
                 const statusFilter = document.getElementById('notif-filter-status').value;
                 const daysFilter = document.getElementById('notif-filter-days').value;
 
+                // 테스트 계정 제외
+                const TEST_USER_IDS = ['7eb83391-e010-478c-8bf0-90426e6f383c'];
+
                 let query = window.supabase
                     .from('notification_logs')
                     .select('*')
+                    .not('user_id', 'in', `(${TEST_USER_IDS.join(',')})`)
                     .order('created_at', { ascending: false })
                     .range(notifOffset, notifOffset + NOTIF_PAGE_SIZE - 1);
 
@@ -2825,9 +2829,12 @@
 
         async function loadNotifStats(daysFilter) {
             try {
+                const TEST_USER_IDS = ['7eb83391-e010-478c-8bf0-90426e6f383c'];
+
                 let query = window.supabase
                     .from('notification_logs')
-                    .select('status');
+                    .select('status')
+                    .not('user_id', 'in', `(${TEST_USER_IDS.join(',')})`);
 
                 if (daysFilter !== 'all') {
                     const since = new Date();
