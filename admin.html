@@ -1349,11 +1349,14 @@
 
         async function loadStudentAssignments() {
             try {
-                // 1. 모든 프로필 데이터
+                // 1. 모든 프로필 데이터 (관리자 제외)
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email')
+                    .select('id, name, email, role')
                     .order('name');
+
+                // 관리자 계정 필터링
+                const studentProfiles = profiles?.filter(p => p.role !== 'admin') || [];
 
                 if (profileError) throw profileError;
 
@@ -1420,9 +1423,9 @@
                 // 퀴즈 결과가 없어도 계속 진행
                 const quizResultsData = quizResults || [];
 
-                // 맵 생성
+                // 맵 생성 (학생만)
                 const profileMap = new Map();
-                profiles?.forEach(p => profileMap.set(p.id, p));
+                studentProfiles.forEach(p => profileMap.set(p.id, p));
 
                 const courseMap = new Map();
                 courses?.forEach(c => courseMap.set(c.id, c));
@@ -1461,9 +1464,9 @@
                     quizMap.get(key).push(q);
                 });
 
-                // 모든 학생-레슨 조합 생성
+                // 모든 학생-레슨 조합 생성 (관리자 제외)
                 allSubmissions = [];
-                profiles?.forEach(profile => {
+                studentProfiles.forEach(profile => {
                     lessons?.forEach(lesson => {
                         const key = `${profile.id}_${lesson.id}`;
                         const submission = submissionMap.get(key);
@@ -5105,16 +5108,18 @@
                     return;
                 }
 
-                // 3. 학생 프로필 정보
-                const { data: profiles, error: profileErr } = await window.supabase
+                // 3. 학생 프로필 정보 (관리자 제외)
+                const { data: courseProfiles, error: profileErr } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email')
+                    .select('id, name, email, role')
                     .in('id', studentIds);
 
                 if (profileErr) throw profileErr;
 
+                // 관리자 제외
+                const filteredProfiles = courseProfiles?.filter(p => p.role !== 'admin') || [];
                 const profileMap = {};
-                profiles?.forEach(p => { profileMap[p.id] = p; });
+                filteredProfiles.forEach(p => { profileMap[p.id] = p; });
 
                 // 4. 해당 강의 레슨들의 진도 데이터
                 const lessonIds = lessons.map(l => l.id);
@@ -5167,9 +5172,9 @@
                     </tr>
                 `;
 
-                // 테이블 바디 렌더링
-                const rows = studentIds.map(sid => {
-                    const profile = profileMap[sid] || {};
+                // 테이블 바디 렌더링 (관리자 제외)
+                const rows = studentIds.filter(sid => profileMap[sid]).map(sid => {
+                    const profile = profileMap[sid];
                     let completed = 0;
 
                     const lessonCells = lessons.map(l => {
