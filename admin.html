@@ -2677,11 +2677,12 @@
                     return;
                 }
 
-                // 템플릿 파라미터 (피드백 제거됨 - 사이트에서 확인)
+                // 템플릿 파라미터 (NHN 템플릿 변수와 일치해야 함)
                 const templateParams = {
                     '학생명': profile.name || '학생',
                     '과제명': `${lesson.order_num}강`,
-                    '점수': feedbackData.score?.toString() || '0'
+                    '점수': feedbackData.score?.toString() || '0',
+                    '피드백': feedbackData.comment ? feedbackData.comment.substring(0, 13) : '사이트에서 확인'
                 };
 
                 // 각 번호에 알림톡 발송
