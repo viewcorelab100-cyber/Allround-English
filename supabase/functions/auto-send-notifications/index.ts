@@ -19,8 +19,15 @@ async function sendAlimtalk(phone: string, templateCode: string, templateParams:
     return { success: false, error: '유효하지 않은 전화번호' }
   }
 
+  // NHN 템플릿 변수 값 14자 제한
+  const safeParams: Record<string, string> = {}
+  for (const [key, value] of Object.entries(templateParams)) {
+    const strVal = String(value || '')
+    safeParams[key] = strVal.length > 14 ? strVal.substring(0, 13) + '…' : strVal
+  }
+
   if (TEST_MODE) {
-    console.log(`[테스트] ${templateCode} → ${formattedPhone}`, JSON.stringify(templateParams))
+    console.log(`[테스트] ${templateCode} → ${formattedPhone}`, JSON.stringify(safeParams))
     return { success: true, testMode: true }
   }
 
@@ -36,7 +43,7 @@ async function sendAlimtalk(phone: string, templateCode: string, templateParams:
         body: JSON.stringify({
           senderKey: NHN_SENDER_KEY,
           templateCode,
-          recipientList: [{ recipientNo: formattedPhone, templateParameter: templateParams }]
+          recipientList: [{ recipientNo: formattedPhone, templateParameter: safeParams }]
         })
       }
     )
