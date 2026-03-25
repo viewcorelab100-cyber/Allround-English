@@ -313,6 +313,9 @@
                 <a href="#payments" onclick="showSection('payments')" id="nav-payments" class="sidebar-link block px-8 py-3.5">
                     Payments
                 </a>
+                <a href="#coupons" onclick="showSection('coupons')" id="nav-coupons" class="sidebar-link block px-8 py-3.5">
+                    Coupons
+                </a>
                 <a href="#assignments" onclick="showSection('assignments')" id="nav-assignments" class="sidebar-link active block px-8 py-3.5">
                     Assignments
                 </a>
@@ -1139,6 +1142,98 @@
             </section>
 
             <!-- 알림톡 발송 내역 섹션 -->
+            <!-- ========== 쿠폰 관리 섹션 ========== -->
+            <section id="section-coupons" class="hidden">
+                <div class="flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Promotion Management</span>
+                        <h1 class="text-4xl font-bold tracking-tight" style="color:#111;">Coupons</h1>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="openIssueCouponModal()" class="btn-admin-primary demo-restricted">
+                            학생에게 발급
+                        </button>
+                        <button onclick="openCouponModal()" class="btn-admin-outline demo-restricted">
+                            + 쿠폰 템플릿 추가
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 통계 카드 -->
+                <div class="grid grid-cols-4 gap-4 mb-8">
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Total Templates</div>
+                        <div class="text-3xl font-bold" style="color:#111;" id="coupon-stat-total">-</div>
+                    </div>
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Active</div>
+                        <div class="text-3xl font-bold text-green-600" id="coupon-stat-active">-</div>
+                    </div>
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Issued</div>
+                        <div class="text-3xl font-bold" style="color:#111;" id="coupon-stat-issued">-</div>
+                    </div>
+                    <div class="p-6 bg-white border border-gray-200" style="background:#fff !important;">
+                        <div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:#6B7280;">Used</div>
+                        <div class="text-3xl font-bold" style="color:#111;" id="coupon-stat-used">-</div>
+                    </div>
+                </div>
+
+                <!-- 쿠폰 템플릿 목록 -->
+                <div class="mb-12">
+                    <h2 class="text-lg font-bold mb-4" style="color:#111;">쿠폰 템플릿</h2>
+                    <div class="bg-white border border-gray-200 overflow-hidden" style="background:#fff !important;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>코드</th>
+                                    <th>이름</th>
+                                    <th>유형</th>
+                                    <th>할인</th>
+                                    <th>유효기간</th>
+                                    <th>상태</th>
+                                    <th class="text-right">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coupon-template-body">
+                                <tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 발급 현황 -->
+                <div>
+                    <div class="flex items-end justify-between mb-4">
+                        <h2 class="text-lg font-bold" style="color:#111;">발급 현황</h2>
+                        <select id="coupon-issue-filter" onchange="loadIssuedCoupons()" class="text-sm px-3 py-2 border border-gray-300">
+                            <option value="all">전체</option>
+                            <option value="active">사용 가능</option>
+                            <option value="used">사용 완료</option>
+                            <option value="expired">만료</option>
+                        </select>
+                    </div>
+                    <div class="bg-white border border-gray-200 overflow-hidden" style="background:#fff !important;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>학생</th>
+                                    <th>쿠폰</th>
+                                    <th>코드</th>
+                                    <th>발급일</th>
+                                    <th>만료일</th>
+                                    <th>상태</th>
+                                    <th class="text-right">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coupon-issued-body">
+                                <tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">로딩 중...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <section id="section-notifications" class="hidden">
                 <div class="flex items-end justify-between mb-12">
                     <div>
@@ -1249,6 +1344,125 @@
         </div>
     </div>
 
+    <!-- 쿠폰 템플릿 생성/수정 모달 -->
+    <div id="coupon-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] flex flex-col" style="color:#111;">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+                <h2 id="coupon-modal-title" class="text-lg font-bold">쿠폰 템플릿 추가</h2>
+                <button onclick="closeCouponModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="coupon-form" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="coupon-edit-id">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">코드 *</label>
+                    <input type="text" id="coupon-code" required placeholder="WELCOME2024"
+                           class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500" style="text-transform:uppercase;">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">이름 *</label>
+                    <input type="text" id="coupon-name" required placeholder="신규 가입 할인 쿠폰"
+                           class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">설명</label>
+                    <input type="text" id="coupon-description" placeholder="첫 구매 시 10% 할인"
+                           class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">할인 유형 *</label>
+                        <select id="coupon-discount-type" required
+                                class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                            <option value="percentage">퍼센트 (%)</option>
+                            <option value="fixed">정액 (원)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">할인 값 *</label>
+                        <input type="number" id="coupon-discount-value" required min="1" placeholder="10"
+                               class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">최소 구매 금액</label>
+                        <input type="number" id="coupon-min-purchase" min="0" value="0" placeholder="0"
+                               class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">최대 할인 금액</label>
+                        <input type="number" id="coupon-max-discount" min="0" placeholder="50000"
+                               class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">유효 기간 (일)</label>
+                        <input type="number" id="coupon-valid-days" min="1" value="7"
+                               class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">쿠폰 유형</label>
+                        <select id="coupon-type"
+                                class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                            <option value="manual">수동 발급</option>
+                            <option value="welcome">가입 환영</option>
+                            <option value="promotion">프로모션</option>
+                            <option value="completion">수강 완료</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <div class="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
+                <button onclick="closeCouponModal()" class="flex-1 px-4 py-2 border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50">취소</button>
+                <button onclick="saveCouponTemplate()" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-bold hover:bg-green-700 demo-restricted">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 학생에게 쿠폰 발급 모달 -->
+    <div id="issue-coupon-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] flex flex-col" style="color:#111;">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+                <h2 class="text-lg font-bold">쿠폰 발급</h2>
+                <button onclick="closeIssueCouponModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                <!-- 쿠폰 선택 -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">쿠폰 선택 *</label>
+                    <select id="issue-coupon-select" required
+                            class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                        <option value="">쿠폰을 선택하세요</option>
+                    </select>
+                </div>
+                <div id="issue-coupon-preview" class="hidden p-4 bg-gray-50 border border-gray-200 text-sm space-y-1"></div>
+
+                <!-- 학생 검색 + 체크박스 -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">학생 선택 *</label>
+                    <input type="text" id="issue-student-search" placeholder="이름 또는 이메일로 검색..."
+                           oninput="filterIssueStudents()"
+                           class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500 mb-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
+                            <input type="checkbox" id="issue-select-all" onchange="toggleSelectAllStudents(this.checked)">
+                            전체 선택 (<span id="issue-student-count">0</span>명)
+                        </label>
+                        <span id="issue-selected-count" class="text-xs font-bold text-green-600">0명 선택</span>
+                    </div>
+                    <div id="issue-student-list" class="border border-gray-200 max-h-48 overflow-y-auto">
+                        <!-- 학생 체크박스 리스트 -->
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
+                <button onclick="closeIssueCouponModal()" class="flex-1 px-4 py-2 border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50">취소</button>
+                <button onclick="issueCouponToStudents()" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-bold hover:bg-green-700 demo-restricted">발급</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/image-utils.js"></script>
@@ -1338,6 +1552,8 @@
                 loadMembers();
             } else if (section === 'qna') {
                 loadQnaListAdmin('pending');
+            } else if (section === 'coupons') {
+                loadCouponSection();
             } else if (section === 'notifications') {
                 loadNotifications();
             }
@@ -5234,6 +5450,399 @@
             }
         }
         // ========== 강의 진도 데이터 함수 끝 ==========
+
+        // ========== 쿠폰 관리 ==========
+        let couponTemplates = [];
+        let issuedCoupons = [];
+
+        async function loadCouponSection() {
+            await loadCouponTemplates();
+            await Promise.all([loadIssuedCoupons(), loadCouponStats()]);
+        }
+
+        // --- 통계 ---
+        async function loadCouponStats() {
+            try {
+                const [{ count: issuedCount }, { count: usedCount }] = await Promise.all([
+                    window.supabase.from('user_coupons').select('*', { count: 'exact', head: true }),
+                    window.supabase.from('user_coupons').select('*', { count: 'exact', head: true }).eq('is_used', true)
+                ]);
+                document.getElementById('coupon-stat-total').textContent = couponTemplates.length;
+                document.getElementById('coupon-stat-active').textContent = couponTemplates.filter(c => c.is_active).length;
+                document.getElementById('coupon-stat-issued').textContent = issuedCount || 0;
+                document.getElementById('coupon-stat-used').textContent = usedCount || 0;
+            } catch (e) {
+                console.error('쿠폰 통계 로드 오류:', e);
+            }
+        }
+
+        // --- 쿠폰 템플릿 CRUD ---
+        async function loadCouponTemplates() {
+            try {
+                const { data, error } = await window.supabase
+                    .from('coupons')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                couponTemplates = data || [];
+                renderCouponTemplates();
+            } catch (e) {
+                console.error('쿠폰 템플릿 로드 오류:', e);
+                document.getElementById('coupon-template-body').innerHTML =
+                    '<tr><td colspan="7" class="text-center py-12" style="color:#EF4444;">로드 오류: ' + e.message + '</td></tr>';
+            }
+        }
+
+        function renderCouponTemplates() {
+            const tbody = document.getElementById('coupon-template-body');
+            if (!couponTemplates.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">등록된 쿠폰 템플릿이 없습니다.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = couponTemplates.map(c => {
+                const discountText = c.discount_type === 'percentage'
+                    ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                    : `${Number(c.discount_value).toLocaleString()}원`;
+                const typeLabels = { completion: '수강완료', welcome: '가입환영', promotion: '프로모션', manual: '수동발급' };
+                const statusColor = c.is_active ? 'color:#16A34A;' : 'color:#9CA3AF;';
+                const statusText = c.is_active ? '활성' : '비활성';
+                return `<tr>
+                    <td><code style="background:#F3F4F6;padding:2px 6px;font-size:12px;">${c.code}</code></td>
+                    <td>${c.name || '-'}</td>
+                    <td><span style="font-size:11px;color:#6B7280;">${typeLabels[c.coupon_type] || c.coupon_type || '-'}</span></td>
+                    <td>${discountText}</td>
+                    <td>${c.valid_days || 7}일</td>
+                    <td>
+                        <button onclick="toggleCouponActive('${c.id}', ${!c.is_active})"
+                                class="text-xs font-bold demo-restricted" style="${statusColor} cursor:pointer;">
+                            ${statusText}
+                        </button>
+                    </td>
+                    <td class="text-right">
+                        <button onclick="openCouponModal('${c.id}')" class="text-xs font-bold demo-restricted" style="color:#3B82F6;cursor:pointer;">수정</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function openCouponModal(couponId = null) {
+            document.getElementById('coupon-modal').classList.remove('hidden');
+            document.getElementById('coupon-form').reset();
+            document.getElementById('coupon-edit-id').value = '';
+            document.getElementById('coupon-modal-title').textContent = couponId ? '쿠폰 템플릿 수정' : '쿠폰 템플릿 추가';
+            document.getElementById('coupon-code').readOnly = false;
+
+            if (couponId) {
+                const c = couponTemplates.find(t => t.id === couponId);
+                if (!c) return;
+                document.getElementById('coupon-edit-id').value = c.id;
+                document.getElementById('coupon-code').value = c.code;
+                document.getElementById('coupon-code').readOnly = true;
+                document.getElementById('coupon-name').value = c.name || '';
+                document.getElementById('coupon-description').value = c.description || '';
+                document.getElementById('coupon-discount-type').value = c.discount_type || 'percentage';
+                document.getElementById('coupon-discount-value').value = c.discount_value || '';
+                document.getElementById('coupon-min-purchase').value = c.min_purchase_amount || 0;
+                document.getElementById('coupon-max-discount').value = c.max_discount_amount || '';
+                document.getElementById('coupon-valid-days').value = c.valid_days || 7;
+                document.getElementById('coupon-type').value = c.coupon_type || 'manual';
+            }
+        }
+
+        function closeCouponModal() {
+            document.getElementById('coupon-modal').classList.add('hidden');
+        }
+
+        async function saveCouponTemplate() {
+            if (!checkDemoWriteAccess('쿠폰 관리')) return;
+
+            const editId = document.getElementById('coupon-edit-id').value;
+            const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+            const name = document.getElementById('coupon-name').value.trim();
+            if (!code || !name) { alert('코드와 이름은 필수입니다.'); return; }
+
+            const couponData = {
+                code,
+                name,
+                description: document.getElementById('coupon-description').value.trim(),
+                discount_type: document.getElementById('coupon-discount-type').value,
+                discount_value: parseFloat(document.getElementById('coupon-discount-value').value) || 0,
+                min_purchase_amount: parseFloat(document.getElementById('coupon-min-purchase').value) || 0,
+                max_discount_amount: parseFloat(document.getElementById('coupon-max-discount').value) || null,
+                valid_days: parseInt(document.getElementById('coupon-valid-days').value) || 7,
+                coupon_type: document.getElementById('coupon-type').value,
+                is_active: true,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                let error;
+                if (editId) {
+                    delete couponData.code; // 코드 변경 불가
+                    ({ error } = await window.supabase.from('coupons').update(couponData).eq('id', editId));
+                } else {
+                    couponData.created_at = new Date().toISOString();
+                    ({ error } = await window.supabase.from('coupons').insert([couponData]));
+                }
+                if (error) throw error;
+                closeCouponModal();
+                await loadCouponSection();
+            } catch (e) {
+                alert('저장 실패: ' + e.message);
+            }
+        }
+
+        async function toggleCouponActive(couponId, newActive) {
+            if (!checkDemoWriteAccess('쿠폰 상태 변경')) return;
+            try {
+                const { error } = await window.supabase.from('coupons')
+                    .update({ is_active: newActive, updated_at: new Date().toISOString() })
+                    .eq('id', couponId);
+                if (error) throw error;
+                await loadCouponSection();
+            } catch (e) {
+                alert('상태 변경 실패: ' + e.message);
+            }
+        }
+
+        // --- 발급 현황 ---
+        async function loadIssuedCoupons() {
+            try {
+                let query = window.supabase
+                    .from('user_coupons')
+                    .select('*, coupons(code, name, discount_type, discount_value)')
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+
+                const filter = document.getElementById('coupon-issue-filter')?.value || 'all';
+                if (filter === 'used') query = query.eq('is_used', true);
+                else if (filter === 'active') query = query.eq('is_used', false).gte('expires_at', new Date().toISOString());
+                else if (filter === 'expired') query = query.eq('is_used', false).lt('expires_at', new Date().toISOString());
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                // profiles는 별도 조회 (user_coupons.user_id → auth.users FK이므로 직접 join 불가)
+                const userIds = [...new Set((data || []).map(d => d.user_id))];
+                let profileMap = {};
+                if (userIds.length > 0) {
+                    const { data: profiles } = await window.supabase
+                        .from('profiles')
+                        .select('id, name, email')
+                        .in('id', userIds);
+                    (profiles || []).forEach(p => { profileMap[p.id] = p; });
+                }
+
+                issuedCoupons = (data || []).map(uc => ({
+                    ...uc,
+                    profile: profileMap[uc.user_id] || null
+                }));
+                renderIssuedCoupons();
+            } catch (e) {
+                console.error('발급 현황 로드 오류:', e);
+                document.getElementById('coupon-issued-body').innerHTML =
+                    '<tr><td colspan="7" class="text-center py-12" style="color:#EF4444;">로드 오류: ' + e.message + '</td></tr>';
+            }
+        }
+
+        function renderIssuedCoupons() {
+            const tbody = document.getElementById('coupon-issued-body');
+            if (!issuedCoupons.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">발급된 쿠폰이 없습니다.</td></tr>';
+                return;
+            }
+            const now = new Date();
+            tbody.innerHTML = issuedCoupons.map(uc => {
+                const studentName = uc.profile?.name || uc.profile?.email || '-';
+                const couponName = uc.coupons?.name || '-';
+                const code = uc.custom_code || uc.coupons?.code || '-';
+                const issuedDate = uc.issued_at ? new Date(uc.issued_at).toLocaleDateString('ko-KR') : '-';
+                const expiresDate = uc.expires_at ? new Date(uc.expires_at).toLocaleDateString('ko-KR') : '-';
+                const isExpired = uc.expires_at && new Date(uc.expires_at) < now;
+
+                let statusHtml;
+                if (uc.is_used) {
+                    statusHtml = '<span style="color:#16A34A;font-size:11px;font-weight:bold;">사용 완료</span>';
+                } else if (isExpired) {
+                    statusHtml = '<span style="color:#9CA3AF;font-size:11px;font-weight:bold;">만료</span>';
+                } else {
+                    statusHtml = '<span style="color:#3B82F6;font-size:11px;font-weight:bold;">사용 가능</span>';
+                }
+
+                const canRevoke = !uc.is_used && !isExpired;
+                return `<tr>
+                    <td>${studentName}</td>
+                    <td>${couponName}</td>
+                    <td><code style="background:#F3F4F6;padding:2px 6px;font-size:12px;">${code}</code></td>
+                    <td>${issuedDate}</td>
+                    <td>${expiresDate}</td>
+                    <td>${statusHtml}</td>
+                    <td class="text-right">
+                        ${canRevoke ? `<button onclick="revokeCoupon('${uc.id}')" class="text-xs font-bold demo-restricted" style="color:#EF4444;cursor:pointer;">회수</button>` : '-'}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function revokeCoupon(userCouponId) {
+            if (!checkDemoWriteAccess('쿠폰 회수')) return;
+            if (!confirm('이 쿠폰을 회수하시겠습니까?')) return;
+            try {
+                const { error } = await window.supabase.from('user_coupons').delete().eq('id', userCouponId);
+                if (error) throw error;
+                await loadCouponSection();
+            } catch (e) {
+                alert('회수 실패: ' + e.message);
+            }
+        }
+
+        // --- 학생에게 쿠폰 발급 ---
+        let issueStudentList = []; // 전체 학생 목록 캐시
+
+        async function openIssueCouponModal() {
+            document.getElementById('issue-coupon-modal').classList.remove('hidden');
+            document.getElementById('issue-coupon-preview').classList.add('hidden');
+            document.getElementById('issue-student-search').value = '';
+            document.getElementById('issue-select-all').checked = false;
+
+            // 학생 목록 로드
+            try {
+                const { data: students } = await window.supabase
+                    .from('profiles')
+                    .select('id, name, email')
+                    .neq('role', 'admin')
+                    .neq('role', 'demo')
+                    .order('name');
+                issueStudentList = students || [];
+            } catch (e) {
+                console.error(e);
+                issueStudentList = [];
+            }
+            renderIssueStudentList();
+
+            // 활성 쿠폰 목록 로드
+            const couponSelect = document.getElementById('issue-coupon-select');
+            couponSelect.innerHTML = '<option value="">쿠폰을 선택하세요</option>';
+            const activeCoupons = couponTemplates.filter(c => c.is_active);
+            activeCoupons.forEach(c => {
+                const discountText = c.discount_type === 'percentage' ? `${c.discount_value}%` : `${Number(c.discount_value).toLocaleString()}원`;
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} (${discountText} 할인)`;
+                couponSelect.appendChild(opt);
+            });
+
+            // 쿠폰 선택 시 미리보기
+            couponSelect.onchange = function() {
+                const preview = document.getElementById('issue-coupon-preview');
+                const c = activeCoupons.find(t => t.id === this.value);
+                if (c) {
+                    const discountText = c.discount_type === 'percentage'
+                        ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                        : `${Number(c.discount_value).toLocaleString()}원`;
+                    preview.innerHTML = `
+                        <div><strong>${c.name}</strong></div>
+                        <div style="color:#6B7280;">할인: ${discountText}</div>
+                        <div style="color:#6B7280;">유효기간: 발급일로부터 ${c.valid_days || 7}일</div>
+                        ${c.min_purchase_amount > 0 ? `<div style="color:#6B7280;">최소 구매: ${Number(c.min_purchase_amount).toLocaleString()}원</div>` : ''}
+                    `;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            };
+        }
+
+        function renderIssueStudentList() {
+            const keyword = (document.getElementById('issue-student-search')?.value || '').toLowerCase();
+            const filtered = issueStudentList.filter(s => {
+                const name = (s.name || '').toLowerCase();
+                const email = (s.email || '').toLowerCase();
+                return !keyword || name.includes(keyword) || email.includes(keyword);
+            });
+
+            const container = document.getElementById('issue-student-list');
+            document.getElementById('issue-student-count').textContent = filtered.length;
+
+            if (!filtered.length) {
+                container.innerHTML = '<div class="px-3 py-4 text-center text-sm" style="color:#9CA3AF;">검색 결과 없음</div>';
+                updateSelectedCount();
+                return;
+            }
+
+            container.innerHTML = filtered.map(s => `
+                <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100" style="font-size:13px;">
+                    <input type="checkbox" class="issue-student-cb" value="${s.id}" onchange="updateSelectedCount()">
+                    <span class="font-medium" style="color:#111;">${s.name || '이름없음'}</span>
+                    <span style="color:#9CA3AF;font-size:11px;">${s.email || ''}</span>
+                </label>
+            `).join('');
+            updateSelectedCount();
+        }
+
+        function filterIssueStudents() {
+            renderIssueStudentList();
+        }
+
+        function toggleSelectAllStudents(checked) {
+            document.querySelectorAll('.issue-student-cb').forEach(cb => { cb.checked = checked; });
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.issue-student-cb:checked').length;
+            document.getElementById('issue-selected-count').textContent = `${count}명 선택`;
+        }
+
+        function closeIssueCouponModal() {
+            document.getElementById('issue-coupon-modal').classList.add('hidden');
+        }
+
+        function generateCustomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'PROMO-';
+            for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
+
+        async function issueCouponToStudents() {
+            if (!checkDemoWriteAccess('쿠폰 발급')) return;
+
+            const couponId = document.getElementById('issue-coupon-select').value;
+            if (!couponId) { alert('쿠폰을 선택하세요.'); return; }
+
+            const selectedIds = [...document.querySelectorAll('.issue-student-cb:checked')].map(cb => cb.value);
+            if (!selectedIds.length) { alert('학생을 1명 이상 선택하세요.'); return; }
+
+            const coupon = couponTemplates.find(c => c.id === couponId);
+            if (!coupon) { alert('선택한 쿠폰을 찾을 수 없습니다.'); return; }
+
+            if (!confirm(`${selectedIds.length}명에게 "${coupon.name}" 쿠폰을 발급하시겠습니까?`)) return;
+
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + (coupon.valid_days || 7));
+
+            const records = selectedIds.map(userId => ({
+                user_id: userId,
+                coupon_id: couponId,
+                custom_code: generateCustomCode(),
+                issued_at: new Date().toISOString(),
+                expires_at: expiresAt.toISOString(),
+                is_used: false,
+                created_at: new Date().toISOString()
+            }));
+
+            try {
+                const { error } = await window.supabase.from('user_coupons').insert(records);
+                if (error) throw error;
+                alert(`${selectedIds.length}명에게 쿠폰이 발급되었습니다!`);
+                closeIssueCouponModal();
+                await loadCouponSection();
+            } catch (e) {
+                alert('발급 실패: ' + e.message);
+            }
+        }
+        // ========== 쿠폰 관리 끝 ==========
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
