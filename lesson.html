@@ -1024,12 +1024,16 @@
                     maxWatchedTime = result.data.watched_seconds;
                 }
                 if (result.data.last_position && videoDuration > 0) {
-                    const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
-                    if (safePosition > 0 && safePosition < videoDuration) {
-                        player.setCurrentTime(safePosition);
+                    // 이미 완료된 레슨(95%+)은 처음부터 재생
+                    const isCompleted = result.data.progress_percent >= 95 || result.data.is_completed;
+                    if (!isCompleted) {
+                        const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
+                        if (safePosition > 0 && safePosition < videoDuration) {
+                            player.setCurrentTime(safePosition);
+                        }
+                        // lastPlaybackTime도 복원 위치로 설정 (스킵 감지 오작동 방지)
+                        lastPlaybackTime = result.data.last_position;
                     }
-                    // lastPlaybackTime도 복원 위치로 설정 (스킵 감지 오작동 방지)
-                    lastPlaybackTime = result.data.last_position;
                 }
                 // 저장된 진도율 표시
                 if (result.data.progress_percent) {
