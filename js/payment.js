@@ -385,6 +385,7 @@ async function initPaymentPage() {
 
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('payment-content').classList.remove('hidden');
+        loadMyCoupons();
         return;
     }
 
@@ -452,6 +453,9 @@ async function initPaymentPage() {
     // 결제 화면 표시
     document.getElementById('loading-state').classList.add('hidden');
     document.getElementById('payment-content').classList.remove('hidden');
+
+    // 보유 쿠폰 목록 로드
+    loadMyCoupons();
 }
 
 // 대기 중인 결제로 UI 설정
@@ -603,6 +607,78 @@ function showErrorState() {
 }
 
 // ========== 쿠폰 관리 ==========
+
+// 보유 쿠폰 목록 로드 및 표시
+async function loadMyCoupons() {
+    const container = document.getElementById('my-coupons-list');
+    if (!container) return;
+
+    try {
+        const user = await getCurrentUser();
+        if (!user) {
+            container.innerHTML = '';
+            return;
+        }
+
+        const nowISO = new Date().toISOString();
+        const { data, error } = await window.supabase
+            .from('user_coupons')
+            .select('*, coupons(code, name, discount_type, discount_value, min_purchase_amount, max_discount_amount)')
+            .eq('user_id', user.id)
+            .eq('is_used', false)
+            .gt('expires_at', nowISO);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p class="text-sm text-gray-500">사용 가능한 쿠폰이 없습니다.</p>';
+            return;
+        }
+
+        container.innerHTML = data.map(uc => {
+            const c = uc.coupons;
+            if (!c) return '';
+            const discountText = c.discount_type === 'percentage'
+                ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                : `${Number(c.discount_value).toLocaleString()}원`;
+            const code = uc.custom_code || c.code;
+            const daysLeft = Math.ceil((new Date(uc.expires_at) - new Date()) / (1000 * 60 * 60 * 24));
+            const urgentClass = daysLeft <= 3 ? 'text-red-400' : 'text-gray-500';
+
+            return `
+                <button onclick="applyMyCoupon('${code}')"
+                        class="w-full text-left p-3 bg-white bg-opacity-5 border border-white border-opacity-10 rounded-xl hover:bg-opacity-10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white text-sm font-semibold">${c.name}</p>
+                            <p class="text-yellow-400 text-xs font-bold mt-1">${discountText} 할인</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs ${urgentClass}">${daysLeft}일 남음</p>
+                            <p class="text-[10px] text-gray-600 mt-1">${code}</p>
+                        </div>
+                    </div>
+                </button>
+            `;
+        }).join('');
+
+    } catch (e) {
+        console.error('보유 쿠폰 로드 오류:', e);
+        container.innerHTML = '';
+    }
+}
+
+// 보유 쿠폰 클릭 시 자동 적용
+function applyMyCoupon(code) {
+    document.getElementById('coupon-code').value = code;
+    applyCoupon();
+}
+
+// 코드 직접 입력 토글
+function toggleCouponCodeInput() {
+    const area = document.getElementById('coupon-code-input-area');
+    area.classList.toggle('hidden');
+}
 
 // 쿠폰 적용
 async function applyCoupon() {
