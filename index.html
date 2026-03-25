@@ -13,10 +13,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --header-h: 126px;
-            --sidebar-w: min(21.77vw, 418px);     /* 418/1920 */
-            --sidebar-gap: min(3.75vw, 72px);     /* 72/1920 */
-            --page-right: min(8.28vw, 159px);     /* 159/1920 */
+            --header-h: 6.56vw;
+            --sidebar-w: 21.77vw;
+            --sidebar-gap: 3.75vw;
+            --page-right: 8.28vw;
+        }
+        html {
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            display: none;
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
@@ -49,25 +55,25 @@
         <!-- 좌측: 로고 -->
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
             <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+                <img src="logo.png" alt="ALLROUND" class="h-[0.89vw] w-auto" style="filter: brightness(0);">
             </a>
         </div>
         <!-- 우측: Auth + 햄버거 -->
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 3.49vw;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 3.07vw;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Sign up</a>
             </div>
-            <div id="user-menu" class="hidden items-center gap-6">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+            <div id="user-menu" class="hidden items-center gap-[1.25vw]">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-[0.73vw] hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-[0.94vw] lg:text-[1.04vw] hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-[0.94vw] lg:text-[1.04vw] hover:opacity-60 transition-opacity">Logout</button>
             </div>
             <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
                 <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
             </button>
             <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[1.25vw] w-auto">
             </button>
         </div>
     </header>
@@ -115,49 +121,49 @@
 
         <!-- Layer 1: 사이드바 (Desktop) — 흰색 배경으로 이미지 좌측을 가림 -->
         <aside class="hidden lg:flex flex-col justify-center absolute z-10 bg-white"
-               style="left: 0; top: 0; width: min(21.77vw, 418px); height: 100vh; padding-right: min(3.75vw, 72px);">
-            <nav class="text-right space-y-6">
+               style="left: 0; top: 0; width: 21.77vw; height: 100vh; padding-right: 3.75vw;">
+            <nav class="text-right space-y-[1.25vw]">
                 <div>
-                    <a href="about.html" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">학원 소개</a>
+                    <a href="about.html" class="sidebar-link block text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw]">학원 소개</a>
                 </div>
                 <div>
-                    <p class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px] mb-3">수업 안내</p>
+                    <p class="text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] mb-[0.63vw]">수업 안내</p>
                     <div class="space-y-0">
-                        <a href="firstee.html" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">ALLROUND firstee</a>
-                        <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">ALLROUND original</a>
-                        <a href="strategy.html" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">ALLROUND strategy</a>
+                        <a href="firstee.html" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">ALLROUND firstee</a>
+                        <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">ALLROUND original</a>
+                        <a href="strategy.html" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">ALLROUND strategy</a>
                     </div>
                 </div>
                 <div>
-                    <a href="courses.html" class="sidebar-link flex items-center justify-end gap-2">
-                        <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
-                        <span class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">온라인 강의</span>
+                    <a href="courses.html" class="sidebar-link flex items-center justify-end gap-[0.42vw]">
+                        <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-[1.04vw] w-auto">
+                        <span class="text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw]">온라인 강의</span>
                     </a>
                 </div>
                 <div>
-                    <p class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px] mb-3">학원 소식</p>
+                    <p class="text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] mb-[0.63vw]">학원 소식</p>
                     <div class="space-y-0">
-                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">Instagram</a>
-                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">Youtube</a>
-                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[18px] leading-[40px] tracking-[-0.18px]">Blog</a>
+                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">Instagram</a>
+                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">Youtube</a>
+                        <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw]">Blog</a>
                     </div>
                 </div>
                 <div>
-                    <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">상담 예약</a>
+                    <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw]">상담 예약</a>
                 </div>
                 <div>
-                    <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">강사 채용</a>
+                    <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw]">강사 채용</a>
                 </div>
             </nav>
         </aside>
 
         <!-- Layer 2: 카톡 상담 Desktop (Figma: right=12.92vw, top=17.04vh) -->
-        <div class="hidden lg:block absolute z-20" style="right: min(12.92vw, 248px); top: 17.04vh;">
+        <div class="hidden lg:block absolute z-20" style="right: 12.92vw; top: 17.04vh;">
             <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                class="kakao-btn relative inline-block">
-                <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
+                <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[3.23vw] w-[9.74vw] object-contain block">
                 <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
-                    <span class="text-[#2F2725] text-[20px] font-bold tracking-[-0.2px]">카톡 상담</span>
+                    <span class="text-[#2F2725] text-[1.04vw] font-bold tracking-[-0.01vw]">카톡 상담</span>
                 </div>
             </a>
         </div>

@@ -12,16 +12,21 @@
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
     <style>
         :root {
-            --page-right: min(8.28vw, 159px);
-            --header-h: 126px;
-            --sidebar-w: min(21.77vw, 418px);
-            --sidebar-gap: min(3.75vw, 72px);
+            --page-right: 8.28vw;
+            --header-h: 6.56vw;
+            --sidebar-w: 21.77vw;
+            --sidebar-gap: 3.75vw;
+        }
+        html {
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            display: none;
         }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
             margin: 0;
-            overflow-x: hidden;
         }
         .sidebar-link { transition: all 0.2s ease; }
         .sidebar-link:hover { color: #2F2725 !important; font-weight: 700; opacity: 0.8; }
@@ -36,24 +41,24 @@
     <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
             <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+                <img src="logo.png" alt="ALLROUND" class="h-[0.89vw] w-auto" style="filter: brightness(0);">
             </a>
         </div>
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 3.49vw;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 3.07vw;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Sign up</a>
             </div>
-            <div id="user-menu" class="hidden items-center gap-6">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+            <div id="user-menu" class="hidden items-center gap-[1.25vw]">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-[0.73vw] hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-[0.94vw] lg:text-[1.04vw] hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-[0.94vw] lg:text-[1.04vw] hover:opacity-60 transition-opacity">Logout</button>
             </div>
             <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[1.04vw] w-auto">
             </button>
             <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[1.25vw] w-auto">
             </button>
         </div>
     </header>
@@ -96,104 +101,104 @@
     <main class="flex-1 relative" style="padding-top: var(--header-h);">
         <div class="flex h-[calc(100vh-var(--header-h))]">
             <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6">
+                <nav class="text-right space-y-[1.25vw]">
                     <div>
-                        <a href="about.html" class="sidebar-link block text-[#9FA0A0] font-semibold text-[18px] leading-relaxed">학원 소개</a>
+                        <a href="about.html" class="sidebar-link block text-[#9FA0A0] font-semibold text-[0.94vw] leading-relaxed">학원 소개</a>
                     </div>
                     <div>
-                        <p class="text-[#2F2725] font-bold text-[18px] leading-relaxed mb-2">수업 안내</p>
-                        <div class="space-y-2">
-                            <a href="firstee.html" class="sidebar-link block text-[#2F2725] font-bold text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
-                            <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
-                            <a href="strategy.html" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
+                        <p class="text-[#2F2725] font-bold text-[0.94vw] leading-relaxed mb-[0.42vw]">수업 안내</p>
+                        <div class="space-y-[0.42vw]">
+                            <a href="firstee.html" class="sidebar-link block text-[#2F2725] font-bold text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
+                            <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
+                            <a href="strategy.html" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
                         </div>
                     </div>
                     <div>
-                        <a href="courses.html" class="sidebar-link flex items-center justify-end gap-2">
-                            <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
-                            <span class="text-[#9FA0A0] font-semibold text-[18px] leading-relaxed">온라인 강의</span>
+                        <a href="courses.html" class="sidebar-link flex items-center justify-end gap-[0.42vw]">
+                            <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-[1.04vw] w-auto">
+                            <span class="text-[#9FA0A0] font-semibold text-[0.94vw] leading-relaxed">온라인 강의</span>
                         </a>
                     </div>
                     <div>
-                        <p class="text-[#2F2725] font-semibold text-[18px] leading-relaxed mb-2">학원 소식</p>
-                        <div class="space-y-2">
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Instagram</a>
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Youtube</a>
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Blog</a>
+                        <p class="text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed mb-[0.42vw]">학원 소식</p>
+                        <div class="space-y-[0.42vw]">
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Instagram</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Youtube</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Blog</a>
                         </div>
                     </div>
                     <div>
-                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">상담 예약</a>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed">상담 예약</a>
                     </div>
                     <div>
-                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">강사 채용</a>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed">강사 채용</a>
                     </div>
                 </nav>
             </aside>
 
             <!-- 본문 컨텐츠 (스크롤 가능 영역) -->
             <div class="flex-1 relative overflow-y-auto" style="background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), #F5F5F5;">
-                
+
                 <!-- 카톡 상담 -->
-                <div class="hidden lg:block fixed z-50" style="right: min(13.44vw, 258px); top: 143px;">
+                <div class="hidden lg:block fixed z-50" style="right: 13.44vw; top: 7.45vw;">
                     <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
                        class="kakao-btn relative inline-block">
-                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
+                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[3.23vw] w-[9.74vw] object-contain block">
                         <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
-                            <span class="text-[#2F2725] text-[20px] font-bold tracking-[-0.2px]">카톡 상담</span>
+                            <span class="text-[#2F2725] text-[1.04vw] font-bold tracking-[-0.01vw]">카톡 상담</span>
                         </div>
                     </a>
                 </div>
 
                 <!-- ALLROUND firstee 타이틀 영역 (회색 배경) -->
-                <div class="px-6 md:px-12 pt-12 pb-6 text-[#2F2725]">
-                    <div class="flex items-center gap-4 max-w-[1320px] ml-[24px]">
-                        <div class="w-[2px] h-[22px] bg-[#2F2725]"></div>
-                        <h1 class="text-[35px] leading-[35px] tracking-[-0.35px]" style="font-family: 'Libre Bodoni', serif; font-weight: 400;"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-2" style="filter: brightness(0); transform: translateY(-0.1em);">firstee</h1>
-                        <span class="bg-[#2F2725] text-white text-[14px] md:text-[20px] px-4 py-1 font-normal ml-2 whitespace-nowrap rounded-md">초등 1학년 - 초등 4학년</span>
+                <div class="px-[1.25vw] lg:px-[2.50vw] pt-[2.50vw] pb-[1.25vw] text-[#2F2725]">
+                    <div class="flex items-center gap-[0.83vw] max-w-[68.75vw] ml-[1.25vw]">
+                        <div class="w-[0.10vw] h-[1.15vw] bg-[#2F2725]"></div>
+                        <h1 class="text-[1.82vw] leading-[1.82vw] tracking-[-0.02vw]" style="font-family: 'Libre Bodoni', serif; font-weight: 400;"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-[0.42vw]" style="filter: brightness(0); transform: translateY(-0.1em);">firstee</h1>
+                        <span class="bg-[#2F2725] text-white text-[1.04vw] px-[0.83vw] py-[0.21vw] font-normal ml-[0.42vw] whitespace-nowrap rounded-md">초등 1학년 - 초등 4학년</span>
                     </div>
                 </div>
 
                 <!-- ALLROUND firstee HTML 컨텐츠 컨테이너 (흰색 배경 카드) -->
-                <div class="w-full max-w-[1320px] ml-[24px] px-6 md:px-16 lg:pl-[82px] lg:pr-[60px] py-16 text-[#2F2725] bg-white mb-[25px] relative z-10">
+                <div class="w-full max-w-[68.75vw] ml-[1.25vw] px-[1.25vw] lg:pl-[4.27vw] lg:pr-[3.13vw] py-[3.33vw] text-[#2F2725] bg-white mb-[1.30vw] relative z-10">
 
                     <!-- Intro -->
-                    <div class="mb-24">
-                        <h2 class="text-[28px] md:text-[35px] font-extrabold leading-[40px] md:leading-[50px] tracking-[-0.35px] mb-16">우리 모두의 출발선은<br>다를 수 밖에 없습니다.</h2>
+                    <div class="mb-[5.00vw]">
+                        <h2 class="text-[1.82vw] font-extrabold leading-[2.60vw] tracking-[-0.02vw] mb-[3.33vw]">우리 모두의 출발선은<br>다를 수 밖에 없습니다.</h2>
 
-                        <div class="flex flex-col lg:flex-row gap-8 lg:gap-[90px] lg:items-end">
+                        <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[4.69vw] lg:items-end">
                             <!-- Left: Text (Figma: 336px) -->
                             <div class="flex-1">
-                                <div class="bg-[#13372A] text-white text-[14px] md:text-[20px] px-5 py-2 mb-6 inline-flex items-center gap-1 font-normal rounded-md">
+                                <div class="bg-[#13372A] text-white text-[1.04vw] px-[1.04vw] py-[0.42vw] mb-[1.25vw] inline-flex items-center gap-[0.21vw] font-normal rounded-md">
                                     <span>Section</span> <span class="font-semibold">1</span>
                                 </div>
-                                <h3 class="text-[22px] md:text-[30px] font-semibold leading-[36px] md:leading-[45px] tracking-[-0.3px] mb-6">가볍게 시작해도,<br>출발선은 명확하게</h3>
-                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                <h3 class="text-[1.56vw] font-semibold leading-[2.34vw] tracking-[-0.02vw] mb-[1.25vw]">가볍게 시작해도,<br>출발선은 명확하게</h3>
+                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
                                     <p>출발을 어떻게 설계하느냐에 따라</p>
                                     <p>아이의 6년, 10년이 달라집니다.</p>
-                                    <p class="mb-[45px]"></p>
+                                    <p class="mb-[2.34vw]"></p>
                                     <p>즐겁게만 학습하기엔 불안하고,</p>
                                     <p>무겁게 시작하기엔 부담스럽습니다.</p>
                                 </div>
                             </div>
 
                             <!-- Right: Entrance Structure (f1) — Figma: 720px, bottom-aligned with text -->
-                            <div class="flex-shrink-0 w-full lg:w-[720px]">
+                            <div class="flex-shrink-0 w-full lg:w-[37.50vw]">
                                 <img src="asset/firstee/f1.png" alt="Allround entrance structure" class="w-full">
                             </div>
                         </div>
                     </div>
 
                     <!-- Section 2 -->
-                    <div class="mb-24">
-                        <div class="bg-[#13372A] text-white text-[14px] md:text-[20px] px-5 py-2 mb-6 inline-flex items-center gap-1 font-normal rounded-md">
+                    <div class="mb-[5.00vw]">
+                        <div class="bg-[#13372A] text-white text-[1.04vw] px-[1.04vw] py-[0.42vw] mb-[1.25vw] inline-flex items-center gap-[0.21vw] font-normal rounded-md">
                             <span>Section</span> <span class="font-semibold">2</span>
                         </div>
 
-                        <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 mb-16 lg:items-start">
+                        <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[3.33vw] mb-[3.33vw] lg:items-start">
                             <div class="flex-1">
-                                <h3 class="text-[22px] md:text-[30px] font-semibold leading-[36px] md:leading-[45px] tracking-[-0.3px] mb-6"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span><br>the first step with ALLROUND</h3>
-                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                <h3 class="text-[1.56vw] font-semibold leading-[2.34vw] tracking-[-0.02vw] mb-[1.25vw]"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span><br>the first step with ALLROUND</h3>
+                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
                                     <p>ALLROUNDfirstee는</p>
                                     <p>올라운드로 들어오는 첫 관문으로</p>
                                     <p>학생의 현재 수준을 정확히 진단하고,</p>
@@ -204,18 +209,18 @@
                             </div>
 
                             <!-- Class/Program table (f2) — Figma: 543px, top-aligned -->
-                            <div class="flex-shrink-0 w-full lg:w-[543px]">
+                            <div class="flex-shrink-0 w-full lg:w-[28.28vw]">
                                 <img src="asset/firstee/f2.png" alt="Class Program table" class="w-full">
                             </div>
                         </div>
 
                         <!-- 01 Firstee Track -->
-                        <div class="mb-20">
-                            <h4 class="text-[20px] md:text-[25px] font-bold mb-3">01 <span style="font-family: 'Libre Bodoni', serif;">Firstee</span> Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[14px] md:text-[18px] px-4 py-1 inline-block font-normal mb-6 rounded-md">영어 첫시작 CLASS</div>
+                        <div class="mb-[4.17vw]">
+                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">01 <span style="font-family: 'Libre Bodoni', serif;">Firstee</span> Track</h4>
+                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">영어 첫시작 CLASS</div>
 
-                            <div class="flex flex-col lg:flex-row lg:gap-[30px] gap-8 lg:items-center">
-                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px] flex-1">
+                            <div class="flex flex-col lg:flex-row lg:gap-[1.56vw] gap-[1.67vw] lg:items-center">
+                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw] flex-1">
                                     <p>처음 영어를 접하는 학생들을 위한 프로그램입니다.</p>
                                     <p>파닉스를 통해 영어를 올바르게 읽고 쓰는 법을 학습 한 후,</p>
                                     <p>기초 문법을 배우게 됩니다. 파닉스가 완성된 이후,</p>
@@ -224,19 +229,19 @@
                                     <p>만들어가는 과정입니다.</p>
                                 </div>
                                 <!-- Firstee Track diagram (f3) — Figma: 574px, vertically centered -->
-                                <div class="flex-shrink-0 w-full lg:w-[574px]">
+                                <div class="flex-shrink-0 w-full lg:w-[29.90vw]">
                                     <img src="asset/firstee/f3.png" alt="Firstee Track" class="w-full">
                                 </div>
                             </div>
                         </div>
 
                         <!-- 02 Global Track -->
-                        <div class="mb-20">
-                            <h4 class="text-[20px] md:text-[25px] font-bold mb-3">02 Global Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[14px] md:text-[18px] px-4 py-1 inline-block font-normal mb-6 rounded-md">영어 유치원 졸업 / 국제학교 CLASS</div>
+                        <div class="mb-[4.17vw]">
+                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">02 Global Track</h4>
+                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">영어 유치원 졸업 / 국제학교 CLASS</div>
 
-                            <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 lg:items-start">
-                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px] flex-1">
+                            <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[3.33vw] lg:items-start">
+                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw] flex-1">
                                     <p>이미 영어에 충분히 노출된 학생을 위한 트랙입니다.</p>
                                     <p>미국 교과서를 기반으로 Social Studies, Science,</p>
                                     <p>Language Arts 중심 수업을 진행합니다.</p>
@@ -245,7 +250,7 @@
                                     <p>내신과 교과 내용을 체계적으로 관리합니다.</p>
                                 </div>
                                 <!-- Global Track diagram (f4) — Figma: 전체그룹 470px (원형182+라벨), top-aligned -->
-                                <div class="flex-shrink-0 w-full lg:w-[470px]">
+                                <div class="flex-shrink-0 w-full lg:w-[24.48vw]">
                                     <img src="asset/firstee/f4.png" alt="Global Track" class="w-full">
                                 </div>
                             </div>
@@ -253,13 +258,13 @@
 
                         <!-- 03 Bridge Track -->
                         <div>
-                            <h4 class="text-[20px] md:text-[25px] font-bold mb-3">03 Bridge Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[14px] md:text-[18px] px-4 py-1 inline-block font-normal mb-6 rounded-md">정규반진입 전 보완 과정</div>
+                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">03 Bridge Track</h4>
+                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">정규반진입 전 보완 과정</div>
 
-                            <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                            <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
                                 <!-- Bridge Track diagram (f5) — Figma: 708px, 텍스트와 겹침 → float -->
-                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="hidden lg:block float-right w-[708px] ml-6 mb-4">
-                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="lg:hidden w-full mb-6">
+                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="hidden lg:block float-right w-[36.88vw] ml-[1.25vw] mb-[0.83vw]">
+                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="lg:hidden w-full mb-[1.25vw]">
                                 <p>영어학습의 경험이 있지만,</p>
                                 <p>정규반에 바로 들어가기에는 부족한 부분이</p>
                                 <p>있는 학생을 위한 과정입니다.</p>
@@ -274,9 +279,9 @@
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex justify-center gap-2 mt-20 pb-16">
-                        <a href="courses.html" class="w-[125px] h-[47px] flex items-center justify-center bg-[#13372A] text-white text-[16px] md:text-[20px] font-normal hover:bg-opacity-90 transition rounded-md">전체 강의</a>
-                        <a href="#" class="w-[125px] h-[47px] flex items-center justify-center bg-[#13372A] text-white text-[16px] md:text-[20px] font-normal hover:bg-opacity-90 transition rounded-md">상담 예약</a>
+                    <div class="flex justify-center gap-[0.42vw] mt-[4.17vw] pb-[3.33vw]">
+                        <a href="courses.html" class="w-[6.51vw] h-[2.45vw] flex items-center justify-center bg-[#13372A] text-white text-[1.04vw] font-normal hover:bg-opacity-90 transition rounded-md">전체 강의</a>
+                        <a href="#" class="w-[6.51vw] h-[2.45vw] flex items-center justify-center bg-[#13372A] text-white text-[1.04vw] font-normal hover:bg-opacity-90 transition rounded-md">상담 예약</a>
                     </div>
                 </div>
             </div>
