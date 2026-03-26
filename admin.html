@@ -382,6 +382,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="courses-pagination" class="flex items-center justify-between mt-6"></div>
 
                 <!-- Data/Manage/Access 인라인 패널은 JS로 동적 생성됨 -->
             </section>
@@ -678,6 +679,7 @@
                         Loading members...
                     </div>
                 </div>
+                <div id="members-pagination" class="flex items-center justify-between mt-6"></div>
             </section>
 
             <!-- 회원 상세 모달 -->
@@ -779,13 +781,19 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="payments-pagination" class="flex items-center justify-between mt-6"></div>
             </section>
 
             <!-- 과제 관리 섹션 -->
             <section id="section-assignments" class="hidden">
-                <div class="mb-12">
-                    <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Academics Management</span>
-                    <h1 class="text-4xl font-bold text-white tracking-tight">Assignments</h1>
+                <div class="flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Academics Management</span>
+                        <h1 class="text-4xl font-bold text-white tracking-tight">Assignments</h1>
+                    </div>
+                    <button onclick="clearAllAssignmentData()" class="btn-admin-outline text-xs demo-restricted" style="border-color: rgba(239,68,68,0.3); color: #EF4444;">
+                        과제 데이터 초기화
+                    </button>
                 </div>
 
                 <!-- 요약 카드들 -->
@@ -888,6 +896,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="assignments-pagination" class="flex items-center justify-between mt-6"></div>
             </section>
 
             <!-- 채점 모달 -->
@@ -1118,6 +1127,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="orders-pagination" class="flex items-center justify-between mt-6"></div>
             </section>
 
             <!-- Q&A 관리 섹션 -->
@@ -1139,6 +1149,7 @@
                 <div id="qna-list-admin" class="space-y-4">
                     <p class="text-gray-500 text-center py-12">Q&A 목록을 불러오는 중...</p>
                 </div>
+                <div id="qna-pagination" class="flex items-center justify-between mt-6"></div>
             </section>
 
             <!-- 알림톡 발송 내역 섹션 -->
@@ -1200,6 +1211,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="coupon-templates-pagination" class="flex items-center justify-between mt-4"></div>
                 </div>
 
                 <!-- 발급 현황 -->
@@ -1231,6 +1243,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="coupon-issued-pagination" class="flex items-center justify-between mt-4"></div>
                 </div>
             </section>
 
@@ -1473,6 +1486,86 @@
         let allCourses = [];
         let isDemoMode = false;
 
+        // ========== 공용 페이지네이션 시스템 ==========
+        const PAGE_SIZE = 20;
+        const paginationState = {};
+
+        function initPagination(key) {
+            if (!paginationState[key]) {
+                paginationState[key] = { page: 1, totalItems: 0, allData: [] };
+            }
+        }
+
+        function getPaginatedData(key) {
+            const state = paginationState[key];
+            if (!state) return [];
+            const start = (state.page - 1) * PAGE_SIZE;
+            return state.allData.slice(start, start + PAGE_SIZE);
+        }
+
+        function renderPaginationUI(key, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const state = paginationState[key];
+            if (!state || state.allData.length <= PAGE_SIZE) {
+                container.innerHTML = '';
+                return;
+            }
+            const totalPages = Math.ceil(state.allData.length / PAGE_SIZE);
+            const current = state.page;
+
+            // 라이트 테마 감지 (쿠폰 섹션)
+            const isLight = key.startsWith('coupon');
+            const borderClass = isLight ? 'border-gray-300' : 'border-white border-opacity-10';
+            const borderHover = isLight ? 'hover:border-gray-500' : 'hover:border-opacity-30';
+            const activeClass = isLight ? 'bg-black text-white border-black' : 'bg-white text-black border-white';
+            const inactiveStyle = isLight ? 'color:#6B7280;' : 'color:#6B7280;';
+            const activeStyle = isLight ? 'color:#fff;' : 'color:#000;';
+
+            // 페이지 번호 생성 (최대 5개 표시)
+            let pages = [];
+            let startPage = Math.max(1, current - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+            for (let i = startPage; i <= endPage; i++) pages.push(i);
+
+            container.innerHTML = `
+                <span class="text-[10px] text-gray-500 uppercase tracking-widest">
+                    ${((current - 1) * PAGE_SIZE) + 1}-${Math.min(current * PAGE_SIZE, state.allData.length)} of ${state.allData.length}
+                </span>
+                <div class="flex items-center gap-1">
+                    <button onclick="goToPage('${key}', ${current - 1})" ${current <= 1 ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border ${borderClass} ${borderHover} disabled:opacity-20 disabled:cursor-not-allowed transition-colors" style="${inactiveStyle}">Prev</button>
+                    ${pages.map(p => `
+                        <button onclick="goToPage('${key}', ${p})"
+                            class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border transition-colors ${p === current ? activeClass : borderClass + ' ' + borderHover}" style="${p === current ? activeStyle : inactiveStyle}">${p}</button>
+                    `).join('')}
+                    <button onclick="goToPage('${key}', ${current + 1})" ${current >= totalPages ? 'disabled' : ''}
+                        class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border ${borderClass} ${borderHover} disabled:opacity-20 disabled:cursor-not-allowed transition-colors" style="${inactiveStyle}">Next</button>
+                </div>
+            `;
+        }
+
+        function goToPage(key, page) {
+            const state = paginationState[key];
+            if (!state) return;
+            const totalPages = Math.ceil(state.allData.length / PAGE_SIZE);
+            if (page < 1 || page > totalPages) return;
+            state.page = page;
+            // 각 탭별 렌더 함수 호출
+            const renderers = {
+                'assignments': () => renderAssignmentsTablePaged(),
+                'courses': () => renderCoursesTablePaged(),
+                'members': () => renderMembersGridPaged(),
+                'payments': () => renderPaymentTablePaged(),
+                'orders': () => renderOrdersTablePaged(),
+                'qna': () => renderQnaListPaged(),
+                'coupon-templates': () => renderCouponTemplatesPaged(),
+                'coupon-issued': () => renderCouponIssuedPaged()
+            };
+            if (renderers[key]) renderers[key]();
+        }
+
         // ========== 데모 모드 함수 ==========
 
         function checkDemoWriteAccess(action = '수정') {
@@ -1565,14 +1658,11 @@
 
         async function loadStudentAssignments() {
             try {
-                // 1. 모든 프로필 데이터 (관리자 제외)
+                // 1. 모든 프로필 데이터
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email, role')
+                    .select('id, name, email')
                     .order('name');
-
-                // 관리자 계정 필터링
-                const studentProfiles = profiles?.filter(p => p.role !== 'admin') || [];
 
                 if (profileError) throw profileError;
 
@@ -1639,9 +1729,9 @@
                 // 퀴즈 결과가 없어도 계속 진행
                 const quizResultsData = quizResults || [];
 
-                // 맵 생성 (학생만)
+                // 맵 생성
                 const profileMap = new Map();
-                studentProfiles.forEach(p => profileMap.set(p.id, p));
+                profiles?.forEach(p => profileMap.set(p.id, p));
 
                 const courseMap = new Map();
                 courses?.forEach(c => courseMap.set(c.id, c));
@@ -1680,9 +1770,9 @@
                     quizMap.get(key).push(q);
                 });
 
-                // 모든 학생-레슨 조합 생성 (관리자 제외)
+                // 모든 학생-레슨 조합 생성
                 allSubmissions = [];
-                studentProfiles.forEach(profile => {
+                profiles?.forEach(profile => {
                     lessons?.forEach(lesson => {
                         const key = `${profile.id}_${lesson.id}`;
                         const submission = submissionMap.get(key);
@@ -1799,6 +1889,34 @@
             }
         }
 
+        async function clearAllAssignmentData() {
+            if (!checkDemoWriteAccess('과제 데이터 초기화')) return;
+
+            const confirmMsg = '정말로 모든 과제 데이터를 삭제하시겠습니까?\n\n삭제 대상:\n- assignments 테이블 (노트/블로그/카카오 체크리스트)\n- student_submissions 테이블 (이미지 제출)\n- teacher_feedback 테이블 (채점 결과)\n\n이 작업은 되돌릴 수 없습니다.';
+            if (!confirm(confirmMsg)) return;
+            if (!confirm('최종 확인: 정말 삭제하시겠습니까?')) return;
+
+            try {
+                // 1. teacher_feedback 삭제 (FK 의존)
+                const { error: fbError } = await window.supabase.from('teacher_feedback').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                if (fbError) console.error('teacher_feedback 삭제 오류:', fbError);
+
+                // 2. student_submissions 삭제
+                const { error: subError } = await window.supabase.from('student_submissions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                if (subError) console.error('student_submissions 삭제 오류:', subError);
+
+                // 3. assignments 삭제
+                const { error: assignError } = await window.supabase.from('assignments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                if (assignError) console.error('assignments 삭제 오류:', assignError);
+
+                alert('과제 데이터가 초기화되었습니다.');
+                loadStudentAssignments();
+            } catch (error) {
+                console.error('과제 데이터 초기화 오류:', error);
+                alert('오류가 발생했습니다: ' + error.message);
+            }
+        }
+
         function updateAssignmentStats() {
             const pending = allSubmissions.filter(s =>
                 (s.imageStatus === 'submitted') ||
@@ -1893,7 +2011,17 @@
                 });
             }
 
-            renderAssignmentsTable(filtered);
+            // 페이지네이션 적용
+            initPagination('assignments');
+            paginationState['assignments'].allData = filtered;
+            paginationState['assignments'].page = 1;
+            renderAssignmentsTablePaged();
+        }
+
+        function renderAssignmentsTablePaged() {
+            const pageData = getPaginatedData('assignments');
+            renderAssignmentsTable(pageData);
+            renderPaginationUI('assignments', 'assignments-pagination');
         }
 
         // 필터 초기화
@@ -1907,10 +2035,9 @@
         function renderAssignmentsTable(submissions) {
             const tbody = document.getElementById('assignments-table-body');
 
-            console.log('과제 테이블 렌더링:', submissions?.length || 0, '건');
-
             if (!submissions || submissions.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">No activity found.</td></tr>';
+                document.getElementById('assignments-pagination').innerHTML = '';
                 return;
             }
 
@@ -2893,7 +3020,7 @@
                     return;
                 }
 
-                // 템플릿 파라미터 (NHN 등록 변수: 학생명, 과제명, 점수)
+                // 템플릿 파라미터 (피드백 제거됨 - 사이트에서 확인)
                 const templateParams = {
                     '학생명': profile.name || '학생',
                     '과제명': `${lesson.order_num}강`,
@@ -2951,13 +3078,9 @@
                 const statusFilter = document.getElementById('notif-filter-status').value;
                 const daysFilter = document.getElementById('notif-filter-days').value;
 
-                // 테스트 계정 제외
-                const TEST_USER_IDS = ['7eb83391-e010-478c-8bf0-90426e6f383c'];
-
                 let query = window.supabase
                     .from('notification_logs')
                     .select('*')
-                    .not('user_id', 'in', `(${TEST_USER_IDS.join(',')})`)
                     .order('created_at', { ascending: false })
                     .range(notifOffset, notifOffset + NOTIF_PAGE_SIZE - 1);
 
@@ -3045,12 +3168,9 @@
 
         async function loadNotifStats(daysFilter) {
             try {
-                const TEST_USER_IDS = ['7eb83391-e010-478c-8bf0-90426e6f383c'];
-
                 let query = window.supabase
                     .from('notification_logs')
-                    .select('status')
-                    .not('user_id', 'in', `(${TEST_USER_IDS.join(',')})`);
+                    .select('status');
 
                 if (daysFilter !== 'all') {
                     const since = new Date();
@@ -3257,51 +3377,12 @@
                     lessonCounts[l.course_id] = (lessonCounts[l.course_id] || 0) + 1;
                 });
 
-                tbody.innerHTML = courses.map(course => {
-                    const visibility = course.visibility || 'public';
-                    const isPublic = visibility === 'public';
-                    const lessonCount = lessonCounts[course.id] || 0;
-
-                    return `
-                    <tr data-course-id="${course.id}">
-                        <td>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-8 bg-white bg-opacity-5 flex-shrink-0 overflow-hidden">
-                                    <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&q=80'}" 
-                                         class="w-full h-full object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-                                </div>
-                                <div>
-                                    <p class="text-white font-medium">${course.title}</p>
-                                    ${!isPublic ? '<span class="text-[9px] uppercase tracking-widest font-bold text-yellow-500">Private</span>' : ''}
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="text-[10px] uppercase tracking-widest text-gray-500">${course.category || '-'}</span></td>
-                        <td class="text-white">₩${(course.price || 0).toLocaleString()}</td>
-                        <td class="text-gray-500 text-[10px] uppercase tracking-widest">${lessonCount} Lessons</td>
-                        <td class="text-right">
-                            <div class="flex justify-end space-x-4">
-                                ${!isDemoMode && !isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
-                                        class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
-                                    Access
-                                </button>` : ''}
-                                <button onclick="showCourseData('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
-                                        class="text-[10px] uppercase tracking-widest font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
-                                    Data
-                                </button>
-                                ${!isDemoMode ? `
-                                <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
-                                        class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
-                                    Manage
-                                </button>
-                                <button onclick="editCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
-                                <button onclick="deleteCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
-                                ` : ''}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                }).join('');
+                // 페이지네이션 적용
+                window._coursesRenderData = { courses, lessonCounts };
+                initPagination('courses');
+                paginationState['courses'].allData = courses;
+                paginationState['courses'].page = 1;
+                renderCoursesTablePaged();
 
             } catch (error) {
                 console.error('Load courses error:', error);
@@ -3313,6 +3394,60 @@
                     </tr>
                 `;
             }
+        }
+
+        function renderCoursesTablePaged() {
+            const pageData = getPaginatedData('courses');
+            const { lessonCounts } = window._coursesRenderData || {};
+            const tbody = document.getElementById('course-table-body');
+            if (!pageData.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">No courses found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = pageData.map(course => {
+                const visibility = course.visibility || 'public';
+                const isPublic = visibility === 'public';
+                const lessonCount = (lessonCounts && lessonCounts[course.id]) || 0;
+                return `
+                <tr data-course-id="${course.id}">
+                    <td>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-8 bg-white bg-opacity-5 flex-shrink-0 overflow-hidden">
+                                <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=100&q=80'}"
+                                     class="w-full h-full object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">${course.title}</p>
+                                ${!isPublic ? '<span class="text-[9px] uppercase tracking-widest font-bold text-yellow-500">Private</span>' : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="text-[10px] uppercase tracking-widest text-gray-500">${course.category || '-'}</span></td>
+                    <td class="text-white">₩${(course.price || 0).toLocaleString()}</td>
+                    <td class="text-gray-500 text-[10px] uppercase tracking-widest">${lessonCount} Lessons</td>
+                    <td class="text-right">
+                        <div class="flex justify-end space-x-4">
+                            ${!isDemoMode && !isPublic ? `<button onclick="manageCourseAccess('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
+                                    class="text-[10px] uppercase tracking-widest font-bold text-yellow-500 hover:text-yellow-400 transition-colors">
+                                Access
+                            </button>` : ''}
+                            <button onclick="showCourseData('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
+                                    class="text-[10px] uppercase tracking-widest font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                                Data
+                            </button>
+                            ${!isDemoMode ? `
+                            <button onclick="selectCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')"
+                                    class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">
+                                Manage
+                            </button>
+                            <button onclick="editCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-gray-400 hover:text-white transition-colors">Edit</button>
+                            <button onclick="deleteCourse('${course.id}')" class="text-[10px] uppercase tracking-widest font-bold text-red-500 hover:text-red-400 transition-colors">Delete</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+            renderPaginationUI('courses', 'courses-pagination');
         }
 
         // 강의 선택 (영상 관리) - 인라인 패널로 표시
@@ -3930,7 +4065,10 @@
                     profile: profileMap.get(order.user_id) || {}
                 }));
 
-                renderPaymentTable();
+                initPagination('payments');
+                paginationState['payments'].allData = allPayments;
+                paginationState['payments'].page = 1;
+                renderPaymentTablePaged();
                 updatePaymentStats();
 
             } catch (error) {
@@ -3940,15 +4078,23 @@
             }
         }
 
-        function renderPaymentTable() {
+        function renderPaymentTablePaged() {
+            const pageData = getPaginatedData('payments');
+            renderPaymentTable(pageData);
+            renderPaginationUI('payments', 'payments-pagination');
+        }
+
+        function renderPaymentTable(paymentsData) {
+            const payments = paymentsData || allPayments;
             const tbody = document.getElementById('payment-table-body');
 
-            if (!allPayments || allPayments.length === 0) {
+            if (!payments || payments.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">No payments found.</td></tr>';
+                document.getElementById('payments-pagination').innerHTML = '';
                 return;
             }
 
-            tbody.innerHTML = allPayments.map(payment => {
+            tbody.innerHTML = payments.map(payment => {
                 const date = new Date(payment.created_at).toLocaleDateString('ko-KR');
                 const paymentType = payment.payment_type || 'course';
                 const typeLabel = paymentType === 'textbook' ? 'Textbook' : 'Course';
@@ -4000,6 +4146,7 @@
             allPayments = [];
             document.getElementById('payment-table-body').innerHTML =
                 '<tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">기간을 선택하고 조회 버튼을 클릭하세요.</td></tr>';
+            document.getElementById('payments-pagination').innerHTML = '';
             document.getElementById('stat-payment-count').textContent = '0건';
             document.getElementById('stat-course-total').textContent = '0원';
             document.getElementById('stat-textbook-total').textContent = '0원';
@@ -4179,8 +4326,11 @@
                 // 통계 업데이트
                 updateMemberStats();
                 
-                // 카드 렌더링
-                renderMembersGrid(allMembers);
+                // 카드 렌더링 (페이지네이션 적용)
+                initPagination('members');
+                paginationState['members'].allData = allMembers;
+                paginationState['members'].page = 1;
+                renderMembersGridPaged();
 
             } catch (error) {
                 console.error('회원 로드 오류:', error);
@@ -4275,6 +4425,12 @@
             }).join('');
         }
 
+        function renderMembersGridPaged() {
+            const pageData = getPaginatedData('members');
+            renderMembersGrid(pageData);
+            renderPaginationUI('members', 'members-pagination');
+        }
+
         let currentMemberTypeFilter = 'all';
 
         function filterMembersByType(type) {
@@ -4312,7 +4468,10 @@
                 return matchesSearch && matchesType;
             });
 
-            renderMembersGrid(filtered);
+            initPagination('members');
+            paginationState['members'].allData = filtered;
+            paginationState['members'].page = 1;
+            renderMembersGridPaged();
         }
 
         function openMemberModal(memberId) {
@@ -4512,7 +4671,10 @@
 
                 allOrders = filteredOrders;
                 updateOrderStats();
-                renderOrdersTable(allOrders);
+                initPagination('orders');
+                paginationState['orders'].allData = allOrders;
+                paginationState['orders'].page = 1;
+                renderOrdersTablePaged();
 
             } catch (error) {
                 console.error('주문 로드 오류:', error);
@@ -4546,15 +4708,22 @@
             document.getElementById('stat-delivered').textContent = stats.DELIVERED;
         }
 
+        function renderOrdersTablePaged() {
+            const pageData = getPaginatedData('orders');
+            renderOrdersTable(pageData);
+            renderPaginationUI('orders', 'orders-pagination');
+        }
+
         function renderOrdersTable(orders) {
             const tbody = document.getElementById('orders-table-body');
-            
+
             if (!orders || orders.length === 0) {
                 tbody.innerHTML = `
                     <tr><td colspan="8" class="px-4 py-20 text-center text-gray-600 uppercase tracking-widest text-[10px]">
                         No orders found.
                     </td></tr>
                 `;
+                document.getElementById('orders-pagination').innerHTML = '';
                 return;
             }
 
@@ -4746,18 +4915,37 @@
 
                 // 데이터 검증 및 변환
                 quizData = jsonData.map((row, index) => {
-                    // 엑셀의 다양한 헤더 형식 처리
-                    const questionNumber = row['문제번호'] || row['번호'] || (index + 1);
-                    const questionType = row['문제유형'] || row['유형'] || '객관식';
-                    const question = row['질문'] || row['문제'] || '';
-                    const option1 = row['선택지1'] || row['보기1'] || '';
-                    const option2 = row['선택지2'] || row['보기2'] || '';
-                    const option3 = row['선택지3'] || row['보기3'] || '';
-                    const option4 = row['선택지4'] || row['보기4'] || '';
-                    const correctAnswer = String(row['정답'] || '').trim();
-                    const explanation = row['해설'] || '';
-                    const appearMinute = parseInt(row['등장시간(분)'] || row['분'] || 0);
-                    const appearSecond = parseInt(row['등장시간(초)'] || row['초'] || 0);
+                    // 엑셀의 다양한 헤더 형식 처리 (공백/줄바꿈 제거)
+                    const trimmedRow = {};
+                    Object.keys(row).forEach(key => {
+                        trimmedRow[key.trim()] = typeof row[key] === 'string' ? row[key].trim() : row[key];
+                    });
+                    const questionNumber = trimmedRow['문제번호'] || trimmedRow['번호'] || (index + 1);
+                    const rawType = trimmedRow['문제유형'] || trimmedRow['유형'] || '';
+                    // 주관식/객관식/OX 정규화 (빈 값이면 선택지 유무로 자동 판별)
+                    let questionType;
+                    if (rawType.includes('주관식') || rawType.toLowerCase() === 'short') {
+                        questionType = '주관식';
+                    } else if (rawType.includes('OX') || rawType.toLowerCase() === 'ox' || rawType.includes('ox')) {
+                        questionType = 'OX';
+                    } else if (rawType.includes('객관식') || rawType.toLowerCase() === 'multiple') {
+                        questionType = '객관식';
+                    } else if (!rawType) {
+                        // 유형이 비어있으면 선택지 유무로 자동 판별
+                        const hasOptions = trimmedRow['선택지1'] || trimmedRow['보기1'];
+                        questionType = hasOptions ? '객관식' : '주관식';
+                    } else {
+                        questionType = rawType; // 알 수 없는 값은 그대로 유지
+                    }
+                    const question = trimmedRow['질문'] || trimmedRow['문제'] || '';
+                    const option1 = trimmedRow['선택지1'] || trimmedRow['보기1'] || '';
+                    const option2 = trimmedRow['선택지2'] || trimmedRow['보기2'] || '';
+                    const option3 = trimmedRow['선택지3'] || trimmedRow['보기3'] || '';
+                    const option4 = trimmedRow['선택지4'] || trimmedRow['보기4'] || '';
+                    const correctAnswer = String(trimmedRow['정답'] || '').trim();
+                    const explanation = trimmedRow['해설'] || '';
+                    const appearMinute = parseInt(trimmedRow['등장시간(분)'] || trimmedRow['분'] || 0);
+                    const appearSecond = parseInt(trimmedRow['등장시간(초)'] || trimmedRow['초'] || 0);
 
                     if (!question) {
                         throw new Error(`${questionNumber}번 문제의 질문이 비어있습니다.`);
@@ -5149,52 +5337,67 @@
                     qna.courses = coursesMap[qna.course_id] || null;
                 });
 
-                container.innerHTML = data.map(qna => {
-                    const date = new Date(qna.created_at).toLocaleString('ko-KR');
-                    const userName = demoMask(qna.profiles?.name, 'name') || '알 수 없음';
-                    const userPhone = demoMask(qna.profiles?.phone, 'phone') || '';
-                    const lessonTitle = qna.lessons ? `${qna.lessons.order_num}강. ${qna.lessons.title}` : '';
-                    const courseTitle = qna.courses?.title || '';
-                    const statusBadge = qna.is_answered
-                        ? '<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-[10px] font-bold uppercase tracking-widest">답변완료</span>'
-                        : '<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-[10px] font-bold uppercase tracking-widest">미답변</span>';
-
-                    return `
-                        <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10 space-y-4 hover:bg-opacity-[0.05] transition-all">
-                            <div class="flex items-start justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        ${statusBadge}
-                                        <span class="text-[10px] text-gray-600">${date}</span>
-                                    </div>
-                                    <h3 class="text-white font-bold text-sm mb-2">${qna.title}</h3>
-                                    <p class="text-gray-400 text-xs leading-relaxed line-clamp-2">${qna.content}</p>
-                                </div>
-                                ${!isDemoMode ? `<button onclick="openQnaAnswerModal(${qna.id})" class="btn-admin-outline text-xs px-4 py-2 ml-4">
-                                    ${qna.is_answered ? '수정' : '답변'}
-                                </button>` : ''}
-                            </div>
-                            <div class="flex items-center gap-6 text-[10px] text-gray-600">
-                                <span>작성자: <span class="text-gray-400">${userName}</span></span>
-                                ${userPhone ? `<span>연락처: <span class="text-gray-400">${userPhone}</span></span>` : ''}
-                                ${courseTitle ? `<span>코스: <span class="text-gray-400">${courseTitle}</span></span>` : ''}
-                                ${lessonTitle ? `<span>강의: <span class="text-gray-400">${lessonTitle}</span></span>` : ''}
-                            </div>
-                            ${qna.answer ? `
-                                <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-green-500">
-                                    <p class="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-2">답변</p>
-                                    <p class="text-gray-400 text-xs leading-relaxed">${qna.answer}</p>
-                                    ${qna.answered_at ? `<p class="text-[10px] text-gray-600 mt-2">${new Date(qna.answered_at).toLocaleString('ko-KR')}</p>` : ''}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
+                // 페이지네이션 적용
+                window._qnaAllData = data;
+                initPagination('qna');
+                paginationState['qna'].allData = data;
+                paginationState['qna'].page = 1;
+                renderQnaListPaged();
 
             } catch (error) {
                 console.error('Q&A 목록 로드 오류:', error);
                 container.innerHTML = '<p class="text-red-400 text-center py-12">Q&A 목록을 불러오는데 실패했습니다.</p>';
             }
+        }
+
+        function renderQnaListPaged() {
+            const pageData = getPaginatedData('qna');
+            const container = document.getElementById('qna-list-admin');
+            if (!pageData || pageData.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-12">No questions found.</p>';
+                document.getElementById('qna-pagination').innerHTML = '';
+                return;
+            }
+            container.innerHTML = pageData.map(qna => {
+                const date = new Date(qna.created_at).toLocaleString('ko-KR');
+                const userName = demoMask(qna.profiles?.name, 'name') || '알 수 없음';
+                const userPhone = demoMask(qna.profiles?.phone, 'phone') || '';
+                const lessonTitle = qna.lessons ? `${qna.lessons.order_num}강. ${qna.lessons.title}` : '';
+                const courseTitle = qna.courses?.title || '';
+                const statusBadge = qna.is_answered
+                    ? '<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-[10px] font-bold uppercase tracking-widest">답변완료</span>'
+                    : '<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-[10px] font-bold uppercase tracking-widest">미답변</span>';
+                return `
+                    <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10 space-y-4 hover:bg-opacity-[0.05] transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    ${statusBadge}
+                                    <span class="text-[10px] text-gray-600">${date}</span>
+                                </div>
+                                <h3 class="text-white font-bold text-sm mb-2">${qna.title}</h3>
+                                <p class="text-gray-400 text-xs leading-relaxed line-clamp-2">${qna.content}</p>
+                            </div>
+                            ${!isDemoMode ? `<button onclick="openQnaAnswerModal(${qna.id})" class="btn-admin-outline text-xs px-4 py-2 ml-4">
+                                ${qna.is_answered ? '수정' : '답변'}
+                            </button>` : ''}
+                        </div>
+                        <div class="flex items-center gap-6 text-[10px] text-gray-600">
+                            <span>작성자: <span class="text-gray-400">${userName}</span></span>
+                            ${userPhone ? `<span>연락처: <span class="text-gray-400">${userPhone}</span></span>` : ''}
+                            ${courseTitle ? `<span>코스: <span class="text-gray-400">${courseTitle}</span></span>` : ''}
+                            ${lessonTitle ? `<span>강의: <span class="text-gray-400">${lessonTitle}</span></span>` : ''}
+                        </div>
+                        ${qna.answer ? `
+                            <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-green-500">
+                                <p class="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-2">답변</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">${qna.answer}</p>
+                                ${qna.answered_at ? `<p class="text-[10px] text-gray-600 mt-2">${new Date(qna.answered_at).toLocaleString('ko-KR')}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>`;
+            }).join('');
+            renderPaginationUI('qna', 'qna-pagination');
         }
 
         async function openQnaAnswerModal(qnaId) {
@@ -5331,18 +5534,16 @@
                     return;
                 }
 
-                // 3. 학생 프로필 정보 (관리자 제외)
-                const { data: courseProfiles, error: profileErr } = await window.supabase
+                // 3. 학생 프로필 정보
+                const { data: profiles, error: profileErr } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email, role')
+                    .select('id, name, email')
                     .in('id', studentIds);
 
                 if (profileErr) throw profileErr;
 
-                // 관리자 제외
-                const filteredProfiles = courseProfiles?.filter(p => p.role !== 'admin') || [];
                 const profileMap = {};
-                filteredProfiles.forEach(p => { profileMap[p.id] = p; });
+                profiles?.forEach(p => { profileMap[p.id] = p; });
 
                 // 4. 해당 강의 레슨들의 진도 데이터
                 const lessonIds = lessons.map(l => l.id);
@@ -5395,9 +5596,9 @@
                     </tr>
                 `;
 
-                // 테이블 바디 렌더링 (관리자 제외)
-                const rows = studentIds.filter(sid => profileMap[sid]).map(sid => {
-                    const profile = profileMap[sid];
+                // 테이블 바디 렌더링
+                const rows = studentIds.map(sid => {
+                    const profile = profileMap[sid] || {};
                     let completed = 0;
 
                     const lessonCells = lessons.map(l => {
@@ -5485,7 +5686,10 @@
                     .order('created_at', { ascending: false });
                 if (error) throw error;
                 couponTemplates = data || [];
-                renderCouponTemplates();
+                initPagination('coupon-templates');
+                paginationState['coupon-templates'].allData = couponTemplates;
+                paginationState['coupon-templates'].page = 1;
+                renderCouponTemplatesPaged();
             } catch (e) {
                 console.error('쿠폰 템플릿 로드 오류:', e);
                 document.getElementById('coupon-template-body').innerHTML =
@@ -5493,13 +5697,20 @@
             }
         }
 
-        function renderCouponTemplates() {
+        function renderCouponTemplatesPaged() {
+            const pageData = getPaginatedData('coupon-templates');
+            renderCouponTemplates(pageData);
+            renderPaginationUI('coupon-templates', 'coupon-templates-pagination');
+        }
+
+        function renderCouponTemplates(data) {
+            const items = data || couponTemplates;
             const tbody = document.getElementById('coupon-template-body');
-            if (!couponTemplates.length) {
+            if (!items.length) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">등록된 쿠폰 템플릿이 없습니다.</td></tr>';
                 return;
             }
-            tbody.innerHTML = couponTemplates.map(c => {
+            tbody.innerHTML = items.map(c => {
                 const discountText = c.discount_type === 'percentage'
                     ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
                     : `${Number(c.discount_value).toLocaleString()}원`;
@@ -5637,7 +5848,10 @@
                     ...uc,
                     profile: profileMap[uc.user_id] || null
                 }));
-                renderIssuedCoupons();
+                initPagination('coupon-issued');
+                paginationState['coupon-issued'].allData = issuedCoupons;
+                paginationState['coupon-issued'].page = 1;
+                renderCouponIssuedPaged();
             } catch (e) {
                 console.error('발급 현황 로드 오류:', e);
                 document.getElementById('coupon-issued-body').innerHTML =
@@ -5645,14 +5859,21 @@
             }
         }
 
-        function renderIssuedCoupons() {
+        function renderCouponIssuedPaged() {
+            const pageData = getPaginatedData('coupon-issued');
+            renderIssuedCoupons(pageData);
+            renderPaginationUI('coupon-issued', 'coupon-issued-pagination');
+        }
+
+        function renderIssuedCoupons(data) {
+            const items = data || issuedCoupons;
             const tbody = document.getElementById('coupon-issued-body');
-            if (!issuedCoupons.length) {
+            if (!items.length) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">발급된 쿠폰이 없습니다.</td></tr>';
                 return;
             }
             const now = new Date();
-            tbody.innerHTML = issuedCoupons.map(uc => {
+            tbody.innerHTML = items.map(uc => {
                 const studentName = uc.profile?.name || uc.profile?.email || '-';
                 const couponName = uc.coupons?.name || '-';
                 const code = uc.custom_code || uc.coupons?.code || '-';
