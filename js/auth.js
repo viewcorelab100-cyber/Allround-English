@@ -149,7 +149,13 @@ async function validateSession() {
         return { valid: true };
     } catch (error) {
         console.error('Validate session error:', error);
-        return { valid: true }; // 에러 시에는 일단 허용
+        // 네트워크 오류 시 3회까지는 허용 (일시적 장애 대응)
+        if (!window._sessionErrorCount) window._sessionErrorCount = 0;
+        window._sessionErrorCount++;
+        if (window._sessionErrorCount >= 3) {
+            return { valid: false, reason: 'error' };
+        }
+        return { valid: true };
     }
 }
 

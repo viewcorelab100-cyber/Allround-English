@@ -520,7 +520,10 @@
                     return;
                 }
 
-                messageDiv.innerHTML = '등록된 이메일: <strong>' + data.email + '</strong>';
+                // 이메일 마스킹 (보안: 전체 이메일 노출 방지)
+                const [localPart, domain] = data.email.split('@');
+                const masked = localPart.charAt(0) + '***@' + domain;
+                messageDiv.textContent = '등록된 이메일: ' + masked;
                 messageDiv.classList.remove('hidden', 'text-red-500', 'text-[#9FA0A0]');
                 messageDiv.classList.add('text-green-600');
             } catch (err) {

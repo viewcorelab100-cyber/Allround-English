@@ -969,7 +969,7 @@
 
                 // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 2) {
+                if (timeDiff > 0 && timeDiff < 5 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 5) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
@@ -1106,7 +1106,7 @@
 
                 // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 2 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 2) {
+                if (timeDiff > 0 && timeDiff < 5 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 5) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
@@ -2217,16 +2217,12 @@
                     continue;
                 }
 
-                // 모든 이미지 자동 압축
-                try {
-                    const compressedFile = await compressImage(file);
-                    console.log(`${file.name}: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
-                    validFiles.push(compressedFile);
-                } catch (error) {
-                    console.error('이미지 압축 오류:', error);
-                    alert(`${file.name}: 압축 실패. 다른 이미지를 선택해주세요.`);
+                // 이미지 검증만 (압축은 업로드 시 convertToWebP에서 처리)
+                if (file.size > 50 * 1024 * 1024) {
+                    alert(`${file.name}: 파일이 너무 큽니다 (50MB 이하만 가능).`);
                     continue;
                 }
+                validFiles.push(file);
             }
 
             if (validFiles.length === 0) return;
@@ -2374,20 +2370,13 @@
                 return;
             }
 
-            // 모든 이미지 자동 압축
-            let finalFile;
-            try {
-                finalFile = await compressImage(file);
-                const originalSize = (file.size / 1024 / 1024).toFixed(2);
-                const compressedSize = (finalFile.size / 1024 / 1024).toFixed(2);
-                console.log(`이미지 압축: ${originalSize}MB → ${compressedSize}MB`);
-            } catch (error) {
-                console.error('이미지 압축 오류:', error);
-                alert('이미지 압축에 실패했습니다. 다른 이미지를 선택해주세요.');
+            // 파일 크기 체크 (압축은 업로드 시 convertToWebP에서 처리)
+            if (file.size > 50 * 1024 * 1024) {
+                alert('파일이 너무 큽니다 (50MB 이하만 가능).');
                 return;
             }
 
-            selectedImageFile = finalFile;
+            selectedImageFile = file;
 
             // 미리보기 표시
             const reader = new FileReader();
@@ -2530,8 +2519,8 @@
 
             // DOM 요소 확인 (없으면 조용히 종료)
             const statusEl = document.getElementById('image-submission-status');
-            const gradingResultEl = document.getElementById('grading-result');
-            
+            const gradingResultEl = document.getElementById('grading-result-modal');
+
             if (!statusEl || !gradingResultEl) {
                 // 필요한 DOM 요소가 없으면 조용히 종료 (이미지 과제 카드가 없는 레슨일 수 있음)
                 return;
@@ -2570,8 +2559,8 @@
                     // 채점 결과 표시
                     if (feedback && submission.status === 'graded') {
                         gradingResultEl.classList.remove('hidden');
-                        const scoreEl = document.getElementById('grading-score');
-                        const commentEl = document.getElementById('grading-comment');
+                        const scoreEl = document.getElementById('grading-score-modal');
+                        const commentEl = document.getElementById('grading-comment-modal');
                         
                         if (scoreEl) {
                             scoreEl.textContent = feedback.score ? `${feedback.score}` : (feedback.grade || 'PASS');

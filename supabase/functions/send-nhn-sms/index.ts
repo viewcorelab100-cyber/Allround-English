@@ -10,9 +10,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// NHN Cloud API 설정
-const NHN_CLOUD_APP_KEY = 'xZBg2ycyyAv1RUyq'
-const NHN_SENDER_PHONE = '01063363823'
+// NHN Cloud API 설정 (환경변수에서 로드)
+const NHN_CLOUD_APP_KEY = Deno.env.get('NHN_CLOUD_APP_KEY') || ''
+const NHN_SENDER_PHONE = Deno.env.get('NHN_SENDER_PHONE') || ''
 
 serve(async (req) => {
   // CORS preflight 처리
@@ -21,6 +21,15 @@ serve(async (req) => {
   }
 
   try {
+    // 인증 확인 (Supabase anon key 또는 service_role key 필요)
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ success: false, error: '인증이 필요합니다.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
+    }
+
     const { phone, message } = await req.json()
 
     console.log('NHN SMS 발송 요청:', { phone, message })

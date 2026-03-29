@@ -202,7 +202,7 @@ serve(async (req) => {
 
     // 5. 쿠폰 사용 처리 (구매 기록 생성 전에 처리하여 race condition 방지)
     if (appliedCoupon) {
-      const { error: couponUseError } = await supabase
+      const { data: couponUpdateResult, error: couponUseError } = await supabase
         .from('user_coupons')
         .update({
           is_used: true,
@@ -210,9 +210,13 @@ serve(async (req) => {
           order_id: orderId,
         })
         .eq('id', appliedCoupon.id)
+        .eq('is_used', false)
+        .select()
 
       if (couponUseError) {
         console.error('쿠폰 사용 처리 실패:', couponUseError)
+      } else if (!couponUpdateResult || couponUpdateResult.length === 0) {
+        console.error('쿠폰이 이미 사용되었습니다:', appliedCoupon.id)
       }
     }
 

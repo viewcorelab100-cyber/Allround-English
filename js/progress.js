@@ -118,8 +118,21 @@ async function getCourseProgress(userId, courseId) {
             .in('lesson_id', lessonIds);
         
         if (progressError) throw progressError;
-        
-        const completedLessons = progress ? progress.filter(p => p.is_completed).length : 0;
+
+        // lesson_id 기준 deduplicate (watched_seconds가 가장 높은 레코드만 사용)
+        const uniqueProgress = [];
+        const seen = new Set();
+        if (progress) {
+            progress.sort((a, b) => (b.watched_seconds || 0) - (a.watched_seconds || 0));
+            for (const p of progress) {
+                if (!seen.has(p.lesson_id)) {
+                    seen.add(p.lesson_id);
+                    uniqueProgress.push(p);
+                }
+            }
+        }
+
+        const completedLessons = uniqueProgress.filter(p => p.is_completed).length;
         const totalLessons = lessons.length;
         const overallProgress = Math.round((completedLessons / totalLessons) * 100);
         
@@ -129,7 +142,7 @@ async function getCourseProgress(userId, courseId) {
                 progress: overallProgress, 
                 completedLessons, 
                 totalLessons,
-                lessonProgress: progress || []
+                lessonProgress: uniqueProgress
             } 
         };
     } catch (error) {
