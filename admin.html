@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
@@ -2214,7 +2215,7 @@
                             <p class="text-white font-medium">${sub.courseTitle}</p>
                             <p class="text-[10px] text-gray-600 uppercase tracking-tight">${sub.lessonOrder}강 ${sub.lessonTitle}</p>
                         </td>
-                        <td>${watchRateDisplay}</td>
+                        <td class="${sub.watchRate < 95 ? 'cursor-pointer hover:bg-white/5' : ''}" ${sub.watchRate < 95 ? `onclick="fixProgress('${sub.user_id}', '${sub.lesson_id}', '${sub.studentName.replace(/'/g, "\\'")}', '${sub.lessonOrder}강')"` : ''}>${watchRateDisplay}</td>
                         <td>${checklistDisplay}</td>
                         <td>${quizDisplay}</td>
                         <td>${imageDisplay}</td>
@@ -2239,6 +2240,61 @@
                 openGradingModalDirect(assignment.id, studentName, studentEmail, lessonTitle);
             } else {
                 alert(`${studentName} - ${lessonTitle}\n\n진도율: ${assignment.watchRate}%\n체크리스트: ${assignment.checklistRate}%\n퀴즈: ${assignment.quizScore !== null ? assignment.quizScore + '점' : '미응시'}\n이미지 과제: 미제출`);
+            }
+        }
+
+        // 관리자 진도 수동 보정 (과제 테이블 Watch 셀 클릭)
+        async function fixProgress(userId, lessonId, studentName, lessonLabel) {
+            if (!confirm(`${studentName} - ${lessonLabel}\n진도를 100% 완료로 보정하시겠습니까?`)) return;
+
+            try {
+                const { data: lesson } = await window.supabase
+                    .from('lessons').select('duration').eq('id', lessonId).single();
+
+                const totalSeconds = lesson?.duration || 0;
+                const now = new Date().toISOString();
+
+                const { data: existing } = await window.supabase
+                    .from('lesson_progress')
+                    .select('id')
+                    .eq('user_id', userId)
+                    .eq('lesson_id', lessonId)
+                    .limit(1);
+
+                if (existing && existing.length > 0) {
+                    const { error } = await window.supabase
+                        .from('lesson_progress')
+                        .update({
+                            watched_seconds: totalSeconds,
+                            total_seconds: totalSeconds,
+                            progress_percent: 100,
+                            is_completed: true,
+                            last_position: totalSeconds,
+                            updated_at: now
+                        })
+                        .eq('id', existing[0].id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await window.supabase
+                        .from('lesson_progress')
+                        .insert({
+                            user_id: userId,
+                            lesson_id: lessonId,
+                            watched_seconds: totalSeconds,
+                            total_seconds: totalSeconds,
+                            progress_percent: 100,
+                            is_completed: true,
+                            last_position: totalSeconds,
+                            created_at: now,
+                            updated_at: now
+                        });
+                    if (error) throw error;
+                }
+
+                alert('완료 처리되었습니다.');
+                await loadStudentAssignments();
+            } catch (error) {
+                alert('보정 실패: ' + error.message);
             }
         }
 
