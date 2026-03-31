@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
@@ -928,6 +929,24 @@
             }, 100);
         }
 
+        // 모바일/탭전환 대응: visibilitychange + pagehide로 진도 저장
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                if (vimeoPlayer || customVimeoPlayer) {
+                    saveVimeoProgress();
+                } else if (videoElement) {
+                    saveNativeProgress();
+                }
+            }
+        });
+        window.addEventListener('pagehide', function() {
+            if (vimeoPlayer || customVimeoPlayer) {
+                saveVimeoProgress();
+            } else if (videoElement) {
+                saveNativeProgress();
+            }
+        });
+
         // Vimeo 진도 추적 설정
         let _boundBeforeUnloadHandler = null; // beforeunload 리스너 참조 보관
         function setupVimeoProgressTracking() {
@@ -967,9 +986,11 @@
                     return;
                 }
 
-                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 버퍼링/탭전환 허용)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 5 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 5) {
+                const isNormalPlayback = timeDiff > 0 && timeDiff < 15;
+                const isNearWatchedFront = currentTime <= maxWatchedTime + 15;
+                if (isNormalPlayback && isNearWatchedFront && currentTime > maxWatchedTime) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
@@ -1002,10 +1023,10 @@
                 showAssignmentSequence(); // 과제 순서대로 모달 표시
             });
 
-            // 주기적으로 진도 저장 (30초마다)
+            // 주기적으로 진도 저장 (15초마다)
             progressInterval = setInterval(() => {
                 saveVimeoProgress();
-            }, 30000);
+            }, 15000);
 
             // 페이지 나갈 때 진도 저장
             _boundBeforeUnloadHandler = saveVimeoProgress;
@@ -1104,9 +1125,11 @@
                     return;
                 }
 
-                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
+                // 최대 시청 시간 업데이트 (건너뛰기 방지 - 버퍼링/탭전환 허용)
                 const timeDiff = currentTime - lastPlaybackTime;
-                if (timeDiff > 0 && timeDiff < 5 && currentTime > maxWatchedTime && currentTime <= maxWatchedTime + 5) {
+                const isNormalPlayback = timeDiff > 0 && timeDiff < 15;
+                const isNearWatchedFront = currentTime <= maxWatchedTime + 15;
+                if (isNormalPlayback && isNearWatchedFront && currentTime > maxWatchedTime) {
                     maxWatchedTime = currentTime;
                 }
                 lastPlaybackTime = currentTime;
@@ -1135,7 +1158,7 @@
 
             progressInterval = setInterval(() => {
                 if (!videoElement.paused) saveNativeProgress();
-            }, 30000);
+            }, 15000);
 
             _boundBeforeUnloadHandler = saveNativeProgress;
             window.addEventListener('beforeunload', _boundBeforeUnloadHandler);

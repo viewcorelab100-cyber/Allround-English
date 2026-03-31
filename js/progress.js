@@ -1,20 +1,10 @@
 // 학습 진도 관련 함수들
 
-// 레슨 진도 저장/업데이트
-async function updateLessonProgress(userId, lessonId, progressData) {
+// 레슨 진도 저장/업데이트 (재시도 로직 포함)
+async function updateLessonProgress(userId, lessonId, progressData, retryCount = 0) {
+    const MAX_RETRIES = 3;
+
     try {
-        // 기존 진도 확인 (.maybeSingle()로 중복 레코드 안전 처리)
-        const { data: rows, error: fetchError } = await window.supabase
-            .from('lesson_progress')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('lesson_id', lessonId)
-            .order('watched_seconds', { ascending: false })
-            .limit(1);
-
-        if (fetchError) throw fetchError;
-        const existing = rows && rows.length > 0 ? rows[0] : null;
-
         const progressRecord = {
             user_id: userId,
             lesson_id: lessonId,
@@ -26,21 +16,32 @@ async function updateLessonProgress(userId, lessonId, progressData) {
             updated_at: new Date().toISOString()
         };
 
+        // 기존 진도 확인
+        const { data: rows, error: fetchError } = await window.supabase
+            .from('lesson_progress')
+            .select('id, watched_seconds')
+            .eq('user_id', userId)
+            .eq('lesson_id', lessonId)
+            .order('watched_seconds', { ascending: false })
+            .limit(1);
+
+        if (fetchError) throw fetchError;
+        const existing = rows && rows.length > 0 ? rows[0] : null;
+
         let result;
         if (existing) {
-            // 업데이트 (더 높은 진도만 저장, last_position은 항상 갱신)
             if (progressData.watchedSeconds > existing.watched_seconds) {
+                // 더 높은 진도 → 전체 업데이트
                 const { data, error } = await window.supabase
                     .from('lesson_progress')
                     .update(progressRecord)
                     .eq('id', existing.id)
                     .select()
                     .single();
-
                 if (error) throw error;
                 result = data;
             } else {
-                // 진도는 낮지만 last_position은 갱신
+                // last_position만 갱신
                 const { data, error } = await window.supabase
                     .from('lesson_progress')
                     .update({
@@ -50,12 +51,11 @@ async function updateLessonProgress(userId, lessonId, progressData) {
                     .eq('id', existing.id)
                     .select()
                     .single();
-
                 if (error) throw error;
                 result = data;
             }
         } else {
-            // 새로 생성
+            // 신규 삽입
             progressRecord.created_at = new Date().toISOString();
             const { data, error } = await window.supabase
                 .from('lesson_progress')
@@ -63,13 +63,23 @@ async function updateLessonProgress(userId, lessonId, progressData) {
                 .select()
                 .single();
 
+            // unique constraint 충돌 → 재조회 후 update로 전환
+            if (error && error.code === '23505') {
+                return updateLessonProgress(userId, lessonId, progressData, retryCount);
+            }
             if (error) throw error;
             result = data;
         }
 
         return { success: true, data: result };
     } catch (error) {
-        console.error('Update progress error:', error);
+        // 재시도 (exponential backoff: 500ms, 1s, 2s)
+        if (retryCount < MAX_RETRIES) {
+            const delay = Math.pow(2, retryCount) * 500;
+            await new Promise(r => setTimeout(r, delay));
+            return updateLessonProgress(userId, lessonId, progressData, retryCount + 1);
+        }
+        console.error('Update progress error (max retries reached):', error);
         return { success: false, error: error.message };
     }
 }
