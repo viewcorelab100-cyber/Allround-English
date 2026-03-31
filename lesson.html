@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
@@ -901,25 +902,30 @@
             }, 100);
         }
 
-        // 최대 시청 시간 업데이트 (건너뛰기 방지 - 연속 재생만 인정)
+        // 최대 시청 시간 업데이트 (건너뛰기 방지 - 버퍼링/탭전환 허용)
         function updateMaxWatchedTime(currentTime) {
             const timeDiff = currentTime - lastPlaybackTime;
-            // 정상 재생: 순방향이고 5초 이내 간격 (버퍼링/지연 허용)
-            // 현재 위치가 maxWatchedTime 근처여야 함 (10초 이내)
-            if (timeDiff > 0 && timeDiff < 5 && currentTime <= maxWatchedTime + 10) {
-                if (currentTime > maxWatchedTime) {
-                    maxWatchedTime = currentTime;
-                }
+            // 정상 재생: 순방향이고 15초 이내 간격 (버퍼링/탭전환/지연 허용)
+            const isNormalPlayback = timeDiff > 0 && timeDiff < 15;
+            // 현재 위치가 maxWatchedTime 근처여야 함 (15초 이내)
+            const isNearWatchedFront = currentTime <= maxWatchedTime + 15;
+            if (isNormalPlayback && isNearWatchedFront && currentTime > maxWatchedTime) {
+                maxWatchedTime = currentTime;
             }
             lastPlaybackTime = currentTime;
         }
 
-        // 탭 전환 시 lastPlaybackTime 리셋 (BUG #7 수정)
+        // 탭 전환 시 진도 저장 + 복귀 시 연속 재생 허용 (BUG #7 수정)
         document.addEventListener('visibilitychange', function() {
             isTabVisible = !document.hidden;
             if (isTabVisible) {
-                // 탭 복귀 시 lastPlaybackTime 리셋하여 timeDiff 폭증 방지
-                lastPlaybackTime = 0;
+                // 탭 복귀 시: 현재 재생 위치로 리셋하여 다음 timeupdate에서 정상 gap 판정
+                // 0으로 리셋하면 timeDiff가 거대해져서 진도가 멈추므로, 비동기로 현재 위치를 가져옴
+                if (vimeoPlayer) {
+                    vimeoPlayer.getCurrentTime().then(t => { lastPlaybackTime = t; }).catch(() => {});
+                } else if (videoElement) {
+                    lastPlaybackTime = videoElement.currentTime;
+                }
             } else {
                 // 탭 이탈 시 현재 진도 저장
                 saveCurrentProgress();
@@ -975,13 +981,13 @@
                 showAssignmentSequence(); // 과제 순서대로 모달 표시
             });
 
-            // 주기적으로 진도 저장 (30초마다, 재생 중일 때만)
+            // 주기적으로 진도 저장 (15초마다, 재생 중일 때만)
             progressInterval = setInterval(async () => {
                 try {
                     const playing = await vimeoPlayer.getPaused().then(p => !p).catch(() => false);
                     if (playing) saveVimeoProgress();
                 } catch(e) {}
-            }, 30000);
+            }, 15000);
         }
 
         // 기존 initVimeoPlayer (하위 호환성)
@@ -1084,7 +1090,7 @@
 
             progressInterval = setInterval(() => {
                 if (!videoElement.paused) saveNativeProgress();
-            }, 30000);
+            }, 15000);
 
             window.addEventListener('beforeunload', saveNativeProgress);
         }
