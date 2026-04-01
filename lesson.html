@@ -1442,9 +1442,9 @@
                 // 영상 재생 중 퀴즈인 경우 - 모달 닫고 비디오 재개
                 closeQuizModal();
                 if (vimeoPlayer) {
-                    vimeoPlayer.play();
+                    vimeoPlayer.play().catch(() => {});
                 } else if (videoElement) {
-                    videoElement.play();
+                    videoElement.play().catch(() => {});
                 }
                 return;
 
@@ -1455,9 +1455,9 @@
             // 오류 발생 시에도 모달 닫고 비디오 재개
             closeQuizModal();
             if (vimeoPlayer) {
-                vimeoPlayer.play();
+                vimeoPlayer.play().catch(() => {});
             } else if (videoElement) {
-                videoElement.play();
+                videoElement.play().catch(() => {});
             }
         }
         
