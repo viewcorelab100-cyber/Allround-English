@@ -68,35 +68,19 @@ function loadGlobalFooter() {
                 </div>
             </div>
 
-            <!-- Mobile: 스택 레이아웃 -->
-            <div class="md:hidden space-y-3 px-4">
-                <p class="text-[#3E3A39] font-bold text-[15px] tracking-[-0.3px]">올라운드원격학원</p>
-                <div class="text-[#3E3A39] font-light text-[12px] leading-relaxed space-y-0.5">
-                    <p>학원설립·운영등록번호 : 제15256호 올라운드원격학원</p>
-                    <p>신고기관명 : 서울특별시 강남교육지원청</p>
-                    <p>사업자등록번호 : 560-94-02154 | 통신판매업신고 : 2026-서울강남-00399</p>
-                    <p>대표 원장 · 개인정보보호책임자 : 배은영</p>
-                    <p>E-mail : contact@allroundedu.co.kr | 고객센터 : 0507-1339-3823</p>
-                    <p>주소 : 서울 강남구 대치동 943-29 3층 3138호</p>
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <div class="flex items-center gap-2 text-[#3E3A39] text-[11px]">
-                        <a href="terms.html" class="hover:text-[#2F2725]">[이용 약관]</a>
-                        <a href="refund.html" class="hover:text-[#2F2725]">[환불 정책]</a>
-                        <a href="privacy.html" class="hover:text-[#2F2725]">[개인정보 처리 방침]</a>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Blog">
-                            <img src="asset/main/인스타그램.png" alt="Blog" class="w-full h-full object-contain">
-                        </a>
-                        <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Instagram">
-                            <img src="asset/main/블로그.png" alt="Instagram" class="w-full h-full object-contain">
-                        </a>
-                        <a href="#" class="block w-[30px] h-[30px] hover:opacity-70 transition-opacity" aria-label="Youtube">
-                            <img src="asset/main/유투브.png" alt="Youtube" class="w-full h-full object-contain">
-                        </a>
+            <!-- Mobile: 컴팩트 레이아웃 -->
+            <div class="md:hidden px-4 py-1">
+                <div class="flex items-center justify-between">
+                    <p class="text-[#3E3A39] font-bold text-[11px]">올라운드원격학원</p>
+                    <div class="flex items-center gap-1.5 text-[#8B95A1] text-[10px]">
+                        <a href="terms.html" class="hover:text-[#2F2725]">이용약관</a>
+                        <span>|</span>
+                        <a href="refund.html" class="hover:text-[#2F2725]">환불정책</a>
+                        <span>|</span>
+                        <a href="privacy.html" class="hover:text-[#2F2725]">개인정보</a>
                     </div>
                 </div>
+                <p class="text-[#8B95A1] text-[9px] mt-1 leading-relaxed">사업자등록번호 560-94-02154 | 통신판매업 2026-서울강남-00399 | 대표 배은영 | 고객센터 0507-1339-3823</p>
             </div>
         </div>
     `;

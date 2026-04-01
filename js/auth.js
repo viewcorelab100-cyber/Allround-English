@@ -488,31 +488,34 @@ async function updateAuthUI() {
     const authButtons = document.getElementById('auth-buttons');
     const userMenu = document.getElementById('user-menu');
     const adminLink = document.getElementById('admin-link');
-    
+    const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+    const mobileUserMenu = document.getElementById('mobile-user-menu');
+
     if (authButtons && userMenu) {
         if (user) {
             authButtons.classList.add('hidden');
             userMenu.classList.remove('hidden');
             userMenu.classList.add('flex', 'flex-row');
-            
-            // 관리자 또는 데모 계정 확인 및 관리자 링크 표시
+
+            // 모바일 햄버거 메뉴 인증 상태
+            if (mobileAuthButtons) mobileAuthButtons.classList.add('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.remove('hidden');
+
+            // 관리자 링크
             const adminOrDemoStatus = await isAdminOrDemo();
             if (adminLink) {
-                if (adminOrDemoStatus) {
-                    adminLink.classList.remove('hidden');
-                } else {
-                    adminLink.classList.add('hidden');
-                }
+                adminLink.classList.toggle('hidden', !adminOrDemoStatus);
             }
         } else {
             authButtons.classList.remove('hidden');
             userMenu.classList.add('hidden');
             userMenu.classList.remove('flex', 'flex-row');
-            
-            // 로그아웃 시 관리자 링크 숨김
-            if (adminLink) {
-                adminLink.classList.add('hidden');
-            }
+
+            // 모바일 햄버거 메뉴 인증 상태
+            if (mobileAuthButtons) mobileAuthButtons.classList.remove('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+
+            if (adminLink) adminLink.classList.add('hidden');
         }
     }
 }

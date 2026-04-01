@@ -22,15 +22,15 @@ function selectPaymentMethod(method) {
     const virtualBtn = document.getElementById('method-virtual');
     
     if (method === 'CARD') {
-        cardBtn.classList.remove('bg-opacity-5', 'border-transparent');
-        cardBtn.classList.add('bg-opacity-10', 'border-white');
-        virtualBtn.classList.remove('bg-opacity-10', 'border-white');
-        virtualBtn.classList.add('bg-opacity-5', 'border-transparent');
+        cardBtn.classList.remove('border-transparent', 'bg-gray-50');
+        cardBtn.classList.add('border-[#2F2725]', 'bg-white');
+        virtualBtn.classList.remove('border-[#2F2725]', 'bg-white');
+        virtualBtn.classList.add('border-transparent', 'bg-gray-50');
     } else {
-        virtualBtn.classList.remove('bg-opacity-5', 'border-transparent');
-        virtualBtn.classList.add('bg-opacity-10', 'border-white');
-        cardBtn.classList.remove('bg-opacity-10', 'border-white');
-        cardBtn.classList.add('bg-opacity-5', 'border-transparent');
+        virtualBtn.classList.remove('border-transparent', 'bg-gray-50');
+        virtualBtn.classList.add('border-[#2F2725]', 'bg-white');
+        cardBtn.classList.remove('border-[#2F2725]', 'bg-white');
+        cardBtn.classList.add('border-transparent', 'bg-gray-50');
     }
 }
 
@@ -872,8 +872,8 @@ function updatePaymentAmount() {
 function showCouponMessage(message, isSuccess) {
     const messageEl = document.getElementById('coupon-message');
     messageEl.textContent = message;
-    messageEl.classList.remove('hidden', 'text-red-400', 'text-green-400');
-    messageEl.classList.add(isSuccess ? 'text-green-400' : 'text-red-400');
+    messageEl.classList.remove('hidden', 'text-red-500', 'text-green-600');
+    messageEl.classList.add(isSuccess ? 'text-green-600' : 'text-red-500');
     
     // 3초 후 자동 숨김
     setTimeout(() => {

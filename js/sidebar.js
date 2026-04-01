@@ -18,38 +18,29 @@
 
     // 데스크탑 사이드바 HTML 생성
     function buildDesktopSidebar(activePage) {
-        const isAbout = activePage === 'about';
-        const isClass = ['firstee', 'original', 'strategy'].includes(activePage);
-        const isCourses = activePage === 'courses';
+        const isCourses = ['courses', 'course-detail', 'payment', 'payment-success', 'payment-fail'].includes(activePage);
 
-        const aboutCls = isAbout
-            ? 'sidebar-link block text-[#2F2725] font-bold text-[22px] leading-[22px]'
-            : 'sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]';
+        // 비활성 스타일: 회색 + 클릭 불가
+        const disabledMainCls = 'block text-[#C5C5C5] font-medium text-[22px] leading-[22px] tracking-[-0.22px] pointer-events-none';
+        const disabledSubCls = 'block text-[#D5D5D5] font-normal text-[18px] leading-[40px] tracking-[-0.18px] pointer-events-none';
 
-        const classTitleCls = isClass
-            ? 'text-[#2F2725] font-bold text-[22px] leading-[22px] mb-2'
-            : 'text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px] mb-2';
-
+        // 온라인 강의: 활성 스타일
         const onlineTitleCls = isCourses
             ? 'text-[#2F2725] font-bold text-[22px] leading-[22px]'
             : 'text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]';
 
         const classLinks = classPages.map(p => {
-            const isActiveClass = activePage === p.key;
-            const cls = isActiveClass
-                ? 'sidebar-link block text-[#2F2725] font-bold text-[18px] leading-[40px] tracking-[-0.18px]'
-                : 'sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]';
-            return `<a href="${p.href}" class="${cls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">${p.label}</span></a>`;
+            return `<span class="${disabledSubCls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); opacity: 0.3; transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">${p.label}</span></span>`;
         }).join('\n');
 
         return `
         <nav class="text-right">
             <div>
-                <a href="about.html" class="${aboutCls}">학원 소개</a>
+                <span class="${disabledMainCls}">학원 소개</span>
             </div>
-            <div style="margin-top:39px;" class="sidebar-group sidebar-group-class">
-                <p class="${classTitleCls} cursor-pointer">수업 안내</p>
-                <div class="sidebar-submenu${isClass ? '' : ' sidebar-submenu-hidden'}" style="margin-top:15px;">
+            <div style="margin-top:39px;">
+                <p class="${disabledMainCls} mb-2">수업 안내</p>
+                <div class="sidebar-submenu sidebar-submenu-hidden" style="margin-top:15px;">
                     ${classLinks}
                 </div>
             </div>
@@ -59,47 +50,49 @@
                     <span class="${onlineTitleCls}">온라인 강의</span>
                 </a>
             </div>
-            <div style="margin-top:76px;" class="sidebar-group sidebar-group-news">
-                <p class="text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px] cursor-pointer">학원 소식</p>
-                <div class="sidebar-submenu sidebar-submenu-hidden" style="margin-top:20px;">
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Instagram</a>
-                    <a href="#" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Youtube</a>
-                    <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="sidebar-link block text-[#9FA0A0] font-normal text-[18px] leading-[40px] tracking-[-0.18px]">Blog</a>
-                </div>
+            <div style="margin-top:76px;">
+                <p class="${disabledMainCls}">학원 소식</p>
             </div>
             <div style="margin-top:72px;">
-                <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">상담 예약</a>
+                <span class="${disabledMainCls}">상담 예약</span>
             </div>
             <div style="margin-top:40px;">
-                <a href="#" class="sidebar-link block text-[#2F2725] font-medium text-[22px] leading-[22px] tracking-[-0.22px]">강사 채용</a>
+                <span class="${disabledMainCls}">강사 채용</span>
             </div>
         </nav>`;
     }
 
     // 모바일 메뉴 HTML 생성
     function buildMobileMenu() {
+        const disabledCls = 'block text-[#C5C5C5] font-medium text-lg mb-2 pointer-events-none';
+        const disabledSubCls = 'block text-[#D5D5D5] text-sm pointer-events-none';
         return `
         <nav class="space-y-6">
-            <div><a href="about.html" class="block text-[#2F2725] font-medium text-lg mb-2">학원 소개</a></div>
+            <div><span class="${disabledCls}">학원 소개</span></div>
             <div>
-                <p class="text-[#2F2725] font-medium text-lg mb-2">수업 안내</p>
+                <p class="${disabledCls}">수업 안내</p>
                 <div class="pl-4 space-y-2">
-                    <a href="firstee.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
-                    <a href="original.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
-                    <a href="strategy.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
+                    <span class="${disabledSubCls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); opacity: 0.3; transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></span>
+                    <span class="${disabledSubCls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); opacity: 0.3; transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></span>
+                    <span class="${disabledSubCls}"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); opacity: 0.3; transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></span>
                 </div>
             </div>
             <div><a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a></div>
             <div>
-                <p class="text-[#2F2725] font-medium text-lg mb-2">학원 소식</p>
-                <div class="pl-4 space-y-2">
-                    <a href="#" class="block text-[#9FA0A0] text-sm">Instagram</a>
-                    <a href="#" class="block text-[#9FA0A0] text-sm">Youtube</a>
-                    <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block text-[#9FA0A0] text-sm">Blog</a>
+                <span class="${disabledCls}">학원 소식</span>
+            </div>
+            <div><span class="block text-[#C5C5C5] font-medium text-lg pointer-events-none">상담 예약</span></div>
+            <div><span class="block text-[#C5C5C5] font-medium text-lg pointer-events-none">강사 채용</span></div>
+            <div class="pt-6 mt-6 border-t border-gray-200">
+                <div id="mobile-auth-buttons" class="space-y-3">
+                    <a href="auth.html" class="block w-full py-3 text-center text-[#2F2725] font-semibold text-[15px] border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Login</a>
+                    <a href="auth.html?mode=signup" class="block w-full py-3 text-center bg-[#2F2725] text-white font-semibold text-[15px] rounded-xl hover:bg-[#1a1716] transition-colors">Sign up</a>
+                </div>
+                <div id="mobile-user-menu" class="hidden space-y-3">
+                    <a href="mypage.html" class="block w-full py-3 text-center text-[#2F2725] font-semibold text-[15px] border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">My Page</a>
+                    <button onclick="signOut()" class="block w-full py-3 text-center text-[#8B95A1] font-medium text-[15px] hover:text-[#2F2725] transition-colors">Logout</button>
                 </div>
             </div>
-            <div><a href="#" class="block text-[#2F2725] font-medium text-lg">상담 예약</a></div>
-            <div><a href="#" class="block text-[#2F2725] font-medium text-lg">강사 채용</a></div>
         </nav>`;
     }
 

@@ -19,10 +19,11 @@
     <style>
         :root {
             --page-right: min(8.28vw, 159px);
-            --header-h: 126px;
+            --header-h: 60px;
             --sidebar-w: min(21.77vw, 418px);
             --sidebar-gap: min(3.75vw, 72px);
         }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
@@ -86,11 +87,21 @@
 </head>
 <body class="min-h-screen flex flex-col" data-active-page="auth">
 
-    <!-- Header (메인 페이지 동일) -->
-    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
+
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
             <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
             </a>
         </div>
         <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
@@ -100,13 +111,10 @@
             </div>
             <div id="user-menu" class="hidden items-center gap-6">
                 <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
             </div>
-            <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
-            </button>
-            <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
                 <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
             </button>
         </div>
@@ -549,7 +557,9 @@
             const result = await signIn(email, password);
 
             if (result.success) {
-                window.location.href = 'mypage.html';
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect');
+                window.location.href = redirectUrl || 'mypage.html';
             } else {
                 errorDiv.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
                 errorDiv.classList.remove('hidden');

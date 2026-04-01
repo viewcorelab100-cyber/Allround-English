@@ -6,162 +6,161 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
     <title>결제 실패 — ALLROUND</title>
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 60px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+        }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
-            font-family: "aileron", sans-serif;
-            background-color: #000000;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
             overflow-x: hidden;
         }
-        
-        .btn-hover-scale {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        
-        .btn-hover-scale:hover {
-            transform: translateY(-2px);
-        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .nav-link {
-            transition: color 0.2s ease-in-out;
-        }
-
-        .nav-link:hover {
-            color: #999;
-        }
-
-        /* 실패 아이콘 애니메이션 */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-
-        .error-icon {
-            animation: shake 0.5s ease-in-out;
-        }
+        .error-icon { animation: shake 0.5s ease-in-out; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
-    
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
-                <!-- 좌측: 빈 공간 -->
-                <div></div>
+<body class="min-h-screen flex flex-col" data-active-page="payment-fail">
 
-                <!-- 중앙: 로고 (grid 중앙 고정) -->
-                <div class="flex justify-center items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
-                    </a>
-                </div>
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
 
-                <!-- 우측: Auth 버튼 영역 -->
-                <div class="flex justify-end items-center">
-                    <div id="auth-buttons" class="flex items-center space-x-4 whitespace-nowrap">
-                        <a href="auth.html" class="nav-link text-white text-sm whitespace-nowrap">Login</a>
-                    </div>
-                    <div id="user-menu" class="hidden items-center space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-sm whitespace-nowrap hidden">관리자</a>
-                        <a href="mypage.html" class="nav-link text-white text-sm whitespace-nowrap">My Page</a>
-                        <button onclick="signOut()" class="nav-link text-gray-400 text-sm whitespace-nowrap">Logout</button>
-                    </div>
-                </div>
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
             </div>
-            
-            <!-- 구분선 -->
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            
-            <!-- 메인 네비게이션 -->
-            <nav class="flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
-                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-            </nav>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
         </div>
     </header>
 
-    <div class="h-36"></div>
-
-    <!-- Fail Content -->
-    <section class="py-20 px-6">
-        <div class="max-w-xl mx-auto text-center space-y-8">
-            
-            <!-- 실패 아이콘 -->
-            <div class="flex justify-center">
-                <svg class="error-icon w-24 h-24 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6"></nav>
             </div>
+        </div>
+    </div>
 
-            <!-- 메시지 -->
-            <div class="space-y-4">
-                <h1 class="text-3xl font-bold text-white">결제에 실패했습니다</h1>
-                <p id="fail-message" class="text-gray-400">결제 중 문제가 발생했습니다. 다시 시도해주세요.</p>
-            </div>
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6"></nav>
+            </aside>
 
-            <!-- 오류 정보 -->
-            <div id="error-info" class="p-6 bg-white bg-opacity-5 rounded-xl space-y-4 text-left hidden">
-                <h2 class="text-lg font-semibold text-white text-center">오류 정보</h2>
-                <div class="w-full h-px bg-white opacity-10"></div>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">오류 코드</span>
-                        <span id="error-code" class="text-white text-sm">-</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">오류 메시지</span>
-                        <span id="error-message" class="text-white text-sm">-</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">주문번호</span>
-                        <span id="order-id" class="text-white text-sm">-</span>
+            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
+                <div class="px-6 md:px-12 py-20">
+                    <div class="max-w-xl md:ml-[24px] text-center space-y-6">
+
+                        <!-- 실패 아이콘 -->
+                        <div class="flex justify-center">
+                            <svg class="error-icon w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+
+                        <!-- 메시지 -->
+                        <div class="space-y-2">
+                            <h1 class="text-[26px] font-bold text-[#2F2725]">결제에 실패했습니다</h1>
+                            <p id="fail-message" class="text-[#8B95A1] text-[15px]">결제 중 문제가 발생했습니다. 다시 시도해주세요.</p>
+                        </div>
+
+                        <!-- 오류 정보 -->
+                        <div id="error-info" class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4 text-left hidden">
+                            <h2 class="text-[16px] font-bold text-[#2F2725] text-center">오류 정보</h2>
+                            <div class="w-full h-px bg-gray-100"></div>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-[#8B95A1]">오류 코드</span>
+                                    <span id="error-code" class="text-[#2F2725] text-sm">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-[#8B95A1]">오류 메시지</span>
+                                    <span id="error-message" class="text-[#2F2725] text-sm">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-[#8B95A1]">주문번호</span>
+                                    <span id="order-id" class="text-[#2F2725] text-sm">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 안내 메시지 -->
+                        <div class="text-sm text-[#C5C5C5] space-y-1">
+                            <p>결제가 완료되지 않았습니다.</p>
+                            <p>문제가 지속될 경우 고객센터로 문의해주세요.</p>
+                        </div>
+
+                        <!-- 버튼 -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                            <a href="courses.html" class="flex-1 px-6 py-4 bg-white text-[#2F2725] font-semibold rounded-2xl border border-gray-200 text-center hover:bg-gray-50 transition-colors">
+                                강의 목록
+                            </a>
+                            <button id="retry-button" onclick="retryPayment()" class="flex-1 px-6 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl hover:bg-[#1a1716] transition-colors">
+                                다시 시도하기
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
-
-            <!-- 안내 메시지 -->
-            <div class="text-sm text-gray-500 space-y-2">
-                <p>결제가 완료되지 않았습니다.</p>
-                <p>문제가 지속될 경우 고객센터로 문의해주세요.</p>
-            </div>
-
-            <!-- 버튼 -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                <a href="courses.html" class="btn-hover-scale flex-1 px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white text-center">
-                    강의 목록
-                </a>
-                <button id="retry-button" onclick="retryPayment()" class="btn-hover-scale flex-1 px-8 py-4 bg-white text-black font-semibold rounded-xl">
-                    다시 시도하기
-                </button>
-            </div>
-
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-2xl font-bold text-white tracking-wider">ALLROUND</div>
-                <div class="text-sm text-gray-400">
-                    © 2024 ALLROUND. All rights reserved.
-                </div>
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
+                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
             </div>
-        </div>
-    </footer>
+        </a>
+    </main>
+
+    <div id="footer-container"></div>
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
@@ -169,7 +168,6 @@
         let failedOrderId = null;
         let failedCourseId = null;
 
-        // URL에서 실패 정보 파라미터 가져오기
         function getFailParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -179,40 +177,35 @@
             };
         }
 
-        // 결제 실패 처리
         async function handlePaymentFail() {
             const { code, message, orderId } = getFailParams();
-            
+
             failedOrderId = orderId;
-            
-            // 오류 메시지 표시
+
             if (message) {
                 document.getElementById('fail-message').textContent = decodeURIComponent(message);
             }
-            
-            // 오류 정보 표시
+
             if (code || orderId) {
                 document.getElementById('error-info').classList.remove('hidden');
-                
+
                 if (code) {
                     document.getElementById('error-code').textContent = code;
                 }
                 if (orderId) {
                     document.getElementById('order-id').textContent = orderId;
-                    
-                    // 주문 정보에서 course_id 가져오기
+
                     try {
                         const { data: order } = await window.supabase
                             .from('orders')
                             .select('course_id')
                             .eq('id', orderId)
                             .single();
-                        
+
                         if (order) {
                             failedCourseId = order.course_id;
                         }
-                        
-                        // 주문 상태를 FAILED로 업데이트
+
                         await window.supabase
                             .from('orders')
                             .update({
@@ -230,23 +223,37 @@
             }
         }
 
-        // 결제 다시 시도
         function retryPayment() {
             if (failedCourseId) {
-                // 강의 ID가 있으면 결제 페이지로 이동
                 window.location.href = `payment.html?courseId=${failedCourseId}`;
             } else if (failedOrderId) {
-                // 주문 ID만 있으면 주문 ID로 결제 페이지 이동
                 window.location.href = `payment.html?orderId=${failedOrderId}`;
             } else {
-                // 아무 정보도 없으면 강의 목록으로
                 window.location.href = 'courses.html';
             }
         }
 
-        // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', handlePaymentFail);
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
     </script>
+    <script src="js/sidebar.js"></script>
     <script src="js/footer.js"></script>
 </body>
 </html>
