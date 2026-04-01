@@ -111,7 +111,13 @@ async function validateSession() {
         }
         const user = await getCurrentUser();
         if (!user) return { valid: true }; // 로그인 안 된 상태는 검증 불필요
-        
+
+        // 데모 계정은 세션 제한 없이 여러 기기에서 접속 허용
+        const demoCheck = await getUserProfile(user.id);
+        if (demoCheck.success && demoCheck.data.role === 'demo') {
+            return { valid: true };
+        }
+
         // localStorage에서 현재 세션 ID 가져오기
         const localSessionId = localStorage.getItem('allround_session_id');
         if (!localSessionId) {
@@ -143,7 +149,13 @@ async function validateSession() {
         return { valid: true };
     } catch (error) {
         console.error('Validate session error:', error);
-        return { valid: true }; // 에러 시에는 일단 허용
+        // 네트워크 오류 시 3회까지는 허용 (일시적 장애 대응)
+        if (!window._sessionErrorCount) window._sessionErrorCount = 0;
+        window._sessionErrorCount++;
+        if (window._sessionErrorCount >= 3) {
+            return { valid: false, reason: 'error' };
+        }
+        return { valid: true };
     }
 }
 
@@ -446,14 +458,26 @@ async function getUserProfile(userId) {
 async function isAdmin() {
     const user = await getCurrentUser();
     if (!user) return false;
-    
-    // ✅ 특정 이메일은 무조건 관리자로 인식
-    if (user.email === 'admin@allround.com') {
-        return true;
-    }
-    
+
+    // DB의 role 컬럼만 신뢰
     const profile = await getUserProfile(user.id);
     return profile.success && profile.data.role === 'admin';
+}
+
+// 데모 사용자 확인
+async function isDemoUser() {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    const profile = await getUserProfile(user.id);
+    return profile.success && profile.data.role === 'demo';
+}
+
+// 관리자 또는 데모 사용자 확인 (관리자 페이지 접근용)
+async function isAdminOrDemo() {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    const profile = await getUserProfile(user.id);
+    return profile.success && (profile.data.role === 'admin' || profile.data.role === 'demo');
 }
 
 // ========== UI 업데이트 함수 ==========
@@ -464,31 +488,34 @@ async function updateAuthUI() {
     const authButtons = document.getElementById('auth-buttons');
     const userMenu = document.getElementById('user-menu');
     const adminLink = document.getElementById('admin-link');
-    
+    const mobileAuthButtons = document.getElementById('mobile-auth-buttons');
+    const mobileUserMenu = document.getElementById('mobile-user-menu');
+
     if (authButtons && userMenu) {
         if (user) {
             authButtons.classList.add('hidden');
             userMenu.classList.remove('hidden');
             userMenu.classList.add('flex', 'flex-row');
-            
-            // 관리자 권한 확인 및 관리자 링크 표시
-            const adminStatus = await isAdmin();
+
+            // 모바일 햄버거 메뉴 인증 상태
+            if (mobileAuthButtons) mobileAuthButtons.classList.add('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.remove('hidden');
+
+            // 관리자 링크
+            const adminOrDemoStatus = await isAdminOrDemo();
             if (adminLink) {
-                if (adminStatus) {
-                    adminLink.classList.remove('hidden');
-                } else {
-                    adminLink.classList.add('hidden');
-                }
+                adminLink.classList.toggle('hidden', !adminOrDemoStatus);
             }
         } else {
             authButtons.classList.remove('hidden');
             userMenu.classList.add('hidden');
             userMenu.classList.remove('flex', 'flex-row');
-            
-            // 로그아웃 시 관리자 링크 숨김
-            if (adminLink) {
-                adminLink.classList.add('hidden');
-            }
+
+            // 모바일 햄버거 메뉴 인증 상태
+            if (mobileAuthButtons) mobileAuthButtons.classList.remove('hidden');
+            if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+
+            if (adminLink) adminLink.classList.add('hidden');
         }
     }
 }

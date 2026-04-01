@@ -10,65 +10,42 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>결제 완료 — ALLROUND</title>
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 60px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+        }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
-            font-family: "aileron", sans-serif;
-            background-color: #000000;
-        }
-        
-        /* 상단바 제외한 본문 영문 폰트 */
-        .main-content {
-            font-family: 'Playfair Display', "aileron", serif;
-        }
-        
-        /* 상단바는 aileron 유지 */
-        header, header * {
-            font-family: "aileron", sans-serif;
-        }
-        
-        .btn-hover-scale {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        
-        .btn-hover-scale:hover {
-            transform: translateY(-2px);
-        }
-
-        html {
-            scroll-behavior: smooth;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
             overflow-x: hidden;
         }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
 
-        .nav-link {
-            transition: color 0.2s ease-in-out;
-        }
-
-        .nav-link:hover {
-            color: #999;
-        }
-
-        /* 성공 아이콘 애니메이션 */
         @keyframes checkmark {
             0% { stroke-dashoffset: 100; }
             100% { stroke-dashoffset: 0; }
         }
-
         @keyframes circle-scale {
             0% { transform: scale(0); opacity: 0; }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); opacity: 1; }
         }
-
-        .success-circle {
-            animation: circle-scale 0.5s ease-out forwards;
-        }
-
+        .success-circle { animation: circle-scale 0.5s ease-out forwards; }
         .success-check {
             stroke-dasharray: 100;
             stroke-dashoffset: 100;
@@ -76,221 +53,227 @@
         }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
-    
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4">
-            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
-                <!-- 좌측: 빈 공간 -->
-                <div></div>
+<body class="min-h-screen flex flex-col" data-active-page="payment-success">
 
-                <!-- 중앙: 로고 (grid 중앙 고정) -->
-                <div class="flex justify-center items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
-                    </a>
-                </div>
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
 
-                <!-- 우측: Auth 버튼 영역 -->
-                <div class="flex justify-end items-center">
-                    <div id="auth-buttons" class="flex items-center space-x-4 whitespace-nowrap">
-                        <a href="auth.html" class="nav-link text-white text-sm whitespace-nowrap">Login</a>
-                    </div>
-                    <div id="user-menu" class="hidden items-center space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-sm whitespace-nowrap hidden">관리자</a>
-                        <a href="mypage.html" class="nav-link text-white text-sm whitespace-nowrap">My Page</a>
-                        <button onclick="signOut()" class="nav-link text-gray-400 text-sm whitespace-nowrap">Logout</button>
-                    </div>
-                </div>
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
             </div>
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            <nav class="flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
-                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-            </nav>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
         </div>
     </header>
 
-    <div class="h-36"></div>
-
-    <!-- Success Content -->
-    <section class="py-12 px-6">
-        <div class="max-w-xl mx-auto">
-            
-            <!-- 로딩 상태 -->
-            <div id="loading-state" class="text-center py-20">
-                <div class="text-gray-500">결제를 확인하는 중...</div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6"></nav>
             </div>
+        </div>
+    </div>
 
-            <!-- 성공 상태 -->
-            <div id="success-content" class="hidden space-y-8">
-                
-                <!-- 성공 아이콘 -->
-                <div class="flex justify-center">
-                    <svg class="w-24 h-24" viewBox="0 0 100 100">
-                        <circle class="success-circle" cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="3"/>
-                        <path class="success-check" d="M30 50 L45 65 L70 35" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6"></nav>
+            </aside>
 
-                <!-- 메시지 -->
-                <div class="text-center space-y-4">
-                    <h1 class="text-3xl font-bold text-white">결제가 완료되었습니다!</h1>
-                    <p class="text-gray-400">강의를 바로 수강하실 수 있습니다.</p>
-                </div>
+            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
+                <div class="px-6 md:px-12 py-12">
+                    <div class="max-w-xl md:ml-[24px]">
 
-                <!-- 결제 정보 -->
-                <div class="p-6 bg-white bg-opacity-5 rounded-xl space-y-4">
-                    <h2 class="text-lg font-semibold text-white text-center">결제 내역</h2>
-                    <div class="w-full h-px bg-white opacity-10"></div>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">주문번호</span>
-                            <span id="order-id" class="text-white text-sm">-</span>
+                        <!-- 로딩 상태 -->
+                        <div id="loading-state" class="text-center py-20">
+                            <div class="text-[#8B95A1]">결제를 확인하는 중...</div>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">상품명</span>
-                            <span id="order-name" class="text-white">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">결제 금액</span>
-                            <span id="order-amount" class="text-white font-bold">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">결제 일시</span>
-                            <span id="order-date" class="text-white">-</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 배송지 입력 섹션 (교재 포함 강의인 경우) -->
-                <div id="shipping-section" class="hidden space-y-6">
-                    <div class="p-6 bg-yellow-500 bg-opacity-10 rounded-xl border border-yellow-500 border-opacity-30">
-                        <div class="flex items-start space-x-3">
-                            <div>
-                                <h3 class="text-white font-semibold">교재 배송 안내</h3>
-                                <p class="text-gray-400 text-sm mt-1">구매하신 강의에 교재가 포함되어 있습니다. 배송받으실 주소를 확인해주세요.</p>
+                        <!-- 성공 상태 -->
+                        <div id="success-content" class="hidden space-y-6">
+
+                            <!-- 성공 아이콘 -->
+                            <div class="flex justify-center pt-4">
+                                <svg class="w-20 h-20" viewBox="0 0 100 100">
+                                    <circle class="success-circle" cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="3"/>
+                                    <path class="success-check" d="M30 50 L45 65 L70 35" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="p-6 bg-white bg-opacity-5 rounded-xl space-y-4">
-                        <h2 class="text-lg font-semibold text-white">배송 정보</h2>
-                        <div class="w-full h-px bg-white opacity-10"></div>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">받는 분</label>
-                                <input type="text" id="shipping-name" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                    placeholder="받는 분 성함">
+                            <!-- 메시지 -->
+                            <div class="text-center space-y-2">
+                                <h1 class="text-[26px] font-bold text-[#2F2725]">결제가 완료되었습니다!</h1>
+                                <p class="text-[#8B95A1] text-[15px]">강의를 바로 수강하실 수 있습니다.</p>
                             </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">연락처</label>
-                                <input type="tel" id="shipping-phone" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                    placeholder="010-0000-0000"
-                                    oninput="formatPhoneNumber(this)"
-                                    maxlength="13">
+
+                            <!-- 결제 정보 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">결제 내역</h2>
+                                <div class="w-full h-px bg-gray-100"></div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">주문번호</span>
+                                        <span id="order-id" class="text-[#2F2725] text-sm">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">상품명</span>
+                                        <span id="order-name" class="text-[#2F2725]">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">결제 금액</span>
+                                        <span id="order-amount" class="text-[#2F2725] font-bold">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">결제 일시</span>
+                                        <span id="order-date" class="text-[#2F2725]">-</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">우편번호</label>
-                                <div class="flex space-x-2">
-                                    <input type="text" id="shipping-zipcode" 
-                                        class="flex-1 px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                        placeholder="우편번호" readonly>
-                                    <button onclick="searchAddress()" class="px-4 py-3 bg-white bg-opacity-10 rounded-xl text-white hover:bg-opacity-20 transition-colors">
-                                        주소 검색
+
+                            <!-- 배송지 입력 섹션 -->
+                            <div id="shipping-section" class="hidden space-y-6">
+                                <div class="p-5 bg-amber-50 rounded-2xl border border-amber-200">
+                                    <div>
+                                        <h3 class="text-[#2F2725] font-semibold">교재 배송 안내</h3>
+                                        <p class="text-[#8B95A1] text-sm mt-1">구매하신 강의에 교재가 포함되어 있습니다. 배송받으실 주소를 확인해주세요.</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                    <h2 class="text-[16px] font-bold text-[#2F2725]">배송 정보</h2>
+                                    <div class="w-full h-px bg-gray-100"></div>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">받는 분</label>
+                                            <input type="text" id="shipping-name"
+                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                placeholder="받는 분 성함">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">연락처</label>
+                                            <input type="tel" id="shipping-phone"
+                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                placeholder="010-0000-0000"
+                                                oninput="formatPhoneNumber(this)"
+                                                maxlength="13">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">우편번호</label>
+                                            <div class="flex space-x-2">
+                                                <input type="text" id="shipping-zipcode"
+                                                    class="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                    placeholder="우편번호" readonly>
+                                                <button onclick="searchAddress()" class="px-4 py-3 bg-gray-100 rounded-xl text-[#2F2725] hover:bg-gray-200 transition-colors border border-gray-200">
+                                                    주소 검색
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">주소</label>
+                                            <input type="text" id="shipping-address"
+                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                placeholder="기본 주소" readonly>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">상세 주소 <span class="text-red-500">* (필수)</span></label>
+                                            <input type="text" id="shipping-address-detail"
+                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                placeholder="상세 주소 (동/호수 등)">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-[#8B95A1] mb-1">배송 메모</label>
+                                            <input type="text" id="shipping-memo"
+                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                                placeholder="배송 시 요청사항 (선택)">
+                                        </div>
+                                    </div>
+                                    <button onclick="saveShippingInfo()" class="w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl hover:bg-[#1a1716] transition-colors">
+                                        교재 배송하기
                                     </button>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">주소</label>
-                                <input type="text" id="shipping-address" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                    placeholder="기본 주소" readonly>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">상세 주소 <span class="text-red-400">* (필수)</span></label>
-                                <input type="text" id="shipping-address-detail" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                    placeholder="상세 주소 (동/호수 등)">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">배송 메모</label>
-                                <input type="text" id="shipping-memo" 
-                                    class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                    placeholder="배송 시 요청사항 (선택)">
-                            </div>
-                        </div>
-                        <button onclick="saveShippingInfo()" class="w-full py-4 bg-white text-black font-semibold rounded-xl hover:bg-gray-100 transition-colors">
-                            교재 배송하기
-                        </button>
-                    </div>
-                </div>
 
-                <!-- 배송 정보 완료 섹션 -->
-                <div id="shipping-complete-section" class="hidden">
-                    <div class="p-6 bg-green-500 bg-opacity-10 rounded-xl border border-green-500 border-opacity-30">
-                        <div class="flex items-start space-x-3">
-                            <div class="flex-1">
-                                <h3 class="text-white font-semibold">배송 정보가 등록되었습니다</h3>
-                                <p class="text-gray-400 text-sm mt-1">교재가 곧 발송될 예정입니다. 마이페이지에서 배송 상태를 확인하실 수 있습니다.</p>
-                                <div id="shipping-info-display" class="mt-3 text-sm text-gray-300"></div>
+                            <!-- 배송 정보 완료 섹션 -->
+                            <div id="shipping-complete-section" class="hidden">
+                                <div class="p-5 bg-green-50 rounded-2xl border border-green-200">
+                                    <div class="flex-1">
+                                        <h3 class="text-[#2F2725] font-semibold">배송 정보가 등록되었습니다</h3>
+                                        <p class="text-[#8B95A1] text-sm mt-1">교재가 곧 발송될 예정입니다. 마이페이지에서 배송 상태를 확인하실 수 있습니다.</p>
+                                        <div id="shipping-info-display" class="mt-3 text-sm text-[#4E5968]"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 버튼 -->
+                            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                                <a href="mypage.html" class="flex-1 px-6 py-4 bg-white text-[#2F2725] font-semibold rounded-2xl border border-gray-200 text-center hover:bg-gray-50 transition-colors">
+                                    마이페이지
+                                </a>
+                                <a id="go-to-course" href="courses.html" class="flex-1 px-6 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
+                                    강의 바로가기
+                                </a>
                             </div>
                         </div>
+
+                        <!-- 오류 상태 -->
+                        <div id="error-state" class="hidden text-center py-20 space-y-6">
+                            <div class="flex justify-center">
+                                <svg class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="space-y-2">
+                                <h1 class="text-[26px] font-bold text-[#2F2725]">결제 처리 중 오류가 발생했습니다</h1>
+                                <p id="error-message" class="text-[#8B95A1]">다시 시도해주세요.</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
+                                <a href="courses.html" class="px-8 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
+                                    강의 목록으로
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
-
-                <!-- 버튼 -->
-                <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="mypage.html" class="btn-hover-scale flex-1 px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white text-center">
-                        마이페이지
-                    </a>
-                    <a id="go-to-course" href="courses.html" class="btn-hover-scale flex-1 px-8 py-4 bg-white text-black font-semibold rounded-xl text-center">
-                        강의 바로가기
-                    </a>
-                </div>
-
-            </div>
-
-            <!-- 오류 상태 -->
-            <div id="error-state" class="hidden text-center py-20 space-y-8">
-                <div class="flex justify-center">
-                    <svg class="w-24 h-24 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div class="space-y-4">
-                    <h1 class="text-3xl font-bold text-white">결제 처리 중 오류가 발생했습니다</h1>
-                    <p id="error-message" class="text-gray-400">다시 시도해주세요.</p>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
-                    <a href="courses.html" class="btn-hover-scale px-8 py-4 bg-white text-black font-semibold rounded-xl text-center">
-                        강의 목록으로
-                    </a>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div class="text-2xl font-bold text-white tracking-wider">ALLROUND</div>
-                <div class="text-sm text-gray-400">
-                    © 2024 ALLROUND. All rights reserved.
                 </div>
             </div>
         </div>
-    </footer>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
+                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+            </div>
+        </a>
+    </main>
+
+    <div id="footer-container"></div>
 
     <!-- 다음 주소 검색 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -299,15 +282,22 @@
     <script src="js/auth.js"></script>
     <script src="js/popup-notice.js"></script>
     <script>
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        history.replaceState(null, '', location.href);
+        window.addEventListener('popstate', function() {
+            history.replaceState(null, '', location.href);
+        });
+
         let currentOrder = null;
         let currentCourse = null;
 
-        // 전화번호 자동 하이픈 포맷
         function formatPhoneNumber(input) {
             let value = input.value.replace(/[^0-9]/g, '');
-            if (value.length > 11) {
-                value = value.slice(0, 11);
-            }
+            if (value.length > 11) value = value.slice(0, 11);
             if (value.length <= 3) {
                 input.value = value;
             } else if (value.length <= 7) {
@@ -317,7 +307,6 @@
             }
         }
 
-        // URL에서 결제 정보 파라미터 가져오기
         function getPaymentResultParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -327,7 +316,6 @@
             };
         }
 
-        // 다음 주소 검색
         function searchAddress() {
             new daum.Postcode({
                 oncomplete: function(data) {
@@ -338,7 +326,6 @@
             }).open();
         }
 
-        // 배송 정보 저장
         async function saveShippingInfo() {
             const shippingName = document.getElementById('shipping-name').value.trim();
             const shippingPhone = document.getElementById('shipping-phone').value.trim();
@@ -347,18 +334,16 @@
             const shippingAddressDetail = document.getElementById('shipping-address-detail').value.trim();
             const shippingMemo = document.getElementById('shipping-memo').value.trim();
 
-            // 필수 입력 검증
             if (!shippingName) { alert('받는 분 성함을 입력해주세요.'); return; }
             if (!shippingPhone) { alert('연락처를 입력해주세요.'); return; }
             if (!shippingZipcode || !shippingAddress) { alert('주소를 검색해주세요.'); return; }
-            if (!shippingAddressDetail) { 
-                alert('상세 주소를 입력해주세요. (필수)'); 
+            if (!shippingAddressDetail) {
+                alert('상세 주소를 입력해주세요. (필수)');
                 document.getElementById('shipping-address-detail').focus();
-                return; 
+                return;
             }
 
             try {
-                // 주문 테이블에 배송 정보 저장
                 const { error } = await window.supabase
                     .from('orders')
                     .update({
@@ -368,14 +353,13 @@
                         shipping_address: shippingAddress,
                         shipping_address_detail: shippingAddressDetail,
                         shipping_memo: shippingMemo,
-                        shipping_status: 'PREPARING', // 배송준비중으로 변경
+                        shipping_status: 'PREPARING',
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', currentOrder.id);
 
                 if (error) throw error;
 
-                // 프로필에도 기본 배송지로 저장 (선택)
                 const user = await getCurrentUser();
                 if (user) {
                     await window.supabase
@@ -388,12 +372,11 @@
                         .eq('id', user.id);
                 }
 
-                // UI 업데이트
                 document.getElementById('shipping-section').classList.add('hidden');
                 document.getElementById('shipping-complete-section').classList.remove('hidden');
                 document.getElementById('shipping-info-display').innerHTML = `
-                    <p>${shippingName} / ${shippingPhone}</p>
-                    <p>(${shippingZipcode}) ${shippingAddress} ${shippingAddressDetail}</p>
+                    <p>${escapeHTML(shippingName)} / ${escapeHTML(shippingPhone)}</p>
+                    <p>(${escapeHTML(shippingZipcode)}) ${escapeHTML(shippingAddress)} ${escapeHTML(shippingAddressDetail)}</p>
                 `;
 
                 alert('배송 정보가 저장되었습니다.');
@@ -403,12 +386,10 @@
             }
         }
 
-        // 결제 승인 및 구매 완료 처리 (서버 사이드 승인)
         async function handlePaymentSuccess() {
             console.log('[DEBUG] payment-success.html VERSION: 2025-02-09-SERVER-CONFIRM');
 
             const { paymentKey, orderId, amount } = getPaymentResultParams();
-
             console.log('[DEBUG] 결제 파라미터:', { paymentKey, orderId, amount });
 
             if (!paymentKey || !orderId || !amount) {
@@ -425,15 +406,11 @@
                     return;
                 }
 
-                // sessionStorage에서 쿠폰 ID 가져오기
                 const couponId = sessionStorage.getItem('appliedCouponId');
-                if (couponId) {
-                    sessionStorage.removeItem('appliedCouponId');
-                }
+                if (couponId) sessionStorage.removeItem('appliedCouponId');
 
                 console.log('[DEBUG] Edge Function 호출:', { paymentKey, orderId, amount, couponId });
 
-                // Edge Function으로 결제 승인 요청 (서버에서 토스 API 승인 + DB 처리)
                 const { data, error } = await window.supabase.functions.invoke('confirm-payment', {
                     body: {
                         paymentKey,
@@ -462,7 +439,6 @@
                 currentOrder = order;
                 currentCourse = course;
 
-                // 쿠폰 정보 재구성 (showSuccess용)
                 let appliedCoupon = null;
                 if (data.appliedCoupon) {
                     appliedCoupon = {
@@ -471,7 +447,6 @@
                 }
 
                 const finalAmount = data.finalAmount !== undefined ? data.finalAmount : order.amount;
-
                 showSuccess(order, course, appliedCoupon, finalAmount);
 
             } catch (error) {
@@ -480,14 +455,11 @@
             }
         }
 
-        // 성공 화면 표시
         async function showSuccess(order, course, appliedCoupon = null, finalAmount = null) {
-            // 대기 중인 결제가 있는지 확인
             const pendingPaymentsStr = sessionStorage.getItem('pendingPayments');
             if (pendingPaymentsStr) {
                 const pendingData = JSON.parse(pendingPaymentsStr);
 
-                // 다음 결제 안내 표시
                 document.getElementById('loading-state').innerHTML = `
                     <div class="text-center space-y-6">
                         <div class="flex justify-center">
@@ -495,15 +467,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-bold text-white">강의비 결제 완료!</h2>
-                        <p class="text-gray-400">교재비 결제를 진행합니다...</p>
+                        <h2 class="text-2xl font-bold text-[#2F2725]">강의비 결제 완료!</h2>
+                        <p class="text-[#8B95A1]">교재비 결제를 진행합니다...</p>
                         <div class="animate-pulse">
-                            <div class="h-2 bg-white bg-opacity-20 rounded w-48 mx-auto"></div>
+                            <div class="h-1 bg-gray-200 rounded w-48 mx-auto"></div>
                         </div>
                     </div>
                 `;
 
-                // 2초 후 결제 페이지로 리다이렉트
                 setTimeout(() => {
                     window.location.href = 'payment.html';
                 }, 2000);
@@ -513,47 +484,40 @@
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('success-content').classList.remove('hidden');
 
-            // 결제 정보 표시
             document.getElementById('order-id').textContent = order.id;
             document.getElementById('order-name').textContent = order.order_name;
 
-            // 쿠폰 적용 시 할인 정보 표시
             const displayAmount = finalAmount !== null ? finalAmount : order.amount;
-            document.getElementById('order-amount').textContent = `₩${displayAmount.toLocaleString()}`;
+            document.getElementById('order-amount').textContent = `\u20A9${displayAmount.toLocaleString()}`;
 
             if (appliedCoupon && finalAmount !== null && finalAmount < order.amount) {
                 const discountAmount = order.amount - finalAmount;
-                const couponInfo = `<span class="text-sm text-green-400">(${appliedCoupon.coupons.name} -₩${discountAmount.toLocaleString()} 할인 적용)</span>`;
+                const couponInfo = `<span class="text-sm text-green-600">(${escapeHTML(appliedCoupon.coupons.name)} -\u20A9${discountAmount.toLocaleString()} 할인 적용)</span>`;
                 document.getElementById('order-amount').innerHTML += ' ' + couponInfo;
             }
 
             document.getElementById('order-date').textContent = new Date().toLocaleString('ko-KR');
             document.getElementById('go-to-course').href = `course-detail.html?id=${order.course_id}`;
-            
-            // 모든 강의에 교재가 포함된 것으로 처리 (배송 정보 항상 표시)
-            const hasTextbook = true; // 모든 강의에 교재 포함
-            
+
+            const hasTextbook = true;
+
             console.log('Order shipping_status:', order.shipping_status);
             console.log('Has textbook:', hasTextbook);
-            
+
             if (hasTextbook) {
-                // 이미 배송 정보가 있는지 확인
-                const hasShippingInfo = order.shipping_status === 'PREPARING' || 
-                                        order.shipping_status === 'SHIPPING' || 
+                const hasShippingInfo = order.shipping_status === 'PREPARING' ||
+                                        order.shipping_status === 'SHIPPING' ||
                                         order.shipping_status === 'DELIVERED';
-                
+
                 if (hasShippingInfo && order.shipping_name && order.shipping_address) {
-                    // 이미 배송 정보 입력 완료
                     document.getElementById('shipping-complete-section').classList.remove('hidden');
                     document.getElementById('shipping-info-display').innerHTML = `
-                        <p>${order.shipping_name || '-'} / ${order.shipping_phone || '-'}</p>
-                        <p>(${order.shipping_zipcode || ''}) ${order.shipping_address || ''} ${order.shipping_address_detail || ''}</p>
+                        <p>${escapeHTML(order.shipping_name) || '-'} / ${escapeHTML(order.shipping_phone) || '-'}</p>
+                        <p>(${escapeHTML(order.shipping_zipcode)}) ${escapeHTML(order.shipping_address)} ${escapeHTML(order.shipping_address_detail)}</p>
                     `;
                 } else {
-                    // 배송 정보 입력 필요 - 무조건 표시
                     document.getElementById('shipping-section').classList.remove('hidden');
-                    
-                    // 프로필에서 기존 주소 정보 불러오기
+
                     try {
                         const user = await getCurrentUser();
                         if (user) {
@@ -562,32 +526,24 @@
                                 .select('name, phone, guardian_phone, address, address_detail, zipcode, postcode')
                                 .eq('id', user.id)
                                 .single();
-                            
+
                             console.log('Profile data:', profile);
-                            
+
                             if (profile) {
                                 document.getElementById('shipping-name').value = profile.name || order.customer_name || '';
                                 document.getElementById('shipping-phone').value = profile.phone || profile.guardian_phone || order.customer_phone || '';
-                                
-                                // 우편번호: zipcode 또는 postcode 사용
                                 const zipcode = profile.zipcode || profile.postcode || '';
                                 document.getElementById('shipping-zipcode').value = zipcode;
-                                
-                                // 주소: address 필드 사용 (회원가입 시 주소+상세주소가 합쳐져 저장됨)
                                 const mainAddress = profile.address || '';
                                 document.getElementById('shipping-address').value = mainAddress;
-                                
-                                // 상세주소: address_detail이 따로 있으면 사용
                                 document.getElementById('shipping-address-detail').value = profile.address_detail || '';
                             } else {
-                                // 프로필이 없으면 주문 정보에서 가져오기
                                 document.getElementById('shipping-name').value = order.customer_name || '';
                                 document.getElementById('shipping-phone').value = order.customer_phone || '';
                             }
                         }
                     } catch (e) {
                         console.error('Profile load error:', e);
-                        // 오류 시에도 배송 섹션은 표시
                         document.getElementById('shipping-name').value = order.customer_name || '';
                         document.getElementById('shipping-phone').value = order.customer_phone || '';
                     }
@@ -595,16 +551,33 @@
             }
         }
 
-        // 오류 화면 표시
         function showError(message) {
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('error-state').classList.remove('hidden');
             document.getElementById('error-message').textContent = message;
         }
 
-        // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', handlePaymentSuccess);
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
     </script>
+    <script src="js/sidebar.js"></script>
     <script src="js/footer.js"></script>
 </body>
 </html>

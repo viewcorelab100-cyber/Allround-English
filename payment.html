@@ -7,322 +7,286 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
     <title>결제하기 — ALLROUND</title>
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- 토스페이먼츠 SDK (v2) -->
     <script src="https://js.tosspayments.com/v2/standard"></script>
     <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 60px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+            --signup-right: min(13.44vw, 258px);
+        }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
-            font-family: "aileron", sans-serif;
-            background-color: #000000;
-        }
-        
-        /* 상단바 제외한 본문 영문 폰트 */
-        .main-content {
-            font-family: 'Playfair Display', "aileron", serif;
-        }
-        
-        /* 상단바는 aileron 유지 */
-        header, header * {
-            font-family: "aileron", sans-serif;
-        }
-        
-        .btn-hover-scale {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-        
-        .btn-hover-scale:hover {
-            transform: translateY(-2px);
-        }
-
-        html {
-            scroll-behavior: smooth;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
             overflow-x: hidden;
         }
-
-        .nav-link {
-            transition: color 0.2s ease-in-out;
-        }
-
-        .nav-link:hover {
-            color: #999;
-        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen">
-    
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
-            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
-                <!-- 좌측: 모바일 햄버거 메뉴 -->
-                <div class="flex justify-start items-center">
-                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    </button>
-                </div>
+<body class="min-h-screen flex flex-col" data-active-page="payment">
 
-                <!-- 중앙: 로고 (grid 중앙 고정) -->
-                <div class="flex justify-center items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
-                    </a>
-                </div>
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
 
-                <!-- 우측: Auth 버튼 영역 -->
-                <div class="flex justify-end items-center">
-                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
-                    </div>
-                    <div id="user-menu" class="hidden items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
-                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
-                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 구분선 -->
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            
-            <!-- 데스크톱 네비게이션 -->
-            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
-                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-            </nav>
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
         </div>
-        
-        <!-- 모바일 메뉴 (토글) -->
-        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
-            <nav class="px-4 py-6 space-y-4">
-                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
-                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
-                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
-            </nav>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
         </div>
     </header>
 
-    <div class="h-36"></div>
-
-    <!-- Payment Section -->
-    <section class="py-12 px-6">
-        <div class="max-w-2xl mx-auto">
-            
-            <!-- 로딩 상태 -->
-            <div id="loading-state" class="text-center py-20">
-                <div class="text-gray-500">결제 정보를 불러오는 중...</div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6"></nav>
             </div>
-
-            <!-- 결제 정보 -->
-            <div id="payment-content" class="hidden space-y-8">
-                
-                <!-- 주문 정보 -->
-                <div class="space-y-4">
-                    <h1 class="text-3xl font-bold text-white">결제하기</h1>
-                    <div class="w-full h-px bg-white opacity-20"></div>
-                </div>
-
-                <!-- 상품 정보 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">주문 상품</h2>
-                    <div class="flex items-center space-x-4 p-4 bg-white bg-opacity-5 rounded-xl">
-                        <div id="course-thumbnail" class="w-24 h-16 rounded-lg bg-cover bg-center bg-gray-800"></div>
-                        <div class="flex-1">
-                            <p id="course-title" class="font-semibold text-white">-</p>
-                            <p id="course-lessons" class="text-sm text-gray-400">-</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 결제 항목 선택 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">결제 항목 선택</h2>
-                    <div class="space-y-3">
-                        <label class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-xl cursor-pointer hover:bg-opacity-10 transition border-2 border-transparent has-[:checked]:border-yellow-400">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="pay-course" name="payment-item" value="course" checked
-                                       class="w-5 h-5 rounded text-yellow-400 bg-white bg-opacity-10 border-gray-600 focus:ring-yellow-400"
-                                       onchange="updateSelectedPayments()">
-                                <div>
-                                    <p class="font-semibold text-white">강의비</p>
-                                    <p class="text-xs text-gray-400">온라인 강의 수강료</p>
-                                </div>
-                            </div>
-                            <span id="course-fee-display" class="text-xl font-bold text-white">₩0</span>
-                        </label>
-                        <label class="flex items-center justify-between p-4 bg-white bg-opacity-5 rounded-xl cursor-pointer hover:bg-opacity-10 transition border-2 border-transparent has-[:checked]:border-yellow-400">
-                            <div class="flex items-center space-x-3">
-                                <input type="checkbox" id="pay-textbook" name="payment-item" value="textbook" checked
-                                       class="w-5 h-5 rounded text-yellow-400 bg-white bg-opacity-10 border-gray-600 focus:ring-yellow-400"
-                                       onchange="updateSelectedPayments()">
-                                <div>
-                                    <p class="font-semibold text-white">교재비</p>
-                                    <p class="text-xs text-gray-400">교재 및 학습 자료</p>
-                                </div>
-                            </div>
-                            <span id="textbook-fee-display" class="text-xl font-bold text-white">₩0</span>
-                        </label>
-                    </div>
-                    <p class="text-xs text-gray-500">※ 강의비와 교재비는 별도 결제됩니다. (결제창이 2번 나타납니다)</p>
-                </div>
-
-                <!-- 구매자 정보 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">구매자 정보</h2>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">이름</label>
-                            <input type="text" id="customer-name" 
-                                class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                placeholder="이름을 입력하세요">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">이메일</label>
-                            <input type="email" id="customer-email" 
-                                class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                placeholder="이메일을 입력하세요">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-gray-400 mb-1">연락처</label>
-                            <input type="tel" id="customer-phone" 
-                                class="w-full px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20" 
-                                placeholder="010-0000-0000"
-                                oninput="formatPhoneNumber(this)"
-                                maxlength="13">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 쿠폰 적용 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">쿠폰 적용</h2>
-                    <!-- 보유 쿠폰 목록 -->
-                    <div id="my-coupons-list" class="space-y-2">
-                        <!-- JS에서 렌더링 -->
-                    </div>
-                    <!-- 코드 직접 입력 -->
-                    <div>
-                        <button onclick="toggleCouponCodeInput()" class="text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                            쿠폰 코드 직접 입력 &darr;
-                        </button>
-                        <div id="coupon-code-input-area" class="hidden mt-2 flex flex-col md:flex-row gap-3">
-                            <input type="text" id="coupon-code"
-                                   placeholder="쿠폰 코드를 입력하세요"
-                                   class="flex-1 px-4 py-3 bg-white bg-opacity-5 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-20">
-                            <button onclick="applyCoupon()"
-                                    class="px-6 py-3 bg-yellow-500 text-black font-semibold rounded-xl hover:bg-yellow-400 transition-colors whitespace-nowrap">
-                                적용
-                            </button>
-                        </div>
-                    </div>
-                    <div id="coupon-message" class="hidden text-sm"></div>
-                    <div id="applied-coupon" class="hidden p-3 bg-green-500 bg-opacity-20 border border-green-500 border-opacity-50 rounded-xl">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <p class="text-sm font-semibold text-green-400">적용된 쿠폰</p>
-                                <p id="applied-coupon-name" class="text-white text-sm"></p>
-                            </div>
-                            <button onclick="removeCoupon()" class="text-red-400 hover:text-red-300 text-sm">
-                                ✕ 취소
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 결제 금액 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">결제 금액</h2>
-                    <div class="p-4 bg-white bg-opacity-5 rounded-xl space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">상품 금액</span>
-                            <span id="product-price" class="text-white">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">할인 금액</span>
-                            <span id="discount-amount" class="text-green-400">-₩0</span>
-                        </div>
-                        <div class="w-full h-px bg-white opacity-10 my-2"></div>
-                        <div class="flex justify-between">
-                            <span class="font-semibold text-white">총 결제 금액</span>
-                            <span id="total-price" class="text-xl font-bold text-white">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 결제 수단 선택 -->
-                <div class="space-y-4">
-                    <h2 class="text-lg font-semibold text-white">결제 수단</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <!-- 카드/간편결제 -->
-                        <button type="button" onclick="selectPaymentMethod('CARD')" 
-                            id="method-card"
-                            class="payment-method-btn p-4 bg-white bg-opacity-10 rounded-xl text-center transition-all border-2 border-white">
-                            <div class="text-white font-semibold">카드/간편결제</div>
-                            <div class="text-xs text-gray-400 mt-1">신용카드, 토스페이, 카카오페이 등</div>
-                        </button>
-                        <!-- 무통장입금 -->
-                        <button type="button" onclick="selectPaymentMethod('VIRTUAL_ACCOUNT')" 
-                            id="method-virtual"
-                            class="payment-method-btn p-4 bg-white bg-opacity-5 rounded-xl text-center transition-all border-2 border-transparent hover:border-white hover:border-opacity-50">
-                            <div class="text-white font-semibold">무통장입금</div>
-                            <div class="text-xs text-gray-400 mt-1">가상계좌 발급 (24시간 내 입금)</div>
-                        </button>
-                    </div>
-                    <input type="hidden" id="selected-payment-method" value="CARD">
-                </div>
-
-                <!-- 결제 버튼 -->
-                <button id="payment-button" onclick="requestPayment()" 
-                    class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-semibold rounded-xl text-lg">
-                    결제하기
-                </button>
-
-            </div>
-
-            <!-- 오류 상태 -->
-            <div id="error-state" class="hidden text-center py-20 space-y-4">
-                <p class="text-xl text-gray-400">결제 정보를 불러올 수 없습니다.</p>
-                <a href="courses.html" class="inline-block text-white underline">강의 목록으로 돌아가기</a>
-            </div>
-
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer class="py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-                <img src="/logo.png" alt="ALLROUND" class="h-6 md:h-8 w-auto">
-                
-                <!-- KB 에스크로 인증마크 -->
-                <div class="flex items-center">
-                    <a href="#" onclick="openKBEscrowPopup(); return false;" class="inline-block opacity-80 hover:opacity-100 transition-opacity">
-                        <img 
-                            src="https://img1.kbstar.com/img/escrow/escrowcmark.gif" 
-                            alt="KB에스크로 이체 인증마크" 
-                            class="h-8">
-                    </a>
-                </div>
-                
-                <div class="text-sm text-gray-400">
-                    © 2024 ALLROUND. All rights reserved.
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6"></nav>
+            </aside>
+
+            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
+                <div class="px-6 md:px-12 py-12">
+                    <div class="max-w-2xl md:ml-[24px]">
+
+                        <!-- 로딩 상태 -->
+                        <div id="loading-state" class="text-center py-20">
+                            <div class="text-[#8B95A1]">결제 정보를 불러오는 중...</div>
+                        </div>
+
+                        <!-- 결제 정보 -->
+                        <div id="payment-content" class="hidden space-y-6">
+
+                            <!-- 뒤로가기 -->
+                            <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-[14px] text-[#8B95A1] hover:text-[#2F2725] transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                뒤로가기
+                            </a>
+
+                            <!-- 주문 정보 -->
+                            <div class="space-y-3">
+                                <h1 class="text-[28px] font-bold text-[#2F2725]">결제하기</h1>
+                                <div class="w-full h-px bg-gray-200"></div>
+                            </div>
+
+                            <!-- 상품 정보 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">주문 상품</h2>
+                                <div class="flex items-center space-x-4">
+                                    <div id="course-thumbnail" class="w-24 h-16 rounded-xl bg-cover bg-center bg-gray-100"></div>
+                                    <div class="flex-1">
+                                        <p id="course-title" class="font-semibold text-[#2F2725]">-</p>
+                                        <p id="course-lessons" class="text-sm text-[#8B95A1]">-</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 결제 항목 선택 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">결제 항목 선택</h2>
+                                <div class="space-y-3">
+                                    <label class="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition border-2 border-transparent has-[:checked]:border-[#2F2725]">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="pay-course" name="payment-item" value="course" checked
+                                                   class="w-5 h-5 rounded text-[#2F2725] bg-gray-50 border-gray-300 focus:ring-[#2F2725]"
+                                                   onchange="updateSelectedPayments()">
+                                            <div>
+                                                <p class="font-semibold text-[#2F2725]">강의비</p>
+                                                <p class="text-xs text-[#8B95A1]">온라인 강의 수강료</p>
+                                            </div>
+                                        </div>
+                                        <span id="course-fee-display" class="text-xl font-bold text-[#2F2725]">₩0</span>
+                                    </label>
+                                    <label class="flex items-center justify-between p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition border-2 border-transparent has-[:checked]:border-[#2F2725]">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="pay-textbook" name="payment-item" value="textbook" checked
+                                                   class="w-5 h-5 rounded text-[#2F2725] bg-gray-50 border-gray-300 focus:ring-[#2F2725]"
+                                                   onchange="updateSelectedPayments()">
+                                            <div>
+                                                <p class="font-semibold text-[#2F2725]">교재비</p>
+                                                <p class="text-xs text-[#8B95A1]">교재 및 학습 자료</p>
+                                            </div>
+                                        </div>
+                                        <span id="textbook-fee-display" class="text-xl font-bold text-[#2F2725]">₩0</span>
+                                    </label>
+                                </div>
+                                <p class="text-xs text-[#C5C5C5]">※ 강의비와 교재비는 별도 결제됩니다. (결제창이 2번 나타납니다)</p>
+                            </div>
+
+                            <!-- 구매자 정보 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">구매자 정보</h2>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm text-[#8B95A1] mb-1">이름</label>
+                                        <input type="text" id="customer-name"
+                                            class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                            placeholder="이름을 입력하세요">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-[#8B95A1] mb-1">이메일</label>
+                                        <input type="email" id="customer-email"
+                                            class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                            placeholder="이메일을 입력하세요">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm text-[#8B95A1] mb-1">연락처</label>
+                                        <input type="tel" id="customer-phone"
+                                            class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                            placeholder="010-0000-0000"
+                                            oninput="formatPhoneNumber(this)"
+                                            maxlength="13">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 쿠폰 적용 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">쿠폰 적용</h2>
+                                <div id="my-coupons-list" class="space-y-2"></div>
+                                <div>
+                                    <button onclick="toggleCouponCodeInput()" class="text-xs text-[#8B95A1] hover:text-[#2F2725] transition-colors">
+                                        쿠폰 코드 직접 입력 &darr;
+                                    </button>
+                                    <div id="coupon-code-input-area" class="hidden mt-2 flex flex-col md:flex-row gap-3">
+                                        <input type="text" id="coupon-code"
+                                               placeholder="쿠폰 코드를 입력하세요"
+                                               class="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200">
+                                        <button onclick="applyCoupon()"
+                                                class="px-6 py-3 bg-[#2F2725] text-white font-semibold rounded-xl hover:bg-[#1a1716] transition-colors whitespace-nowrap">
+                                            적용
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="coupon-message" class="hidden text-sm"></div>
+                                <div id="applied-coupon" class="hidden p-3 bg-green-50 border border-green-200 rounded-xl">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <p class="text-sm font-semibold text-green-700">적용된 쿠폰</p>
+                                            <p id="applied-coupon-name" class="text-[#2F2725] text-sm"></p>
+                                        </div>
+                                        <button onclick="removeCoupon()" class="text-red-500 hover:text-red-400 text-sm">
+                                            ✕ 취소
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 결제 금액 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">결제 금액</h2>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">상품 금액</span>
+                                        <span id="product-price" class="text-[#2F2725]">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">할인 금액</span>
+                                        <span id="discount-amount" class="text-green-600">-₩0</span>
+                                    </div>
+                                    <div class="w-full h-px bg-gray-100 my-2"></div>
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold text-[#2F2725]">총 결제 금액</span>
+                                        <span id="total-price" class="text-xl font-bold text-[#2F2725]">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 결제 수단 선택 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725]">결제 수단</h2>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button type="button" onclick="selectPaymentMethod('CARD')"
+                                        id="method-card"
+                                        class="payment-method-btn p-4 bg-white rounded-xl text-center transition-all border-2 border-[#2F2725]">
+                                        <div class="text-[#2F2725] font-semibold">카드/간편결제</div>
+                                        <div class="text-xs text-[#8B95A1] mt-1">신용카드, 토스페이, 카카오페이 등</div>
+                                    </button>
+                                    <button type="button" onclick="selectPaymentMethod('VIRTUAL_ACCOUNT')"
+                                        id="method-virtual"
+                                        class="payment-method-btn p-4 bg-gray-50 rounded-xl text-center transition-all border-2 border-transparent hover:border-gray-300">
+                                        <div class="text-[#2F2725] font-semibold">무통장입금</div>
+                                        <div class="text-xs text-[#8B95A1] mt-1">가상계좌 발급 (24시간 내 입금)</div>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="selected-payment-method" value="CARD">
+                            </div>
+
+                            <!-- 결제 버튼 -->
+                            <button id="payment-button" onclick="requestPayment()"
+                                class="w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-[16px] hover:bg-[#1a1716] transition-colors">
+                                결제하기
+                            </button>
+
+                        </div>
+
+                        <!-- 오류 상태 -->
+                        <div id="error-state" class="hidden text-center py-20 space-y-4">
+                            <p class="text-xl text-[#8B95A1]">결제 정보를 불러올 수 없습니다.</p>
+                            <a href="courses.html" class="inline-block text-[#2F2725] underline font-semibold">강의 목록으로 돌아가기</a>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </footer>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
+                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+            </div>
+        </a>
+    </main>
+
+    <div id="footer-container"></div>
 
     <!-- KB 에스크로 인증마크 숨겨진 폼 -->
     <form name="KB_AUTHMARK_FORM" method="get" style="display: none;">
@@ -333,22 +297,13 @@
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/popup-notice.js"></script>
     <script src="js/courses.js"></script>
     <script src="js/escrow.js"></script>
     <script src="js/payment.js?v=20241219-debug-all"></script>
     <script>
-        // 전화번호 자동 하이픈 포맷
         function formatPhoneNumber(input) {
-            // 숫자만 추출
             let value = input.value.replace(/[^0-9]/g, '');
-            
-            // 최대 11자리로 제한
-            if (value.length > 11) {
-                value = value.slice(0, 11);
-            }
-            
-            // 하이픈 추가
+            if (value.length > 11) value = value.slice(0, 11);
             if (value.length <= 3) {
                 input.value = value;
             } else if (value.length <= 7) {
@@ -357,41 +312,26 @@
                 input.value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7);
             }
         }
-        
-        // 모바일 메뉴 토글
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                
-                // 햄버거 메뉴 아이콘 애니메이션
-                const spans = mobileMenuBtn.querySelectorAll('span');
-                if (!mobileMenu.classList.contains('hidden')) {
-                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
-                    spans[1].style.opacity = '0';
-                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
-                } else {
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                }
-            });
-            
-            // 모바일 메뉴 링크 클릭시 메뉴 닫기
-            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                    const spans = mobileMenuBtn.querySelectorAll('span');
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
                 });
-            });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
         }
     </script>
+    <script src="js/sidebar.js"></script>
     <script src="js/footer.js"></script>
 </body>
 </html>

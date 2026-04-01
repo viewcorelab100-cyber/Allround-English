@@ -1,4 +1,20 @@
 {
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/auto-push.sh",
+            "timeout": 30,
+            "statusMessage": "Auto commit & push...",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(tasklist:*)",
@@ -11,7 +27,28 @@
       "WebFetch(domain:fqxbfetyfjyzomgrczwi.supabase.co)",
       "Bash(curl:*)",
       "WebFetch(domain:www.allroundedu.co.kr)",
-      "Bash(timeout /t 60 /nobreak)"
+      "Bash(timeout /t 60 /nobreak)",
+      "Bash(supabase functions deploy:*)",
+      "Bash(npx supabase functions deploy:*)",
+      "Bash(npx supabase link:*)",
+      "Bash(git restore:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(node -e \"\nconst https = require\\(''https''\\);\n\nconst data = JSON.stringify\\({\n  senderKey: ''ea98b16e16f06e2dbc1eaf903cd26832d0633070'',\n  templateCode: ''assignment_reminder'',\n  recipientList: [{\n    recipientNo: ''01095592139'',\n    templateParameter: {\n      ''학생명'': ''테스트'',\n      ''과정명'': ''영어 기초반'',\n      ''강의제목'': ''1강 인사하기''\n    }\n  }]\n}\\);\n\nconst options = {\n  hostname: ''api-alimtalk.cloud.toast.com'',\n  path: ''/alimtalk/v2.2/appkeys/zhZSielWtWCB3Uz8/messages'',\n  method: ''POST'',\n  headers: {\n    ''Content-Type'': ''application/json;charset=UTF-8'',\n    ''X-Secret-Key'': ''aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'',\n    ''Content-Length'': Buffer.byteLength\\(data\\)\n  }\n};\n\nconst req = https.request\\(options, \\(res\\) => {\n  let body = '''';\n  res.on\\(''data'', \\(chunk\\) => body += chunk\\);\n  res.on\\(''end'', \\(\\) => console.log\\(body\\)\\);\n}\\);\n\nreq.write\\(data\\);\nreq.end\\(\\);\n\")",
+      "Bash(node -e \"\nconst https = require\\(''https''\\);\n\nconst data = JSON.stringify\\({\n  senderKey: ''ea98b16e16f06e2dbc1eaf903cd26832d0633070'',\n  templateCode: ''grading_complete'',\n  recipientList: [{\n    recipientNo: ''01095592139'',\n    templateParameter: {\n      ''학생명'': ''테스트'',\n      ''과제명'': ''1강 과제'',\n      ''점수'': ''95'',\n      ''피드백'': ''아주 잘했습니다!''\n    }\n  }]\n}\\);\n\nconst options = {\n  hostname: ''api-alimtalk.cloud.toast.com'',\n  path: ''/alimtalk/v2.2/appkeys/zhZSielWtWCB3Uz8/messages'',\n  method: ''POST'',\n  headers: {\n    ''Content-Type'': ''application/json;charset=UTF-8'',\n    ''X-Secret-Key'': ''aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'',\n    ''Content-Length'': Buffer.byteLength\\(data\\)\n  }\n};\n\nconst req = https.request\\(options, \\(res\\) => {\n  let body = '''';\n  res.on\\(''data'', \\(chunk\\) => body += chunk\\);\n  res.on\\(''end'', \\(\\) => console.log\\(''grading_complete:'', body\\)\\);\n}\\);\n\nreq.write\\(data\\);\nreq.end\\(\\);\n\")",
+      "Bash(node -e \"\nconst https = require\\(''https''\\);\n\nconst data = JSON.stringify\\({\n  senderKey: ''ea98b16e16f06e2dbc1eaf903cd26832d0633070'',\n  templateCode: ''inactive_reminder'',\n  recipientList: [{\n    recipientNo: ''01095592139'',\n    templateParameter: {\n      ''학생명'': ''테스트'',\n      ''과정명'': ''영어 기초반'',\n      ''경과일수'': ''7''\n    }\n  }]\n}\\);\n\nconst options = {\n  hostname: ''api-alimtalk.cloud.toast.com'',\n  path: ''/alimtalk/v2.2/appkeys/zhZSielWtWCB3Uz8/messages'',\n  method: ''POST'',\n  headers: {\n    ''Content-Type'': ''application/json;charset=UTF-8'',\n    ''X-Secret-Key'': ''aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'',\n    ''Content-Length'': Buffer.byteLength\\(data\\)\n  }\n};\n\nconst req = https.request\\(options, \\(res\\) => {\n  let body = '''';\n  res.on\\(''data'', \\(chunk\\) => body += chunk\\);\n  res.on\\(''end'', \\(\\) => console.log\\(''inactive_reminder:'', body\\)\\);\n}\\);\n\nreq.write\\(data\\);\nreq.end\\(\\);\n\")",
+      "Bash(node -e \"\nconst https = require\\(''https''\\);\n\nconst data = JSON.stringify\\({\n  senderKey: ''ea98b16e16f06e2dbc1eaf903cd26832d0633070'',\n  templateCode: ''course_complete'',\n  recipientList: [{\n    recipientNo: ''01095592139'',\n    templateParameter: {\n      ''학생명'': ''테스트'',\n      ''과정명'': ''영어 기초반'',\n      ''진도율'': ''100'',\n      ''숙제완료율'': ''95''\n    }\n  }]\n}\\);\n\nconst options = {\n  hostname: ''api-alimtalk.cloud.toast.com'',\n  path: ''/alimtalk/v2.2/appkeys/zhZSielWtWCB3Uz8/messages'',\n  method: ''POST'',\n  headers: {\n    ''Content-Type'': ''application/json;charset=UTF-8'',\n    ''X-Secret-Key'': ''aSMenGNdTBFNtK8FdEr4vEuDFvTOdPxB'',\n    ''Content-Length'': Buffer.byteLength\\(data\\)\n  }\n};\n\nconst req = https.request\\(options, \\(res\\) => {\n  let body = '''';\n  res.on\\(''data'', \\(chunk\\) => body += chunk\\);\n  res.on\\(''end'', \\(\\) => console.log\\(''course_complete:'', body\\)\\);\n}\\);\n\nreq.write\\(data\\);\nreq.end\\(\\);\n\")",
+      "Bash(supabase functions list:*)",
+      "Bash(npx supabase functions:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\이현수\\\\Documents\\\\GitHub\\\\Allround-English\\\\js\"\" | grep -E \"auth)",
+      "Bash(site \")",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(npx serve:*)",
+      "Skill(pdca)",
+      "Bash(git -C \"C:\\\\Users\\\\이현수\\\\Documents\\\\GitHub\\\\Allround-English\" status --short)",
+      "Bash(npx supabase secrets set:*)",
+      "WebSearch",
+      "WebFetch(domain:swarmify.com)"
     ]
   }
 }

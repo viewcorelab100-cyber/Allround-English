@@ -5,31 +5,201 @@
     <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="refresh" content="0; url=courses.html">
     <title>ALLROUND — English Communication</title>
-    <script>
-        // 즉시 리다이렉트
-        window.location.replace('courses.html');
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #ffffff;
-            font-family: sans-serif;
+        :root {
+            --header-h: max(60px, 6.56vw);
+            --sidebar-w: 21.77vw;
+            --sidebar-gap: 3.75vw;
+            --page-right: max(20px, 8.28vw);
         }
-        .loading {
-            text-align: center;
+        html {
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            overflow: hidden;
+        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .kakao-btn { display: inline-block; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
+
+        /* index 전용: 푸터를 뷰포트 하단에 고정 */
+        #allround-footer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            z-index: 20 !important;
+            border-top: 1px solid #e5e7eb;
         }
     </style>
 </head>
-<body>
-    <div class="loading">
-        <p>강의 페이지로 이동 중...</p>
+<body data-active-page="index">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
+
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[0.89vw] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 3.49vw;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 3.07vw;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-[1.25vw]">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-[0.73vw] hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-[1.04vw] hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-[1.04vw] hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[1.25vw] w-auto">
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6">
+                    <div><span class="block text-[#C5C5C5] font-medium text-lg mb-2 pointer-events-none">학원 소개</span></div>
+                    <div>
+                        <p class="text-[#C5C5C5] font-medium text-lg mb-2 pointer-events-none">수업 안내</p>
+                        <div class="pl-4 space-y-2">
+                            <span class="block text-[#D5D5D5] text-sm pointer-events-none">ALLROUND firstee</span>
+                            <span class="block text-[#D5D5D5] text-sm pointer-events-none">ALLROUND original</span>
+                            <span class="block text-[#D5D5D5] text-sm pointer-events-none">ALLROUND strategy</span>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a>
+                    </div>
+                    <div>
+                        <span class="block text-[#C5C5C5] font-medium text-lg mb-2 pointer-events-none">학원 소식</span>
+                    </div>
+                    <div><span class="block text-[#C5C5C5] font-medium text-lg pointer-events-none">상담 예약</span></div>
+                    <div><span class="block text-[#C5C5C5] font-medium text-lg pointer-events-none">강사 채용</span></div>
+                </nav>
+            </div>
+        </div>
     </div>
+
+    <!-- Main: 통합 비주얼 이미지 + 인터랙티브 요소 -->
+    <main class="relative w-screen h-screen overflow-hidden">
+
+        <!-- Layer 0: 통합 비주얼 (배경+그룹12+슬로건+우측텍스트 합본) -->
+        <img src="asset/main/new.png" alt="ALLROUND — Structure Creates Results"
+             class="absolute inset-0 w-full h-full object-cover lg:object-fill pointer-events-none"
+             style="object-position: 57% center;">
+
+        <!-- Layer 1: 사이드바 (Desktop) — 흰색 배경으로 이미지 좌측을 가림 -->
+        <aside class="hidden lg:flex flex-col justify-center absolute z-10 bg-white"
+               style="left: 0; top: 0; width: 21.77vw; height: 100vh; padding-right: 3.75vw;">
+            <nav class="text-right space-y-[1.25vw]">
+                <div>
+                    <span class="block text-[#C5C5C5] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] pointer-events-none">학원 소개</span>
+                </div>
+                <div>
+                    <p class="text-[#C5C5C5] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] mb-[0.63vw] pointer-events-none">수업 안내</p>
+                    <div class="space-y-0">
+                        <span class="block text-[#D5D5D5] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw] pointer-events-none">ALLROUND firstee</span>
+                        <span class="block text-[#D5D5D5] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw] pointer-events-none">ALLROUND original</span>
+                        <span class="block text-[#D5D5D5] text-[0.94vw] leading-[2.08vw] tracking-[-0.01vw] pointer-events-none">ALLROUND strategy</span>
+                    </div>
+                </div>
+                <div>
+                    <a href="courses.html" class="sidebar-link flex items-center justify-end gap-[0.42vw]">
+                        <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-[1.04vw] w-auto">
+                        <span class="text-[#2F2725] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw]">온라인 강의</span>
+                    </a>
+                </div>
+                <div>
+                    <p class="text-[#C5C5C5] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] pointer-events-none">학원 소식</p>
+                </div>
+                <div>
+                    <span class="block text-[#C5C5C5] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] pointer-events-none">상담 예약</span>
+                </div>
+                <div>
+                    <span class="block text-[#C5C5C5] font-medium text-[1.15vw] leading-[1.15vw] tracking-[-0.01vw] pointer-events-none">강사 채용</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Layer 2: 카톡 상담 Desktop (Figma: right=12.92vw, top=17.04vh) -->
+        <div class="hidden lg:block absolute z-20" style="right: 12.92vw; top: 17.04vh;">
+            <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+               class="kakao-btn relative inline-block">
+                <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[3.23vw] w-[9.74vw] object-contain block">
+                <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
+                    <span class="text-[#2F2725] text-[1.04vw] font-bold tracking-[-0.01vw]">카톡 상담</span>
+                </div>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Mobile: 카톡 플로팅 -->
+    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+       class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-11 w-auto object-contain drop-shadow-lg block">
+        <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
+            <span class="text-[#2F2725] text-[10px] font-bold tracking-[-0.2px]">카톡 상담</span>
+        </div>
+    </a>
+
+    <div id="footer-container"></div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -7,82 +7,77 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
     <title>My Page — ALLROUND</title>
-    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 60px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+        }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
-            font-family: 'Noto Sans KR', "Poppins", sans-serif;
-            background-color: #000000;
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
         }
-        
-        /* 상단바 제외한 본문 영문 폰트 */
-        .main-content {
-            font-family: "Poppins", 'Noto Sans KR', sans-serif;
-        }
-        
-        /* 상단바 스타일 */
-        header, header * {
-            font-family: "Poppins", sans-serif;
-        }
-        
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
+
         .btn-hover-scale {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        
         .btn-hover-scale:hover {
             transform: translateY(-2px);
         }
 
         html {
             scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
-
-        .nav-link {
-            transition: color 0.2s ease-in-out;
-        }
-
-        .nav-link:hover {
-            color: #999;
         }
 
         .tab-btn {
             transition: all 0.2s ease;
-            border-radius: 0px;
+            border-radius: 8px;
         }
 
         .tab-btn.active {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #2F2725;
             color: white;
         }
 
-        /* Minimal Course Card */
+        /* Course Card */
         .course-card {
             transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
             display: block;
-            background-color: rgba(255, 255, 255, 0.03);
-            border-radius: 0px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
             overflow: hidden;
         }
-        
+
         .course-image-wrapper {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
             overflow: hidden;
         }
-        
+
         .course-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
         }
-        
+
         .course-card:hover .course-image {
             transform: scale(1.05);
         }
@@ -91,7 +86,7 @@
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            color: #666;
+            color: #8B95A1;
             margin-bottom: 0.5rem;
             display: block;
         }
@@ -100,376 +95,366 @@
             font-size: 1.1rem;
             font-weight: 600;
             line-height: 1.4;
-            color: #fff;
+            color: #2F2725;
             margin-bottom: 0.75rem;
             word-break: keep-all;
         }
 
         .course-meta {
             font-size: 10px;
-            color: #444;
+            color: #8B95A1;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         /* Input Styles */
         input, textarea, select {
-            border-radius: 0px !important;
+            border-radius: 12px !important;
         }
 
         .btn-primary {
-            background-color: white;
-            color: black;
-            border-radius: 0px;
+            background-color: #2F2725;
+            color: white;
+            border-radius: 16px;
             font-weight: 600;
             transition: all 0.2s ease;
         }
 
         .btn-primary:hover {
-            background-color: #e5e5e5;
+            opacity: 0.9;
         }
 
         .btn-outline {
-            background-color: transparent;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0px;
+            background-color: white;
+            color: #2F2725;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
             font-weight: 600;
             transition: all 0.2s ease;
         }
 
         .btn-outline:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: white;
+            border-color: #2F2725;
         }
     </style>
     <!-- 다음 주소 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
-<body class="bg-black text-white min-h-screen">
-    
-    <!-- 상단 네비게이션 바 -->
-    <header class="fixed top-0 left-0 right-0 bg-black z-50">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
-            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
-            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
-                <!-- 좌측: 모바일 햄버거 메뉴 -->
-                <div class="flex justify-start items-center">
-                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
-                    </button>
-                </div>
+<body class="bg-white text-[#2F2725] min-h-screen flex flex-col" data-active-page="mypage">
 
-                <!-- 중앙: 로고 (grid 중앙 고정) -->
-                <div class="flex justify-center items-center">
-                    <a href="index.html" class="flex items-center">
-                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
-                    </a>
-                </div>
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
 
-                <!-- 우측: User 메뉴 영역 -->
-                <div class="flex justify-end items-center">
-                    <div id="user-menu" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
-                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
-                        <span class="nav-link text-white text-xs md:text-sm whitespace-nowrap hidden sm:inline">My Page</span>
-                        <button onclick="handleSignOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap">Logout</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 구분선 -->
-            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
-            
-            <!-- 데스크톱 네비게이션 -->
-            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
-                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
-                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
-                <a href="courses.html" class="nav-link text-white">강의</a>
-                <a href="board.html" class="nav-link text-white">게시판</a>
-            </nav>
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
         </div>
-        
-        <!-- 모바일 메뉴 (토글) -->
-        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
-            <nav class="px-4 py-6 space-y-4">
-                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
-                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
-                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
-                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
-                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
-                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
-            </nav>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="handleSignOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
         </div>
     </header>
 
-    <div class="h-36"></div>
-
-    <!-- Main Content -->
-    <main class="main-content">
-    <section class="py-12 md:py-20 px-4 md:px-6">
-        <div class="max-w-5xl mx-auto">
-            
-            <!-- Profile Header -->
-            <div class="mb-12 md:mb-16 text-center space-y-4">
-                <span class="text-xs md:text-sm font-semibold text-white tracking-widest uppercase">My Account</span>
-                <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold text-white leading-tight">My Page</h1>
-                <p id="user-email" class="text-sm md:text-base text-gray-500 font-light tracking-wide"></p>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6"></nav>
             </div>
-
-            <!-- Tabs -->
-            <div class="flex flex-wrap justify-center gap-2 mb-12 border-b border-white border-opacity-10 pb-6">
-                <button onclick="showTab('courses')" id="tab-courses" class="tab-btn active px-6 py-2 text-white font-medium text-sm tracking-wider uppercase">
-                    수강 강의
-                </button>
-                <button onclick="showTab('grades')" id="tab-grades" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    성적표
-                </button>
-                <button onclick="showTab('orders')" id="tab-orders" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    주문/배송
-                </button>
-                <button onclick="showTab('profile')" id="tab-profile" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    프로필 설정
-                </button>
-                <button onclick="showTab('devices')" id="tab-devices" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    내 기기
-                </button>
-                <button onclick="showTab('coupons')" id="tab-coupons" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    쿠폰
-                </button>
-                <button onclick="showTab('qna')" id="tab-qna" class="tab-btn px-6 py-2 text-gray-500 font-medium text-sm tracking-wider uppercase">
-                    내 질문
-                </button>
-            </div>
-
-            <!-- Tab Content: Courses -->
-            <div id="content-courses" class="space-y-8">
-                <div id="my-courses" class="grid md:grid-cols-2 gap-6">
-                    <div class="text-center text-gray-500 col-span-full py-20">
-                        강의 정보를 불러오는 중...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Content: Grades -->
-            <div id="content-grades" class="hidden space-y-6">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-2">과제 성적표</h2>
-                    <p class="text-sm text-gray-400">제출한 과제의 채점 결과를 확인할 수 있습니다.</p>
-                </div>
-                <div id="my-grades" class="space-y-4">
-                    <div class="text-center text-gray-500 py-20">
-                        성적 정보를 불러오는 중...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Content: Orders/Shipping -->
-            <div id="content-orders" class="hidden space-y-6">
-                <div id="my-orders" class="space-y-4">
-                    <div class="text-center text-gray-500 py-20">
-                        주문 내역을 불러오는 중...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Content: Profile -->
-            <div id="content-profile" class="hidden space-y-12">
-                <div class="max-w-xl mx-auto space-y-8">
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Name</label>
-                            <input type="text" id="profile-name" 
-                                   class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Email</label>
-                            <input type="email" id="profile-email" 
-                                   class="w-full px-4 py-4 bg-transparent border border-white border-opacity-10 text-gray-600 cursor-not-allowed"
-                                   disabled>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Phone</label>
-                            <input type="tel" id="profile-phone" 
-                                   class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                                   placeholder="010-0000-0000">
-                        </div>
-                    </div>
-                    
-                    <!-- 학부모 정보 섹션 -->
-                    <div class="pt-12 border-t border-white border-opacity-10 space-y-8">
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-tight">Parent Notification</h3>
-                            <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">SMS alerts for course completion</p>
-                            <input type="hidden" id="parent-notification-enabled" value="true">
-                        </div>
-                        
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Parent Name</label>
-                                <input type="text" id="parent-name" 
-                                       class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                                       placeholder="Name">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Parent Phone</label>
-                                <input type="tel" id="parent-phone" 
-                                       class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                                       placeholder="010-0000-0000">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="profile-message" class="text-xs hidden"></div>
-                    <button onclick="updateProfile()" 
-                            class="btn-hover-scale w-full px-8 py-4 bg-white text-black font-bold text-sm tracking-widest uppercase">
-                        Save Profile
-                    </button>
-                </div>
-
-                <!-- 비밀번호 변경 섹션 -->
-                <div class="pt-16 border-t border-white border-opacity-10 max-w-xl mx-auto">
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-white tracking-tight">Security</h3>
-                        <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">Update your password</p>
-                    </div>
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">New Password</label>
-                            <input type="password" id="new-password" 
-                                   class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                                   placeholder="Min. 8 characters">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-semibold text-gray-500 mb-2 uppercase tracking-widest">Confirm Password</label>
-                            <input type="password" id="new-password-confirm" 
-                                   class="w-full px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors"
-                                   placeholder="Repeat password">
-                        </div>
-                        <div id="password-message" class="text-sm hidden"></div>
-                        <button onclick="changePassword()"
-                                class="btn-hover-scale w-full px-8 py-4 bg-transparent text-white font-bold text-sm tracking-widest uppercase border border-white border-opacity-20 hover:border-opacity-100 transition-colors">
-                            Change Password
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 회원 탈퇴 섹션 -->
-                <div class="pt-16 border-t border-white border-opacity-10 max-w-xl mx-auto">
-                    <div class="mb-8">
-                        <h3 class="text-xl font-bold text-red-400 tracking-tight">회원 탈퇴</h3>
-                        <p class="text-xs text-gray-600 mt-1 uppercase tracking-wider">Delete your account permanently</p>
-                    </div>
-                    <p class="text-sm text-gray-400 mb-6">
-                        회원 탈퇴 시 모든 학습 기록, 진도, 과제 제출 내역이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
-                    </p>
-                    <button onclick="confirmDeleteAccount()"
-                            class="w-full px-8 py-4 bg-transparent text-red-400 font-bold text-sm tracking-widest uppercase border border-red-400 border-opacity-50 hover:bg-red-400 hover:text-black transition-colors">
-                        회원 탈퇴
-                    </button>
-                </div>
-            </div>
-
-            <!-- Tab Content: Devices -->
-            <div id="content-devices" class="hidden space-y-6">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-2">내 기기 관리</h2>
-                    <p class="text-sm text-gray-400">최대 3대까지 동시 접속이 가능합니다. 4대째 로그인 시 가장 오래된 기기가 자동으로 로그아웃됩니다.</p>
-                </div>
-
-                <div id="devices-list" class="space-y-4">
-                    <div class="text-center text-gray-500 py-12">
-                        기기 정보를 불러오는 중...
-                    </div>
-                </div>
-
-                <!-- 현재 기기 정보 -->
-                <div class="mt-8 p-4 bg-white bg-opacity-5 border border-white border-opacity-10">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-sm font-semibold text-white">현재 기기</span>
-                    </div>
-                    <p id="current-device-info" class="text-sm text-gray-400"></p>
-                </div>
-            </div>
-
-            <!-- Tab Content: Coupons -->
-            <div id="content-coupons" class="hidden space-y-6">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-2">내 쿠폰</h2>
-                    <p class="text-sm text-gray-400">사용 가능한 쿠폰과 사용 내역을 확인할 수 있습니다.</p>
-                </div>
-
-                <!-- 쿠폰 입력 -->
-                <div class="bg-white bg-opacity-5 p-8 border border-white border-opacity-10">
-                    <h3 class="text-[10px] font-semibold text-gray-500 mb-6 uppercase tracking-widest">Register Coupon</h3>
-                    <div class="flex flex-col md:flex-row gap-3">
-                        <input type="text" id="coupon-code-input" 
-                               placeholder="ENTER COUPON CODE" 
-                               class="flex-1 px-4 py-4 bg-white bg-opacity-5 border border-white border-opacity-10 text-white placeholder-gray-600 focus:outline-none focus:border-white transition-colors uppercase tracking-widest text-xs">
-                        <button onclick="registerCoupon()" 
-                                class="px-8 py-4 bg-white text-black font-bold text-xs uppercase tracking-[0.2em] hover:bg-gray-200 transition-all whitespace-nowrap">
-                            Register
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 사용 가능한 쿠폰 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-white mb-4">사용 가능한 쿠폰</h3>
-                    <div id="available-coupons" class="space-y-4">
-                        <div class="text-center text-gray-500 py-12">
-                            쿠폰을 불러오는 중...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 사용 완료 / 만료된 쿠폰 -->
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-400 mb-4">사용 완료 / 만료</h3>
-                    <div id="used-coupons" class="space-y-4">
-                        <div class="text-center text-gray-500 py-12">
-                            사용 내역이 없습니다.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Content: Q&A -->
-            <div id="content-qna" class="hidden space-y-6">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-2">내 질문</h2>
-                    <p class="text-sm text-gray-400">강의에서 질문한 내역과 답변을 확인할 수 있습니다.</p>
-                </div>
-
-                <div id="my-qna-list" class="space-y-4">
-                    <div class="text-center text-gray-500 py-12">
-                        질문 내역을 불러오는 중...
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </section>
+    </div>
+
+    <!-- Main Layout -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <!-- Sidebar -->
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6"></nav>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
+                <section class="py-12 md:py-20 px-6 md:px-10 lg:px-16">
+                    <div class="max-w-5xl mx-auto">
+
+                        <!-- Profile Header -->
+                        <div class="mb-10 space-y-2">
+                            <h1 class="text-2xl md:text-3xl font-bold text-[#2F2725]">My Page</h1>
+                            <p id="user-email" class="text-sm text-[#8B95A1]"></p>
+                        </div>
+
+                        <!-- Tabs -->
+                        <div class="flex flex-wrap gap-2 mb-10 border-b border-gray-200 pb-6">
+                            <button onclick="showTab('courses')" id="tab-courses" class="tab-btn active px-5 py-2 text-[#2F2725] font-medium text-sm tracking-wider uppercase">
+                                수강 강의
+                            </button>
+                            <button onclick="showTab('grades')" id="tab-grades" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                성적표
+                            </button>
+                            <button onclick="showTab('orders')" id="tab-orders" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                주문/배송
+                            </button>
+                            <button onclick="showTab('profile')" id="tab-profile" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                프로필 설정
+                            </button>
+                            <button onclick="showTab('devices')" id="tab-devices" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                내 기기
+                            </button>
+                            <button onclick="showTab('coupons')" id="tab-coupons" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                쿠폰
+                            </button>
+                            <button onclick="showTab('qna')" id="tab-qna" class="tab-btn px-5 py-2 text-[#8B95A1] font-medium text-sm tracking-wider uppercase">
+                                내 질문
+                            </button>
+                        </div>
+
+                        <!-- Tab Content: Courses -->
+                        <div id="content-courses" class="space-y-8">
+                            <div id="my-courses" class="grid md:grid-cols-2 gap-6">
+                                <div class="text-center text-[#8B95A1] col-span-full py-20">
+                                    강의 정보를 불러오는 중...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Grades -->
+                        <div id="content-grades" class="hidden space-y-6">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-[#2F2725] mb-2">과제 성적표</h2>
+                                <p class="text-sm text-[#8B95A1]">제출한 과제의 채점 결과를 확인할 수 있습니다.</p>
+                            </div>
+                            <div id="my-grades" class="space-y-4">
+                                <div class="text-center text-[#8B95A1] py-20">
+                                    성적 정보를 불러오는 중...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Orders/Shipping -->
+                        <div id="content-orders" class="hidden space-y-6">
+                            <div id="my-orders" class="space-y-4">
+                                <div class="text-center text-[#8B95A1] py-20">
+                                    주문 내역을 불러오는 중...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Profile -->
+                        <div id="content-profile" class="hidden space-y-12">
+                            <div class="max-w-xl mx-auto space-y-8">
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Name</label>
+                                        <input type="text" id="profile-name"
+                                               class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Email</label>
+                                        <input type="email" id="profile-email"
+                                               class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#C5C5C5] rounded-xl cursor-not-allowed"
+                                               disabled>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Phone</label>
+                                        <input type="tel" id="profile-phone"
+                                               class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors"
+                                               placeholder="010-0000-0000">
+                                    </div>
+                                </div>
+
+                                <!-- 학부모 정보 섹션 -->
+                                <div class="pt-12 border-t border-gray-200 space-y-8">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-[#2F2725] tracking-tight">Parent Notification</h3>
+                                        <p class="text-xs text-[#C5C5C5] mt-1 uppercase tracking-wider">SMS alerts for course completion</p>
+                                        <input type="hidden" id="parent-notification-enabled" value="true">
+                                    </div>
+
+                                    <div class="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Parent Name</label>
+                                            <input type="text" id="parent-name"
+                                                   class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors"
+                                                   placeholder="Name">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Parent Phone</label>
+                                            <input type="tel" id="parent-phone"
+                                                   class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors"
+                                                   placeholder="010-0000-0000">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="profile-message" class="text-xs hidden"></div>
+                                <button onclick="updateProfile()"
+                                        class="btn-hover-scale w-full px-8 py-4 bg-[#2F2725] text-white font-bold text-sm tracking-widest uppercase rounded-2xl">
+                                    Save Profile
+                                </button>
+                            </div>
+
+                            <!-- 비밀번호 변경 섹션 -->
+                            <div class="pt-16 border-t border-gray-200 max-w-xl mx-auto">
+                                <div class="mb-8">
+                                    <h3 class="text-xl font-bold text-[#2F2725] tracking-tight">Security</h3>
+                                    <p class="text-xs text-[#C5C5C5] mt-1 uppercase tracking-wider">Update your password</p>
+                                </div>
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">New Password</label>
+                                        <input type="password" id="new-password"
+                                               class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors"
+                                               placeholder="Min. 8 characters">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-semibold text-[#8B95A1] mb-2 uppercase tracking-widest">Confirm Password</label>
+                                        <input type="password" id="new-password-confirm"
+                                               class="w-full px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors"
+                                               placeholder="Repeat password">
+                                    </div>
+                                    <div id="password-message" class="text-sm hidden"></div>
+                                    <button onclick="changePassword()"
+                                            class="btn-hover-scale w-full px-8 py-4 bg-white text-[#2F2725] font-bold text-sm tracking-widest uppercase border border-gray-200 rounded-2xl hover:border-[#2F2725] transition-colors">
+                                        Change Password
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 회원 탈퇴 섹션 -->
+                            <div class="pt-16 border-t border-gray-200 max-w-xl mx-auto">
+                                <div class="mb-8">
+                                    <h3 class="text-xl font-bold text-red-500 tracking-tight">회원 탈퇴</h3>
+                                    <p class="text-xs text-[#C5C5C5] mt-1 uppercase tracking-wider">Delete your account permanently</p>
+                                </div>
+                                <p class="text-sm text-[#8B95A1] mb-6">
+                                    회원 탈퇴 시 모든 학습 기록, 진도, 과제 제출 내역이 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+                                </p>
+                                <button onclick="confirmDeleteAccount()"
+                                        class="w-full px-8 py-4 bg-white text-red-500 font-bold text-sm tracking-widest uppercase border border-red-300 rounded-2xl hover:bg-red-50 transition-colors">
+                                    회원 탈퇴
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Devices -->
+                        <div id="content-devices" class="hidden space-y-6">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-[#2F2725] mb-2">내 기기 관리</h2>
+                                <p class="text-sm text-[#8B95A1]">최대 3대까지 동시 접속이 가능합니다. 4대째 로그인 시 가장 오래된 기기가 자동으로 로그아웃됩니다.</p>
+                            </div>
+
+                            <div id="devices-list" class="space-y-4">
+                                <div class="text-center text-[#8B95A1] py-12">
+                                    기기 정보를 불러오는 중...
+                                </div>
+                            </div>
+
+                            <!-- 현재 기기 정보 -->
+                            <div class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="text-sm font-semibold text-[#2F2725]">현재 기기</span>
+                                </div>
+                                <p id="current-device-info" class="text-sm text-[#8B95A1]"></p>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Coupons -->
+                        <div id="content-coupons" class="hidden space-y-6">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-[#2F2725] mb-2">내 쿠폰</h2>
+                                <p class="text-sm text-[#8B95A1]">사용 가능한 쿠폰과 사용 내역을 확인할 수 있습니다.</p>
+                            </div>
+
+                            <!-- 쿠폰 입력 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-8">
+                                <h3 class="text-[10px] font-semibold text-[#8B95A1] mb-6 uppercase tracking-widest">Register Coupon</h3>
+                                <div class="flex flex-col md:flex-row gap-3">
+                                    <input type="text" id="coupon-code-input"
+                                           placeholder="ENTER COUPON CODE"
+                                           class="flex-1 px-4 py-4 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 transition-colors uppercase tracking-widest text-xs">
+                                    <button onclick="registerCoupon()"
+                                            class="px-8 py-4 bg-[#2F2725] text-white font-bold text-xs uppercase tracking-[0.2em] rounded-2xl hover:opacity-90 transition-all whitespace-nowrap">
+                                        Register
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 사용 가능한 쿠폰 -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-[#2F2725] mb-4">사용 가능한 쿠폰</h3>
+                                <div id="available-coupons" class="space-y-4">
+                                    <div class="text-center text-[#8B95A1] py-12">
+                                        쿠폰을 불러오는 중...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 사용 완료 / 만료된 쿠폰 -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-[#8B95A1] mb-4">사용 완료 / 만료</h3>
+                                <div id="used-coupons" class="space-y-4">
+                                    <div class="text-center text-[#8B95A1] py-12">
+                                        사용 내역이 없습니다.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Q&A -->
+                        <div id="content-qna" class="hidden space-y-6">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-[#2F2725] mb-2">내 질문</h2>
+                                <p class="text-sm text-[#8B95A1]">강의에서 질문한 내역과 답변을 확인할 수 있습니다.</p>
+                            </div>
+
+                            <div id="my-qna-list" class="space-y-4">
+                                <div class="text-center text-[#8B95A1] py-12">
+                                    질문 내역을 불러오는 중...
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
+                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+            </div>
+        </a>
     </main>
 
-    <!-- Footer -->
-    <footer class="py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <img src="/logo.png" alt="ALLROUND" class="h-6 md:h-8 w-auto">
-                <div class="text-sm text-gray-400">
-                    © 2024 ALLROUND. All rights reserved.
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-container"></div>
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
@@ -477,20 +462,42 @@
     <script src="js/courses.js"></script>
     <script src="js/progress.js"></script>
     <script>
+        // XSS 방지: 사용자 입력 데이터 이스케이프
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                });
+            } else {
+                panel.classList.add('translate-x-full');
+                setTimeout(() => menu.classList.add('hidden'), 300);
+            }
+        }
+
         let currentUser = null;
         let userProfile = null;
 
         // 탭 전환
         function showTab(tab) {
             // 모든 콘텐츠와 탭 숨기기
-            ['courses', 'grades', 'orders', 'profile', 'devices', 'coupons'].forEach(t => {
+            ['courses', 'grades', 'orders', 'profile', 'devices', 'coupons', 'qna'].forEach(t => {
                 const contentEl = document.getElementById(`content-${t}`);
                 const tabEl = document.getElementById(`tab-${t}`);
 
                 if (contentEl) contentEl.classList.add('hidden');
                 if (tabEl) {
                     tabEl.classList.remove('active');
-                    tabEl.classList.add('text-gray-400');
+                    tabEl.classList.add('text-[#8B95A1]');
+                    tabEl.classList.remove('text-[#2F2725]');
                 }
             });
 
@@ -501,7 +508,8 @@
             if (selectedContent) selectedContent.classList.remove('hidden');
             if (selectedTab) {
                 selectedTab.classList.add('active');
-                selectedTab.classList.remove('text-gray-400');
+                selectedTab.classList.remove('text-[#8B95A1]');
+                selectedTab.classList.add('text-[#2F2725]');
             }
 
             // 성적표 탭 선택 시 데이터 로드
@@ -534,34 +542,34 @@
         function renderMyCourseCard(purchase, progress) {
             const course = purchase.course;
             const progressPercent = progress?.progress || 0;
-            
+
             return `
                 <div class="course-card group">
                     <div class="course-image-wrapper">
-                        <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}" 
-                             alt="${course.title}" 
+                        <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80'}"
+                             alt="${course.title}"
                              class="course-image">
                     </div>
                     <div class="p-6 space-y-4">
                         <div class="space-y-1">
                             <span class="category-tag">${course.category || 'General'}</span>
-                            <h3 class="course-title group-hover:text-gray-300 transition-colors">${course.title}</h3>
+                            <h3 class="course-title group-hover:opacity-70 transition-opacity">${course.title}</h3>
                         </div>
-                        
+
                         <!-- Progress Bar -->
                         <div class="space-y-2">
                             <div class="flex justify-between text-[10px] uppercase tracking-wider">
-                                <span class="text-gray-500">Progress</span>
-                                <span class="text-white">${progressPercent}%</span>
+                                <span class="text-[#8B95A1]">Progress</span>
+                                <span class="text-[#2F2725]">${progressPercent}%</span>
                             </div>
-                            <div class="w-full h-[2px] bg-white bg-opacity-10 overflow-hidden">
-                                <div class="h-full bg-white transition-all duration-300" style="width: ${progressPercent}%"></div>
+                            <div class="w-full h-[2px] bg-gray-100 overflow-hidden rounded-full">
+                                <div class="h-full bg-[#2F2725] transition-all duration-300 rounded-full" style="width: ${progressPercent}%"></div>
                             </div>
-                            <p class="text-[10px] text-gray-600 uppercase tracking-tight">${progress?.completedLessons || 0}/${progress?.totalLessons || 0} Lessons Completed</p>
+                            <p class="text-[10px] text-[#C5C5C5] uppercase tracking-tight">${progress?.completedLessons || 0}/${progress?.totalLessons || 0} Lessons Completed</p>
                         </div>
-                        
-                        <a href="course-detail.html?id=${course.id}" 
-                           class="btn-hover-scale block text-center px-6 py-3 bg-white text-black font-semibold text-sm tracking-wider uppercase">
+
+                        <a href="course-detail.html?id=${course.id}"
+                           class="btn-hover-scale block text-center px-6 py-3 bg-[#2F2725] text-white font-semibold text-sm tracking-wider uppercase rounded-2xl">
                             Continue Learning
                         </a>
                     </div>
@@ -572,11 +580,11 @@
         // 배송 상태 배지 HTML 반환
         function getShippingStatusBadge(status) {
             const badges = {
-                'PENDING_ADDRESS': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-yellow-500 bg-opacity-20 text-yellow-400">Pending</span>',
-                'PREPARING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-blue-500 bg-opacity-20 text-blue-400">Preparing</span>',
-                'SHIPPING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-purple-500 bg-opacity-20 text-purple-400">Shipping</span>',
-                'DELIVERED': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-green-500 bg-opacity-20 text-green-400">Delivered</span>',
-                'NO_SHIPPING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-gray-500 bg-opacity-20 text-gray-400">None</span>'
+                'PENDING_ADDRESS': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-yellow-50 text-yellow-700 rounded-lg">Pending</span>',
+                'PREPARING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-blue-50 text-blue-700 rounded-lg">Preparing</span>',
+                'SHIPPING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-purple-50 text-purple-700 rounded-lg">Shipping</span>',
+                'DELIVERED': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-green-50 text-green-700 rounded-lg">Delivered</span>',
+                'NO_SHIPPING': '<span class="px-3 py-1 text-[10px] uppercase tracking-widest font-bold bg-gray-100 text-gray-500 rounded-lg">None</span>'
             };
             return badges[status] || badges['PENDING_ADDRESS'];
         }
@@ -613,9 +621,9 @@
 
                 if (!orders || orders.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center text-gray-500 py-20 space-y-4">
+                        <div class="text-center text-[#8B95A1] py-20 space-y-4">
                             <p class="text-xl uppercase tracking-widest font-bold">No Orders Found</p>
-                            <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
+                            <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-[#2F2725] text-white font-bold text-xs uppercase tracking-[0.2em] rounded-2xl">
                                 Browse Courses
                             </a>
                         </div>
@@ -627,7 +635,7 @@
 
             } catch (error) {
                 console.error('Load orders error:', error);
-                container.innerHTML = '<div class="text-center text-red-400 py-10">주문 내역을 불러올 수 없습니다.</div>';
+                container.innerHTML = '<div class="text-center text-red-500 py-10">주문 내역을 불러올 수 없습니다.</div>';
             }
         }
 
@@ -635,63 +643,63 @@
         function renderOrderCard(order) {
             // 택배 정보가 있으면 표시 (has_textbook과 무관)
             const hasShippingInfo = order.tracking_number || order.shipping_address;
-            
+
             return `
-                <div class="bg-white bg-opacity-5 p-6 space-y-4">
+                <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
                     <div class="flex justify-between items-start">
                         <div class="flex space-x-4">
-                            <div class="w-20 h-20 bg-cover bg-center flex-shrink-0" 
-                                 style="background-image: url('${order.courses?.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&q=80'}'); background-color: #111;">
+                            <div class="w-20 h-20 bg-cover bg-center flex-shrink-0 rounded-xl"
+                                 style="background-image: url('${order.courses?.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200&q=80'}'); background-color: #f5f5f5;">
                             </div>
                             <div class="space-y-1">
-                                <h3 class="font-bold text-white">${order.courses?.title || order.order_name}</h3>
-                                <p class="text-sm text-gray-500">주문일: ${new Date(order.created_at).toLocaleDateString('ko-KR')}</p>
-                                <p class="text-sm text-gray-400">₩${(order.amount || 0).toLocaleString()}</p>
+                                <h3 class="font-bold text-[#2F2725]">${escapeHTML(order.courses?.title || order.order_name)}</h3>
+                                <p class="text-sm text-[#8B95A1]">주문일: ${new Date(order.created_at).toLocaleDateString('ko-KR')}</p>
+                                <p class="text-sm text-[#8B95A1]">\u20A9${(order.amount || 0).toLocaleString()}</p>
                             </div>
                         </div>
                         ${getShippingStatusBadge(order.shipping_status)}
                     </div>
 
                     ${hasShippingInfo ? `
-                    <div class="pt-4 border-t border-white border-opacity-10 space-y-3">
-                        <h4 class="text-sm font-semibold text-gray-300">교재 배송 정보</h4>
-                        
+                    <div class="pt-4 border-t border-gray-200 space-y-3">
+                        <h4 class="text-sm font-semibold text-[#4E5968]">교재 배송 정보</h4>
+
                         ${order.shipping_status === 'PENDING_ADDRESS' ? `
-                            <div class="p-4 bg-yellow-500 bg-opacity-10 border border-yellow-500 border-opacity-30 space-y-3">
-                                <p class="text-yellow-400 text-sm font-semibold">배송지 정보가 입력되지 않았습니다.</p>
-                                <p class="text-gray-400 text-xs">교재를 받으실 배송지를 입력해주세요.</p>
-                                <a href="payment-success.html?orderId=${order.id}&paymentKey=${order.payment_key || ''}&amount=${order.amount}" 
-                                   class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold hover:bg-gray-100">
+                            <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                                <p class="text-yellow-700 text-sm font-semibold">배송지 정보가 입력되지 않았습니다.</p>
+                                <p class="text-[#8B95A1] text-xs">교재를 받으실 배송지를 입력해주세요.</p>
+                                <a href="payment-success.html?orderId=${order.id}&paymentKey=${order.payment_key || ''}&amount=${order.amount}"
+                                   class="btn-hover-scale block w-full py-3 bg-[#2F2725] text-white text-center font-semibold rounded-2xl hover:opacity-90">
                                     배송 정보 입력하기
                                 </a>
                             </div>
                         ` : `
                             <div class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <p class="text-gray-500">받는분</p>
-                                    <p class="text-white">${order.shipping_name || '-'}</p>
+                                    <p class="text-[#8B95A1]">받는분</p>
+                                    <p class="text-[#2F2725]">${escapeHTML(order.shipping_name) || '-'}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-500">연락처</p>
-                                    <p class="text-white">${order.shipping_phone || '-'}</p>
+                                    <p class="text-[#8B95A1]">연락처</p>
+                                    <p class="text-[#2F2725]">${escapeHTML(order.shipping_phone) || '-'}</p>
                                 </div>
                                 <div class="col-span-2">
-                                    <p class="text-gray-500">배송지</p>
-                                    <p class="text-white">${order.shipping_address || '-'} ${order.shipping_address_detail || ''}</p>
+                                    <p class="text-[#8B95A1]">배송지</p>
+                                    <p class="text-[#2F2725]">${escapeHTML(order.shipping_address) || '-'} ${escapeHTML(order.shipping_address_detail)}</p>
                                 </div>
                                 ${(order.shipping_status === 'SHIPPING' || order.shipping_status === 'DELIVERED') && order.tracking_number ? `
-                                    <div class="col-span-2 pt-3 border-t border-white border-opacity-10">
+                                    <div class="col-span-2 pt-3 border-t border-gray-200">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <p class="text-gray-500 mb-1">택배 정보</p>
-                                                <p class="text-white font-semibold">${getCarrierName(order.shipping_carrier)}</p>
-                                                <p class="text-gray-400 text-sm mt-1">송장번호: ${order.tracking_number}</p>
+                                                <p class="text-[#8B95A1] mb-1">택배 정보</p>
+                                                <p class="text-[#2F2725] font-semibold">${getCarrierName(order.shipping_carrier)}</p>
+                                                <p class="text-[#8B95A1] text-sm mt-1">송장번호: ${escapeHTML(order.tracking_number)}</p>
                                             </div>
                                             ${order.shipping_carrier && order.tracking_number ? `
-                                                <a href="${getTrackingUrl(order.shipping_carrier, order.tracking_number)}" 
-                                                   target="_blank" 
-                                                   class="btn-hover-scale px-4 py-2 bg-white bg-opacity-10 text-white text-sm font-semibold hover:bg-opacity-20 border border-white border-opacity-20">
-                                                    🚚 배송조회
+                                                <a href="${getTrackingUrl(order.shipping_carrier, order.tracking_number)}"
+                                                   target="_blank"
+                                                   class="btn-hover-scale px-4 py-2 bg-gray-100 text-[#2F2725] text-sm font-semibold rounded-xl hover:bg-gray-200 border border-gray-200">
+                                                    배송조회
                                                 </a>
                                             ` : ''}
                                         </div>
@@ -699,82 +707,82 @@
                                 ` : ''}
                                 ${order.shipping_status === 'DELIVERED' && order.delivered_at ? `
                                     <div class="col-span-2">
-                                        <p class="text-gray-500">배송완료일</p>
-                                        <p class="text-green-400">${new Date(order.delivered_at).toLocaleDateString('ko-KR')}</p>
+                                        <p class="text-[#8B95A1]">배송완료일</p>
+                                        <p class="text-green-600">${new Date(order.delivered_at).toLocaleDateString('ko-KR')}</p>
                                     </div>
                                 ` : ''}
                             </div>
                         `}
                     </div>
                     ` : `
-                    <div class="pt-4 border-t border-white border-opacity-10">
+                    <div class="pt-4 border-t border-gray-200">
                         <!-- 배송 정보 입력 버튼 -->
-                        <div id="shipping-btn-${order.id}" class="p-4 bg-white bg-opacity-5 space-y-3">
-                            <p class="text-gray-400 text-sm">교재 배송을 원하시면 배송 정보를 입력해주세요.</p>
-                            <button onclick="toggleShippingForm('${order.id}')" 
-                               class="btn-hover-scale block w-full py-3 bg-white text-black text-center font-semibold hover:bg-gray-100">
+                        <div id="shipping-btn-${order.id}" class="p-4 bg-gray-50 rounded-xl space-y-3">
+                            <p class="text-[#8B95A1] text-sm">교재 배송을 원하시면 배송 정보를 입력해주세요.</p>
+                            <button onclick="toggleShippingForm('${order.id}')"
+                               class="btn-hover-scale block w-full py-3 bg-[#2F2725] text-white text-center font-semibold rounded-2xl hover:opacity-90">
                                 배송 정보 입력하기
                             </button>
                         </div>
 
                         <!-- 배송 정보 입력 폼 (숨김) -->
                         <div id="shipping-form-${order.id}" class="hidden space-y-4 mt-4">
-                            <h4 class="text-lg font-bold text-white">배송 정보</h4>
-                            
+                            <h4 class="text-lg font-bold text-[#2F2725]">배송 정보</h4>
+
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">받는 분 *</label>
-                                    <input type="text" id="name-${order.id}" 
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                    <label class="block text-sm text-[#8B95A1] mb-2">받는 분 *</label>
+                                    <input type="text" id="name-${order.id}"
+                                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20"
                                            placeholder="이름">
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">연락처 *</label>
-                                    <input type="tel" id="phone-${order.id}" 
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                    <label class="block text-sm text-[#8B95A1] mb-2">연락처 *</label>
+                                    <input type="tel" id="phone-${order.id}"
+                                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20"
                                            placeholder="010-0000-0000"
                                            oninput="formatPhoneNumber(this)"
                                            maxlength="13">
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">우편번호 *</label>
+                                    <label class="block text-sm text-[#8B95A1] mb-2">우편번호 *</label>
                                     <div class="flex space-x-2">
                                         <input type="text" id="zipcode-${order.id}" readonly
-                                               class="flex-1 px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500"
+                                               class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl"
                                                placeholder="우편번호">
-                                        <button onclick="searchAddress('${order.id}')" 
-                                                class="px-4 py-3 bg-white bg-opacity-20 text-white hover:bg-opacity-30">
+                                        <button onclick="searchAddress('${order.id}')"
+                                                class="px-4 py-3 bg-gray-100 text-[#2F2725] rounded-xl hover:bg-gray-200">
                                             주소 검색
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">주소 *</label>
+                                    <label class="block text-sm text-[#8B95A1] mb-2">주소 *</label>
                                     <input type="text" id="address-${order.id}" readonly
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500"
+                                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl"
                                            placeholder="주소">
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">상세 주소 * <span class="text-red-400">(필수)</span></label>
-                                    <input type="text" id="address-detail-${order.id}" 
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                    <label class="block text-sm text-[#8B95A1] mb-2">상세 주소 * <span class="text-red-500">(필수)</span></label>
+                                    <input type="text" id="address-detail-${order.id}"
+                                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20"
                                            placeholder="상세 주소 (동/호수 등)">
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-gray-400 mb-2">배송 메모</label>
-                                    <input type="text" id="memo-${order.id}" 
-                                           class="w-full px-4 py-3 bg-white bg-opacity-10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30"
+                                    <label class="block text-sm text-[#8B95A1] mb-2">배송 메모</label>
+                                    <input type="text" id="memo-${order.id}"
+                                           class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-[#2F2725] placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20"
                                            placeholder="배송 시 요청사항 (선택)">
                                 </div>
                             </div>
 
                             <div class="flex space-x-3 pt-2">
-                                <button onclick="toggleShippingForm('${order.id}')" 
-                                        class="flex-1 py-3 bg-white bg-opacity-10 text-white font-semibold hover:bg-opacity-20">
+                                <button onclick="toggleShippingForm('${order.id}')"
+                                        class="flex-1 py-3 bg-gray-100 text-[#2F2725] font-semibold rounded-2xl hover:bg-gray-200">
                                     취소
                                 </button>
-                                <button onclick="saveShippingFromMypage('${order.id}')" 
-                                        class="flex-1 py-3 bg-white text-black font-semibold hover:bg-gray-100">
+                                <button onclick="saveShippingFromMypage('${order.id}')"
+                                        class="flex-1 py-3 bg-[#2F2725] text-white font-semibold rounded-2xl hover:opacity-90">
                                     교재 배송하기
                                 </button>
                             </div>
@@ -804,17 +812,30 @@
             if (!currentUser?.id) return;
 
             const purchasesResult = await getUserPurchasedCourses(currentUser.id);
-            
+
             if (!purchasesResult.success || purchasesResult.data.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center text-gray-500 col-span-full py-20 space-y-4">
+                    <div class="text-center text-[#8B95A1] col-span-full py-20 space-y-4">
                         <p class="text-xl uppercase tracking-widest font-bold">No Courses Found</p>
-                        <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-white text-black font-bold text-xs uppercase tracking-[0.2em]">
+                        <a href="courses.html" class="inline-block btn-hover-scale px-8 py-3 bg-[#2F2725] text-white font-bold text-xs uppercase tracking-[0.2em] rounded-2xl">
                             Browse Courses
                         </a>
                     </div>
                 `;
-                console.log('[DEBUG] 🔴 Showing empty state');
+                console.log('[DEBUG] Showing empty state');
+                return;
+            }
+
+            // 삭제된 강의 제외
+            const validPurchases = purchasesResult.data.filter(p => p.course?.id);
+
+            if (validPurchases.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-[#8B95A1] col-span-full py-20 space-y-4">
+                        <p class="text-xl font-bold">수강 중인 강의가 없습니다</p>
+                        <a href="courses.html" class="inline-block px-8 py-3 bg-[#2F2725] text-white font-semibold rounded-2xl">강의 둘러보기</a>
+                    </div>
+                `;
                 return;
             }
 
@@ -838,13 +859,13 @@
             if (!currentUser?.id) return;
 
             const profileResult = await getUserProfile(currentUser.id);
-            
+
             if (profileResult.success) {
                 userProfile = profileResult.data;
                 document.getElementById('profile-name').value = userProfile.name || '';
                 document.getElementById('profile-email').value = currentUser.email;
                 document.getElementById('profile-phone').value = userProfile.phone || '';
-                
+
                 // 학부모 정보 로드
                 document.getElementById('parent-name').value = userProfile.parent_name || '';
                 document.getElementById('parent-phone').value = userProfile.parent_phone || '';
@@ -964,7 +985,7 @@
         }
 
         // ========== 기기 관리 ==========
-        
+
         // 기기 목록 불러오기
         async function loadDevices() {
             try {
@@ -989,7 +1010,7 @@
 
                 if (activeSessions.length === 0) {
                     document.getElementById('devices-list').innerHTML = `
-                        <div class="text-center text-gray-500 py-12">
+                        <div class="text-center text-[#8B95A1] py-12">
                             등록된 기기가 없습니다.
                         </div>
                     `;
@@ -1005,18 +1026,18 @@
                         const timeAgo = getTimeAgo(createdDate);
 
                         return `
-                            <div class="p-4 bg-white bg-opacity-5 border ${isCurrentDevice ? 'border-white border-opacity-30' : 'border-white border-opacity-10'}">
+                            <div class="p-4 bg-white rounded-2xl border ${isCurrentDevice ? 'border-gray-300' : 'border-gray-200'}">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
                                         <div class="flex items-center space-x-2 mb-2">
-                                            <span class="text-white font-bold uppercase tracking-widest text-xs">${session.device_info}</span>
-                                            ${isCurrentDevice ? '<span class="text-[9px] px-2 py-0.5 border border-green-500 text-green-500 uppercase tracking-widest font-bold">Current</span>' : ''}
+                                            <span class="text-[#2F2725] font-bold uppercase tracking-widest text-xs">${escapeHTML(session.device_info)}</span>
+                                            ${isCurrentDevice ? '<span class="text-[9px] px-2 py-0.5 border border-green-500 text-green-600 uppercase tracking-widest font-bold rounded-md">Current</span>' : ''}
                                         </div>
-                                        <p class="text-[10px] text-gray-500 uppercase tracking-tight">Login: ${timeAgo}</p>
+                                        <p class="text-[10px] text-[#8B95A1] uppercase tracking-tight">Login: ${timeAgo}</p>
                                     </div>
                                     ${!isCurrentDevice ? `
-                                        <button onclick="logoutDevice('${session.session_id}')" 
-                                                class="px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-red-500 border border-red-500 border-opacity-20 hover:bg-red-500 hover:bg-opacity-10 transition-all">
+                                        <button onclick="logoutDevice('${session.session_id}')"
+                                                class="px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-red-500 border border-red-300 rounded-xl hover:bg-red-50 transition-all">
                                             Logout
                                         </button>
                                     ` : ''}
@@ -1029,7 +1050,7 @@
             } catch (error) {
                 console.error('Load devices error:', error);
                 document.getElementById('devices-list').innerHTML = `
-                    <div class="text-center text-red-400 py-12">
+                    <div class="text-center text-red-500 py-12">
                         기기 정보를 불러오는 중 오류가 발생했습니다.
                     </div>
                 `;
@@ -1095,7 +1116,7 @@
             const ua = navigator.userAgent;
             let deviceType = 'Desktop';
             let browser = 'Unknown';
-            
+
             if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) {
                 if (/iPad/.test(ua)) {
                     deviceType = 'iPad';
@@ -1107,7 +1128,7 @@
                     deviceType = 'Mobile';
                 }
             }
-            
+
             if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
                 browser = 'Chrome';
             } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
@@ -1117,7 +1138,7 @@
             } else if (/Edge|Edg/.test(ua)) {
                 browser = 'Edge';
             }
-            
+
             return `${deviceType} (${browser})`;
         }
 
@@ -1127,11 +1148,11 @@
             el.textContent = message;
             el.classList.remove('hidden');
             if (isSuccess) {
-                el.classList.remove('text-red-400');
-                el.classList.add('text-green-400');
+                el.classList.remove('text-red-500');
+                el.classList.add('text-green-600');
             } else {
-                el.classList.remove('text-green-400');
-                el.classList.add('text-red-400');
+                el.classList.remove('text-green-600');
+                el.classList.add('text-red-500');
             }
         }
 
@@ -1179,7 +1200,7 @@
 
                 if (!submissions || submissions.length === 0) {
                     container.innerHTML = `
-                        <div class="text-center text-gray-500 py-20">
+                        <div class="text-center text-[#8B95A1] py-20">
                             제출한 과제가 없습니다.
                         </div>
                     `;
@@ -1194,82 +1215,82 @@
                     const isGraded = sub.status === 'graded' && feedback;
 
                     const statusBadge = isGraded
-                        ? `<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-xs uppercase tracking-widest">Graded</span>`
-                        : `<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-xs uppercase tracking-widest">Pending</span>`;
+                        ? `<span class="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-xs uppercase tracking-widest">Graded</span>`
+                        : `<span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-lg text-xs uppercase tracking-widest">Pending</span>`;
 
                     const passStatus = feedback?.is_passed === true
-                        ? `<span class="text-green-400 font-bold">PASS</span>`
+                        ? `<span class="text-green-600 font-bold">PASS</span>`
                         : feedback?.is_passed === false
-                            ? `<span class="text-red-400 font-bold">FAIL</span>`
-                            : `<span class="text-gray-500">-</span>`;
+                            ? `<span class="text-red-500 font-bold">FAIL</span>`
+                            : `<span class="text-[#8B95A1]">-</span>`;
 
                     return `
-                        <div class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-6">
+                        <div class="bg-white rounded-2xl border border-gray-200 p-6">
                             <div class="flex flex-col md:flex-row gap-6">
                                 <!-- 제출 이미지 -->
                                 <div class="w-full md:w-48 flex-shrink-0">
-                                    <div class="aspect-[4/5] bg-black border border-white border-opacity-10 overflow-hidden">
+                                    <div class="aspect-[4/5] bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
                                         ${sub.image_url
                                             ? `<img src="${sub.image_url}" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${sub.image_url}', '_blank')">`
-                                            : `<div class="w-full h-full flex items-center justify-center text-gray-600 text-xs">No Image</div>`
+                                            : `<div class="w-full h-full flex items-center justify-center text-[#C5C5C5] text-xs">No Image</div>`
                                         }
                                     </div>
-                                    <p class="text-[10px] text-gray-600 text-center mt-2 uppercase tracking-widest">My Submission</p>
+                                    <p class="text-[10px] text-[#C5C5C5] text-center mt-2 uppercase tracking-widest">My Submission</p>
                                 </div>
 
                                 <!-- 정보 -->
                                 <div class="flex-1 space-y-4">
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">${course?.title || 'Course'}</p>
-                                            <h3 class="text-lg font-bold text-white">${lesson?.order_num || ''}강. ${lesson?.title || 'Lesson'}</h3>
+                                            <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-1">${course?.title || 'Course'}</p>
+                                            <h3 class="text-lg font-bold text-[#2F2725]">${lesson?.order_num || ''}강. ${lesson?.title || 'Lesson'}</h3>
                                         </div>
                                         ${statusBadge}
                                     </div>
 
-                                    <div class="text-sm text-gray-400">
+                                    <div class="text-sm text-[#8B95A1]">
                                         제출일: ${sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('ko-KR') : '-'}
                                     </div>
 
                                     ${isGraded ? `
-                                        <div class="border-t border-white border-opacity-10 pt-4 space-y-3">
+                                        <div class="border-t border-gray-200 pt-4 space-y-3">
                                             <div class="grid grid-cols-3 gap-4 text-center">
                                                 <div>
-                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Score</p>
-                                                    <p class="text-2xl font-bold text-white">${feedback.score ?? '-'}</p>
+                                                    <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-1">Score</p>
+                                                    <p class="text-2xl font-bold text-[#2F2725]">${feedback.score ?? '-'}</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Grade</p>
-                                                    <p class="text-2xl font-bold text-white">${feedback.grade || '-'}</p>
+                                                    <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-1">Grade</p>
+                                                    <p class="text-2xl font-bold text-[#2F2725]">${feedback.grade || '-'}</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Result</p>
+                                                    <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-1">Result</p>
                                                     <p class="text-xl">${passStatus}</p>
                                                 </div>
                                             </div>
 
                                             ${feedback.comment ? `
-                                                <div class="bg-white bg-opacity-[0.02] p-4 border border-white border-opacity-5">
-                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Teacher's Comment</p>
-                                                    <p class="text-sm text-gray-300">${feedback.comment}</p>
+                                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                                                    <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-2">Teacher's Comment</p>
+                                                    <p class="text-sm text-[#4E5968]">${feedback.comment}</p>
                                                 </div>
                                             ` : ''}
 
                                             ${feedback.feedback_image_url ? `
                                                 <div>
-                                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-2">Feedback Image</p>
-                                                    <div class="w-48 aspect-[4/5] bg-black border border-white border-opacity-10 overflow-hidden">
+                                                    <p class="text-[10px] text-[#8B95A1] uppercase tracking-widest mb-2">Feedback Image</p>
+                                                    <div class="w-48 aspect-[4/5] bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
                                                         <img src="${feedback.feedback_image_url}" class="w-full h-full object-contain cursor-pointer" onclick="window.open('${feedback.feedback_image_url}', '_blank')">
                                                     </div>
                                                 </div>
                                             ` : ''}
 
-                                            <p class="text-[10px] text-gray-600">
+                                            <p class="text-[10px] text-[#C5C5C5]">
                                                 채점일: ${feedback.graded_at ? new Date(feedback.graded_at).toLocaleDateString('ko-KR') : '-'}
                                             </p>
                                         </div>
                                     ` : `
-                                        <div class="text-sm text-gray-500 py-4">
+                                        <div class="text-sm text-[#8B95A1] py-4">
                                             채점 대기 중입니다.
                                         </div>
                                     `}
@@ -1282,7 +1303,7 @@
             } catch (error) {
                 console.error('성적표 로드 오류:', error);
                 container.innerHTML = `
-                    <div class="text-center text-red-400 py-20">
+                    <div class="text-center text-red-500 py-20">
                         성적 정보를 불러오는 중 오류가 발생했습니다.
                     </div>
                 `;
@@ -1295,7 +1316,7 @@
         async function loadCoupons() {
             try {
                 const user = await getCurrentUser();
-                
+
                 if (!user) return;
 
                 const { data: userCoupons, error } = await window.supabase
@@ -1331,7 +1352,7 @@
             } catch (error) {
                 console.error('Load coupons error:', error);
                 document.getElementById('available-coupons').innerHTML = `
-                    <div class="text-center text-red-400 py-12">
+                    <div class="text-center text-red-500 py-12">
                         쿠폰을 불러오는 중 오류가 발생했습니다.
                     </div>
                 `;
@@ -1341,10 +1362,10 @@
         // 사용 가능한 쿠폰 렌더링
         function renderAvailableCoupons(coupons) {
             const container = document.getElementById('available-coupons');
-            
+
             if (!coupons || coupons.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center text-gray-500 py-12">
+                    <div class="text-center text-[#8B95A1] py-12">
                         <p>사용 가능한 쿠폰이 없습니다.</p>
                         <p class="text-sm mt-2 uppercase tracking-widest">Complete courses to earn rewards!</p>
                     </div>
@@ -1355,35 +1376,35 @@
             container.innerHTML = coupons.map(coupon => {
                 const expiresAt = new Date(coupon.expires_at);
                 const daysLeft = Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24));
-                const discountText = coupon.coupons.discount_type === 'percentage' 
+                const discountText = coupon.coupons.discount_type === 'percentage'
                     ? `${coupon.coupons.discount_value}% OFF`
                     : `${coupon.coupons.discount_value.toLocaleString()}원 OFF`;
 
                 return `
-                    <div class="bg-white bg-opacity-5 border border-white border-opacity-10 p-8 relative overflow-hidden">
+                    <div class="bg-white rounded-2xl border border-gray-200 p-8 relative overflow-hidden">
                         <div class="relative z-10">
                             <div class="flex items-start justify-between mb-6">
                                 <div class="flex-1">
-                                    <h4 class="text-xl font-bold text-white mb-1 tracking-tight">${coupon.coupons.name}</h4>
-                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">${coupon.coupons.description || ''}</p>
-                                    ${coupon.courses ? `<p class="text-[10px] text-gray-600 uppercase tracking-widest">${coupon.courses.title} Completion Reward</p>` : ''}
+                                    <h4 class="text-xl font-bold text-[#2F2725] mb-1 tracking-tight">${escapeHTML(coupon.coupons.name)}</h4>
+                                    <p class="text-xs text-[#8B95A1] uppercase tracking-wider mb-2">${escapeHTML(coupon.coupons.description)}</p>
+                                    ${coupon.courses ? `<p class="text-[10px] text-[#C5C5C5] uppercase tracking-widest">${escapeHTML(coupon.courses.title)} Completion Reward</p>` : ''}
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-3xl font-bold text-white tracking-tighter">${discountText}</p>
+                                    <p class="text-3xl font-bold text-[#2F2725] tracking-tighter">${discountText}</p>
                                 </div>
                             </div>
-                            <div class="bg-white bg-opacity-5 p-4 mb-4">
-                                <p class="text-[10px] text-gray-600 uppercase tracking-widest mb-1">Coupon Code</p>
-                                <p class="text-lg font-mono font-bold text-white tracking-[0.2em]">${coupon.custom_code || coupon.coupons.code}</p>
+                            <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                                <p class="text-[10px] text-[#C5C5C5] uppercase tracking-widest mb-1">Coupon Code</p>
+                                <p class="text-lg font-mono font-bold text-[#2F2725] tracking-[0.2em]">${escapeHTML(coupon.custom_code || coupon.coupons.code)}</p>
                             </div>
                             <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                                <span class="text-gray-600">
-                                    ${coupon.coupons.min_purchase_amount > 0 
-                                        ? `Min. Purchase ₩${coupon.coupons.min_purchase_amount.toLocaleString()}` 
+                                <span class="text-[#C5C5C5]">
+                                    ${coupon.coupons.min_purchase_amount > 0
+                                        ? `Min. Purchase \u20A9${coupon.coupons.min_purchase_amount.toLocaleString()}`
                                         : 'No Min. Purchase'
                                     }
                                 </span>
-                                <span class="${daysLeft <= 2 ? 'text-red-500' : 'text-gray-400'}">
+                                <span class="${daysLeft <= 2 ? 'text-red-500' : 'text-[#8B95A1]'}">
                                     ${daysLeft} Days Left
                                 </span>
                             </div>
@@ -1396,10 +1417,10 @@
         // 사용 완료/만료된 쿠폰 렌더링
         function renderUsedCoupons(coupons) {
             const container = document.getElementById('used-coupons');
-            
+
             if (!coupons || coupons.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center text-gray-600 uppercase tracking-widest text-[10px] py-12">
+                    <div class="text-center text-[#C5C5C5] uppercase tracking-widest text-[10px] py-12">
                         No used or expired coupons.
                     </div>
                 `;
@@ -1409,20 +1430,20 @@
             container.innerHTML = coupons.map(coupon => {
                 const isExpired = new Date(coupon.expires_at) <= new Date();
                 const status = coupon.is_used ? 'USED' : 'EXPIRED';
-                const statusColor = coupon.is_used ? 'text-green-900' : 'text-gray-700';
-                const discountText = coupon.coupons.discount_type === 'percentage' 
+                const statusColor = coupon.is_used ? 'text-green-700' : 'text-gray-400';
+                const discountText = coupon.coupons.discount_type === 'percentage'
                     ? `${coupon.coupons.discount_value}%`
                     : `${coupon.coupons.discount_value.toLocaleString()}원`;
 
                 return `
-                    <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 p-6 opacity-40">
+                    <div class="bg-gray-50 rounded-xl border border-gray-100 p-6 opacity-40">
                         <div class="flex items-center justify-between">
                             <div class="flex-1">
-                                <h4 class="text-sm font-bold text-gray-400 mb-1 uppercase tracking-tight">${coupon.coupons.name}</h4>
-                                <p class="text-[10px] text-gray-600 uppercase tracking-widest">${discountText} Discount</p>
-                                ${coupon.is_used && coupon.used_at 
-                                    ? `<p class="text-[9px] text-gray-700 uppercase tracking-tight mt-2">Used: ${new Date(coupon.used_at).toLocaleDateString('ko-KR')}</p>`
-                                    : `<p class="text-[9px] text-gray-700 uppercase tracking-tight mt-2">Expired: ${new Date(coupon.expires_at).toLocaleDateString('ko-KR')}</p>`
+                                <h4 class="text-sm font-bold text-[#8B95A1] mb-1 uppercase tracking-tight">${escapeHTML(coupon.coupons.name)}</h4>
+                                <p class="text-[10px] text-[#C5C5C5] uppercase tracking-widest">${discountText} Discount</p>
+                                ${coupon.is_used && coupon.used_at
+                                    ? `<p class="text-[9px] text-gray-400 uppercase tracking-tight mt-2">Used: ${new Date(coupon.used_at).toLocaleDateString('ko-KR')}</p>`
+                                    : `<p class="text-[9px] text-gray-400 uppercase tracking-tight mt-2">Expired: ${new Date(coupon.expires_at).toLocaleDateString('ko-KR')}</p>`
                                 }
                             </div>
                             <div class="text-right">
@@ -1504,25 +1525,25 @@
         // 페이지 로드
         async function init() {
             currentUser = await getCurrentUser();
-            
+
             if (!currentUser) {
                 window.location.href = 'auth.html';
                 return;
             }
 
             document.getElementById('user-email').textContent = currentUser.email;
-            
+
             // 관리자 권한 확인 및 관리자 링크 표시
             const adminStatus = await isAdmin();
             const adminLink = document.getElementById('admin-link');
             if (adminLink && adminStatus) {
                 adminLink.classList.remove('hidden');
             }
-            
+
             // URL 파라미터에서 탭 확인
             const params = new URLSearchParams(window.location.search);
             const tab = params.get('tab');
-            
+
             if (tab && ['courses', 'orders', 'profile', 'devices', 'coupons', 'qna'].includes(tab)) {
                 showTab(tab);
             } else {
@@ -1537,7 +1558,7 @@
         function toggleShippingForm(orderId) {
             const btnSection = document.getElementById(`shipping-btn-${orderId}`);
             const formSection = document.getElementById(`shipping-form-${orderId}`);
-            
+
             if (formSection.classList.contains('hidden')) {
                 btnSection.classList.add('hidden');
                 formSection.classList.remove('hidden');
@@ -1561,13 +1582,13 @@
         // 전화번호 자동 포맷팅
         function formatPhoneNumber(input) {
             let value = input.value.replace(/[^0-9]/g, '');
-            
+
             if (value.length > 3 && value.length <= 7) {
                 value = value.slice(0, 3) + '-' + value.slice(3);
             } else if (value.length > 7) {
                 value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
             }
-            
+
             input.value = value;
         }
 
@@ -1617,7 +1638,7 @@
                 if (error) throw error;
 
                 alert('배송 정보가 저장되었습니다!');
-                
+
                 // 페이지 새로고침
                 loadMyOrders();
 
@@ -1630,12 +1651,12 @@
         // 내 Q&A 목록 로드
         async function loadMyQnaList() {
             const container = document.getElementById('my-qna-list');
-            container.innerHTML = '<div class="text-center text-gray-500 py-12">질문 내역을 불러오는 중...</div>';
+            container.innerHTML = '<div class="text-center text-[#8B95A1] py-12">질문 내역을 불러오는 중...</div>';
 
             try {
                 const user = await getCurrentUser();
                 if (!user) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-12">로그인이 필요합니다.</div>';
+                    container.innerHTML = '<div class="text-center text-[#8B95A1] py-12">로그인이 필요합니다.</div>';
                     return;
                 }
 
@@ -1649,7 +1670,7 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-12">등록한 질문이 없습니다.</div>';
+                    container.innerHTML = '<div class="text-center text-[#8B95A1] py-12">등록한 질문이 없습니다.</div>';
                     return;
                 }
 
@@ -1675,27 +1696,27 @@
                     const course = coursesMap[qna.course_id];
                     const lessonInfo = lesson ? `${lesson.order_num}강. ${lesson.title}` : (course?.title || '');
                     const statusBadge = qna.is_answered
-                        ? '<span class="px-3 py-1 bg-green-500 bg-opacity-20 text-green-400 text-[10px] font-bold uppercase tracking-widest">답변완료</span>'
-                        : '<span class="px-3 py-1 bg-orange-500 bg-opacity-20 text-orange-400 text-[10px] font-bold uppercase tracking-widest">대기중</span>';
+                        ? '<span class="px-3 py-1 bg-green-50 text-green-700 rounded-lg text-[10px] font-bold uppercase tracking-widest">답변완료</span>'
+                        : '<span class="px-3 py-1 bg-orange-50 text-orange-700 rounded-lg text-[10px] font-bold uppercase tracking-widest">대기중</span>';
 
                     return `
-                        <div class="p-6 bg-white bg-opacity-[0.03] border border-white border-opacity-10 space-y-4">
+                        <div class="p-6 bg-white rounded-2xl border border-gray-200 space-y-4">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
                                         ${statusBadge}
-                                        <span class="text-[10px] text-gray-600">${date}</span>
-                                        ${lessonInfo ? `<span class="text-[10px] text-gray-600">| ${lessonInfo}</span>` : ''}
+                                        <span class="text-[10px] text-[#C5C5C5]">${date}</span>
+                                        ${lessonInfo ? `<span class="text-[10px] text-[#C5C5C5]">| ${lessonInfo}</span>` : ''}
                                     </div>
-                                    <h3 class="text-white font-bold text-sm mb-2">${qna.title}</h3>
-                                    <p class="text-gray-400 text-xs leading-relaxed">${qna.content}</p>
+                                    <h3 class="text-[#2F2725] font-bold text-sm mb-2">${escapeHTML(qna.title)}</h3>
+                                    <p class="text-[#8B95A1] text-xs leading-relaxed">${escapeHTML(qna.content)}</p>
                                 </div>
                             </div>
                             ${qna.answer ? `
-                                <div class="mt-4 p-4 bg-white bg-opacity-[0.02] border-l-2 border-green-500">
-                                    <p class="text-[10px] text-green-400 uppercase tracking-widest font-bold mb-2">답변</p>
-                                    <p class="text-gray-400 text-xs leading-relaxed">${qna.answer}</p>
-                                    ${qna.answered_at ? `<p class="text-[10px] text-gray-600 mt-2">${new Date(qna.answered_at).toLocaleDateString('ko-KR')}</p>` : ''}
+                                <div class="mt-4 p-4 border-l-2 border-green-500 bg-green-50 rounded-r-xl">
+                                    <p class="text-[10px] text-green-600 uppercase tracking-widest font-bold mb-2">답변</p>
+                                    <p class="text-[#8B95A1] text-xs leading-relaxed">${escapeHTML(qna.answer)}</p>
+                                    ${qna.answered_at ? `<p class="text-[10px] text-[#C5C5C5] mt-2">${new Date(qna.answered_at).toLocaleDateString('ko-KR')}</p>` : ''}
                                 </div>
                             ` : ''}
                         </div>
@@ -1704,48 +1725,14 @@
 
             } catch (error) {
                 console.error('Q&A 목록 로드 오류:', error);
-                container.innerHTML = '<div class="text-center text-red-400 py-12">질문 내역을 불러오는데 실패했습니다.</div>';
+                container.innerHTML = '<div class="text-center text-red-500 py-12">질문 내역을 불러오는데 실패했습니다.</div>';
             }
         }
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
-    
-    <!-- 모바일 메뉴 토글 스크립트 -->
-    <script>
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-                
-                // 햄버거 메뉴 아이콘 애니메이션
-                const spans = mobileMenuBtn.querySelectorAll('span');
-                if (!mobileMenu.classList.contains('hidden')) {
-                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
-                    spans[1].style.opacity = '0';
-                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
-                } else {
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                }
-            });
-            
-            // 모바일 메뉴 링크 클릭시 메뉴 닫기
-            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                    const spans = mobileMenuBtn.querySelectorAll('span');
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                });
-            });
-        }
-    </script>
+
+    <script src="js/sidebar.js"></script>
     <script src="js/footer.js"></script>
 </body>
 </html>

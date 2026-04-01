@@ -39,12 +39,10 @@ async function getCurrentUser() {
 if (window.supabase) {
     window.supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_IN') {
-            console.log('User signed in:', session.user);
             if (typeof updateUIForLoggedInUser === 'function') {
                 updateUIForLoggedInUser(session.user);
             }
         } else if (event === 'SIGNED_OUT') {
-            console.log('User signed out');
             if (typeof updateUIForLoggedOutUser === 'function') {
                 updateUIForLoggedOutUser();
             }
