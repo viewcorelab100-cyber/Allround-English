@@ -701,37 +701,8 @@ async function applyCoupon() {
         
         // 쿠폰 코드로 사용 가능한 쿠폰 찾기 (custom_code 포함)
         const nowISO = new Date().toISOString();
-        
-        // 먼저 모든 쿠폰 조회 (디버깅용)
-        const { data: allUserCoupons } = await window.supabase
-            .from('user_coupons')
-            .select(`
-                *,
-                coupons (
-                    code,
-                    name,
-                    discount_type,
-                    discount_value,
-                    min_purchase_amount,
-                    max_discount_amount
-                )
-            `)
-            .eq('user_id', user.id);
-        
-        console.log('[전체 쿠폰 조회 - 필터 없음]', {
-            전체개수: allUserCoupons?.length,
-            현재시각: nowISO,
-            전체목록: allUserCoupons?.map(uc => ({
-                id: uc.id,
-                custom_code: uc.custom_code,
-                db_code: uc.coupons?.code,
-                is_used: uc.is_used,
-                expires_at: uc.expires_at,
-                만료여부: new Date(uc.expires_at) <= new Date(nowISO) ? '만료됨' : '유효함'
-            }))
-        });
-        
-        // 사용 가능한 쿠폰만 필터링
+
+        // 사용 가능한 쿠폰만 조회
         const { data: userCoupons, error } = await window.supabase
             .from('user_coupons')
             .select(`
