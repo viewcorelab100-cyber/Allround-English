@@ -6230,6 +6230,15 @@
             return code;
         }
 
+        function autoGenerateCouponCode() {
+            const el = document.getElementById('coupon-code');
+            if (el.readOnly) return; // 수정 모드에서는 비활성
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            el.value = code;
+        }
+
         async function issueCouponToStudents() {
             if (!checkDemoWriteAccess('쿠폰 발급')) return;
 
