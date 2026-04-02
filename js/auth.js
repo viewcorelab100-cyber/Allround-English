@@ -112,9 +112,9 @@ async function validateSession() {
         const user = await getCurrentUser();
         if (!user) return { valid: true }; // 로그인 안 된 상태는 검증 불필요
 
-        // 데모 계정은 세션 제한 없이 여러 기기에서 접속 허용
-        const demoCheck = await getUserProfile(user.id);
-        if (demoCheck.success && demoCheck.data.role === 'demo') {
+        // 관리자/데모 계정은 세션 제한 없이 여러 기기에서 접속 허용
+        const profileCheck = await getUserProfile(user.id);
+        if (profileCheck.success && (profileCheck.data.role === 'admin' || profileCheck.data.role === 'demo')) {
             return { valid: true };
         }
 
