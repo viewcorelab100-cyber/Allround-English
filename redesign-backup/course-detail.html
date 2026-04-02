@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="google-site-verification" content="WNwZFDVX7UaW_NACddXD11x8oo7S-LWx8Pdk-H2XVzE">
+    <title>강의 상세 — ALLROUND</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <!-- 토스페이먼츠 SDK -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', "Poppins", sans-serif;
+            background-color: #000000;
+            overflow-x: hidden;
+        }
+        
+        /* 상단바 제외한 본문 영문 폰트 */
+        .main-content {
+            font-family: "Poppins", 'Noto Sans KR', sans-serif;
+        }
+        
+        /* 상단바 스타일 */
+        header, header * {
+            font-family: "Poppins", sans-serif;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .nav-link {
+            transition: color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            color: #999;
+        }
+
+        .lesson-item {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0px;
+        }
+
+        .lesson-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .course-hero-img {
+            width: 100%;
+            aspect-ratio: 21 / 9;
+            object-fit: cover;
+            border-radius: 0px;
+        }
+
+        .btn-primary {
+            background-color: #fff;
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            padding: 1.25rem 2.5rem;
+            transition: all 0.3s ease;
+            border-radius: 0px;
+        }
+
+        .btn-primary:hover {
+            background-color: #eee;
+        }
+
+        /* Custom Scrollbar for Curriculum */
+        .curriculum-scroll {
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+            padding-right: 1rem;
+        }
+
+        .curriculum-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .curriculum-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .curriculum-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0px;
+        }
+
+        .curriculum-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    
+    <!-- 상단 네비게이션 바 -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-4">
+            <!-- 로고 라인 (3-column Grid: 로고 항상 중앙 고정) -->
+            <div class="grid grid-cols-3 items-center mb-4" style="height: 24px;">
+                <!-- 좌측: 모바일 햄버거 메뉴 -->
+                <div class="flex justify-start items-center">
+                    <button id="mobile-menu-btn" class="md:hidden text-white w-6 h-6 flex flex-col justify-center items-center space-y-1">
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                        <span class="block w-5 h-0.5 bg-white transition-all"></span>
+                    </button>
+                </div>
+
+                <!-- 중앙: 로고 (grid 중앙 고정) -->
+                <div class="flex justify-center items-center">
+                    <a href="index.html" class="flex items-center">
+                        <img src="/logo.png" alt="ALLROUND" class="header-logo" style="height: 1rem; width: auto;">
+                    </a>
+                </div>
+
+                <!-- 우측: Auth 버튼 영역 -->
+                <div class="flex justify-end items-center">
+                    <div id="auth-buttons" class="flex items-center space-x-2 md:space-x-4 whitespace-nowrap">
+                        <a href="auth.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">Login</a>
+                        <a href="auth.html?mode=signup" class="nav-link text-white text-xs md:text-sm whitespace-nowrap hidden sm:inline">Sign Up</a>
+                    </div>
+                    <div id="user-menu" class="hidden items-center space-x-2 md:space-x-4 whitespace-nowrap">
+                        <a id="admin-link" href="admin.html" class="nav-link text-yellow-400 text-xs md:text-sm whitespace-nowrap hidden">관리자</a>
+                        <a href="mypage.html" class="nav-link text-white text-xs md:text-sm whitespace-nowrap">My Page</a>
+                        <button onclick="signOut()" class="nav-link text-gray-400 text-xs md:text-sm whitespace-nowrap hidden sm:inline">Logout</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 구분선 -->
+            <div class="w-full h-px bg-white opacity-20 mb-4"></div>
+            
+            <!-- 데스크톱 네비게이션 -->
+            <nav class="hidden md:flex justify-center items-center space-x-8 md:space-x-12 text-sm font-light">
+                <a href="index.html#about" class="nav-link text-white">ABOUT</a>
+                <a href="original.html" class="nav-link text-white">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="nav-link text-white">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="nav-link text-white">ALLROUND ARTIST</a>
+                <a href="courses.html" class="nav-link text-white">강의</a>
+                <a href="board.html" class="nav-link text-white">게시판</a>
+            </nav>
+        </div>
+        
+        <!-- 모바일 메뉴 (토글) -->
+        <div id="mobile-menu" class="md:hidden hidden bg-black border-t border-white border-opacity-20">
+            <nav class="px-4 py-6 space-y-4">
+                <a href="index.html#about" class="block nav-link text-white text-sm py-2">ABOUT</a>
+                <a href="original.html" class="block nav-link text-white text-sm py-2">ALLROUND ORIGINAL</a>
+                <a href="firstee.html" class="block nav-link text-white text-sm py-2">ALLROUND FIRSTEE</a>
+                <a href="artist.html" class="block nav-link text-white text-sm py-2">ALLROUND ARTIST</a>
+                <a href="courses.html" class="block nav-link text-white text-sm py-2">강의</a>
+                <a href="board.html" class="block nav-link text-white text-sm py-2">게시판</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="h-36"></div>
+
+    <main class="main-content">
+
+    <!-- Course Detail -->
+    <section id="course-content" class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center text-gray-500 py-20">
+                강의 정보를 불러오는 중...
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="w-full h-px bg-white opacity-20 mb-8"></div>
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <img src="/logo.png" alt="ALLROUND" class="h-6 md:h-8 w-auto">
+                <div class="text-sm text-gray-400">
+                    © 2024 ALLROUND. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    </main>
+
+    <!-- 커스텀 모달 -->
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center p-6">
+        <div class="bg-black border border-white border-opacity-20 w-full max-w-md p-8 space-y-6">
+            <h3 id="modal-title" class="text-2xl font-bold text-white text-center uppercase tracking-widest"></h3>
+            <p id="modal-message" class="text-gray-300 text-center text-sm font-light"></p>
+            <div id="modal-buttons" class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스페이먼츠 결제 모달 -->
+    <div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-black border border-white border-opacity-20 w-full max-w-lg my-8">
+            <!-- 헤더 -->
+            <div class="p-6 border-b border-white border-opacity-10">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white uppercase tracking-widest">Payment</h3>
+                    <button onclick="closePaymentModal()" class="text-gray-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 주문 정보 -->
+            <div class="p-6 border-b border-white border-opacity-10">
+                <div class="space-y-4">
+                    <div class="flex justify-between text-[10px] uppercase tracking-widest">
+                        <span class="text-gray-500">Product</span>
+                        <span id="payment-product-name" class="text-white font-bold"></span>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold">
+                        <span class="text-white uppercase tracking-widest text-xs">Total Amount</span>
+                        <span id="payment-amount" class="text-white"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 결제 수단 선택 영역 -->
+            <div class="p-6">
+                <div id="payment-method" class="overflow-hidden bg-white min-h-[200px]"></div>
+            </div>
+            
+            <!-- 약관 동의 영역 -->
+            <div class="px-6 pb-6">
+                <div id="agreement" class="overflow-hidden bg-white"></div>
+            </div>
+            
+            <!-- 결제 버튼 -->
+            <div class="p-6 border-t border-white border-opacity-10">
+                <button id="payment-button" onclick="requestTossPayment()" disabled
+                    class="w-full py-4 bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-100 transition-colors disabled:bg-gray-800 disabled:text-gray-600 disabled:cursor-not-allowed">
+                    Pay Now
+                </button>
+                <p class="text-[10px] text-gray-600 text-center mt-4 uppercase tracking-wider">
+                    By proceeding, you agree to the terms of service.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/progress.js"></script>
+    <script>
+        function showModal(title, message, callback) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            if (callback) window.modalCallback = callback;
+        }
+
+        function closeModal(confirmed = false) {
+            document.getElementById('custom-modal').classList.add('hidden');
+            if (confirmed && window.modalCallback) { window.modalCallback(); window.modalCallback = null; }
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-buttons').innerHTML = `
+                <button onclick="closeModal(false)" class="flex-1 px-8 py-4 bg-transparent text-white font-bold uppercase tracking-widest text-xs border border-white border-opacity-20 hover:border-opacity-100 transition-colors">Cancel</button>
+                <button onclick="closeModal(true)" class="flex-1 px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs">Confirm</button>
+            `;
+            window.modalCallback = onConfirm;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+    
+        let currentCourse = null;
+        let hasAccess = false;
+
+        function getCourseId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function renderLessons(lessons, hasAccess) {
+            if (!lessons || lessons.length === 0) return '<p class="text-gray-500 text-center py-8">아직 등록된 레슨이 없습니다.</p>';
+            return lessons.map((lesson, index) => {
+                const isLocked = !hasAccess;
+                return `
+                    <div class="lesson-item flex items-center justify-between py-6 px-2 ${isLocked ? 'opacity-40' : ''}">
+                        <div class="flex items-baseline space-x-6">
+                            <span class="text-[10px] font-medium text-gray-600 font-mono">${String(index + 1).padStart(2, '0')}</span>
+                            <div>
+                                <h4 class="text-base font-medium text-white mb-1">${lesson.title}</h4>
+                                <p class="text-[10px] text-gray-600 uppercase tracking-widest">${lesson.duration || 0} Minutes</p>
+                            </div>
+                        </div>
+                        <div>
+                            ${isLocked ? `
+                                <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            ` : `
+                                <a href="lesson.html?id=${lesson.id}" class="text-[10px] uppercase tracking-[0.2em] text-white hover:text-gray-400 transition-colors font-semibold">
+                                    Play
+                                </a>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCourseDetail(course, hasAccess, progress) {
+            // 총 시간 포맷팅
+            const totalMinutes = course.totalDuration || 0;
+            let totalDurationText = '';
+            if (totalMinutes >= 60) {
+                const hours = Math.floor(totalMinutes / 60);
+                const mins = totalMinutes % 60;
+                totalDurationText = mins > 0 ? `${hours}H ${mins}M` : `${hours}H`;
+            } else {
+                totalDurationText = `${totalMinutes}M`;
+            }
+            
+            const contentDiv = document.getElementById('course-content');
+            contentDiv.innerHTML = `
+                <div class="max-w-6xl mx-auto space-y-16">
+                    <!-- Hero Section -->
+                    <div class="space-y-10">
+                        <div class="overflow-hidden">
+                            <img src="${course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80'}" 
+                                 class="course-hero-img" alt="${course.title}">
+                        </div>
+                        
+                        <div class="grid md:grid-cols-12 gap-10 items-start">
+                            <div class="md:col-span-8 space-y-6">
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-medium">${course.category || 'General'}</span>
+                                <h1 class="text-4xl md:text-6xl font-bold text-white leading-tight">${course.title}</h1>
+                                <p class="text-lg text-gray-400 font-light leading-relaxed max-w-2xl">${course.description || ''}</p>
+                                <div class="flex items-center space-x-8 text-[11px] uppercase tracking-widest text-gray-500 pt-4">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-gray-600">Lessons</span>
+                                        <span class="text-white">${course.lessons?.length || 0} Modules</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-gray-600">Duration</span>
+                                        <span class="text-white">${totalDurationText}</span>
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-gray-600">Access</span>
+                                        <span class="text-white">6 Months</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="md:col-span-4 pt-4">
+                                ${hasAccess ? `
+                                    <div class="p-8 border border-white/10 space-y-6">
+                                        <div class="flex justify-between items-end">
+                                            <span class="text-[10px] uppercase tracking-widest text-gray-500">Progress</span>
+                                            <span class="text-2xl font-bold text-white">${progress?.progress || 0}%</span>
+                                        </div>
+                                        <div class="w-full h-[2px] bg-white/10 overflow-hidden">
+                                            <div class="h-full bg-white transition-all duration-1000" style="width: ${progress?.progress || 0}%"></div>
+                                        </div>
+                                        <p class="text-[11px] text-gray-500 text-center uppercase tracking-widest">
+                                            ${progress?.completedLessons || 0} / ${progress?.totalLessons || 0} Completed
+                                        </p>
+                                    </div>
+                                ` : `
+                                    <div class="p-8 border border-white/10 space-y-6">
+                                        <div class="space-y-4">
+                                            <span class="text-[10px] uppercase tracking-widest text-gray-500 block">Investment</span>
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-[10px] uppercase tracking-widest text-gray-500">Course</span>
+                                                    <span class="text-xl font-bold text-white">₩${(course.price || 0).toLocaleString()}</span>
+                                                </div>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-[10px] uppercase tracking-widest text-gray-500">Textbook</span>
+                                                    <span class="text-xl font-bold text-white">₩${(course.textbook_price || 0).toLocaleString()}</span>
+                                                </div>
+                                                <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                                                    <span class="text-[10px] uppercase tracking-widest text-gray-300">Total</span>
+                                                    <span class="text-2xl font-bold text-white">₩${((course.price || 0) + (course.textbook_price || 0)).toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button onclick="handlePurchase()" class="btn-primary w-full">
+                                            ${((course.price || 0) + (course.textbook_price || 0)) === 0 ? 'Start Free Course' : 'Enroll Now'}
+                                        </button>
+                                        <p class="text-[10px] text-gray-600 text-center leading-relaxed uppercase tracking-wider">
+                                            6 months unlimited access<br>from date of purchase
+                                        </p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="grid md:grid-cols-12 gap-16">
+                        <div class="md:col-span-8 space-y-12">
+                            <div class="space-y-8">
+                                <h2 class="text-xs uppercase tracking-[0.3em] text-gray-500 font-bold border-b border-white/10 pb-4">Curriculum</h2>
+                                <div class="curriculum-scroll divide-y divide-white/5">
+                                    ${renderLessons(course.lessons, hasAccess)}
+                                </div>
+                            </div>
+                            
+                            ${course.long_description ? `
+                                <div class="space-y-8">
+                                    <h2 class="text-xs uppercase tracking-[0.3em] text-gray-500 font-bold border-b border-white/10 pb-4">Overview</h2>
+                                    <div class="prose prose-invert max-w-none text-gray-400 font-light leading-relaxed">
+                                        ${typeof course.long_description === 'string' ? course.long_description : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.title = `${course.title} — ALLROUND`;
+        }
+
+        async function handlePurchase() {
+            const user = await getCurrentUser();
+            if (!user) {
+                showModal('로그인 필요', '로그인이 필요한 서비스입니다.', () => {
+                    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+                });
+                return;
+            }
+
+            const totalPrice = (currentCourse.price || 0) + (currentCourse.textbook_price || 0);
+
+            // 무료 강의: 결제 없이 바로 구매 처리
+            if (totalPrice === 0) {
+                await handleFreePurchase(user);
+                return;
+            }
+
+            // 유료 강의: 토스페이먼츠 결제 페이지로 이동
+            window.location.href = `payment.html?courseId=${currentCourse.id}`;
+        }
+
+        async function handleFreePurchase(user) {
+            try {
+                const orderId = `free-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+                // 주문 생성 (DONE 상태로 바로)
+                const { error: orderError } = await window.supabase
+                    .from('orders')
+                    .insert({
+                        id: orderId,
+                        user_id: user.id,
+                        course_id: currentCourse.id,
+                        amount: 0,
+                        order_name: `${currentCourse.title} (무료)`,
+                        customer_name: user.email?.split('@')[0] || '',
+                        customer_email: user.email || '',
+                        status: 'DONE',
+                        payment_type: 'course',
+                        shipping_status: 'NO_SHIPPING'
+                    });
+
+                if (orderError) throw orderError;
+
+                // 구매 기록 생성
+                const { error: purchaseError } = await window.supabase
+                    .from('purchases')
+                    .insert({
+                        user_id: user.id,
+                        course_id: currentCourse.id,
+                        order_id: orderId,
+                        status: 'completed',
+                        payment_method: 'free',
+                        amount: 0,
+                        purchased_at: new Date().toISOString()
+                    });
+
+                if (purchaseError && purchaseError.code !== '23505') throw purchaseError;
+
+                showModal('수강 신청 완료', '무료 강의가 등록되었습니다. 바로 수강하실 수 있습니다.', () => {
+                    window.location.reload();
+                });
+            } catch (error) {
+                console.error('Free purchase error:', error);
+                showModal('오류', '수강 신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        async function loadCourseDetail() {
+            const courseId = getCourseId();
+            if (!courseId) { window.location.href = 'courses.html'; return; }
+            
+            const courseResult = await getCourseById(courseId);
+            if (!courseResult.success) { 
+                document.getElementById('course-content').innerHTML = `<div class="text-center text-gray-500 py-20"><p class="text-xl mb-4">강의를 찾을 수 없습니다.</p><a href="courses.html" class="text-white underline">강의 목록으로 돌아가기</a></div>`; 
+                return; 
+            }
+            
+            currentCourse = courseResult.data;
+            const visibility = currentCourse.visibility || 'public';
+            const user = await getCurrentUser();
+            
+            // 비공개 강의 접근 권한 체크 (관리자는 우회)
+            const userIsAdmin = user ? await isAdmin() : false;
+            if (visibility === 'private' && !userIsAdmin) {
+                if (!user) {
+                    alert('이 강의는 비공개 강의입니다. 로그인이 필요합니다.');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                const { data: permission, error: permError } = await window.supabase
+                    .from('course_access_permissions')
+                    .select('id')
+                    .eq('course_id', courseId)
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (permError || !permission) {
+                    document.getElementById('course-content').innerHTML = `
+                        <div class="text-center text-gray-500 py-20">
+                            <div class="mb-6">
+                                <svg class="w-12 h-12 mx-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-2xl mb-4 text-white">비공개 강의입니다</p>
+                            <p class="text-lg mb-6">이 강의는 관리자가 승인한 사용자만 접근할 수 있습니다.</p>
+                            <p class="text-sm mb-8">접근 권한이 필요하시다면 관리자에게 문의해주세요.</p>
+                            <a href="courses.html" class="inline-block px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition">
+                                강의 목록으로 돌아가기
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+            
+            let progress = null;
+            if (user) {
+                const accessResult = await hasAccessToCourse(user.id, courseId);
+                hasAccess = accessResult.hasAccess;
+                if (hasAccess) { 
+                    const progressResult = await getCourseProgress(user.id, courseId); 
+                    progress = progressResult.data; 
+                }
+            }
+            
+            renderCourseDetail(currentCourse, hasAccess, progress);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCourseDetail);
+    </script>
+    
+    <!-- 모바일 메뉴 토글 스크립트 -->
+    <script>
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                
+                // 햄버거 메뉴 아이콘 애니메이션
+                const spans = mobileMenuBtn.querySelectorAll('span');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    spans[0].style.transform = 'rotate(45deg) translateY(6px)';
+                    spans[1].style.opacity = '0';
+                    spans[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+                } else {
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                }
+            });
+            
+            // 모바일 메뉴 링크 클릭시 메뉴 닫기
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    const spans = mobileMenuBtn.querySelectorAll('span');
+                    spans[0].style.transform = 'none';
+                    spans[1].style.opacity = '1';
+                    spans[2].style.transform = 'none';
+                });
+            });
+        }
+    </script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

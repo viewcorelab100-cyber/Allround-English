@@ -1,0 +1,165 @@
+{
+  "timestamp": "2026-02-23T05:09:24.214Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-02-23T05:03:24.533Z",
+    "activeFeatures": [
+      "demo-account",
+      "js",
+      "confirm-payment"
+    ],
+    "primaryFeature": "demo-account",
+    "features": {
+      "demo-account": {
+        "phase": "check",
+        "phaseNumber": 4,
+        "matchRate": 100,
+        "iterationCount": 1,
+        "requirements": [
+          "읽기 전용 데모 계정 역할 추가",
+          "관리자 페이지 데모 모드 UI",
+          "개인정보 마스킹",
+          "Supabase RLS 정책"
+        ],
+        "documents": {
+          "plan": "docs/01-plan/features/demo-account.plan.md",
+          "design": "docs/02-design/features/demo-account.design.md",
+          "analysis": "docs/03-analysis/demo-account.analysis.md"
+        },
+        "timestamps": {
+          "started": "2026-02-09T03:00:00.000Z",
+          "lastUpdated": "2026-02-09T04:00:00.000Z"
+        }
+      },
+      "js": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-08T05:18:15.368Z",
+          "lastUpdated": "2026-02-23T05:03:24.533Z"
+        },
+        "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\footer.js"
+      },
+      "confirm-payment": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-09T07:45:21.253Z",
+          "lastUpdated": "2026-02-09T07:45:21.254Z"
+        },
+        "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\confirm-payment\\index.ts"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-02-08T05:10:34.375Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-02-23T05:03:24.533Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-02-08T05:18:15.368Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T03:00:00.000Z",
+        "feature": "demo-account",
+        "phase": "plan",
+        "action": "created"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:07.240Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:18.036Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:29.444Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T03:57:52.177Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:45:21.254Z",
+        "feature": "confirm-payment",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:46:23.979Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:46:52.204Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:59:50.713Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T01:36:56.152Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T02:34:57.095Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T02:35:15.945Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T05:03:16.202Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T05:03:24.533Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

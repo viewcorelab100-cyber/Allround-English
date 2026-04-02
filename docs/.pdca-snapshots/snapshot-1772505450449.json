@@ -1,0 +1,341 @@
+{
+  "timestamp": "2026-03-03T02:37:30.447Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-03T01:22:17.637Z",
+    "activeFeatures": [
+      "demo-account",
+      "js",
+      "confirm-payment",
+      ".claude"
+    ],
+    "primaryFeature": "demo-account",
+    "features": {
+      "demo-account": {
+        "phase": "check",
+        "phaseNumber": 4,
+        "matchRate": 100,
+        "iterationCount": 1,
+        "requirements": [
+          "읽기 전용 데모 계정 역할 추가",
+          "관리자 페이지 데모 모드 UI",
+          "개인정보 마스킹",
+          "Supabase RLS 정책"
+        ],
+        "documents": {
+          "plan": "docs/01-plan/features/demo-account.plan.md",
+          "design": "docs/02-design/features/demo-account.design.md",
+          "analysis": "docs/03-analysis/demo-account.analysis.md"
+        },
+        "timestamps": {
+          "started": "2026-02-09T03:00:00.000Z",
+          "lastUpdated": "2026-02-09T04:00:00.000Z"
+        }
+      },
+      "js": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-08T05:18:15.368Z",
+          "lastUpdated": "2026-03-03T01:22:17.637Z"
+        },
+        "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\footer.js"
+      },
+      "confirm-payment": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-09T07:45:21.253Z",
+          "lastUpdated": "2026-02-09T07:45:21.254Z"
+        },
+        "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\confirm-payment\\index.ts"
+      },
+      ".claude": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-02-25T09:03:04.728Z",
+          "lastUpdated": "2026-02-25T09:04:13.897Z"
+        },
+        "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\.claude\\auto-push.sh"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-02-08T05:10:34.375Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-03T01:22:17.637Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-02-08T05:18:15.368Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T03:00:00.000Z",
+        "feature": "demo-account",
+        "phase": "plan",
+        "action": "created"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:07.240Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:18.036Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T02:32:29.444Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T03:57:52.177Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:45:21.254Z",
+        "feature": "confirm-payment",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:46:23.979Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:46:52.204Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-09T07:59:50.713Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T01:36:56.152Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T02:34:57.095Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T02:35:15.945Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T05:03:16.202Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-23T05:03:24.533Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T06:51:32.949Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:29.232Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:33.475Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:37.447Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:41.421Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:45.572Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:49.803Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:37:54.159Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:38:03.685Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:38:07.610Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:55:32.770Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:55:41.726Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:55:47.277Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:55:51.612Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T08:56:03.523Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T09:03:04.728Z",
+        "feature": ".claude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T09:03:19.987Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T09:04:13.897Z",
+        "feature": ".claude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T09:04:22.999Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-02-25T09:07:38.412Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T00:38:34.849Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T00:38:53.040Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T00:40:18.815Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T00:40:36.827Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T01:03:15.379Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T01:03:36.860Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-03T01:22:17.637Z",
+        "feature": "js",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

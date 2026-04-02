@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ALLROUND — ALLROUND strategy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="stylesheet" href="https://use.typekit.net/lii5ces.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 126px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+            --signup-right: min(13.44vw, 258px);
+        }
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; font-weight: 700; opacity: 0.8; }
+        .kakao-btn { display: inline-block; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col" data-active-page="strategy">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
+            </button>
+            <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6">
+                    <div><a href="about.html" class="block text-[#2F2725] font-medium text-lg mb-2">학원 소개</a></div>
+                    <div>
+                        <p class="text-[#2F2725] font-medium text-lg mb-2">수업 안내</p>
+                        <div class="pl-4 space-y-2">
+                            <a href="firstee.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
+                            <a href="original.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
+                            <a href="strategy.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-medium text-lg mb-2">학원 소식</p>
+                        <div class="pl-4 space-y-2">
+                            <a href="#" class="block text-[#9FA0A0] text-sm">Instagram</a>
+                            <a href="#" class="block text-[#9FA0A0] text-sm">Youtube</a>
+                            <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block text-[#9FA0A0] text-sm">Blog</a>
+                        </div>
+                    </div>
+                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">상담 예약</a></div>
+                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">강사 채용</a></div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6">
+                    <div>
+                        <a href="about.html" class="sidebar-link block text-[#9FA0A0] font-semibold text-[18px] leading-relaxed">학원 소개</a>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-bold text-[18px] leading-relaxed mb-2">수업 안내</p>
+                        <div class="space-y-2">
+                            <a href="firstee.html" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
+                            <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
+                            <a href="strategy.html" class="sidebar-link block text-[#2F2725] font-bold text-[15px] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="courses.html" class="sidebar-link flex items-center justify-end gap-2">
+                            <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-5 w-auto">
+                            <span class="text-[#9FA0A0] font-semibold text-[18px] leading-relaxed">온라인 강의</span>
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-[#2F2725] font-semibold text-[18px] leading-relaxed mb-2">학원 소식</p>
+                        <div class="space-y-2">
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Instagram</a>
+                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Youtube</a>
+                            <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="sidebar-link block text-[#9FA0A0] text-[15px] leading-relaxed">Blog</a>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">상담 예약</a>
+                    </div>
+                    <div>
+                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[18px] leading-relaxed">강사 채용</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- 본문 컨텐츠 (스크롤 가능 영역) -->
+            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
+                
+                <!-- 카톡 상담 (firstee 기준) -->
+                <div class="hidden lg:block fixed z-50" style="right: min(13.44vw, 258px); top: 143px;">
+                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+                       class="kakao-btn relative inline-block">
+                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
+                        <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
+                            <span class="text-[#2F2725] text-[20px] font-bold tracking-[-0.2px]">카톡 상담</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- ALLROUND strategy 타이틀 영역 (회색 배경) -->
+                <div class="px-6 md:px-12 pt-12 pb-6 text-[#2F2725]">
+                    <div class="flex items-center gap-4 max-w-[1320px] ml-[24px]">
+                        <div class="w-[2px] h-[22px] bg-[#2F2725]"></div>
+                        <h1 class="text-[35px] leading-[35px] tracking-[-0.35px]" style="font-family: 'Libre Bodoni', serif; font-weight: 400;"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-2" style="filter: brightness(0); transform: translateY(-0.1em);">strategy</h1>
+                        <span class="bg-[#2F2725] text-white text-[14px] md:text-[20px] px-4 py-1 font-normal ml-2 whitespace-nowrap rounded-md">중등 3학년 - 고등 3학년</span>
+                    </div>
+                </div>
+
+                <!-- ALLROUND strategy HTML 컨텐츠 컨테이너 (흰색 배경 카드) -->
+                <div class="w-full max-w-[1320px] ml-[24px] px-6 md:px-16 lg:px-24 py-16 text-[#2F2725] bg-white mb-[25px] relative z-10">
+                    
+                    <!-- Section 1: Differentiation — s1: 본문과 중앙 정렬 -->
+                    <div class="mb-24">
+                        <div class="bg-[#13372A] text-white text-[14px] md:text-[20px] px-5 py-2 mb-6 inline-block font-normal rounded-md">DIFFERENTIATION</div>
+                        <div class="flex flex-col lg:flex-row gap-10 items-end">
+                            <div class="flex-1">
+                                <h2 class="text-[22px] md:text-[30px] font-semibold leading-[36px] md:leading-[45px] tracking-[-0.3px] mb-8"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><br>맞춤 교재 개발 시스템</h2>
+                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                    <p>올라운드는 매 수업 후 학생 평가를 통해,</p>
+                                    <p>학생의 약점을 파악하여 학생별 개별 문제를 제작하고,</p>
+                                    <p>주간지와 월간지를 발행하여 고교 내신 외부지문과</p>
+                                    <p>수능, 모의고사에 적극 준비하고 있습니다.</p>
+                                </div>
+                            </div>
+                            <div class="lg:w-[45%] flex-shrink-0 flex items-center justify-center">
+                                <img src="asset/strategy/s1.png" alt="맞춤 교재 개발 시스템" class="w-full max-w-[554px]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: 중학교 3학년 -->
+                    <div class="mb-24">
+                        <div class="bg-[#13372A] text-white text-[14px] md:text-[20px] px-5 py-2 mb-6 inline-block font-normal rounded-md">중학교 3학년</div>
+                        <!-- s2: 표1과 중앙 정렬 -->
+                        <div class="flex flex-col lg:flex-row gap-10 items-end mb-10">
+                            <div class="flex-1">
+                                <h3 class="text-[22px] md:text-[30px] font-semibold leading-[36px] md:leading-[45px] tracking-[-0.3px] mb-6">제대로 된 전략으로<br>완성하는 결정적인 한 수</h3>
+                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                    <p>중학교 3학년부터는</p>
+                                    <p>각자가 진학하고자 하는 고등학교의 유형에 맞춰</p>
+                                    <p>학습 방향을 본격적으로 집중,선택합니다.</p>
+                                    <p>필요한 전략과 우선순위가 다르기 때문입니다.</p>
+                                </div>
+                            </div>
+                            <div class="lg:w-[45%] flex-shrink-0 flex items-center justify-center">
+                                <img src="asset/strategy/s2.png" alt="상시 수업 · 기간 특강" class="w-full max-w-[365px]">
+                            </div>
+                        </div>
+
+                        <!-- 상시 수업 표 (이미지) -->
+                        <div class="mt-20 mb-20">
+                            <div class="bg-[#9FA0A0] text-white text-[14px] md:text-[18px] px-4 py-1 mb-4 inline-block font-normal rounded-md">상시 수업</div>
+                            <div>
+                                <img src="asset/strategy/표1.png" alt="상시 수업 표" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- 기간 특강 표 (이미지) -->
+                        <div class="mt-20 mb-20">
+                            <div class="bg-[#9FA0A0] text-white text-[14px] md:text-[18px] px-4 py-1 mb-4 inline-block font-normal rounded-md">기간 특강</div>
+                            <div>
+                                <img src="asset/strategy/표2.png" alt="기간 특강 표" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: 고등학교 -->
+                    <div class="mb-24 mt-20">
+                        <div class="bg-[#13372A] text-white text-[14px] md:text-[20px] px-5 py-2 mb-6 inline-block font-normal rounded-md">고등학교 1학년 - 3학년</div>
+                        <!-- 고등학교 테이블: 본문과 중앙 정렬, 테이블 55% -->
+                        <div class="flex flex-col lg:flex-row gap-10 items-start mb-32">
+                            <div class="flex-1">
+                                <h3 class="text-[22px] md:text-[30px] font-semibold leading-[36px] md:leading-[45px] tracking-[-0.3px] mb-6">학생을 계획 된 자리로 보내는<br>마지막 전략</h3>
+                                <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                    <p>각 과정은 학교별 평가 방식과 난이도,</p>
+                                    <p>내신과 수능의 비중을 고려해</p>
+                                    <p>대입 전략을 조율합니다</p>
+                                </div>
+                            </div>
+                            <div class="lg:w-[55%] flex-shrink-0">
+                                <img src="asset/strategy/표3.png" alt="고등학교 과정표" class="w-full">
+                            </div>
+                        </div>
+
+                        <!-- 01 내신 관리 -->
+                        <div class="mb-40">
+                            <h4 class="text-[20px] md:text-[25px] font-bold mb-10">01 내신 관리</h4>
+
+                            <img src="asset/strategy/s4.png" alt="내신 관리 프로세스" class="w-full mb-16">
+
+                            <p class="text-center" style="color:#2F2725; font-family:'Pretendard Variable',Pretendard,sans-serif; font-size:25px; font-weight:400; line-height:25px; letter-spacing:-0.25px;">특히, 과학고 조기 졸업을 목표로 하는 <span class="relative inline-block" style="color:#2F2725; font-weight:600;">PREMIUM CLASS<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 207 19" fill="none" class="absolute right-0 -z-10 h-[19px]" style="top:50%; width:calc(100% + 0.3em);"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.99953 0H207L200.999 18.9999H0L5.99953 0Z" fill="#61D4AB"/></svg></span><span style="color:#221815; font-weight:600;">를</span> 별도 운영해 보다 집중적인 설계를 진행합니다.</p>
+                        </div>
+
+                        <!-- 02 수능 준비 — 이미지가 타이틀과 같은 높이에서 시작 -->
+                        <div class="mt-20 mb-40">
+                            <div class="flex flex-col lg:flex-row gap-10 items-start">
+                                <div class="flex-1">
+                                    <h4 class="text-[20px] md:text-[25px] font-bold mb-10">02 수능 준비</h4>
+                                    <div class="text-[18px] md:text-[25px] font-normal leading-[36px] md:leading-[45px] tracking-[-0.25px]">
+                                        <p>목표 대학 조기 진학 혹은</p>
+                                        <p>수능까지 이어지는 장기 전략을 선택해</p>
+                                        <p>흔들림 없이 완주합니다.</p>
+                                    </div>
+                                </div>
+                                <div class="lg:w-[55%] flex-shrink-0 flex justify-center items-start">
+                                    <img src="asset/strategy/s5.png" alt="수능 준비 벤다이어그램" class="w-full max-w-[600px]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Banner: 졸업모 배경 -->
+                        <div class="mt-40">
+                            <img src="asset/strategy/s6.png" alt="ALLROUND" class="w-full">
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex justify-center gap-2 mt-10 pb-16">
+                        <a href="courses.html" class="w-[125px] h-[47px] flex items-center justify-center bg-[#13372A] text-white text-[16px] md:text-[20px] font-normal hover:bg-opacity-90 transition rounded-md">전체 강의</a>
+                        <a href="#" class="w-[125px] h-[47px] flex items-center justify-center bg-[#13372A] text-white text-[16px] md:text-[20px] font-normal hover:bg-opacity-90 transition rounded-md">상담 예약</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden kakao-btn fixed bottom-6 right-6 z-40 relative inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-12 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[20%] pointer-events-none">
+                <span class="text-[#2F2725] text-[11px] font-bold tracking-wide">카톡 문의</span>
+            </div>
+        </a>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
+</body>
+</html>
