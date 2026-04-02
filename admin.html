@@ -1471,8 +1471,12 @@
                 <input type="hidden" id="coupon-edit-id">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">코드 *</label>
-                    <input type="text" id="coupon-code" required placeholder="WELCOME2024"
-                           class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500" style="text-transform:uppercase;">
+                    <div class="flex gap-2">
+                        <input type="text" id="coupon-code" required placeholder="WELCOME2024"
+                               class="flex-1 px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500" style="text-transform:uppercase;">
+                        <button type="button" onclick="autoGenerateCouponCode()" id="coupon-code-gen-btn"
+                                class="px-3 py-2 border border-gray-300 text-xs font-bold text-gray-600 hover:bg-gray-50 whitespace-nowrap">자동생성</button>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">이름 *</label>
