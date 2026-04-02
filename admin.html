@@ -4429,7 +4429,7 @@
                 // 모든 회원 정보 로드
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('*')
+                    .select('id, name, email, phone, student_phone, created_at, student_type, role, parent_name, parent_phone, guardian_phone, notification_enabled')
                     .order('created_at', { ascending: false });
 
                 if (profileError) throw profileError;
@@ -4437,7 +4437,7 @@
                 // 결제 완료된 주문 로드
                 const { data: orders, error: orderError } = await window.supabase
                     .from('orders')
-                    .select('*')
+                    .select('id, user_id, course_id, amount, order_name, created_at')
                     .eq('status', 'DONE');
 
                 if (orderError) throw orderError;
