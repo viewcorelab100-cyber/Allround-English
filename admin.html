@@ -5886,7 +5886,7 @@
             const items = data || couponTemplates;
             const tbody = document.getElementById('coupon-template-body');
             if (!items.length) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12" style="color:#9CA3AF;">등록된 쿠폰 템플릿이 없습니다.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12" style="color:#9CA3AF;">등록된 쿠폰 템플릿이 없습니다.</td></tr>';
                 return;
             }
             tbody.innerHTML = items.map(c => {
@@ -5896,20 +5896,23 @@
                 const typeLabels = { completion: '수강완료', welcome: '가입환영', promotion: '프로모션', manual: '수동발급' };
                 const statusColor = c.is_active ? 'color:#16A34A;' : 'color:#9CA3AF;';
                 const statusText = c.is_active ? '활성' : '비활성';
+                const stats = couponTemplateStats[c.id] || { issued: 0, used: 0 };
                 return `<tr>
                     <td><code style="background:#F3F4F6;padding:2px 6px;font-size:12px;">${c.code}</code></td>
                     <td>${c.name || '-'}</td>
                     <td><span style="font-size:11px;color:#6B7280;">${typeLabels[c.coupon_type] || c.coupon_type || '-'}</span></td>
                     <td>${discountText}</td>
                     <td>${c.valid_days || 7}일</td>
+                    <td><span style="font-size:12px;">${stats.issued}<span style="color:#9CA3AF;"> / </span><span style="color:#16A34A;">${stats.used}</span></span></td>
                     <td>
                         <button onclick="toggleCouponActive('${c.id}', ${!c.is_active})"
                                 class="text-xs font-bold demo-restricted" style="${statusColor} cursor:pointer;">
                             ${statusText}
                         </button>
                     </td>
-                    <td class="text-right">
+                    <td class="text-right" style="white-space:nowrap;">
                         <button onclick="openCouponModal('${c.id}')" class="text-xs font-bold demo-restricted" style="color:#3B82F6;cursor:pointer;">수정</button>
+                        <button onclick="deleteCouponTemplate('${c.id}')" class="text-xs font-bold demo-restricted" style="color:#EF4444;cursor:pointer;margin-left:8px;">삭제</button>
                     </td>
                 </tr>`;
             }).join('');
