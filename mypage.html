@@ -839,9 +839,6 @@
                 return;
             }
 
-            // 삭제된 강의 제외
-            const validPurchases = purchasesResult.data.filter(p => p.course?.id);
-
             // 각 강의의 진도 정보 가져오기
             const progressPromises = validPurchases.map(p =>
                 getCourseProgress(currentUser.id, p.course.id)
