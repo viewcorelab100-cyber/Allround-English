@@ -49,18 +49,19 @@ async function saveSessionId(userId, sessionId) {
             return { success: false, error: '서비스 초기화 중입니다.' };
         }
         
-        // 현재 활성 세션 목록 가져오기
+        // 현재 활성 세션 목록 + role 가져오기
         const { data: profile, error: fetchError } = await window.supabase
             .from('profiles')
-            .select('active_sessions')
+            .select('active_sessions, role')
             .eq('id', userId)
             .single();
-        
+
         if (fetchError) throw fetchError;
-        
+
+        const isUnlimited = profile.role === 'admin' || profile.role === 'demo';
         let activeSessions = profile.active_sessions || [];
         const currentDeviceInfo = getDeviceInfo();
-        
+
         // 새 세션 정보
         const newSession = {
             session_id: sessionId,
@@ -68,14 +69,14 @@ async function saveSessionId(userId, sessionId) {
             device_info: currentDeviceInfo,
             last_activity: new Date().toISOString()
         };
-        
+
         // 같은 기기의 기존 세션 제거 (중복 방지)
-        activeSessions = activeSessions.filter(s => 
+        activeSessions = activeSessions.filter(s =>
             s.session_id !== sessionId && s.device_info !== currentDeviceInfo
         );
-        
-        // 최대 개수 초과 시 가장 오래된 세션 제거
-        if (activeSessions.length >= MAX_DEVICES) {
+
+        // 관리자/데모는 기기 제한 없음, 일반 사용자만 제한 적용
+        if (!isUnlimited && activeSessions.length >= MAX_DEVICES) {
             // created_at 기준 정렬 (오래된 순)
             activeSessions.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             activeSessions = activeSessions.slice(-(MAX_DEVICES - 1)); // 가장 오래된 것 제거
