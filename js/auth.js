@@ -190,7 +190,7 @@ async function checkSessionOnPageLoad() {
 // 주기적 세션 검증 시작 (선택적: 실시간 감지)
 let sessionCheckInterval = null;
 
-function startSessionMonitor(intervalMs = 300000) { // 5분 간격 (egress 최적화)
+function startSessionMonitor(intervalMs = 120000) { // 2분 간격 (egress 최적화, 계정공유 방지 균형)
     // 기존 인터벌 정리
     if (sessionCheckInterval) {
         clearInterval(sessionCheckInterval);
