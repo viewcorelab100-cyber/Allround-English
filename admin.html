@@ -5815,10 +5815,29 @@
         // ========== 쿠폰 관리 ==========
         let couponTemplates = [];
         let issuedCoupons = [];
+        let couponTemplateStats = {}; // { coupon_id: { issued: N, used: N } }
 
         async function loadCouponSection() {
             await loadCouponTemplates();
-            await Promise.all([loadIssuedCoupons(), loadCouponStats()]);
+            await Promise.all([loadIssuedCoupons(), loadCouponStats(), loadCouponTemplateStats()]);
+        }
+
+        async function loadCouponTemplateStats() {
+            try {
+                const { data, error } = await window.supabase
+                    .from('user_coupons')
+                    .select('coupon_id, is_used');
+                if (error) throw error;
+                couponTemplateStats = {};
+                (data || []).forEach(uc => {
+                    if (!couponTemplateStats[uc.coupon_id]) couponTemplateStats[uc.coupon_id] = { issued: 0, used: 0 };
+                    couponTemplateStats[uc.coupon_id].issued++;
+                    if (uc.is_used) couponTemplateStats[uc.coupon_id].used++;
+                });
+                renderCouponTemplatesPaged();
+            } catch (e) {
+                console.error('쿠폰 템플릿 통계 로드 오류:', e);
+            }
         }
 
         // --- 통계 ---
