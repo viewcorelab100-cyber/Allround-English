@@ -5928,6 +5928,7 @@
             document.getElementById('coupon-edit-id').value = '';
             document.getElementById('coupon-modal-title').textContent = couponId ? '쿠폰 템플릿 수정' : '쿠폰 템플릿 추가';
             document.getElementById('coupon-code').readOnly = false;
+            document.getElementById('coupon-code-gen-btn').classList.remove('hidden');
 
             if (couponId) {
                 const c = couponTemplates.find(t => t.id === couponId);
@@ -5935,6 +5936,7 @@
                 document.getElementById('coupon-edit-id').value = c.id;
                 document.getElementById('coupon-code').value = c.code;
                 document.getElementById('coupon-code').readOnly = true;
+                document.getElementById('coupon-code-gen-btn').classList.add('hidden');
                 document.getElementById('coupon-name').value = c.name || '';
                 document.getElementById('coupon-description').value = c.description || '';
                 document.getElementById('coupon-discount-type').value = c.discount_type || 'percentage';
