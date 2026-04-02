@@ -1223,12 +1223,18 @@
                 <div>
                     <div class="flex items-end justify-between mb-4">
                         <h2 class="text-lg font-bold" style="color:#111;">발급 현황</h2>
-                        <select id="coupon-issue-filter" onchange="loadIssuedCoupons()" class="text-sm px-3 py-2 border border-gray-300">
-                            <option value="all">전체</option>
-                            <option value="active">사용 가능</option>
-                            <option value="used">사용 완료</option>
-                            <option value="expired">만료</option>
-                        </select>
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="coupon-issued-search" placeholder="학생/쿠폰명 검색..."
+                                   oninput="filterIssuedCoupons()"
+                                   class="text-sm px-3 py-2 border border-gray-300 focus:outline-none focus:border-gray-500" style="width:180px;">
+                            <select id="coupon-issue-filter" onchange="loadIssuedCoupons()" class="text-sm px-3 py-2 border border-gray-300">
+                                <option value="all">전체</option>
+                                <option value="active">사용 가능</option>
+                                <option value="used">사용 완료</option>
+                                <option value="expired">만료</option>
+                            </select>
+                            <button onclick="exportCouponCSV()" class="text-sm px-3 py-2 border border-gray-300 font-bold text-gray-600 hover:bg-gray-50 whitespace-nowrap">CSV 내보내기</button>
+                        </div>
                     </div>
                     <div class="bg-white border border-gray-200 overflow-hidden" style="background:#fff !important;">
                         <table class="admin-table">
