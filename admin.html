@@ -6103,6 +6103,7 @@
                 }
 
                 const canRevoke = !uc.is_used && !isExpired;
+                const canExtend = !uc.is_used;
                 return `<tr>
                     <td>${studentName}</td>
                     <td>${couponName}</td>
@@ -6110,8 +6111,10 @@
                     <td>${issuedDate}</td>
                     <td>${expiresDate}</td>
                     <td>${statusHtml}</td>
-                    <td class="text-right">
-                        ${canRevoke ? `<button onclick="revokeCoupon('${uc.id}')" class="text-xs font-bold demo-restricted" style="color:#EF4444;cursor:pointer;">회수</button>` : '-'}
+                    <td class="text-right" style="white-space:nowrap;">
+                        ${canExtend ? `<button onclick="extendCouponExpiry('${uc.id}', '${uc.expires_at || ''}')" class="text-xs font-bold demo-restricted" style="color:#F59E0B;cursor:pointer;">연장</button>` : ''}
+                        ${canRevoke ? `<button onclick="revokeCoupon('${uc.id}')" class="text-xs font-bold demo-restricted" style="color:#EF4444;cursor:pointer;margin-left:6px;">회수</button>` : ''}
+                        ${!canExtend && !canRevoke ? '-' : ''}
                     </td>
                 </tr>`;
             }).join('');
