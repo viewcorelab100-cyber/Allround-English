@@ -6129,6 +6129,70 @@
             }
         }
 
+        function filterIssuedCoupons() {
+            const keyword = (document.getElementById('coupon-issued-search')?.value || '').toLowerCase();
+            if (!keyword) {
+                renderCouponIssuedPaged();
+                return;
+            }
+            const filtered = issuedCoupons.filter(uc => {
+                const name = (uc.profile?.name || '').toLowerCase();
+                const email = (uc.profile?.email || '').toLowerCase();
+                const couponName = (uc.coupons?.name || '').toLowerCase();
+                const code = (uc.custom_code || uc.coupons?.code || '').toLowerCase();
+                return name.includes(keyword) || email.includes(keyword) || couponName.includes(keyword) || code.includes(keyword);
+            });
+            renderIssuedCoupons(filtered);
+            // 검색 중에는 페이지네이션 숨김
+            document.getElementById('coupon-issued-pagination').innerHTML = '';
+        }
+
+        function exportCouponCSV() {
+            if (!issuedCoupons.length) { alert('내보낼 데이터가 없습니다.'); return; }
+            const now = new Date();
+            const rows = [['학생', '이메일', '쿠폰명', '코드', '발급일', '만료일', '상태']];
+            issuedCoupons.forEach(uc => {
+                const name = uc.profile?.name || '-';
+                const email = uc.profile?.email || '-';
+                const couponName = uc.coupons?.name || '-';
+                const code = uc.custom_code || uc.coupons?.code || '-';
+                const issued = uc.issued_at ? new Date(uc.issued_at).toLocaleDateString('ko-KR') : '-';
+                const expires = uc.expires_at ? new Date(uc.expires_at).toLocaleDateString('ko-KR') : '-';
+                let status = '사용 가능';
+                if (uc.is_used) status = '사용 완료';
+                else if (uc.expires_at && new Date(uc.expires_at) < now) status = '만료';
+                rows.push([name, email, couponName, code, issued, expires, status]);
+            });
+            const bom = '\uFEFF';
+            const csv = bom + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `쿠폰발급현황_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        async function extendCouponExpiry(userCouponId, currentExpiry) {
+            if (!checkDemoWriteAccess('만료일 연장')) return;
+            const current = currentExpiry ? new Date(currentExpiry).toISOString().slice(0, 10) : '';
+            const newDate = prompt(`새 만료일을 입력하세요 (YYYY-MM-DD 형식)\n현재: ${current}`, current);
+            if (!newDate) return;
+            const parsed = new Date(newDate + 'T23:59:59');
+            if (isNaN(parsed.getTime())) { alert('유효하지 않은 날짜입니다.'); return; }
+            if (parsed < new Date()) { alert('만료일은 오늘 이후여야 합니다.'); return; }
+            try {
+                const { error } = await window.supabase.from('user_coupons')
+                    .update({ expires_at: parsed.toISOString() })
+                    .eq('id', userCouponId);
+                if (error) throw error;
+                await loadCouponSection();
+            } catch (e) {
+                alert('만료일 변경 실패: ' + e.message);
+            }
+        }
+
         // --- 학생에게 쿠폰 발급 ---
         let issueStudentList = []; // 전체 학생 목록 캐시
 
