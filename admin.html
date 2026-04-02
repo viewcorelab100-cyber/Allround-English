@@ -5998,6 +5998,24 @@
             }
         }
 
+        async function deleteCouponTemplate(couponId) {
+            if (!checkDemoWriteAccess('쿠폰 삭제')) return;
+            const stats = couponTemplateStats[couponId];
+            if (stats && stats.issued > 0) {
+                alert(`이 쿠폰은 ${stats.issued}건 발급된 이력이 있어 삭제할 수 없습니다.\n비활성 처리를 이용하세요.`);
+                return;
+            }
+            const tpl = couponTemplates.find(c => c.id === couponId);
+            if (!confirm(`"${tpl?.name || ''}" 쿠폰 템플릿을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+            try {
+                const { error } = await window.supabase.from('coupons').delete().eq('id', couponId);
+                if (error) throw error;
+                await loadCouponSection();
+            } catch (e) {
+                alert('삭제 실패: ' + e.message);
+            }
+        }
+
         // --- 발급 현황 ---
         async function loadIssuedCoupons() {
             try {
