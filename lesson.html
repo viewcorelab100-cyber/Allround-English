@@ -1252,6 +1252,14 @@
             
             document.getElementById('course-title').textContent = currentCourse?.title || '';
             document.getElementById('lesson-title').textContent = currentLesson.title;
+
+            // 수강기간 FAQ 동적 설정
+            const enrollDays = currentCourse?.enrollment_days || 180;
+            const enrollMonths = Math.round(enrollDays / 30);
+            const enrollFaq = document.getElementById('faq-enrollment-period');
+            if (enrollFaq) {
+                enrollFaq.textContent = `결제일로부터 ${enrollDays}일(${enrollMonths}개월) 동안 수강 가능합니다. 남은 수강 기간은 마이페이지에서 확인하실 수 있습니다.`;
+            }
             document.getElementById('lesson-description').textContent = currentLesson.description || '';
             document.getElementById('back-to-course').href = `course-detail.html?id=${currentLesson.course.id}`;
             document.title = `${currentLesson.title} — ALLROUND`;
