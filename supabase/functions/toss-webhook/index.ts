@@ -5,18 +5,41 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { status: 200 })
   }
 
   try {
-    const body = await req.json()
+    // 토스페이먼츠 웹훅 서명 검증
+    const tossSecretKey = Deno.env.get('TOSS_SECRET_KEY')
+    if (!tossSecretKey) {
+      console.error('TOSS_SECRET_KEY 환경변수 미설정')
+      return new Response('Server configuration error', { status: 500 })
+    }
+
+    const rawBody = await req.text()
+    const signature = req.headers.get('TossPayments-Signature')
+
+    if (signature) {
+      const encoder = new TextEncoder()
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(tossSecretKey),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      )
+      const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(rawBody))
+      const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)))
+
+      if (signature !== expectedSignature) {
+        console.error('웹훅 서명 검증 실패')
+        return new Response('Invalid signature', { status: 401 })
+      }
+    }
+
+    const body = JSON.parse(rawBody)
     console.log('토스 웹훅 수신:', JSON.stringify(body))
 
     const { eventType, data } = body
