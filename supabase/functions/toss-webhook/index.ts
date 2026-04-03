@@ -12,44 +12,26 @@ serve(async (req) => {
 
   try {
     const body = await req.json()
-    console.log('토스 웹훅 수신:', JSON.stringify(body))
-
-    const { eventType, data } = body
-
-    // 토스페이먼츠 secret 필드로 검증 (각 결제 건에 포함된 시크릿)
-    const tossSecretKey = Deno.env.get('TOSS_SECRET_KEY')
-    if (data?.secret && tossSecretKey) {
-      if (data.secret !== tossSecretKey) {
-        console.error('웹훅 secret 검증 실패')
-        return new Response('Invalid secret', { status: 401 })
-      }
-    }
+    console.log('[WEBHOOK] 수신:', JSON.stringify(body))
 
     // Supabase 서비스 역할 클라이언트
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // 수신 데이터 상세 로깅
-    console.log('[WEBHOOK] eventType:', eventType)
-    console.log('[WEBHOOK] data keys:', Object.keys(data || {}))
-    console.log('[WEBHOOK] data.orderId:', data?.orderId)
-    console.log('[WEBHOOK] data.paymentKey:', data?.paymentKey)
-    console.log('[WEBHOOK] data.status:', data?.status)
+    // 토스페이먼츠 웹훅 형식 판별:
+    // - DEPOSIT_CALLBACK: 플랫 구조 {orderId, status, secret, transactionKey, createdAt}
+    // - PAYMENT_STATUS_CHANGED: 래핑 구조 {eventType, data: {...}}
+    const eventType = body.eventType
+    const isDepositCallback = !eventType && body.orderId && body.secret
+    const isPaymentStatusChanged = eventType === 'PAYMENT_STATUS_CHANGED'
 
-    // 이벤트 타입별 처리
-    if (eventType === 'DEPOSIT_CALLBACK') {
-      // 가상계좌 입금 완료
-      const { orderId, paymentKey, status } = data
-      console.log('[DEPOSIT_CALLBACK] 처리 시작:', { orderId, paymentKey, status })
+    console.log('[WEBHOOK] 형식 판별:', { eventType, isDepositCallback, isPaymentStatusChanged })
 
-      if (!orderId || !paymentKey) {
-        console.error('웹훅 필수 파라미터 누락:', { orderId, paymentKey })
-        return new Response(
-          JSON.stringify({ success: false, error: '필수 파라미터 누락' }),
-          { headers: { 'Content-Type': 'application/json' }, status: 400 }
-        )
-      }
+    if (isDepositCallback) {
+      // ===== 가상계좌 입금 콜백 (플랫 구조) =====
+      const { orderId, status, transactionKey, secret } = body
+      console.log('[DEPOSIT_CALLBACK] 처리 시작:', { orderId, status, transactionKey })
 
       // 주문 조회
       const { data: order, error: orderError } = await supabase
@@ -69,23 +51,22 @@ serve(async (req) => {
       console.log('[DEPOSIT_CALLBACK] 주문 조회 성공:', { orderId, orderStatus: order.status, userId: order.user_id })
 
       if (status === 'DONE') {
-        // 실제 입금 완료 → 주문 완료 처리
-
-        // 이미 완료됐거나, 입금 대기 상태가 아닌 주문은 무시
+        // 이미 완료된 주문
         if (order.status === 'DONE') {
-          console.log('이미 완료된 주문:', orderId)
+          console.log('[DEPOSIT_CALLBACK] 이미 완료된 주문:', orderId)
           return new Response(JSON.stringify({ success: true, message: '이미 처리됨' }), {
             headers: { 'Content-Type': 'application/json' },
           })
         }
+        // 입금 대기 상태가 아닌 주문은 무시
         if (order.status !== 'WAITING_FOR_DEPOSIT') {
-          console.error('입금 대기 상태가 아닌 주문에 DONE 웹훅 수신:', { orderId, currentStatus: order.status })
-          return new Response(JSON.stringify({ success: false, error: '잘못된 주문 상태' }), {
+          console.error('[DEPOSIT_CALLBACK] 잘못된 상태:', { orderId, currentStatus: order.status })
+          return new Response(JSON.stringify({ success: true, message: '상태 불일치 - 무시' }), {
             headers: { 'Content-Type': 'application/json' },
           })
         }
 
-        // 1. orders 상태를 DONE으로 업데이트 (WAITING_FOR_DEPOSIT인 경우만)
+        // 1. orders → DONE
         const { error: updateError } = await supabase
           .from('orders')
           .update({
@@ -97,14 +78,15 @@ serve(async (req) => {
           .eq('status', 'WAITING_FOR_DEPOSIT')
 
         if (updateError) {
-          console.error('웹훅 주문 업데이트 실패:', updateError)
-          return new Response(JSON.stringify({ success: false, error: '주문 상태 업데이트 실패' }), {
+          console.error('[DEPOSIT_CALLBACK] 주문 업데이트 실패:', updateError)
+          return new Response(JSON.stringify({ success: false, error: '주문 업데이트 실패' }), {
             headers: { 'Content-Type': 'application/json' }, status: 500,
           })
         }
 
-        // 2. purchases 레코드 생성 (paid_amount가 있으면 사용, 없으면 원래 amount)
+        // 2. purchases 생성 (강의 접근 권한 부여)
         const purchaseAmount = order.paid_amount || order.amount
+        const paymentKey = order.payment_key || transactionKey
         const { error: purchaseError } = await supabase
           .from('purchases')
           .insert({
@@ -119,22 +101,20 @@ serve(async (req) => {
           })
 
         if (purchaseError && purchaseError.code !== '23505') {
-          console.error('웹훅 구매 기록 생성 실패:', purchaseError)
+          console.error('[DEPOSIT_CALLBACK] 구매 기록 생성 실패:', purchaseError)
         }
 
-        console.log('가상계좌 입금 완료 처리 성공:', { orderId, paymentKey, amount: purchaseAmount })
+        console.log('[DEPOSIT_CALLBACK] 입금 완료 처리 성공:', { orderId, amount: purchaseAmount })
 
       } else if (status === 'CANCELED' || status === 'EXPIRED') {
-        // 입금 대기 상태가 아니면 무시
         if (order.status !== 'WAITING_FOR_DEPOSIT') {
-          console.log('이미 처리된 주문의 취소/만료 웹훅 무시:', { orderId, currentStatus: order.status })
+          console.log('[DEPOSIT_CALLBACK] 이미 처리된 주문 취소/만료 무시:', orderId)
           return new Response(JSON.stringify({ success: true }), {
             headers: { 'Content-Type': 'application/json' },
           })
         }
 
-        // 입금 기한 만료 또는 취소
-        const { error: cancelError } = await supabase
+        await supabase
           .from('orders')
           .update({
             status: status === 'EXPIRED' ? 'EXPIRED' : 'CANCELLED',
@@ -143,33 +123,21 @@ serve(async (req) => {
           .eq('id', orderId)
           .eq('status', 'WAITING_FOR_DEPOSIT')
 
-        if (cancelError) {
-          console.error('웹훅 주문 취소 업데이트 실패:', cancelError)
-        }
-
-        // 쿠폰 복원 (가상계좌 발급 시 사용 처리했던 쿠폰)
-        const { error: couponRestoreError } = await supabase
+        // 쿠폰 복원
+        await supabase
           .from('user_coupons')
-          .update({
-            is_used: false,
-            used_at: null,
-            order_id: null,
-          })
+          .update({ is_used: false, used_at: null, order_id: null })
           .eq('order_id', orderId)
           .eq('is_used', true)
 
-        if (couponRestoreError) {
-          console.error('쿠폰 복원 실패:', couponRestoreError)
-        } else {
-          console.log('미입금 취소/만료 - 쿠폰 복원 완료:', orderId)
-        }
-
-        console.log(`가상계좌 ${status} 처리 완료:`, orderId)
+        console.log(`[DEPOSIT_CALLBACK] ${status} 처리 완료:`, orderId)
       }
-    } else if (eventType === 'PAYMENT_STATUS_CHANGED') {
-      // 일반 결제 상태 변경 (환불 등)
+
+    } else if (isPaymentStatusChanged) {
+      // ===== 결제 상태 변경 (래핑 구조) =====
+      const data = body.data
       const { orderId, paymentKey, status } = data
-      console.log('결제 상태 변경:', { orderId, paymentKey, status })
+      console.log('[PAYMENT_STATUS_CHANGED]:', { orderId, paymentKey, status })
 
       if (status === 'CANCELED') {
         await supabase
@@ -182,17 +150,17 @@ serve(async (req) => {
           .update({ status: 'refunded' })
           .eq('order_id', orderId)
       }
+    } else {
+      console.log('[WEBHOOK] 알 수 없는 형식, 무시:', { eventType, keys: Object.keys(body) })
     }
 
-    // 토스페이먼츠는 200 응답을 기대
     return new Response(
       JSON.stringify({ success: true }),
       { headers: { 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
-    console.error('웹훅 처리 오류:', error)
-    // DB 오류 등 일시적 오류는 500 반환 → 토스가 재시도
+    console.error('[WEBHOOK] 오류:', error)
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { headers: { 'Content-Type': 'application/json' }, status: 500 }
