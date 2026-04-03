@@ -272,14 +272,13 @@ async function processPayment(amount, orderName, customerName, customerEmail, cu
             if (coupon.discount_type === 'percentage') {
                 discountAmount = Math.floor(amount * (coupon.discount_value / 100));
                 if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
-                    discountAmount = coupon.max_discount_amount;
+                    discountAmount = Math.floor(coupon.max_discount_amount);
                 }
             } else {
-                discountAmount = coupon.discount_value;
+                discountAmount = Math.floor(Number(coupon.discount_value));
             }
 
-            finalAmount = amount - discountAmount;
-            if (finalAmount < 0) finalAmount = 0;
+            finalAmount = Math.max(0, amount - discountAmount);
         }
 
         // 성공 URL 설정
