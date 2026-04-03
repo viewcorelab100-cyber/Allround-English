@@ -221,6 +221,12 @@ async function requestPayment() {
 
     // 새 주문 생성
     const user = await getCurrentUser();
+    if (!user) {
+        alert('로그인이 필요합니다. 로그인 후 다시 시도해주세요.');
+        _paymentInFlight = false;
+        window.location.href = 'auth.html';
+        return;
+    }
     const orderResult = await createOrder(
         user.id,
         currentCourse.id,
