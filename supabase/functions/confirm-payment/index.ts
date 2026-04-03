@@ -186,6 +186,9 @@ serve(async (req) => {
       has_textbook: course?.has_textbook || false,
     }
 
+    // 실제 결제(할인 적용 후) 금액 저장
+    updateData.paid_amount = expectedAmount
+
     if (isWaitingForDeposit) {
       // 가상계좌: 입금 대기 상태로 설정 (DONE이 아님)
       updateData.status = 'WAITING_FOR_DEPOSIT'
@@ -203,6 +206,7 @@ serve(async (req) => {
     } else {
       // 카드 등 즉시 결제: 기존대로 DONE 처리
       updateData.status = 'DONE'
+      updateData.paid_at = new Date().toISOString()
     }
 
     if (!course?.has_textbook) {
