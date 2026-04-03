@@ -767,15 +767,6 @@ async function applyCoupon() {
             return;
         }
         
-        // 최소 구매 금액 확인
-        if (matchedCoupon.coupons.min_purchase_amount > currentOrder.amount) {
-            showCouponMessage(
-                `이 쿠폰은 ₩${matchedCoupon.coupons.min_purchase_amount.toLocaleString()} 이상 구매 시 사용 가능합니다.`,
-                false
-            );
-            return;
-        }
-        
         // 쿠폰 적용
         appliedCouponData = matchedCoupon;
         updatePaymentAmount();
