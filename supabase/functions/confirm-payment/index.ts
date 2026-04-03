@@ -210,18 +210,21 @@ serve(async (req) => {
       updateData.shipping_status = 'NO_SHIPPING'
     }
 
+    console.log('DB 업데이트 시도:', JSON.stringify(updateData))
+
     const { error: updateError } = await supabase
       .from('orders')
       .update(updateData)
       .eq('id', orderId)
 
     if (updateError) {
-      console.error('주문 상태 업데이트 실패:', updateError)
+      console.error('주문 상태 업데이트 실패:', JSON.stringify(updateError))
       return new Response(
-        JSON.stringify({ success: false, error: '주문 상태 업데이트에 실패했습니다.' }),
+        JSON.stringify({ success: false, error: `주문 상태 업데이트 실패: ${updateError.message}`, details: updateError }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
+    console.log('DB 업데이트 성공')
 
     // 5. 쿠폰 사용 처리 (가상계좌도 계좌 발급 시점에 쿠폰 차감 - 미입금 취소 시 복원은 웹훅에서 처리)
     if (appliedCoupon) {
