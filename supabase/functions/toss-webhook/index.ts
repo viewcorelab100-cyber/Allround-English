@@ -196,15 +196,15 @@ serve(async (req) => {
     // 토스페이먼츠는 200 응답을 기대
     return new Response(
       JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('웹훅 처리 오류:', error)
-    // 웹훅은 실패해도 200 반환 (재시도 방지)
+    // DB 오류 등 일시적 오류는 500 반환 → 토스가 재시도
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { 'Content-Type': 'application/json' }, status: 500 }
     )
   }
 })
