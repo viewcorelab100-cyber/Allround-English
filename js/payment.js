@@ -804,11 +804,6 @@ function updatePaymentAmount() {
         if (coupon.discount_type === 'percentage') {
             // 퍼센트 할인
             discountAmount = Math.floor(currentOrder.amount * (coupon.discount_value / 100));
-
-            // 최대 할인 금액 적용
-            if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
-                discountAmount = Math.floor(coupon.max_discount_amount);
-            }
         } else {
             // 고정 금액 할인 (KRW 정수 보장)
             discountAmount = Math.floor(Number(coupon.discount_value));
