@@ -189,7 +189,6 @@ serve(async (req) => {
     if (isWaitingForDeposit) {
       // 가상계좌: 입금 대기 상태로 설정 (DONE이 아님)
       updateData.status = 'WAITING_FOR_DEPOSIT'
-      updateData.payment_method = '가상계좌'
       // 가상계좌 정보 저장
       if (confirmResult.virtualAccount) {
         updateData.virtual_account_info = JSON.stringify({
