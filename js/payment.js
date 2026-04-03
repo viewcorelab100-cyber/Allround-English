@@ -271,9 +271,6 @@ async function processPayment(amount, orderName, customerName, customerEmail, cu
 
             if (coupon.discount_type === 'percentage') {
                 discountAmount = Math.floor(amount * (coupon.discount_value / 100));
-                if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
-                    discountAmount = Math.floor(coupon.max_discount_amount);
-                }
             } else {
                 discountAmount = Math.floor(Number(coupon.discount_value));
             }
