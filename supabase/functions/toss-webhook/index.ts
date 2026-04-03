@@ -59,12 +59,14 @@ serve(async (req) => {
         .single()
 
       if (orderError || !order) {
-        console.error('웹훅 주문 조회 실패:', orderError)
+        console.error('[DEPOSIT_CALLBACK] 주문 조회 실패:', orderError)
         return new Response(
           JSON.stringify({ success: false, error: '주문을 찾을 수 없습니다.' }),
           { headers: { 'Content-Type': 'application/json' }, status: 404 }
         )
       }
+
+      console.log('[DEPOSIT_CALLBACK] 주문 조회 성공:', { orderId, orderStatus: order.status, userId: order.user_id })
 
       if (status === 'DONE') {
         // 실제 입금 완료 → 주문 완료 처리
