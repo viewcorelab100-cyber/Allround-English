@@ -306,6 +306,13 @@
                 totalDurationText = `${totalMinutes}분`;
             }
 
+            // 수강 기간 텍스트
+            const enrollDays = course.enrollment_days || 180;
+            const enrollText = enrollDays >= 30 ? `${Math.round(enrollDays / 30)}개월` : `${enrollDays}일`;
+
+            // 업로드 상태 뱃지
+            const uploadBadge = course.is_complete === false ? '<span class="inline-block ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-full">업로드 중</span>' : '';
+
             const contentDiv = document.getElementById('course-content');
             contentDiv.innerHTML = `
                 <div class="max-w-[900px] md:ml-[24px] space-y-10">
