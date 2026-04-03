@@ -6292,6 +6292,23 @@
                 completedStudentIds = new Set();
             }
 
+            // 완강쿠폰(completion 타입) 이미 발급된 학생 조회
+            try {
+                const completionCoupons = couponTemplates.filter(c => c.coupon_type === 'completion').map(c => c.id);
+                if (completionCoupons.length > 0) {
+                    const { data: issued } = await window.supabase
+                        .from('user_coupons')
+                        .select('user_id')
+                        .in('coupon_id', completionCoupons);
+                    issuedCouponStudentIds = new Set((issued || []).map(r => r.user_id));
+                } else {
+                    issuedCouponStudentIds = new Set();
+                }
+            } catch (e) {
+                console.error('쿠폰 발급 이력 조회 오류:', e);
+                issuedCouponStudentIds = new Set();
+            }
+
             renderIssueStudentList();
 
             // 활성 쿠폰 목록 로드
