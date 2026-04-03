@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
+    <script>
+    Sentry.onLoad(function() {
+        Sentry.init({
+            ignoreErrors: [
+                'NotAllowedError',
+                /The request is not allowed by the user agent/,
+                /play\(\) failed/,
+                /undefined is not an object \(evaluating 'r\.name\.includes'\)/
+            ]
+        });
+    });
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>ALLROUND — English Communication</title>
