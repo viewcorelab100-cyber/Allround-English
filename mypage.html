@@ -614,7 +614,7 @@
                         courses (title, thumbnail_url, has_textbook)
                     `)
                     .eq('user_id', currentUser.id)
-                    .eq('status', 'DONE')
+                    .in('status', ['DONE', 'WAITING_FOR_DEPOSIT'])
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
