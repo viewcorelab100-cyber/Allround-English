@@ -512,8 +512,28 @@
                 currentOrder = order;
                 currentCourse = course;
 
-                // 가상계좌 입금 대기 분기
+                // 가상계좌 입금 대기 분기 (단, pending payments가 있으면 다음 결제 먼저 진행)
                 if (data.isWaitingForDeposit && data.virtualAccountInfo) {
+                    const pendingPaymentsStr = sessionStorage.getItem('pendingPayments');
+                    if (pendingPaymentsStr) {
+                        // 다음 결제(교재비 등)가 남아있으면 진행
+                        document.getElementById('loading-state').innerHTML = `
+                            <div class="text-center space-y-6">
+                                <div class="flex justify-center">
+                                    <svg class="w-16 h-16 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-2xl font-bold text-[#2F2725]">강의비 가상계좌 발급 완료!</h2>
+                                <p class="text-[#8B95A1]">교재비 결제를 진행합니다...</p>
+                                <div class="animate-pulse">
+                                    <div class="h-1 bg-gray-200 rounded w-48 mx-auto"></div>
+                                </div>
+                            </div>
+                        `;
+                        setTimeout(() => { window.location.href = 'payment.html'; }, 2000);
+                        return;
+                    }
                     showVirtualAccountWaiting(order, data.virtualAccountInfo, data.finalAmount);
                     return;
                 }
