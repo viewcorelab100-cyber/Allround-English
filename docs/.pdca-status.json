@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-03T14:26:59.884Z",
+  "lastUpdated": "2026-04-03T14:58:37.791Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -44,9 +44,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-08T05:18:15.368Z",
-        "lastUpdated": "2026-04-03T12:12:07.840Z"
+        "lastUpdated": "2026-04-03T14:58:37.791Z"
       },
-      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\payment.js"
+      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\report.js"
     },
     "confirm-payment": {
       "phase": "do",
@@ -154,7 +154,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-03T14:26:59.884Z"
+    "lastActivity": "2026-04-03T14:58:37.791Z"
   },
   "history": [
     {
@@ -1084,6 +1084,12 @@
     {
       "timestamp": "2026-04-03T14:26:59.884Z",
       "feature": "toss-webhook",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-03T14:58:37.791Z",
+      "feature": "js",
       "phase": "do",
       "action": "updated"
     }

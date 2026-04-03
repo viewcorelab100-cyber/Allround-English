@@ -36,11 +36,6 @@ async function loadReport(reportId, publicId) {
         // 데이터 바인딩
         renderReport(data);
 
-        // 쿠폰 발급 (완강 리포트인 경우에만)
-        if (data.user_id && data.course_id) {
-            await issueCoupon(data.user_id, data.course_id);
-        }
-
         // 추천 강의 로드
         if (data.course_id) {
             await loadRecommendedCourses(data.course_id);
