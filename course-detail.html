@@ -525,6 +525,83 @@
             }
 
             renderCourseDetail(currentCourse, hasAccess, progress);
+
+            // 결제 미완료 안내 모달 체크
+            if (user && hasAccess) {
+                checkPaymentNotice(user.id, courseId);
+            }
+        }
+
+        async function checkPaymentNotice(userId, courseId) {
+            try {
+                // NEEDS_PAYMENT 상태 주문이 있는지 확인
+                const { data: needsPayment } = await window.supabase
+                    .from('orders')
+                    .select('id, order_name, amount')
+                    .eq('user_id', userId)
+                    .eq('course_id', courseId)
+                    .eq('status', 'NEEDS_PAYMENT')
+                    .limit(1);
+
+                if (!needsPayment || needsPayment.length === 0) return;
+
+                // 이미 정상 결제된 DONE 주문이 있으면 모달 안 띄움
+                const { data: doneOrders } = await window.supabase
+                    .from('orders')
+                    .select('id')
+                    .eq('user_id', userId)
+                    .eq('course_id', courseId)
+                    .eq('status', 'DONE')
+                    .limit(1);
+
+                if (doneOrders && doneOrders.length > 0) return;
+
+                // 모달 표시
+                const order = needsPayment[0];
+                showPaymentNoticeModal(order, courseId);
+            } catch (e) {
+                console.error('결제 안내 체크 오류:', e);
+            }
+        }
+
+        function showPaymentNoticeModal(order, courseId) {
+            const overlay = document.createElement('div');
+            overlay.id = 'payment-notice-overlay';
+            overlay.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-5';
+            overlay.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-[360px] w-full overflow-hidden shadow-xl">
+                    <div class="bg-[#2F2725] px-6 py-5 text-center">
+                        <svg class="w-10 h-10 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <h2 class="text-white text-[18px] font-bold">결제 확인이 필요합니다</h2>
+                    </div>
+                    <div class="px-6 py-6 space-y-4">
+                        <p class="text-[#2F2725] text-[15px] leading-relaxed text-center">
+                            수강 중인 강의의 결제가 아직 완료되지 않았습니다.<br>
+                            아래 버튼을 눌러 결제를 진행해주세요.
+                        </p>
+                        <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-[#8B95A1]">강의명</span>
+                                <span class="text-[#2F2725] font-semibold">${order.order_name.replace(' (강의비)', '')}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-[#8B95A1]">결제 금액</span>
+                                <span class="text-[#2F2725] font-bold">\u20A9${(order.amount || 0).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <p class="text-[#8B95A1] text-xs text-center">결제 전까지 수강은 계속 가능합니다.</p>
+                    </div>
+                    <div class="px-6 pb-6 space-y-3">
+                        <a href="payment.html?courseId=${courseId}" class="block w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-[15px] text-center hover:bg-[#1a1817] transition-colors">결제하기</a>
+                        <button onclick="document.getElementById('payment-notice-overlay').remove()" class="w-full py-3 text-[#8B95A1] text-sm hover:text-[#2F2725] transition-colors">나중에 할게요</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
         }
 
         document.addEventListener('DOMContentLoaded', loadCourseDetail);
