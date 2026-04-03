@@ -3809,6 +3809,8 @@
                 document.getElementById('course-price').value = course.price || '';
                 document.getElementById('course-textbook-price').value = course.textbook_price || '';
                 document.getElementById('course-thumbnail').value = course.thumbnail_url || '';
+                document.getElementById('course-enrollment-days').value = course.enrollment_days || 180;
+                document.getElementById('course-is-complete').checked = course.is_complete || false;
                 // 공개 범위 설정
                 const visibility = course.visibility || 'public';
                 const visibilityRadio = document.getElementById(`course-visibility-${visibility}`);
