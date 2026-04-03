@@ -512,6 +512,12 @@
                 currentOrder = order;
                 currentCourse = course;
 
+                // 가상계좌 입금 대기 분기
+                if (data.isWaitingForDeposit && data.virtualAccountInfo) {
+                    showVirtualAccountWaiting(order, data.virtualAccountInfo, data.finalAmount);
+                    return;
+                }
+
                 let appliedCoupon = null;
                 if (data.appliedCoupon) {
                     appliedCoupon = {
