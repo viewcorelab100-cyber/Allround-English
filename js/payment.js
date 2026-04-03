@@ -625,7 +625,7 @@ async function loadMyCoupons() {
         const nowISO = new Date().toISOString();
         const { data, error } = await window.supabase
             .from('user_coupons')
-            .select('*, coupons(code, name, discount_type, discount_value, min_purchase_amount, max_discount_amount)')
+            .select('*, coupons(code, name, discount_type, discount_value)')
             .eq('user_id', user.id)
             .eq('is_used', false)
             .gt('expires_at', nowISO);
