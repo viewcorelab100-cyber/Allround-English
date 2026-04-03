@@ -166,7 +166,11 @@ serve(async (req) => {
       )
     }
 
-    console.log('토스 결제 승인 성공:', { orderId, paymentKey, amount })
+    console.log('토스 결제 승인 성공:', { orderId, paymentKey, amount, method: confirmResult.method, status: confirmResult.status })
+
+    // 가상계좌(무통장입금) 여부 판별
+    const isVirtualAccount = confirmResult.method === '가상계좌'
+    const isWaitingForDeposit = isVirtualAccount && confirmResult.status === 'WAITING_FOR_DEPOSIT'
 
     // 3. 강의 정보 조회 (교재 포함 여부)
     const { data: course } = await supabase
@@ -177,10 +181,28 @@ serve(async (req) => {
 
     // 4. orders 테이블 업데이트
     const updateData: Record<string, unknown> = {
-      status: 'DONE',
       payment_key: paymentKey,
       updated_at: new Date().toISOString(),
       has_textbook: course?.has_textbook || false,
+    }
+
+    if (isWaitingForDeposit) {
+      // 가상계좌: 입금 대기 상태로 설정 (DONE이 아님)
+      updateData.status = 'WAITING_FOR_DEPOSIT'
+      updateData.payment_method = '가상계좌'
+      // 가상계좌 정보 저장
+      if (confirmResult.virtualAccount) {
+        updateData.virtual_account_info = JSON.stringify({
+          accountNumber: confirmResult.virtualAccount.accountNumber,
+          bank: confirmResult.virtualAccount.bankCode,
+          bankName: confirmResult.virtualAccount.bank,
+          customerName: confirmResult.virtualAccount.customerName,
+          dueDate: confirmResult.virtualAccount.dueDate,
+        })
+      }
+    } else {
+      // 카드 등 즉시 결제: 기존대로 DONE 처리
+      updateData.status = 'DONE'
     }
 
     if (!course?.has_textbook) {
@@ -200,7 +222,7 @@ serve(async (req) => {
       )
     }
 
-    // 5. 쿠폰 사용 처리 (구매 기록 생성 전에 처리하여 race condition 방지)
+    // 5. 쿠폰 사용 처리 (가상계좌도 계좌 발급 시점에 쿠폰 차감 - 미입금 취소 시 복원은 웹훅에서 처리)
     if (appliedCoupon) {
       const { data: couponUpdateResult, error: couponUseError } = await supabase
         .from('user_coupons')
@@ -220,30 +242,47 @@ serve(async (req) => {
       }
     }
 
-    // 6. purchases 테이블에 구매 기록 생성
-    const { error: purchaseError } = await supabase
-      .from('purchases')
-      .insert({
-        user_id: user.id,
-        course_id: order.course_id,
-        order_id: orderId,
-        payment_key: paymentKey,
-        status: 'completed',
-        payment_method: 'tosspayments',
-        amount: parseInt(amount),
-        purchased_at: new Date().toISOString(),
-      })
+    // 6. 가상계좌가 아닌 경우에만 즉시 purchases 생성 (가상계좌는 입금 확인 웹훅에서 생성)
+    if (!isWaitingForDeposit) {
+      const { error: purchaseError } = await supabase
+        .from('purchases')
+        .insert({
+          user_id: user.id,
+          course_id: order.course_id,
+          order_id: orderId,
+          payment_key: paymentKey,
+          status: 'completed',
+          payment_method: 'tosspayments',
+          amount: parseInt(amount),
+          purchased_at: new Date().toISOString(),
+        })
 
-    if (purchaseError && purchaseError.code !== '23505') {
-      console.error('구매 기록 생성 실패:', purchaseError)
+      if (purchaseError && purchaseError.code !== '23505') {
+        console.error('구매 기록 생성 실패:', purchaseError)
+      }
     }
 
     // 7. 성공 응답
+    const responseOrder = {
+      ...order,
+      status: isWaitingForDeposit ? 'WAITING_FOR_DEPOSIT' : 'DONE',
+      payment_key: paymentKey,
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
-        order: { ...order, status: 'DONE', payment_key: paymentKey },
+        order: responseOrder,
         course,
+        isVirtualAccount,
+        isWaitingForDeposit,
+        virtualAccountInfo: isWaitingForDeposit && confirmResult.virtualAccount ? {
+          accountNumber: confirmResult.virtualAccount.accountNumber,
+          bank: confirmResult.virtualAccount.bankCode,
+          bankName: confirmResult.virtualAccount.bank,
+          customerName: confirmResult.virtualAccount.customerName,
+          dueDate: confirmResult.virtualAccount.dueDate,
+        } : null,
         appliedCoupon: appliedCoupon ? {
           id: appliedCoupon.id,
           name: appliedCoupon.coupons.name,
