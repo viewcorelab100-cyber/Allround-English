@@ -6210,12 +6210,14 @@
 
         // --- 학생에게 쿠폰 발급 ---
         let issueStudentList = []; // 전체 학생 목록 캐시
+        let completedStudentIds = new Set(); // 완강 학생 ID 캐시
 
         async function openIssueCouponModal() {
             document.getElementById('issue-coupon-modal').classList.remove('hidden');
             document.getElementById('issue-coupon-preview').classList.add('hidden');
             document.getElementById('issue-student-search').value = '';
             document.getElementById('issue-select-all').checked = false;
+            document.getElementById('issue-completion-filter').value = 'all';
 
             // 학생 목록 로드
             try {
@@ -6230,6 +6232,45 @@
                 console.error(e);
                 issueStudentList = [];
             }
+
+            // 완강 학생 목록 로드 (진도율 100%)
+            try {
+                const { data: completions } = await window.supabase
+                    .from('lesson_progress')
+                    .select('user_id, course_id, lessons!inner(course_id)')
+                    .eq('completed', true);
+
+                // 사용자별 강의별 완료 레슨 수 계산
+                const userCourseProgress = {};
+                (completions || []).forEach(p => {
+                    const key = `${p.user_id}_${p.course_id}`;
+                    userCourseProgress[key] = (userCourseProgress[key] || 0) + 1;
+                });
+
+                // 각 강의의 총 레슨 수 조회
+                const { data: courses } = await window.supabase
+                    .from('courses')
+                    .select('id, lessons(id)');
+
+                const courseLessonCount = {};
+                (courses || []).forEach(c => {
+                    courseLessonCount[c.id] = c.lessons?.length || 0;
+                });
+
+                // 완강한 학생 ID 수집
+                completedStudentIds = new Set();
+                Object.entries(userCourseProgress).forEach(([key, count]) => {
+                    const [userId, courseId] = key.split('_');
+                    const totalLessons = courseLessonCount[courseId] || 0;
+                    if (totalLessons > 0 && count >= totalLessons) {
+                        completedStudentIds.add(userId);
+                    }
+                });
+            } catch (e) {
+                console.error('완강 학생 조회 오류:', e);
+                completedStudentIds = new Set();
+            }
+
             renderIssueStudentList();
 
             // 활성 쿠폰 목록 로드
