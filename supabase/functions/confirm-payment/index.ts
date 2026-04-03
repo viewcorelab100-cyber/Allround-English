@@ -161,11 +161,13 @@ serve(async (req) => {
       )
     }
 
-    console.log('토스 결제 승인 성공:', { orderId, paymentKey, amount, method: confirmResult.method, status: confirmResult.status })
+    console.log('토스 결제 승인 성공 - 전체 응답:', JSON.stringify(confirmResult))
+    console.log('토스 결제 승인 요약:', { orderId, paymentKey, amount, method: confirmResult.method, status: confirmResult.status, hasVirtualAccount: !!confirmResult.virtualAccount })
 
     // 가상계좌(무통장입금) 여부 판별
     const isVirtualAccount = confirmResult.method === '가상계좌'
     const isWaitingForDeposit = isVirtualAccount && confirmResult.status === 'WAITING_FOR_DEPOSIT'
+    console.log('가상계좌 판별:', { isVirtualAccount, isWaitingForDeposit })
 
     // 3. 강의 정보 조회 (교재 포함 여부)
     const { data: course } = await supabase
