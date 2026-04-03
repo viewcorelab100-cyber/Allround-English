@@ -227,6 +227,12 @@ async function requestPayment() {
         window.location.href = 'auth.html';
         return;
     }
+    // await 이후 currentCourse가 null이 될 수 있음 (race condition)
+    if (!currentCourse) {
+        alert('강의 정보를 불러올 수 없습니다. 페이지를 새로고침 해주세요.');
+        _paymentInFlight = false;
+        return;
+    }
     const orderResult = await createOrder(
         user.id,
         currentCourse.id,
