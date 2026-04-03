@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-03T13:27:29.455Z",
+  "lastUpdated": "2026-04-03T14:07:57.559Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -141,7 +141,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-03T11:44:15.259Z",
-        "lastUpdated": "2026-04-03T11:49:01.714Z"
+        "lastUpdated": "2026-04-03T14:07:57.559Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\toss-webhook\\index.ts"
     }
@@ -154,7 +154,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-03T13:27:29.455Z"
+    "lastActivity": "2026-04-03T14:07:57.559Z"
   },
   "history": [
     {
@@ -1054,6 +1054,12 @@
     {
       "timestamp": "2026-04-03T13:27:29.455Z",
       "feature": "confirm-payment",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-03T14:07:57.559Z",
+      "feature": "toss-webhook",
       "phase": "do",
       "action": "updated"
     }

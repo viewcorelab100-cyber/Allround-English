@@ -11,38 +11,19 @@ serve(async (req) => {
   }
 
   try {
-    // 토스페이먼츠 웹훅 서명 검증
-    const tossSecretKey = Deno.env.get('TOSS_SECRET_KEY')
-    if (!tossSecretKey) {
-      console.error('TOSS_SECRET_KEY 환경변수 미설정')
-      return new Response('Server configuration error', { status: 500 })
-    }
-
-    const rawBody = await req.text()
-    const signature = req.headers.get('TossPayments-Signature')
-
-    if (signature) {
-      const encoder = new TextEncoder()
-      const key = await crypto.subtle.importKey(
-        'raw',
-        encoder.encode(tossSecretKey),
-        { name: 'HMAC', hash: 'SHA-256' },
-        false,
-        ['sign']
-      )
-      const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(rawBody))
-      const expectedSignature = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)))
-
-      if (signature !== expectedSignature) {
-        console.error('웹훅 서명 검증 실패')
-        return new Response('Invalid signature', { status: 401 })
-      }
-    }
-
-    const body = JSON.parse(rawBody)
+    const body = await req.json()
     console.log('토스 웹훅 수신:', JSON.stringify(body))
 
     const { eventType, data } = body
+
+    // 토스페이먼츠 secret 필드로 검증 (각 결제 건에 포함된 시크릿)
+    const tossSecretKey = Deno.env.get('TOSS_SECRET_KEY')
+    if (data?.secret && tossSecretKey) {
+      if (data.secret !== tossSecretKey) {
+        console.error('웹훅 secret 검증 실패')
+        return new Response('Invalid secret', { status: 401 })
+      }
+    }
 
     // Supabase 서비스 역할 클라이언트
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
