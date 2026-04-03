@@ -105,9 +105,6 @@ serve(async (req) => {
         let discountAmount = 0
         if (coupon.discount_type === 'percentage') {
           discountAmount = Math.floor(order.amount * (coupon.discount_value / 100))
-          if (coupon.max_discount_amount && discountAmount > coupon.max_discount_amount) {
-            discountAmount = Math.floor(Number(coupon.max_discount_amount))
-          }
         } else {
           discountAmount = Math.floor(Number(coupon.discount_value))
         }
