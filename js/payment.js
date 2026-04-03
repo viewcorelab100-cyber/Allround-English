@@ -641,7 +641,7 @@ async function loadMyCoupons() {
             const c = uc.coupons;
             if (!c) return '';
             const discountText = c.discount_type === 'percentage'
-                ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                ? `${c.discount_value}%`
                 : `${Number(c.discount_value).toLocaleString()}원`;
             const code = uc.custom_code || c.code;
             const daysLeft = Math.ceil((new Date(uc.expires_at) - new Date()) / (1000 * 60 * 60 * 24));
