@@ -6367,7 +6367,13 @@
 
             container.innerHTML = filtered.map(s => {
                 const isCompleted = completedStudentIds.has(s.id);
-                const badge = isCompleted ? '<span style="color:#16A34A;font-size:10px;font-weight:bold;margin-left:4px;">완강</span>' : '';
+                const isIssued = issuedCouponStudentIds.has(s.id);
+                let badge = '';
+                if (isCompleted && isIssued) {
+                    badge = '<span style="color:#9CA3AF;font-size:10px;font-weight:bold;margin-left:4px;">발급완료</span>';
+                } else if (isCompleted) {
+                    badge = '<span style="color:#16A34A;font-size:10px;font-weight:bold;margin-left:4px;">완강</span>';
+                }
                 return `
                     <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100" style="font-size:13px;">
                         <input type="checkbox" class="issue-student-cb" value="${s.id}" onchange="updateSelectedCount()">
