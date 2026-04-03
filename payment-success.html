@@ -114,6 +114,79 @@
                             <div class="text-[#8B95A1]">결제를 확인하는 중...</div>
                         </div>
 
+                        <!-- 가상계좌 입금 대기 상태 -->
+                        <div id="virtual-account-content" class="hidden space-y-6">
+                            <!-- 대기 아이콘 -->
+                            <div class="flex justify-center pt-4">
+                                <svg class="w-20 h-20" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                                    <text x="50" y="58" text-anchor="middle" font-size="36" fill="#f59e0b" font-weight="bold">!</text>
+                                </svg>
+                            </div>
+
+                            <!-- 메시지 -->
+                            <div class="text-center space-y-2">
+                                <h1 class="text-[26px] font-bold text-[#2F2725]">입금 대기 중</h1>
+                                <p class="text-[#8B95A1] text-[15px]">아래 계좌로 입금해주시면 자동으로 수강이 시작됩니다.</p>
+                            </div>
+
+                            <!-- 가상계좌 정보 -->
+                            <div class="bg-amber-50 rounded-2xl border border-amber-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">입금 계좌 정보</h2>
+                                <div class="w-full h-px bg-amber-200"></div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">은행</span>
+                                        <span id="va-bank" class="text-[#2F2725] font-semibold">-</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[#8B95A1]">계좌번호</span>
+                                        <span id="va-account" class="text-[#2F2725] font-bold text-lg tracking-wide">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">예금주</span>
+                                        <span id="va-holder" class="text-[#2F2725]">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">입금 금액</span>
+                                        <span id="va-amount" class="text-[#2F2725] font-bold">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">입금 기한</span>
+                                        <span id="va-due" class="text-red-500 font-semibold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 주문 정보 -->
+                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">주문 내역</h2>
+                                <div class="w-full h-px bg-gray-100"></div>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">주문번호</span>
+                                        <span id="va-order-id" class="text-[#2F2725] text-sm">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-[#8B95A1]">상품명</span>
+                                        <span id="va-order-name" class="text-[#2F2725]">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 안내 -->
+                            <div class="bg-gray-50 rounded-2xl p-5 text-sm text-[#8B95A1] space-y-2">
+                                <p>입금 기한 내에 입금하지 않으시면 주문이 자동 취소됩니다.</p>
+                                <p>입금 확인 후 강의가 자동으로 열리며, 마이페이지에서 확인하실 수 있습니다.</p>
+                            </div>
+
+                            <!-- 버튼 -->
+                            <div class="space-y-3 pb-8">
+                                <a href="mypage.html" class="block w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1817] transition-colors">마이페이지에서 확인</a>
+                                <a href="index.html" class="block w-full py-4 bg-white text-[#2F2725] font-semibold rounded-2xl text-center border border-gray-200 hover:bg-gray-50 transition-colors">홈으로 돌아가기</a>
+                            </div>
+                        </div>
+
                         <!-- 성공 상태 -->
                         <div id="success-content" class="hidden space-y-6">
 
