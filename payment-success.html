@@ -630,6 +630,29 @@
             }
         }
 
+        function showVirtualAccountWaiting(order, vaInfo, finalAmount) {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('virtual-account-content').classList.remove('hidden');
+
+            document.getElementById('va-bank').textContent = vaInfo.bankName || vaInfo.bank || '-';
+            document.getElementById('va-account').textContent = vaInfo.accountNumber || '-';
+            document.getElementById('va-holder').textContent = vaInfo.customerName || '-';
+
+            const displayAmount = finalAmount !== null && finalAmount !== undefined ? finalAmount : order.amount;
+            document.getElementById('va-amount').textContent = `\u20A9${displayAmount.toLocaleString()}`;
+
+            if (vaInfo.dueDate) {
+                const due = new Date(vaInfo.dueDate);
+                document.getElementById('va-due').textContent = due.toLocaleString('ko-KR', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+
+            document.getElementById('va-order-id').textContent = order.id;
+            document.getElementById('va-order-name').textContent = order.order_name;
+        }
+
         function showError(message) {
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('error-state').classList.remove('hidden');
