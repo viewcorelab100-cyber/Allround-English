@@ -5918,6 +5918,24 @@
             }).join('');
         }
 
+        function updateDiscountValueHint() {
+            const type = document.getElementById('coupon-discount-type').value;
+            const label = document.getElementById('coupon-discount-value-label');
+            const suffix = document.getElementById('coupon-discount-value-suffix');
+            const input = document.getElementById('coupon-discount-value');
+            if (type === 'percentage') {
+                label.textContent = '할인 값 (%) *';
+                suffix.textContent = '%';
+                input.placeholder = '10';
+                input.max = 100;
+            } else {
+                label.textContent = '할인 값 (원) *';
+                suffix.textContent = '원';
+                input.placeholder = '5000';
+                input.removeAttribute('max');
+            }
+        }
+
         function openCouponModal(couponId = null) {
             document.getElementById('coupon-modal').classList.remove('hidden');
             document.getElementById('coupon-form').reset();
