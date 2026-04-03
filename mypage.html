@@ -1414,13 +1414,7 @@
                                 <p class="text-[10px] text-[#C5C5C5] uppercase tracking-widest mb-1">Coupon Code</p>
                                 <p class="text-lg font-mono font-bold text-[#2F2725] tracking-[0.2em]">${escapeHTML(coupon.custom_code || coupon.coupons.code)}</p>
                             </div>
-                            <div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
-                                <span class="text-[#C5C5C5]">
-                                    ${coupon.coupons.min_purchase_amount > 0
-                                        ? `Min. Purchase \u20A9${coupon.coupons.min_purchase_amount.toLocaleString()}`
-                                        : 'No Min. Purchase'
-                                    }
-                                </span>
+                            <div class="flex items-center justify-end text-[10px] uppercase tracking-widest font-bold">
                                 <span class="${daysLeft <= 2 ? 'text-red-500' : 'text-[#8B95A1]'}">
                                     ${daysLeft} Days Left
                                 </span>
