@@ -6231,6 +6231,7 @@
         // --- 학생에게 쿠폰 발급 ---
         let issueStudentList = []; // 전체 학생 목록 캐시
         let completedStudentIds = new Set(); // 완강 학생 ID 캐시
+        let issuedCouponStudentIds = new Set(); // 완강쿠폰 발급 완료 학생 ID
 
         async function openIssueCouponModal() {
             document.getElementById('issue-coupon-modal').classList.remove('hidden');
