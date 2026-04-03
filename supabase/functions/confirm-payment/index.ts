@@ -117,7 +117,7 @@ serve(async (req) => {
       }
     }
 
-    if (parseInt(amount) !== expectedAmount) {
+    if (Math.floor(Number(amount)) !== Math.floor(expectedAmount)) {
       console.error('금액 불일치:', { expected: expectedAmount, received: amount })
       return new Response(
         JSON.stringify({ success: false, error: '결제 금액이 일치하지 않습니다.' }),
