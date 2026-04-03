@@ -79,15 +79,22 @@ serve(async (req) => {
 
       if (status === 'DONE') {
         // 실제 입금 완료 → 주문 완료 처리
+
+        // 이미 완료됐거나, 입금 대기 상태가 아닌 주문은 무시
         if (order.status === 'DONE') {
           console.log('이미 완료된 주문:', orderId)
-          return new Response(
-            JSON.stringify({ success: true, message: '이미 처리된 주문입니다.' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          )
+          return new Response(JSON.stringify({ success: true, message: '이미 처리됨' }), {
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+        if (order.status !== 'WAITING_FOR_DEPOSIT') {
+          console.error('입금 대기 상태가 아닌 주문에 DONE 웹훅 수신:', { orderId, currentStatus: order.status })
+          return new Response(JSON.stringify({ success: false, error: '잘못된 주문 상태' }), {
+            headers: { 'Content-Type': 'application/json' },
+          })
         }
 
-        // 1. orders 상태를 DONE으로 업데이트
+        // 1. orders 상태를 DONE으로 업데이트 (WAITING_FOR_DEPOSIT인 경우만)
         const { error: updateError } = await supabase
           .from('orders')
           .update({
@@ -96,16 +103,17 @@ serve(async (req) => {
             paid_at: new Date().toISOString(),
           })
           .eq('id', orderId)
+          .eq('status', 'WAITING_FOR_DEPOSIT')
 
         if (updateError) {
           console.error('웹훅 주문 업데이트 실패:', updateError)
-          return new Response(
-            JSON.stringify({ success: false, error: '주문 상태 업데이트 실패' }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-          )
+          return new Response(JSON.stringify({ success: false, error: '주문 상태 업데이트 실패' }), {
+            headers: { 'Content-Type': 'application/json' }, status: 500,
+          })
         }
 
-        // 2. purchases 레코드 생성 (이 시점에서 강의 접근 권한 부여)
+        // 2. purchases 레코드 생성 (paid_amount가 있으면 사용, 없으면 원래 amount)
+        const purchaseAmount = order.paid_amount || order.amount
         const { error: purchaseError } = await supabase
           .from('purchases')
           .insert({
@@ -115,7 +123,7 @@ serve(async (req) => {
             payment_key: paymentKey,
             status: 'completed',
             payment_method: 'tosspayments',
-            amount: order.amount,
+            amount: purchaseAmount,
             purchased_at: new Date().toISOString(),
           })
 
@@ -123,9 +131,17 @@ serve(async (req) => {
           console.error('웹훅 구매 기록 생성 실패:', purchaseError)
         }
 
-        console.log('가상계좌 입금 완료 처리 성공:', { orderId, paymentKey })
+        console.log('가상계좌 입금 완료 처리 성공:', { orderId, paymentKey, amount: purchaseAmount })
 
       } else if (status === 'CANCELED' || status === 'EXPIRED') {
+        // 입금 대기 상태가 아니면 무시
+        if (order.status !== 'WAITING_FOR_DEPOSIT') {
+          console.log('이미 처리된 주문의 취소/만료 웹훅 무시:', { orderId, currentStatus: order.status })
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
         // 입금 기한 만료 또는 취소
         const { error: cancelError } = await supabase
           .from('orders')
@@ -134,6 +150,7 @@ serve(async (req) => {
             updated_at: new Date().toISOString(),
           })
           .eq('id', orderId)
+          .eq('status', 'WAITING_FOR_DEPOSIT')
 
         if (cancelError) {
           console.error('웹훅 주문 취소 업데이트 실패:', cancelError)
