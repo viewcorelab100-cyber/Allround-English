@@ -6220,13 +6220,12 @@
                 const c = activeCoupons.find(t => t.id === this.value);
                 if (c) {
                     const discountText = c.discount_type === 'percentage'
-                        ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                        ? `${c.discount_value}%`
                         : `${Number(c.discount_value).toLocaleString()}원`;
                     preview.innerHTML = `
                         <div><strong>${c.name}</strong></div>
                         <div style="color:#6B7280;">할인: ${discountText}</div>
                         <div style="color:#6B7280;">유효기간: 발급일로부터 ${c.valid_days || 7}일</div>
-                        ${c.min_purchase_amount > 0 ? `<div style="color:#6B7280;">최소 구매: ${Number(c.min_purchase_amount).toLocaleString()}원</div>` : ''}
                     `;
                     preview.classList.remove('hidden');
                 } else {
