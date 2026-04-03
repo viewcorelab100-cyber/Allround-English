@@ -39,7 +39,7 @@ serve(async (req) => {
         console.error('웹훅 필수 파라미터 누락:', { orderId, paymentKey })
         return new Response(
           JSON.stringify({ success: false, error: '필수 파라미터 누락' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+          { headers: { 'Content-Type': 'application/json' }, status: 400 }
         )
       }
 
@@ -54,7 +54,7 @@ serve(async (req) => {
         console.error('웹훅 주문 조회 실패:', orderError)
         return new Response(
           JSON.stringify({ success: false, error: '주문을 찾을 수 없습니다.' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
+          { headers: { 'Content-Type': 'application/json' }, status: 404 }
         )
       }
 
