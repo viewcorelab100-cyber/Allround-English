@@ -1498,15 +1498,19 @@
                     <div>
                         <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">할인 유형 *</label>
                         <select id="coupon-discount-type" required
+                                onchange="updateDiscountValueHint()"
                                 class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
                             <option value="percentage">퍼센트 (%)</option>
                             <option value="fixed">정액 (원)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">할인 값 *</label>
-                        <input type="number" id="coupon-discount-value" required min="1" placeholder="10"
-                               class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                        <label id="coupon-discount-value-label" class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">할인 값 (%) *</label>
+                        <div class="relative">
+                            <input type="number" id="coupon-discount-value" required min="1" placeholder="10"
+                                   class="w-full px-3 py-2 pr-10 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                            <span id="coupon-discount-value-suffix" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none">%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
