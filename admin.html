@@ -3854,6 +3854,8 @@
                 thumbnail_url: document.getElementById('course-thumbnail').value,
                 is_published: true,
                 visibility: visibility,
+                enrollment_days: parseInt(document.getElementById('course-enrollment-days').value) || 180,
+                is_complete: document.getElementById('course-is-complete').checked,
                 updated_at: new Date().toISOString()
             };
 
