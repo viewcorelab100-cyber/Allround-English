@@ -30,10 +30,18 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // 수신 데이터 상세 로깅
+    console.log('[WEBHOOK] eventType:', eventType)
+    console.log('[WEBHOOK] data keys:', Object.keys(data || {}))
+    console.log('[WEBHOOK] data.orderId:', data?.orderId)
+    console.log('[WEBHOOK] data.paymentKey:', data?.paymentKey)
+    console.log('[WEBHOOK] data.status:', data?.status)
+
     // 이벤트 타입별 처리
     if (eventType === 'DEPOSIT_CALLBACK') {
       // 가상계좌 입금 완료
       const { orderId, paymentKey, status } = data
+      console.log('[DEPOSIT_CALLBACK] 처리 시작:', { orderId, paymentKey, status })
 
       if (!orderId || !paymentKey) {
         console.error('웹훅 필수 파라미터 누락:', { orderId, paymentKey })
