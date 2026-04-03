@@ -6307,32 +6307,45 @@
 
         function renderIssueStudentList() {
             const keyword = (document.getElementById('issue-student-search')?.value || '').toLowerCase();
+            const completionFilter = document.getElementById('issue-completion-filter')?.value || 'all';
+
             const filtered = issueStudentList.filter(s => {
                 const name = (s.name || '').toLowerCase();
                 const email = (s.email || '').toLowerCase();
-                return !keyword || name.includes(keyword) || email.includes(keyword);
+                const matchesKeyword = !keyword || name.includes(keyword) || email.includes(keyword);
+                const matchesCompletion = completionFilter === 'all' || completedStudentIds.has(s.id);
+                return matchesKeyword && matchesCompletion;
             });
 
             const container = document.getElementById('issue-student-list');
             document.getElementById('issue-student-count').textContent = filtered.length;
 
             if (!filtered.length) {
-                container.innerHTML = '<div class="px-3 py-4 text-center text-sm" style="color:#9CA3AF;">검색 결과 없음</div>';
+                const msg = completionFilter === 'completed' ? '완강한 학생이 없습니다' : '검색 결과 없음';
+                container.innerHTML = `<div class="px-3 py-4 text-center text-sm" style="color:#9CA3AF;">${msg}</div>`;
                 updateSelectedCount();
                 return;
             }
 
-            container.innerHTML = filtered.map(s => `
-                <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100" style="font-size:13px;">
-                    <input type="checkbox" class="issue-student-cb" value="${s.id}" onchange="updateSelectedCount()">
-                    <span class="font-medium" style="color:#111;">${s.name || '이름없음'}</span>
-                    <span style="color:#9CA3AF;font-size:11px;">${s.email || ''}</span>
-                </label>
-            `).join('');
+            container.innerHTML = filtered.map(s => {
+                const isCompleted = completedStudentIds.has(s.id);
+                const badge = isCompleted ? '<span style="color:#16A34A;font-size:10px;font-weight:bold;margin-left:4px;">완강</span>' : '';
+                return `
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100" style="font-size:13px;">
+                        <input type="checkbox" class="issue-student-cb" value="${s.id}" onchange="updateSelectedCount()">
+                        <span class="font-medium" style="color:#111;">${s.name || '이름없음'}${badge}</span>
+                        <span style="color:#9CA3AF;font-size:11px;">${s.email || ''}</span>
+                    </label>
+                `;
+            }).join('');
             updateSelectedCount();
         }
 
         function filterIssueStudents() {
+            renderIssueStudentList();
+        }
+
+        function filterByCompletion() {
             renderIssueStudentList();
         }
 
