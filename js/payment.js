@@ -713,9 +713,7 @@ async function applyCoupon() {
                     code,
                     name,
                     discount_type,
-                    discount_value,
-                    min_purchase_amount,
-                    max_discount_amount
+                    discount_value
                 )
             `)
             .eq('user_id', user.id)
