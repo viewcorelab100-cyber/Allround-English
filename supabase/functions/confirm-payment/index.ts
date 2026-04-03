@@ -92,8 +92,7 @@ serve(async (req) => {
         .select(`
           *,
           coupons (
-            code, name, discount_type, discount_value,
-            min_purchase_amount, max_discount_amount
+            code, name, discount_type, discount_value
           )
         `)
         .eq('id', couponId)
