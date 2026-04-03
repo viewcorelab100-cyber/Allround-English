@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-03T11:43:30.760Z",
+  "lastUpdated": "2026-04-03T11:44:15.259Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -9,7 +9,8 @@
     ".claude",
     "send-nhn-alimtalk",
     "auto-send-notifications",
-    "send-nhn-sms"
+    "send-nhn-sms",
+    "toss-webhook"
   ],
   "primaryFeature": "notification-system",
   "features": {
@@ -130,6 +131,19 @@
         "lastUpdated": "2026-03-29T13:55:06.756Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\send-nhn-sms\\index.ts"
+    },
+    "toss-webhook": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-03T11:44:15.259Z",
+        "lastUpdated": "2026-04-03T11:44:15.259Z"
+      },
+      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\toss-webhook\\index.ts"
     }
   },
   "pipeline": {
@@ -140,7 +154,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-03T11:43:30.760Z"
+    "lastActivity": "2026-04-03T11:44:15.259Z"
   },
   "history": [
     {
@@ -920,6 +934,12 @@
     {
       "timestamp": "2026-04-03T11:43:30.760Z",
       "feature": "confirm-payment",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-03T11:44:15.259Z",
+      "feature": "toss-webhook",
       "phase": "do",
       "action": "updated"
     }
