@@ -5887,9 +5887,9 @@
             }
             tbody.innerHTML = items.map(c => {
                 const discountText = c.discount_type === 'percentage'
-                    ? `${c.discount_value}%${c.max_discount_amount ? ' (최대 ' + Number(c.max_discount_amount).toLocaleString() + '원)' : ''}`
+                    ? `${c.discount_value}%`
                     : `${Number(c.discount_value).toLocaleString()}원`;
-                const typeLabels = { completion: '수강완료', welcome: '가입환영', promotion: '프로모션', manual: '수동발급' };
+                const typeLabels = { completion: '수강완료', manual: '수동발급' };
                 const statusColor = c.is_active ? 'color:#16A34A;' : 'color:#9CA3AF;';
                 const statusText = c.is_active ? '활성' : '비활성';
                 const stats = couponTemplateStats[c.id] || { issued: 0, used: 0 };
