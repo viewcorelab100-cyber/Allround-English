@@ -641,11 +641,18 @@
 
         // 주문 카드 렌더링
         function renderOrderCard(order) {
+            const isWaitingDeposit = order.status === 'WAITING_FOR_DEPOSIT';
             // 택배 정보가 있으면 표시 (has_textbook과 무관)
             const hasShippingInfo = order.tracking_number || order.shipping_address;
 
+            // 가상계좌 정보 파싱
+            let vaInfo = null;
+            if (isWaitingDeposit && order.virtual_account_info) {
+                try { vaInfo = JSON.parse(order.virtual_account_info); } catch(e) {}
+            }
+
             return `
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                <div class="bg-white rounded-2xl border ${isWaitingDeposit ? 'border-amber-300' : 'border-gray-200'} p-6 space-y-4">
                     <div class="flex justify-between items-start">
                         <div class="flex space-x-4">
                             <div class="w-20 h-20 bg-cover bg-center flex-shrink-0 rounded-xl"
@@ -657,8 +664,23 @@
                                 <p class="text-sm text-[#8B95A1]">\u20A9${(order.amount || 0).toLocaleString()}</p>
                             </div>
                         </div>
-                        ${getShippingStatusBadge(order.shipping_status)}
+                        ${isWaitingDeposit
+                            ? '<span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full whitespace-nowrap">입금 대기</span>'
+                            : getShippingStatusBadge(order.shipping_status)}
                     </div>
+
+                    ${isWaitingDeposit && vaInfo ? `
+                    <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-2">
+                        <p class="text-amber-800 text-sm font-semibold">입금 계좌 정보</p>
+                        <div class="text-sm space-y-1">
+                            <p class="text-[#2F2725]"><span class="text-[#8B95A1]">은행:</span> ${escapeHTML(vaInfo.bankName || vaInfo.bank)}</p>
+                            <p class="text-[#2F2725] font-bold"><span class="text-[#8B95A1]">계좌:</span> ${escapeHTML(vaInfo.accountNumber)}</p>
+                            <p class="text-[#2F2725]"><span class="text-[#8B95A1]">예금주:</span> ${escapeHTML(vaInfo.customerName)}</p>
+                            ${vaInfo.dueDate ? `<p class="text-red-500"><span class="text-[#8B95A1]">입금기한:</span> ${new Date(vaInfo.dueDate).toLocaleString('ko-KR')}</p>` : ''}
+                        </div>
+                        <p class="text-xs text-[#8B95A1] mt-2">입금 확인 후 자동으로 강의가 열립니다.</p>
+                    </div>
+                    ` : ''}
 
                     ${hasShippingInfo ? `
                     <div class="pt-4 border-t border-gray-200 space-y-3">
