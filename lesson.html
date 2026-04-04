@@ -2479,7 +2479,7 @@
 
         function showAssignmentSequence() {
             // 시간을 충분히 시청했는지 확인 (95% 이상)
-            const watchedPercent = (maxWatchedTime / videoDuration) * 100;
+            const watchedPercent = getWatchedProgress(videoDuration);
             if (watchedPercent < 95) {
                 showAssignmentModal('', '강의를 끝까지 시청해주세요', `현재 시청률: ${Math.round(watchedPercent)}%\n95% 이상 시청해야 과제를 진행할 수 있습니다.`);
                 return;
