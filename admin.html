@@ -4815,6 +4815,7 @@
                     .from('orders')
                     .select('*')
                     .eq('status', 'DONE')
+                    .eq('payment_type', 'textbook')
                     .order('created_at', { ascending: false });
 
                 // 기간 필터 적용
