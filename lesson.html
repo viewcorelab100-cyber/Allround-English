@@ -1045,7 +1045,7 @@
                 const currentTime = await player.getCurrentTime();
                 
                 const progressData = {
-                    watchedSeconds: maxWatchedTime,
+                    watchedSeconds: Math.max(watchedSet.size, dbWatchedSeconds),
                     totalSeconds: videoDuration,
                     lastPosition: currentTime
                 };
