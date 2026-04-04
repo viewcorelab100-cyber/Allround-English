@@ -1011,30 +1011,27 @@
         async function loadLastPositionForVimeo() {
             const player = customVimeoPlayer?.player || vimeoPlayer;
             if (!currentUser || !currentLesson || !player) return;
-            
+
             const result = await getLessonProgress(currentUser.id, currentLesson.id);
-            
+
             if (result.success && result.data) {
+                // DB 기존 시청 초 복원 (UI 점프 방지)
                 if (result.data.watched_seconds) {
-                    maxWatchedTime = result.data.watched_seconds;
+                    dbWatchedSeconds = result.data.watched_seconds;
                 }
                 if (result.data.last_position && videoDuration > 0) {
-                    // 이미 완료된 레슨(95%+)은 처음부터 재생
                     const isCompleted = result.data.progress_percent >= 95 || result.data.is_completed;
                     if (!isCompleted) {
                         const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
                         if (safePosition > 0 && safePosition < videoDuration) {
                             player.setCurrentTime(safePosition);
                         }
-                        // lastPlaybackTime도 복원 위치로 설정 (스킵 감지 오작동 방지)
-                        lastPlaybackTime = result.data.last_position;
                     }
                 }
                 // 저장된 진도율 표시
                 if (result.data.progress_percent) {
                     document.getElementById('progress-bar').style.width = `${result.data.progress_percent}%`;
                     document.getElementById('progress-text').textContent = `${result.data.progress_percent}%`;
-                    // 95% 이상이면 과제 섹션 표시
                     checkAndShowAssignment(result.data.progress_percent);
                 }
             }
