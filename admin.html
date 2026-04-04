@@ -310,6 +310,10 @@
         </div>
     </header>
 
+    <script>
+        // 페이지 로딩 중 클릭 시 ReferenceError 방지 스텁 (메인 스크립트가 덮어씀)
+        function showSection(s) { window._pendingSection = s; }
+    </script>
     <div class="flex pt-20">
         <!-- 사이드바 -->
         <aside class="fixed left-0 top-20 h-[calc(100vh-5rem)] w-64 border-r border-gray-300 overflow-y-auto py-8" style="background-color:#F0F1F3;">

@@ -1,20 +1,4 @@
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/auto-push.sh",
-            "timeout": 30,
-            "statusMessage": "Auto commit & push...",
-            "async": true
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(tasklist:*)",
@@ -48,7 +32,24 @@
       "Bash(git -C \"C:\\\\Users\\\\이현수\\\\Documents\\\\GitHub\\\\Allround-English\" status --short)",
       "Bash(npx supabase secrets set:*)",
       "WebSearch",
-      "WebFetch(domain:swarmify.com)"
+      "WebFetch(domain:swarmify.com)",
+      "Skill(bkit:pdca)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/auto-push.sh",
+            "timeout": 30,
+            "statusMessage": "Auto commit & push...",
+            "async": true
+          }
+        ]
+      }
     ]
   }
 }
