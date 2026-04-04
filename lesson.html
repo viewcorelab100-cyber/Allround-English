@@ -963,34 +963,35 @@
                 const duration = data.duration;
                 videoDuration = duration;
 
-                updateMaxWatchedTime(currentTime);
+                recordWatchedSecond(currentTime);
 
-                // UI 업데이트 (시청 진도 바)
-                const progress = duration > 0 ? (maxWatchedTime / duration) * 100 : 0;
+                // UI 업데��트 (시청 진도 바)
+                const progress = getWatchedProgress(duration);
                 document.getElementById('progress-bar').style.width = `${progress}%`;
-                document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+                document.getElementById('progress-text').textContent = `${progress}%`;
 
                 // 퀴즈 시간 체크
                 checkQuizTime(currentTime);
 
-                // 95% 이상이면 과제 섹션 표시
-                checkAndShowAssignment(Math.round(progress));
+                // 95% 이상이면 과제 섹�� 표시
+                checkAndShowAssignment(progress);
             });
 
-            // 일시정지 시 진도 저장
+            // 일시정지 시 ��도 저장
             vimeoPlayer.on('pause', function() {
                 saveVimeoProgress();
             });
 
             // 영상 종료 시 진도 저장 및 과제 모달 표시
             vimeoPlayer.on('ended', function() {
-                // 시간을 꽉 채워서 들었는지 확인 (95% 이상 시청해야 완료)
-                const watchedPercent = videoDuration > 0 ? (maxWatchedTime / videoDuration) * 100 : 0;
-                if (watchedPercent >= 95) {
-                    maxWatchedTime = videoDuration; // 95% 이상이면 완료 처리
+                const progress = getWatchedProgress(videoDuration);
+                if (progress >= 95) {
+                    // 95% 이상 시청 시 나머지 초도 채워서 100% 처리
+                    const totalSec = Math.floor(videoDuration);
+                    for (let s = 0; s <= totalSec; s++) watchedSet.add(s);
                 }
                 saveVimeoProgress();
-                showAssignmentSequence(); // 과제 순서대로 모달 표시
+                showAssignmentSequence();
             });
 
             // 주기적으로 진도 저장 (15초마다, 재생 중일 때만)
