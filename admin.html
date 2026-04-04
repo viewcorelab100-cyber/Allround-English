@@ -4439,8 +4439,10 @@
 
         // 페이지 초기화
         async function init() {
-            // 기본 섹션을 먼저 표시 (인증 확인 전에 UI를 보여줌)
-            showSection('assignments');
+            // 로딩 중 클릭된 섹션이 있으면 그것을, 없으면 기본값 표시
+            const pendingSection = window._pendingSection || 'assignments';
+            delete window._pendingSection;
+            showSection(pendingSection);
 
             try {
                 const hasAccess = await checkAdminAccess();
