@@ -869,20 +869,12 @@
             const container = document.getElementById('video-container');
             
             if (lesson.video_url) {
-                if (lesson.video_url.includes('youtube.com') || lesson.video_url.includes('youtu.be')) {
-                    const videoId = extractYouTubeId(lesson.video_url);
-                    container.innerHTML = `<div class="aspect-video"><iframe id="youtube-player" class="w-full h-full" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
-                    // YouTube API 로드
-                    loadYouTubeAPI();
-                } else if (lesson.video_url.includes('vimeo.com')) {
+                if (lesson.video_url.includes('vimeo.com')) {
                     const vimeoId = extractVimeoId(lesson.video_url);
-                    // 커스텀 Vimeo 플레이어 사용
                     container.innerHTML = '<div id="custom-vimeo-container"></div>';
                     initCustomVimeoPlayer(vimeoId);
                 } else {
-                    container.innerHTML = `<div class="aspect-video"><video id="video-player" class="w-full h-full" controls><source src="${lesson.video_url}" type="video/mp4">브라우저가 비디오를 지원하지 않습니다.</video></div>`;
-                    videoElement = document.getElementById('video-player');
-                    setupNativeVideoTracking();
+                    container.innerHTML = `<div class="aspect-video flex items-center justify-center text-gray-500 bg-black"><div class="text-center"><p class="text-xl mb-2">지원하지 않는 영상 형식입니다</p><p class="text-sm">Vimeo 영상만 지원됩니다.</p></div></div>`;
                 }
             } else {
                 container.innerHTML = `<div class="aspect-video flex items-center justify-center text-gray-500 bg-black"><div class="text-center"><p class="text-xl mb-2">영상이 준비 중입니다</p><p class="text-sm">곧 업로드될 예정입니다.</p></div></div>`;
