@@ -1006,7 +1006,7 @@
                     dbWatchedSeconds = result.data.watched_seconds;
                 }
                 if (result.data.last_position && videoDuration > 0) {
-                    const isCompleted = result.data.progress_percent >= 95 || result.data.is_completed;
+                    const isCompleted = result.data.progress_percent >= 90 || result.data.is_completed;
                     if (!isCompleted) {
                         const safePosition = Math.min(result.data.last_position, videoDuration - 0.5);
                         if (safePosition > 0 && safePosition < videoDuration) {
