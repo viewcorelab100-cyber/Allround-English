@@ -1689,6 +1689,9 @@
         // 코스 전체 완료 여부 체크
         async function checkCourseCompletion() {
             if (!currentUser || !currentCourse || !courseLessons.length) return;
+
+            // 코스 업로드가 완료되지 않았으면 완강 체크하지 않음
+            if (currentCourse.is_complete === false) return;
             
             try {
                 // 모든 레슨의 진도 가져오기
