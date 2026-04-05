@@ -2478,10 +2478,17 @@
         const assignmentSequence = ['quiz', 'note', 'blog', 'image'];
 
         function showAssignmentSequence() {
-            // 시간을 충분히 시청했는지 확인 (95% 이상)
+            // 시간을 충분히 시청했는지 확인 (90% 이상)
             const watchedPercent = getWatchedProgress(videoDuration);
-            if (watchedPercent < 95) {
-                showAssignmentModal('', '강의를 끝까지 시청해주세요', `현재 시청률: ${Math.round(watchedPercent)}%\n95% 이상 시청해야 과제를 진행할 수 있습니다.`);
+            if (watchedPercent < 90) {
+                showAssignmentModal('', '강의 시청이 부족합니다', `현재 시청률: ${Math.round(watchedPercent)}%\n\n강의 시청이 90% 미만이라 강의를 더 들어야 합니다.\n어려웠던 부분을 다시 한번 시청해보는 건 어떨까요?`, function() {
+                    // 모달 닫힌 후 영상 처음부터 다시 재생
+                    const player = customVimeoPlayer?.player || vimeoPlayer;
+                    if (player) {
+                        player.setCurrentTime(0);
+                        player.play();
+                    }
+                });
                 return;
             }
 
