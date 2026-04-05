@@ -1192,11 +1192,11 @@
             saveCurrentProgress();
         });
 
-        // 과제 섹션 표시/숨김 (95% 이상일 때만 표시)
+        // 과제 섹션 표시/숨김 (90% 이상일 때만 표시)
         function checkAndShowAssignment(progress) {
             currentProgress = progress;
 
-            if (progress >= 95 && currentUser) {
+            if (progress >= 90 && currentUser) {
                 // 과제 카드 컨테이너 표시
                 document.getElementById('assignment-cards-container')?.classList.remove('hidden');
                 
