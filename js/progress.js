@@ -30,7 +30,7 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
             watched_seconds: watchedSeconds,
             total_seconds: progressData.totalSeconds,
             progress_percent: Math.min(progressPercent, 100),
-            is_completed: watchedSeconds >= progressData.totalSeconds * 0.95,
+            is_completed: watchedSeconds >= progressData.totalSeconds * 0.90,
             last_position: progressData.lastPosition || 0,
             updated_at: new Date().toISOString()
         };
