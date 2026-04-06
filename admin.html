@@ -4768,6 +4768,11 @@
                             비밀번호 초기화
                         </button>
                         <p class="text-[10px] text-gray-600 mt-2">비밀번호가 <strong>allround1234</strong>로 초기화됩니다. 학생에게 로그인 후 변경을 안내해주세요.</p>
+                        <button onclick="deleteMember('${member.id}', '${mName}')"
+                                class="w-full py-3 mt-3 bg-red-500 bg-opacity-20 text-red-400 text-xs uppercase tracking-widest font-bold border border-red-500 border-opacity-30 hover:bg-opacity-40 transition-all demo-restricted">
+                            회원 삭제
+                        </button>
+                        <p class="text-[10px] text-gray-600 mt-2">회원 계정과 관련 데이터가 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</p>
                     </div>
                 </div>
             `;
