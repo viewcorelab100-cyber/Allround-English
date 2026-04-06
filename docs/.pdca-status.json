@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-06T21:02:39.367Z",
+  "lastUpdated": "2026-04-06T21:12:22.766Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -197,7 +197,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-06T17:58:16.513Z",
-        "lastUpdated": "2026-04-06T21:02:27.798Z"
+        "lastUpdated": "2026-04-06T21:12:22.766Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\naver-auth\\index.ts"
     }
@@ -210,7 +210,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-06T21:02:39.367Z"
+    "lastActivity": "2026-04-06T21:12:22.766Z"
   },
   "history": [
     {
@@ -1236,6 +1236,12 @@
     {
       "timestamp": "2026-04-06T21:02:39.367Z",
       "feature": "js",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-06T21:12:22.766Z",
+      "feature": "naver-auth",
       "phase": "do",
       "action": "updated"
     }

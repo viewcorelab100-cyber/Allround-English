@@ -150,13 +150,10 @@ Deno.serve(async (req) => {
         }
       }
 
-      // 3-5. 매직 링크 생성 (세션 발급용)
+      // 3-5. 매직 링크 생성 → 토큰을 auth-callback.html로 직접 전달
       const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email,
-        options: {
-          redirectTo: `${SITE_URL}/auth-callback.html`,
-        },
       })
 
       if (linkError || !linkData) {
@@ -166,20 +163,18 @@ Deno.serve(async (req) => {
         })
       }
 
-      // action_link에서 redirect_to를 auth-callback.html로 강제 교체
-      const actionLink = linkData.properties?.action_link
-      if (actionLink) {
-        const linkUrl = new URL(actionLink)
-        linkUrl.searchParams.set('redirect_to', `${SITE_URL}/auth-callback.html`)
+      const hashed_token = linkData.properties?.hashed_token
+      if (hashed_token) {
+        // 토큰을 auth-callback.html로 전달, 클라이언트에서 verifyOtp 호출
         return new Response(null, {
           status: 302,
-          headers: { Location: linkUrl.toString() },
+          headers: { Location: `${SITE_URL}/auth-callback.html?token_hash=${hashed_token}&type=magiclink` },
         })
       }
 
       return new Response(null, {
         status: 302,
-        headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('링크 생성 실패')}` },
+        headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('토큰 생성 실패')}` },
       })
     }
 
