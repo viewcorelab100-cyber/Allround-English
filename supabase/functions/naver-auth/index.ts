@@ -166,22 +166,14 @@ Deno.serve(async (req) => {
         })
       }
 
-      // Supabase가 생성한 매직링크의 토큰을 추출하여 verify 엔드포인트로 리다이렉트
-      const hashed_token = linkData.properties?.hashed_token
-      if (hashed_token) {
-        const verifyUrl = `${SUPABASE_URL}/auth/v1/verify?type=magiclink&token=${hashed_token}&redirect_to=${encodeURIComponent(SITE_URL + '/auth-callback.html')}`
-        return new Response(null, {
-          status: 302,
-          headers: { Location: verifyUrl },
-        })
-      }
-
-      // fallback: action_link 직접 사용
+      // action_link에서 redirect_to를 auth-callback.html로 강제 교체
       const actionLink = linkData.properties?.action_link
       if (actionLink) {
+        const linkUrl = new URL(actionLink)
+        linkUrl.searchParams.set('redirect_to', `${SITE_URL}/auth-callback.html`)
         return new Response(null, {
           status: 302,
-          headers: { Location: actionLink },
+          headers: { Location: linkUrl.toString() },
         })
       }
 
