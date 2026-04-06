@@ -67,29 +67,21 @@ serve(async (req) => {
     }
 
     // 관련 데이터 삭제 (FK 제약 조건 순서 고려)
-    const tables = [
-      'teacher_feedback',
-      'quiz_results',
-      'student_submissions',
-      'lesson_progress',
-      'assignments',
-      'notification_logs',
+    const deleteTasks = [
+      { table: 'teacher_feedback', column: 'student_id' },
+      { table: 'quiz_results', column: 'user_id' },
+      { table: 'student_submissions', column: 'user_id' },
+      { table: 'lesson_progress', column: 'user_id' },
+      { table: 'assignments', column: 'user_id' },
+      { table: 'notification_logs', column: 'user_id' },
     ]
 
-    for (const table of tables) {
-      const { error } = await adminClient.from(table).delete().eq('user_id', table === 'teacher_feedback' ? 'student_id' : 'user_id', userId)
+    for (const { table, column } of deleteTasks) {
+      const { error } = await adminClient.from(table).delete().eq(column, userId)
       if (error) {
         console.warn(`Warning: failed to delete from ${table}:`, error.message)
       }
     }
-
-    // user_id 컬럼명이 다를 수 있는 테이블 개별 처리
-    await adminClient.from('teacher_feedback').delete().eq('student_id', userId)
-    await adminClient.from('quiz_results').delete().eq('user_id', userId)
-    await adminClient.from('student_submissions').delete().eq('user_id', userId)
-    await adminClient.from('lesson_progress').delete().eq('user_id', userId)
-    await adminClient.from('assignments').delete().eq('user_id', userId)
-    await adminClient.from('notification_logs').delete().eq('user_id', userId)
 
     // profiles 삭제
     const { error: profileError } = await adminClient.from('profiles').delete().eq('id', userId)
