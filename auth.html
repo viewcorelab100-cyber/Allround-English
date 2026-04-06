@@ -635,6 +635,16 @@
             alert('네이버 로그인은 현재 준비 중입니다.');
         }
 
+        function showEmailLogin() {
+            document.getElementById('login-method-select').classList.add('hidden');
+            document.getElementById('login-email-form').classList.remove('hidden');
+        }
+
+        function showLoginMethodSelect() {
+            document.getElementById('login-email-form').classList.add('hidden');
+            document.getElementById('login-method-select').classList.remove('hidden');
+        }
+
         function showEmailSignup() {
             document.getElementById('signup-method-select').classList.add('hidden');
             document.getElementById('signup-email-form').classList.remove('hidden');
