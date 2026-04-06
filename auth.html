@@ -439,25 +439,6 @@
     <script src="js/auth.js"></script>
     <script src="js/sidebar.js"></script>
     <script>
-        // 모바일 메뉴 토글
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            const overlay = menu.querySelector('.mobile-menu-overlay');
-
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.style.transform = 'translateX(0)';
-                    overlay.style.opacity = '1';
-                });
-            } else {
-                panel.style.transform = 'translateX(100%)';
-                overlay.style.opacity = '0';
-                setTimeout(() => menu.classList.add('hidden'), 300);
-            }
-        }
-
         // 커스텀 모달 함수
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
