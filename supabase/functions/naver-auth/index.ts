@@ -153,14 +153,14 @@ Deno.serve(async (req) => {
 
       // 2) 네이버 인증 에러
       if (error) {
-        return htmlRedirect(`${SITE_URL}/auth.html?error=${encodeURIComponent('네이버 인증이 취소되었습니다.')}`)
+        return redirect(`${SITE_URL}/auth.html?error=${encodeURIComponent('네이버 인증이 취소되었습니다.')}`)
       }
 
       // 3) 네이버 콜백 (code 수신) → 처리 후 HTML로 리다이렉트
       if (code) {
         const state = url.searchParams.get('state') || ''
         const tempCode = await processNaverCode(code, state)
-        return htmlRedirect(`${SITE_URL}/auth-callback.html?naver_code=${tempCode}`)
+        return redirect(`${SITE_URL}/auth-callback.html?naver_code=${tempCode}`)
       }
 
       return new Response(JSON.stringify({ error: 'Invalid request' }), {
@@ -216,6 +216,6 @@ Deno.serve(async (req) => {
 
   } catch (err) {
     console.error('naver-auth error:', err)
-    return htmlRedirect(`${SITE_URL}/auth.html?error=${encodeURIComponent(String(err))}`)
+    return redirect(`${SITE_URL}/auth.html?error=${encodeURIComponent(String(err))}`)
   }
 })
