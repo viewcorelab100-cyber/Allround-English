@@ -303,8 +303,9 @@ textarea {
 .kakao-btn {
   position: absolute;
   top: 100%;
-  right: 20px;
+  right: 0;
   margin-top: 12px;
+  margin-right: 20px;
   z-index: 996;
   display: inline-flex;
   align-items: center;
@@ -314,6 +315,13 @@ textarea {
   border-radius: 999px;
   background: #fff;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1920px) {
+  .kakao-btn {
+    right: 0;
+    margin-right: 0;
+  }
 }
 
 .kakao-btn img {
