@@ -145,60 +145,38 @@
 </head>
 <body data-active-page="mypage">
 
-    <!-- Mobile Header -->
-    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
-        <a href="index.html">
-            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
-        </a>
-        <button id="hamburger-btn" onclick="toggleMobileMenu()">
-            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
-        </button>
+    <header class="main-header">
+      <div class="shell-container">
+        <div class="shell-logo-wrap">
+          <a href="index.html" class="shell-logo"><img src="img/logo.png" alt="ALLROUND"></a>
+        </div>
+        <div class="shell-header-right">
+          <div id="auth-buttons" class="shell-auth-buttons">
+            <a href="auth.html">Login</a>
+            <a href="auth.html?mode=signup">Sign up</a>
+          </div>
+          <div id="user-menu" class="shell-user-menu">
+            <a id="admin-link" class="admin-link" href="admin.html">관리자</a>
+            <a href="mypage.html">My Page</a>
+            <button onclick="handleSignOut()">Logout</button>
+          </div>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header"><img src="img/kakao-icon.png" alt=""></a>
+          <a href="#" class="menu-btn"><img src="img/menu-icon.png" alt="menu"></a>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="shell-kakao-btn">
+            <img src="img/kakao-icon.png" alt="카카오톡"><span>카톡 상담</span>
+          </a>
+        </div>
+      </div>
     </header>
+    <div class="shell-menu-overlay"></div>
 
-    <!-- Desktop Header -->
-    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
-        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
-            <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
-            </a>
-        </div>
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
-            </div>
-            <div id="user-menu" class="hidden items-center gap-6">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="handleSignOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
-            </div>
-            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
-            </button>
-        </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
-        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
-        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
-            <div class="p-6 pt-20">
-                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
-                <nav class="space-y-6"></nav>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Layout -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex h-[calc(100vh-var(--header-h))]">
-            <!-- Sidebar -->
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6"></nav>
-            </aside>
-
-            <!-- Content Area -->
-            <div class="flex-1 relative overflow-y-auto font-suit content-area">
+    <main class="shell-main">
+      <div class="shell-grid">
+        <aside class="shell-left-bar">
+          <button type="button" class="shell-menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu"></div>
+        </aside>
+        <section class="shell-content">
                 <section class="py-12 md:py-20 px-6 md:px-10 lg:px-16">
                     <div class="max-w-5xl mx-auto">
 
