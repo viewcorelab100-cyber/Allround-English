@@ -270,31 +270,6 @@
     position: relative;
 }
 
-.sub-visual .kakao-btn {
-    position: absolute;
-    top: 15px;
-    right: 7%;
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    height: 62px;
-    padding: 0 26px 0 0;
-    border-radius: 999px;
-    background: #fff;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
-}
-
-.sub-visual .kakao-btn img {
-    width: 62px;
-    height: 62px;
-}
-
-.sub-visual .kakao-btn span {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2d2d2d;
-    white-space: nowrap;
-}
 
 .menu-title.is-active {
     color: #9fa0a0;
