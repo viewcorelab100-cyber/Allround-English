@@ -83,14 +83,13 @@
     </header>
     <div class="shell-menu-overlay"></div>
 
-    <!-- Main Content -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex h-[calc(100vh-var(--header-h))]">
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6"></nav>
-            </aside>
-
-            <div class="flex-1 relative overflow-y-auto content-area font-suit">
+    <main class="shell-main">
+      <div class="shell-grid">
+        <aside class="shell-left-bar">
+          <button type="button" class="shell-menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu"></div>
+        </aside>
+        <section class="shell-content">
                 <div class="px-6 md:px-12 py-12">
                     <div class="max-w-xl md:ml-[24px]">
 
