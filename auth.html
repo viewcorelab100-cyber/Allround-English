@@ -113,29 +113,13 @@
     </header>
     <div class="shell-menu-overlay"></div>
 
-    <!-- Main Content -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex min-h-[calc(100vh-var(--header-h))]">
-
-            <!-- Left Sidebar (Desktop) -->
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6">
-                    <!-- sidebar.js가 주입 -->
-                </nav>
-            </aside>
-
-            <!-- 본문 컨텐츠 -->
-            <div class="flex-1 relative overflow-y-auto" style="background: url('img/sub-bg.png') no-repeat center top / cover;">
-
-                <!-- 카톡 문의 -->
-                <div class="hidden lg:block fixed z-50" style="right: min(13.44vw, 258px); top: 143px;">
-                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn relative inline-block">
-                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
-                        <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
-                            <span class="text-[#2F2725] text-[20px] font-bold tracking-[-0.2px]">카톡 상담</span>
-                        </div>
-                    </a>
-                </div>
+    <main class="shell-main">
+      <div class="shell-grid">
+        <aside class="shell-left-bar">
+          <button type="button" class="shell-menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu"></div>
+        </aside>
+        <section class="shell-content">
 
                 <!-- Auth Card -->
                 <div class="flex items-start justify-center px-4 md:px-6 py-12 md:py-20">
