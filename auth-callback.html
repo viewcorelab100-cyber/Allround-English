@@ -224,27 +224,19 @@
             window.location.href = 'index.html';
         }
 
-        // 페이지 로드 시 — 네이버 콜백 or 기존 세션 확인
+        // 페이지 로드 시 — naver_code로 세션 생성 or 기존 세션 확인
         async function init() {
             const params = new URLSearchParams(window.location.search);
-            const naverCode = params.get('code');
-            const naverState = params.get('state');
-            const naverError = params.get('error');
+            const naverCode = params.get('naver_code');
 
-            // 네이버 인증 에러
-            if (naverError) {
-                showError('네이버 인증이 취소되었습니다.');
-                return;
-            }
-
-            // 네이버 콜백 (code 파라미터가 있으면)
+            // Edge Function에서 전달받은 naver_code로 token_hash 조회 → 세션 생성
             if (naverCode) {
                 try {
-                    // Edge Function에 code를 POST로 전달 → token_hash 받기
+                    // Edge Function POST로 token_hash 조회
                     const res = await fetch('https://fqxbfetyfjyzomgrczwi.supabase.co/functions/v1/naver-auth', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ code: naverCode, state: naverState }),
+                        body: JSON.stringify({ naver_code: naverCode }),
                     });
 
                     const result = await res.json();
