@@ -467,18 +467,7 @@ textarea {
   }
 
   .kakao-btn {
-    height: 30px;
-    padding: 0 16px 0 0;
-    right: 20px;
-  }
-
-  .kakao-btn img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .kakao-btn span {
-    font-size: 16px;
+    display: none;
   }
 }
 
