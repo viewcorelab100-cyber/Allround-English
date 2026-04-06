@@ -12,7 +12,7 @@ const NAVER_CLIENT_SECRET = Deno.env.get('NAVER_CLIENT_SECRET')!
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-const SITE_URL = 'https://allround-english.co.kr'
+const SITE_URL = 'https://allroundedu.co.kr'
 const NAVER_CALLBACK_URL = `${SITE_URL}/auth-callback.html`
 
 const corsHeaders = {
