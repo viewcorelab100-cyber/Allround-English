@@ -1,334 +1,250 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>ALLROUND — ALLROUND firstee</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --page-right: 8.28vw;
-            --header-h: 60px;
-            --sidebar-w: 21.77vw;
-            --sidebar-gap: 3.75vw;
-        }
-        @media (min-width: 1024px) { :root { --header-h: 126px; } }
-        html {
-            scrollbar-width: none;
-        }
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        body {
-            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-        }
-        .sidebar-link { transition: all 0.2s ease; }
-        .sidebar-link:hover { color: #2F2725 !important; font-weight: 700; opacity: 0.8; }
-        .kakao-btn { display: inline-block; }
-        .mobile-menu-overlay { transition: opacity 0.3s ease; }
-        .mobile-menu-panel { transition: transform 0.3s ease; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALLROUND firstee</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/original.css">
+  <link rel="stylesheet" href="./css/firstee.css">
+  <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="./js/main.js"></script>
 </head>
-<body class="min-h-screen flex flex-col" data-active-page="firstee">
 
-    <!-- Mobile Header -->
-    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
-        <a href="index.html">
-            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+<body>
+  <div id="wrap" class="wrap">
+    <header class="main-header">
+      <div class="container">
+        <div class="logo-wrap">
+          <a href="./index.html" class="logo">
+            <img src="./img/logo.png" alt="ALLROUND">
+          </a>
+        </div>
+
+        <div class="header-right">
+          <a href="../auth.html">Login</a>
+          <a href="../auth.html?mode=signup">Sign up</a>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
+            <img src="./img/kakao-icon.png" alt="">
+          </a>
+          <a href="#" class="menu-btn">
+            <img src="./img/menu-icon.png" alt="menu">
+          </a>
+        </div>
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
+          <img src="./img/kakao-icon.png" alt="카카오톡">
+          <span>카톡 상담</span>
         </a>
-        <button id="hamburger-btn" onclick="toggleMobileMenu()">
-            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
-        </button>
+      </div>
     </header>
-
-    <!-- Desktop Header -->
-    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
-        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-            <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
-            </a>
-        </div>
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[1.04vw] leading-[1.04vw] tracking-[-0.01vw] hover:opacity-60 transition-opacity">Sign up</a>
+    <div class="menu-overlay"></div>
+    <main class="main-section">
+      <div class="main-grid">
+        <aside class="main-left-bar">
+          <button type="button" class="menu-close" aria-label="메뉴 닫기">×</button>
+          <div class="left-menu">
+            <div class="menu-group">
+              <a href="./philosophy.html" class="menu-title">학원 소개</a>
+              <a href="#" class="menu-title is-active">수업 안내</a>
+              <div class="menu-sub">
+                <a href="./firstee.html" class="is-active"><span class="font-style">ALLROUND firstee</span></a>
+                <a href="./original.html"><span class="font-style">ALLROUND original</span></a>
+                <a href="./strategy.html"><span class="font-style">ALLROUND strategy</span></a>
+              </div>
             </div>
-            <div id="user-menu" class="hidden items-center gap-[1.25vw]">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-[0.73vw] hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-[1.04vw] hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-[1.04vw] hover:opacity-60 transition-opacity">Logout</button>
+            <div class="menu-group">
+              <a href="./online-class.html" class="menu-title menu-title-icon">
+                <img src="./img/icon-video.png" alt="">
+                <span>온라인 강의</span>
+              </a>
             </div>
-            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[1.25vw] w-auto">
-            </button>
-        </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
-        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
-        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
-            <div class="p-6 pt-20">
-                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
-                <nav class="space-y-6">
-                    <div><a href="about.html" class="block text-[#2F2725] font-medium text-lg mb-2">학원 소개</a></div>
-                    <div>
-                        <p class="text-[#2F2725] font-medium text-lg mb-2">수업 안내</p>
-                        <div class="pl-4 space-y-2">
-                            <a href="firstee.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
-                            <a href="original.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
-                            <a href="strategy.html" class="block text-[#9FA0A0] text-sm"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
-                        </div>
-                    </div>
-                    <div>
-                        <a href="courses.html" class="block text-[#2F2725] font-medium text-lg mb-2">온라인 강의</a>
-                    </div>
-                    <div>
-                        <p class="text-[#2F2725] font-medium text-lg mb-2">학원 소식</p>
-                        <div class="pl-4 space-y-2">
-                            <a href="#" class="block text-[#9FA0A0] text-sm">Instagram</a>
-                            <a href="#" class="block text-[#9FA0A0] text-sm">Youtube</a>
-                            <a href="#" class="block text-[#9FA0A0] text-sm">Blog</a>
-                        </div>
-                    </div>
-                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">상담 예약</a></div>
-                    <div><a href="#" class="block text-[#2F2725] font-medium text-lg">강사 채용</a></div>
-                </nav>
+            <div class="menu-group">
+              <a href="#" class="menu-title">학원 소식</a>
+              <div class="menu-sub">
+                <span class="menu-sub-text">Instagram</span>
+                <span class="menu-sub-text">Youtube</span>
+                <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener">Blog</a>
+              </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex h-[calc(100vh-var(--header-h))]">
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-[1.25vw]">
-                    <div>
-                        <a href="about.html" class="sidebar-link block text-[#9FA0A0] font-semibold text-[0.94vw] leading-relaxed">학원 소개</a>
-                    </div>
-                    <div>
-                        <p class="text-[#2F2725] font-bold text-[0.94vw] leading-relaxed mb-[0.42vw]">수업 안내</p>
-                        <div class="space-y-[0.42vw]">
-                            <a href="firstee.html" class="sidebar-link block text-[#2F2725] font-bold text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span></a>
-                            <a href="original.html" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">original</span></a>
-                            <a href="strategy.html" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">strategy</span></a>
-                        </div>
-                    </div>
-                    <div>
-                        <a href="courses.html" class="sidebar-link flex items-center justify-end gap-[0.42vw]">
-                            <img src="asset/main/온라인강의 아이콘.png" alt="" class="h-[1.04vw] w-auto">
-                            <span class="text-[#9FA0A0] font-semibold text-[0.94vw] leading-relaxed">온라인 강의</span>
-                        </a>
-                    </div>
-                    <div>
-                        <p class="text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed mb-[0.42vw]">학원 소식</p>
-                        <div class="space-y-[0.42vw]">
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Instagram</a>
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Youtube</a>
-                            <a href="#" class="sidebar-link block text-[#9FA0A0] text-[0.78vw] leading-relaxed">Blog</a>
-                        </div>
-                    </div>
-                    <div>
-                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed">상담 예약</a>
-                    </div>
-                    <div>
-                        <a href="#" class="sidebar-link block text-[#2F2725] font-semibold text-[0.94vw] leading-relaxed">강사 채용</a>
-                    </div>
-                </nav>
-            </aside>
-
-            <!-- 본문 컨텐츠 (스크롤 가능 영역) -->
-            <div class="flex-1 relative overflow-y-auto" style="background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)), #F5F5F5;">
-
-                <!-- 카톡 상담 -->
-                <div class="hidden lg:block fixed z-50" style="right: 13.44vw; top: 7.45vw;">
-                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
-                       class="kakao-btn relative inline-block">
-                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[3.23vw] w-[9.74vw] object-contain block">
-                        <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
-                            <span class="text-[#2F2725] text-[1.04vw] font-bold tracking-[-0.01vw]">카톡 상담</span>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- ALLROUND firstee 타이틀 영역 (회색 배경) -->
-                <div class="px-[1.25vw] lg:px-[2.50vw] pt-[2.50vw] pb-[1.25vw] text-[#2F2725]">
-                    <div class="flex items-center gap-[0.83vw] max-w-[68.75vw] ml-[1.25vw]">
-                        <div class="w-[0.10vw] h-[1.15vw] bg-[#2F2725]"></div>
-                        <h1 class="text-[1.82vw] leading-[1.82vw] tracking-[-0.02vw]" style="font-family: 'Libre Bodoni', serif; font-weight: 400;"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-[0.42vw]" style="filter: brightness(0); transform: translateY(-0.1em);">firstee</h1>
-                        <span class="bg-[#2F2725] text-white text-[1.04vw] px-[0.83vw] py-[0.21vw] font-normal ml-[0.42vw] whitespace-nowrap rounded-md">초등 1학년 - 초등 4학년</span>
-                    </div>
-                </div>
-
-                <!-- ALLROUND firstee HTML 컨텐츠 컨테이너 (흰색 배경 카드) -->
-                <div class="w-full max-w-[68.75vw] ml-[1.25vw] px-[1.25vw] lg:pl-[4.27vw] lg:pr-[3.13vw] py-[3.33vw] text-[#2F2725] bg-white mb-[1.30vw] relative z-10">
-
-                    <!-- Intro -->
-                    <div class="mb-[5.00vw]">
-                        <h2 class="text-[1.82vw] font-extrabold leading-[2.60vw] tracking-[-0.02vw] mb-[3.33vw]">우리 모두의 출발선은<br>다를 수 밖에 없습니다.</h2>
-
-                        <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[4.69vw] lg:items-end">
-                            <!-- Left: Text (Figma: 336px) -->
-                            <div class="flex-1">
-                                <div class="bg-[#13372A] text-white text-[1.04vw] px-[1.04vw] py-[0.42vw] mb-[1.25vw] inline-flex items-center gap-[0.21vw] font-normal rounded-md">
-                                    <span>Section</span> <span class="font-semibold">1</span>
-                                </div>
-                                <h3 class="text-[1.56vw] font-semibold leading-[2.34vw] tracking-[-0.02vw] mb-[1.25vw]">가볍게 시작해도,<br>출발선은 명확하게</h3>
-                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
-                                    <p>출발을 어떻게 설계하느냐에 따라</p>
-                                    <p>아이의 6년, 10년이 달라집니다.</p>
-                                    <p class="mb-[2.34vw]"></p>
-                                    <p>즐겁게만 학습하기엔 불안하고,</p>
-                                    <p>무겁게 시작하기엔 부담스럽습니다.</p>
-                                </div>
-                            </div>
-
-                            <!-- Right: Entrance Structure (f1) — Figma: 720px, bottom-aligned with text -->
-                            <div class="flex-shrink-0 w-full lg:w-[37.50vw]">
-                                <img src="asset/firstee/f1.png" alt="Allround entrance structure" class="w-full">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section 2 -->
-                    <div class="mb-[5.00vw]">
-                        <div class="bg-[#13372A] text-white text-[1.04vw] px-[1.04vw] py-[0.42vw] mb-[1.25vw] inline-flex items-center gap-[0.21vw] font-normal rounded-md">
-                            <span>Section</span> <span class="font-semibold">2</span>
-                        </div>
-
-                        <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[3.33vw] mb-[3.33vw] lg:items-start">
-                            <div class="flex-1">
-                                <h3 class="text-[1.56vw] font-semibold leading-[2.34vw] tracking-[-0.02vw] mb-[1.25vw]"><img src="logo.png" alt="ALLROUND" class="inline-block h-[0.8em] w-auto mr-1" style="filter: brightness(0); transform: translateY(-0.1em);"><span style="font-family: 'Libre Bodoni', serif;">firstee</span><br>the first step with ALLROUND</h3>
-                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
-                                    <p>ALLROUNDfirstee는</p>
-                                    <p>올라운드로 들어오는 첫 관문으로</p>
-                                    <p>학생의 현재 수준을 정확히 진단하고,</p>
-                                    <p>가장 적합한 트랙에서 시작합니다.</p>
-                                    <p>처음부터 학생의 학습환경에 맞는</p>
-                                    <p>출발선을 설계합니다.</p>
-                                </div>
-                            </div>
-
-                            <!-- Class/Program table (f2) — Figma: 543px, top-aligned -->
-                            <div class="flex-shrink-0 w-full lg:w-[28.28vw]">
-                                <img src="asset/firstee/f2.png" alt="Class Program table" class="w-full">
-                            </div>
-                        </div>
-
-                        <!-- 01 Firstee Track -->
-                        <div class="mb-[4.17vw]">
-                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">01 <span style="font-family: 'Libre Bodoni', serif;">Firstee</span> Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">영어 첫시작 CLASS</div>
-
-                            <div class="flex flex-col lg:flex-row lg:gap-[1.56vw] gap-[1.67vw] lg:items-center">
-                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw] flex-1">
-                                    <p>처음 영어를 접하는 학생들을 위한 프로그램입니다.</p>
-                                    <p>파닉스를 통해 영어를 올바르게 읽고 쓰는 법을 학습 한 후,</p>
-                                    <p>기초 문법을 배우게 됩니다. 파닉스가 완성된 이후,</p>
-                                    <p>기초 문법을 스토리와 연결해 자연스럽게 구조를 잡습니다.</p>
-                                    <p>읽는 영어로 시작해, 자신의 생각을 스스로 표현하는 영어로</p>
-                                    <p>만들어가는 과정입니다.</p>
-                                </div>
-                                <!-- Firstee Track diagram (f3) — Figma: 574px, vertically centered -->
-                                <div class="flex-shrink-0 w-full lg:w-[29.90vw]">
-                                    <img src="asset/firstee/f3.png" alt="Firstee Track" class="w-full">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 02 Global Track -->
-                        <div class="mb-[4.17vw]">
-                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">02 Global Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">영어 유치원 졸업 / 국제학교 CLASS</div>
-
-                            <div class="flex flex-col lg:flex-row gap-[1.67vw] lg:gap-[3.33vw] lg:items-start">
-                                <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw] flex-1">
-                                    <p>이미 영어에 충분히 노출된 학생을 위한 트랙입니다.</p>
-                                    <p>미국 교과서를 기반으로 Social Studies, Science,</p>
-                                    <p>Language Arts 중심 수업을 진행합니다.</p>
-                                    <p>English-Only 환경의 교과 기반 사고 확장 수업입니다.</p>
-                                    <p>국제학교 학생은 각 학교 커리큘럼에 따라</p>
-                                    <p>내신과 교과 내용을 체계적으로 관리합니다.</p>
-                                </div>
-                                <!-- Global Track diagram (f4) — Figma: 전체그룹 470px (원형182+라벨), top-aligned -->
-                                <div class="flex-shrink-0 w-full lg:w-[24.48vw]">
-                                    <img src="asset/firstee/f4.png" alt="Global Track" class="w-full">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 03 Bridge Track -->
-                        <div>
-                            <h4 class="text-[1.30vw] font-bold mb-[0.63vw]">03 Bridge Track</h4>
-                            <div class="bg-gray-200 text-gray-600 text-[0.94vw] px-[0.83vw] py-[0.21vw] inline-block font-normal mb-[1.25vw] rounded-md">정규반진입 전 보완 과정</div>
-
-                            <div class="text-[1.30vw] font-normal leading-[2.34vw] tracking-[-0.01vw]">
-                                <!-- Bridge Track diagram (f5) — Figma: 708px, 텍스트와 겹침 → float -->
-                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="hidden lg:block float-right w-[36.88vw] ml-[1.25vw] mb-[0.83vw]">
-                                <img src="asset/firstee/f5.png" alt="Bridge Track" class="lg:hidden w-full mb-[1.25vw]">
-                                <p>영어학습의 경험이 있지만,</p>
-                                <p>정규반에 바로 들어가기에는 부족한 부분이</p>
-                                <p>있는 학생을 위한 과정입니다.</p>
-                                <p>레벨 테스트 후, 목표하는 정규반을 설정하고</p>
-                                <p>부족한 영역을 정확히 확인합니다.</p>
-                                <p>개별 진도 수업을 통해, 부족한 부분을 채우고,</p>
-                                <p>정규반에 안정적으로 진입하는 것을 목표로 합니다.</p>
-                                <p>목표한 반의 기준에 도달하면 정규반으로 이동합니다.</p>
-                                <div class="clear-both"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex justify-center gap-[0.42vw] mt-[4.17vw] pb-[3.33vw]">
-                        <a href="courses.html" class="w-[6.51vw] h-[2.45vw] flex items-center justify-center bg-[#13372A] text-white text-[1.04vw] font-normal hover:bg-opacity-90 transition rounded-md">전체 강의</a>
-                        <a href="#" class="w-[6.51vw] h-[2.45vw] flex items-center justify-center bg-[#13372A] text-white text-[1.04vw] font-normal hover:bg-opacity-90 transition rounded-md">상담 예약</a>
-                    </div>
-                </div>
+            <div class="menu-group">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
+              <span class="menu-title menu-title-disabled">강사 채용</span>
             </div>
-        </div>
-
-        <!-- Mobile: 카톡 플로팅 -->
-        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
-           class="lg:hidden kakao-btn fixed bottom-5 right-5 z-40 inline-block">
-            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
-            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
-                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+          </div>
+        </aside>
+        <section class="main-content sub-content original-page">
+          <div class="sub-visual">
+            <div class="sub-visual-inner original-inner">
+              <div class="original-title-row">
+                <h2 class="original-title">ALLROUND firstee</h2>
+                <span class="original-badge">초등 1학년 ~ 초등 4학년</span>
+              </div>
+              <div class="original-card">
+                <section class="original-sec-hero">
+                  <div class="original-copy">
+                    <h3 class="original-headline">
+                      우리 모두의 출발선은<br>
+                      다를 수 밖에 없습니다.
+                    </h3>
+                  </div>
+                </section>
+                <section class="original-sec original-sec-01">
+                  <div class="sec-label">Section 1</div>
+                  <div class="original-sec-grid original-sec-grid-1">
+                    <div class="original-copy">
+                      <h4 class="original-sec-title">
+                        가볍게 시작해도,<br>
+                        출발선은 명확하게
+                      </h4>
+                      <div class="original-copy-text original-copy-text-75">
+                        <p>
+                          출발을 어떻게 설계하느냐에 따라<br class="mo-br mo-br2">
+                          아이의 6년, 10년이 달라집니다.<br class="mo-br mo-br2"><br class="mo-br mo-br2">
+                          즐겁게만 학습하기엔 불안하고,<br class="mo-br mo-br2">
+                          무겁게 시작하기엔 부담스럽습니다.<br class="mo-br mo-br2">
+                        </p>
+                      </div>
+                    </div>
+                    <div class="original-figure">
+                      <img src="./img/firstee-img01.png" alt="" class="img-1490">
+                    </div>
+                  </div>
+                </section>
+                <section class="original-sec">
+                  <div class="sec-label">Section 2</div>
+                  <div class="original-sec-grid original-sec-grid-lg">
+                    <div class="original-copy">
+                      <h4 class="original-sec-title">
+                        <span class="font-style">ALLROUND Firstee</span><br class="mo-br">
+                        the first step with ALLROUND
+                      </h4>
+                      <div class="original-copy-text original-copy-text-75">
+                        <p>
+                          <span class="font-style">ALLROUND firstee</span>는<br class="mo-br">
+                          올라운드로 들어오는 첫 관문으로<br class="mo-br">
+                          학생의 현재 수준을 정확히 진단하고,<br class="mo-br">
+                          가장 적합한 트랙에서 시작합니다.<br class="mo-br">
+                          처음부터 학생의 학습환경에 맞는<br class="mo-br">
+                          출발선을 설계합니다.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="original-figure">
+                      <img src="./img/firstee-img02.png" alt="" class="img-bottom">
+                    </div>
+                  </div>
+                  <div class="original-sec-grid original-sec-grid-lg original-sec-grid-lg2">
+                    <div class="original-copy">
+                      <div class="original-list">
+                        <dl>
+                          <dt>01 <span class="font-style">Firstee</span> Track <br><span class="tag">영어 첫시작 CLASS</span>
+                          </dt>
+                          <dd>
+                            처음 영어를 접하는 학생들을 위한 프로그램입니다.<br class="mo-br">
+                            파닉스를 통해 영어를 올바르게 읽고 쓰는 법을 학습 한 후,<br class="mo-br">
+                            기초 문법을 배우게 됩니다. 파닉스가 완성된 이후,<br class="mo-br">
+                            기초 문법을 스토리와 연결해 자연스럽게 구조를 잡습니다.<br class="mo-br">
+                            읽는 영어로 시작해, 자신의 생각을 스스로 표현하는 영어로<br class="mo-br">
+                            만들어가는 과정입니다.
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                    <div class="original-figure">
+                      <img src="./img/firstee-img03.png" alt="" class="img-bottom">
+                    </div>
+                  </div>
+                  <div class="original-sec-grid original-sec-grid-lg original-sec-grid-lg2">
+                    <div class="original-copy">
+                      <div class="original-list">
+                        <dl>
+                          <dt>02 Global Track <br><span class="tag">영어 유치원 졸업 / 국제학교 CLASS</span></dt>
+                          <dd>
+                            이미 영어에 충분히 노출된 학생을 위한 트랙입니다.<br class="mo-br">
+                            미국 교과서를 기반으로 Social Studies, Science, <br class="mo-br">
+                            Language Arts 중심 수업을 진행합니다.<br class="mo-br">
+                            English-Only 환경의 교과 기반 사고 확장 수업입니다.<br class="mo-br">
+                            국제학교 학생은 각 학교 커리큘럼에 따라<br class="mo-br">
+                            내신과 교과 내용을 체계적으로 관리합니다.
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                    <div class="original-figure">
+                      <img src="./img/firstee-img04.png" alt="" class="img-bottom2 img-size01">
+                    </div>
+                  </div>
+                  <div
+                    class="original-sec-grid original-sec-grid-1 original-sec-grid-lg original-sec-grid-lg2 original-sec-grid-lg3">
+                    <div class="original-copy">
+                      <div class="original-list">
+                        <dl>
+                          <dt>03 Bridge Track <br><span class="tag">정규반진입 전 보완 과정</span></dt>
+                          <dd>
+                            영어학습의 경험이 있지만, <br class="mo-br mo-br2">
+                            정규반에 바로 들어가기에는 부족한 부분이 <br class="mo-br mo-br2">
+                            있는 학생을 위한 과정입니다.<br class="mo-br mo-br2">
+                            레벨 테스트 후, 목표하는 정규반을 설정하고<br class="mo-br mo-br2">
+                            부족한 영역을 정확히 확인합니다.<br class="mo-br mo-br2">
+                            개별 진도 수업을 통해, 부족한 부분을 채우고,<br class="mo-br mo-br2">
+                            정규반에 안정적으로 진입하는 것을 목표로 합니다.<br class="mo-br mo-br2">
+                            목표한 반의 기준에 도달하면 정규반으로 이동합니다.
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                    <div class="original-figure">
+                      <img src="./img/firstee-img05.png" alt="" class="img-bottom3 img-size02 img-1490">
+                    </div>
+                  </div>
+                  <div class="original-btns">
+                    <a href="../courses.html" class="btn-original">전체 강의</a>
+                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="btn-original">상담 예약</a>
+                  </div>
+                </section>
+              </div>
             </div>
-        </a>
+          </div>
+        </section>
+      </div>
     </main>
-
-    <div id="footer-container"></div>
-
-    <script src="js/supabase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/footer.js"></script>
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.classList.remove('translate-x-full');
-                    panel.classList.add('translate-x-0');
-                });
-                document.body.style.overflow = 'hidden';
-            } else {
-                panel.classList.remove('translate-x-0');
-                panel.classList.add('translate-x-full');
-                setTimeout(() => { menu.classList.add('hidden'); }, 300);
-                document.body.style.overflow = '';
-            }
-        }
-    </script>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>올라운드원격학원</strong>
+        </div>
+        <div class="footer-content-wrap">
+          <div class="footer-center">
+            <p>
+              학원설립·운영등록번호 : 제15256호 온라인원격학원 <br class="br-pc-none">신고기관명 : 서울특별시 강남교육지원청<br class="br-pc-none">
+              사업자등록번호 : 560-94-02154<br class="br-pc-none">
+              통신판매업신고 : 2026-서울강남-00399
+            </p>
+            <p>
+              대표 원장 : 개인정보보호책임자 : 배은영<br class="br-pc-none">
+              E-mail : contact@allroundedu.co.kr<br class="br-pc-none">
+              고객센터 : 0507-1339-3828<br class="br-pc-none">
+              주소 : 서울 강남구 대치동 943-29 3층 3138호
+            </p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-links">
+              <a href="../terms.html">[이용 약관]</a>
+              <a href="../refund.html">[환불 정책]</a>
+              <a href="../privacy.html">[개인정보 처리 방침]</a>
+            </div>
+            <div class="footer-sns">
+              <a href="#"><img src="./img/insta.png" alt="instagram"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
+              <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
 </body>
+
 </html>

@@ -15,11 +15,12 @@
     <style>
         :root {
             --page-right: min(8.3vw, 159px);
-            --header-h: 126px;
+            --header-h: 60px;
             --sidebar-right-edge: min(21.8vw, 418px);
             --sidebar-gap: min(3.75vw, 72px);
             --signup-right: min(13.44vw, 258px);
         }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
@@ -36,11 +37,21 @@
 </head>
 <body class="min-h-screen flex flex-col" data-active-page="strategy">
 
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white z-50 flex items-center" style="height: var(--header-h);">
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
+    </header>
+
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
         <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
             <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-4 md:h-[17px] w-auto" style="filter: brightness(0);">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
             </a>
         </div>
         <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
@@ -50,13 +61,10 @@
             </div>
             <div id="user-menu" class="hidden items-center gap-6">
                 <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-lg lg:text-xl hover:opacity-60 transition-opacity">Logout</button>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
             </div>
-            <button id="hamburger-btn" class="lg:hidden flex-shrink-0" onclick="toggleMobileMenu()">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-5 w-auto">
-            </button>
-            <button class="hidden lg:block flex-shrink-0 hover:opacity-60 transition-opacity">
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
                 <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
             </button>
         </div>
@@ -277,7 +285,7 @@
 
         <!-- Mobile: 카톡 플로팅 -->
         <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
-           class="lg:hidden kakao-btn fixed bottom-6 right-6 z-40 relative inline-block">
+           class="lg:hidden kakao-btn fixed bottom-5 right-5 z-40 inline-block">
             <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-12 w-auto object-contain drop-shadow-lg block">
             <div class="absolute inset-0 flex items-center justify-end pr-[20%] pointer-events-none">
                 <span class="text-[#2F2725] text-[11px] font-bold tracking-wide">카톡 문의</span>

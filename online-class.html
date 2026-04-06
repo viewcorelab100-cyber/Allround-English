@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ALLROUND online class</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/original.css" />
+  <link rel="stylesheet" href="./css/online-class.css" />
+  <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+  <script src="./js/main.js"></script>
+</head>
+
+<body>
+  <div id="wrap" class="wrap">
+    <header class="main-header">
+      <div class="container">
+        <div class="logo-wrap">
+          <a href="./index.html" class="logo">
+            <img src="./img/logo.png" alt="ALLROUND" />
+          </a>
+        </div>
+
+        <div class="header-right">
+          <a href="../auth.html">Login</a>
+          <a href="../auth.html?mode=signup">Sign up</a>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
+            <img src="./img/kakao-icon.png" alt="" />
+          </a>
+          <a href="#" class="menu-btn">
+            <img src="./img/menu-icon.png" alt="menu" />
+          </a>
+        </div>
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
+          <img src="./img/kakao-icon.png" alt="카카오톡" />
+          <span>카톡 상담</span>
+        </a>
+      </div>
+    </header>
+    <div class="menu-overlay"></div>
+    <main class="main-section">
+      <div class="main-grid">
+        <aside class="main-left-bar">
+          <button type="button" class="menu-close" aria-label="메뉴 닫기">×</button>
+          <div class="left-menu">
+            <div class="menu-group">
+              <a href="./philosophy.html" class="menu-title">학원 소개</a>
+              <a href="#" class="menu-title">수업 안내</a>
+
+              <div class="menu-sub">
+                <a href="./firstee.html"><span class="font-style">ALLROUND firstee</span></a>
+                <a href="./original.html"><span class="font-style">ALLROUND original</span></a>
+                <a href="./strategy.html"><span class="font-style">ALLROUND strategy</span></a>
+              </div>
+            </div>
+            <div class="menu-group">
+              <a href="./online-class.html" class="menu-title menu-title-icon is-active">
+                <img src="./img/icon-video.png" alt="" />
+                <span>온라인 강의</span>
+              </a>
+            </div>
+            <div class="menu-group">
+              <a href="#" class="menu-title">학원 소식</a>
+              <div class="menu-sub">
+                <span class="menu-sub-text">Instagram</span>
+                <span class="menu-sub-text">Youtube</span>
+                <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener">Blog</a>
+              </div>
+            </div>
+            <div class="menu-group">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
+              <span class="menu-title menu-title-disabled">강사 채용</span>
+            </div>
+          </div>
+        </aside>
+        <section class="main-content sub-content online-class-page">
+          <div class="sub-visual">
+            <div class="sub-visual-inner original-inner">
+              <div class="online-title-row">
+                <h2 class="online-title">Online class</h2>
+                <span class="online-badge">정규 강의</span>
+              </div>
+              <div class="online-card">
+                <div id="category-tabs" class="online-tabs">
+                  <a href="#" class="is-active" data-category="all">전체</a>
+                </div>
+                <div id="courses-list" class="online-list">
+                  <div style="text-align:center; color:#9fa0a0; padding:60px 0;">강의를 불러오는 중...</div>
+                </div>
+                <div id="pagination" class="online-pagination" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>올라운드원격학원</strong>
+        </div>
+        <div class="footer-content-wrap">
+          <div class="footer-center">
+            <p>
+              학원설립·운영등록번호 : 제15256호 온라인원격학원 <br class="br-pc-none">신고기관명 : 서울특별시 강남교육지원청<br class="br-pc-none">
+              사업자등록번호 : 560-94-02154<br class="br-pc-none">
+              통신판매업신고 : 2026-서울강남-00399
+            </p>
+            <p>
+              대표 원장 : 개인정보보호책임자 : 배은영<br class="br-pc-none">
+              E-mail : contact@allroundedu.co.kr<br class="br-pc-none">
+              고객센터 : 0507-1339-3828<br class="br-pc-none">
+              주소 : 서울 강남구 대치동 943-29 3층 3138호
+            </p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-links">
+              <a href="../terms.html">[이용 약관]</a>
+              <a href="../refund.html">[환불 정책]</a>
+              <a href="../privacy.html">[개인정보 처리 방침]</a>
+            </div>
+            <div class="footer-sns">
+              <a href="#"><img src="./img/insta.png" alt="instagram"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
+              <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script>
+    var sb = supabase.createClient(
+      'https://fqxbfetyfjyzomgrczwi.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeGJmZXR5Zmp5em9tZ3JjendpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMzM0NjQsImV4cCI6MjA3OTYwOTQ2NH0.90t1jzTtyEUkIu0MBMhRUwN6b1fGRZGR2CfqXBMczn0'
+    );
+    var allCourses=[], filteredCourses=[], currentCategory='all', currentPage=1, perPage=6;
+
+    function renderCard(c) {
+      var mins=c.totalDuration||0, dt='';
+      if(mins>=60){var h=Math.floor(mins/60),m=mins%60; dt=m>0?h+'시간 '+m+'분':h+'시간';}
+      else if(mins>0) dt=mins+'분';
+      var lc=c.lessonCount||0, meta=[lc>0?lc+'강':'',dt].filter(Boolean).join(' · ');
+      var cat=c.category||'정규 강의', th=c.thumbnail_url||'./img/online-thumb.jpg';
+      var desc=c.description||'', df=desc.split('\n')[0];
+      return '<article class="online-item"><a href="./course-detail.html?id='+c.id+'" class="online-thumb"><img src="'+th+'" alt="'+c.title+'"/></a><div class="online-info"><div class="online-info-top"><div class="online-texts"><h3>'+c.title+'</h3>'+(df?'<p class="online-subtitle">'+df+'</p>':'')+'</div><span class="online-label">'+cat+'</span></div><p class="online-desc">'+desc+'</p>'+(meta?'<p style="margin-top:12px;font-size:14px;color:#9fa0a0;">'+meta+'</p>':'')+'</div></article>';
+    }
+    function render() {
+      var el=document.getElementById('courses-list'), s=(currentPage-1)*perPage, pg=filteredCourses.slice(s,s+perPage);
+      el.innerHTML = filteredCourses.length===0 ? '<div style="text-align:center;color:#9fa0a0;padding:60px 0;"><p style="font-size:18px;">등록된 강의가 없습니다.</p><p style="font-size:14px;">곧 새로운 강의가 업로드될 예정입니다.</p></div>' : pg.map(renderCard).join('');
+      renderPag();
+    }
+    function renderPag() {
+      var el=document.getElementById('pagination'), tp=Math.ceil(filteredCourses.length/perPage);
+      if(tp<=1){el.style.display='none';return;} el.style.display='';
+      var h=''; for(var i=1;i<=tp;i++) h+='<a href="#" class="'+(i===currentPage?'is-active':'')+'" data-page="'+i+'">'+i+'</a>';
+      el.innerHTML=h;
+      $(el).find('a').on('click',function(e){e.preventDefault();currentPage=parseInt($(this).data('page'));render();});
+    }
+    function filterCat(cat) {
+      currentCategory=cat; currentPage=1;
+      filteredCourses=cat==='all'?allCourses.slice():allCourses.filter(function(c){return c.category===cat;});
+      $('#category-tabs a').each(function(){$(this).toggleClass('is-active',$(this).data('category')===cat);});
+      render();
+    }
+    async function init() {
+      try {
+        var r=await sb.from('courses').select('*,lessons(id,duration)').eq('is_published',true).order('created_at',{ascending:false});
+        if(r.error) throw r.error;
+        allCourses=(r.data||[]).filter(function(c){return (c.visibility||'public')==='public';}).map(function(c){
+          var m=(c.lessons||[]).reduce(function(s,l){return s+(l.duration||0);},0);
+          return Object.assign({},c,{totalDuration:m,lessonCount:(c.lessons||[]).length});
+        });
+        filteredCourses=allCourses.slice();
+        var cats=[]; allCourses.forEach(function(c){if(c.category&&cats.indexOf(c.category)===-1)cats.push(c.category);});
+        var te=document.getElementById('category-tabs'), th='<a href="#" class="is-active" data-category="all">전체</a>';
+        cats.forEach(function(c){th+='<a href="#" data-category="'+c+'">'+c+'</a>';});
+        te.innerHTML=th;
+        $('#category-tabs a').on('click',function(e){e.preventDefault();filterCat($(this).data('category'));});
+        render();
+      } catch(e) {
+        document.getElementById('courses-list').innerHTML='<div style="text-align:center;color:#9fa0a0;padding:60px 0;"><p>강의를 불러올 수 없습니다.</p></div>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded',init);
+  </script>
+</body>
+
+</html>
