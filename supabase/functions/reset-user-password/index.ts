@@ -23,24 +23,23 @@ serve(async (req) => {
 
     // 요청자의 권한 확인
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
-    // 요청자 확인용 클라이언트 (anon key + 사용자 토큰)
-    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
-    })
+    // 토큰 추출 후 직접 검증
+    const token = authHeader.replace('Bearer ', '')
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    const { data: { user: caller }, error: callerError } = await userClient.auth.getUser()
+    const { data: { user: caller }, error: callerError } = await adminClient.auth.getUser(token)
     if (callerError || !caller) {
+      console.error('Auth error:', callerError)
       return new Response(
-        JSON.stringify({ error: '유효하지 않은 인증입니다.' }),
+        JSON.stringify({ error: '유효하지 않은 인증입니다: ' + (callerError?.message || 'unknown') }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     // 관리자 권한 확인
-    const { data: profile } = await userClient
+    const { data: profile } = await adminClient
       .from('profiles')
       .select('role')
       .eq('id', caller.id)
