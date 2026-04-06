@@ -1126,11 +1126,11 @@
 
         async function loadLesson() {
             const lessonId = getLessonId();
-            if (!lessonId) { window.location.href = 'online-class.html'; return; }
+            if (!lessonId) { window.location.href = 'courses.html'; return; }
             currentUser = await getCurrentUser();
             
             const lessonResult = await getLessonById(lessonId);
-            if (!lessonResult.success) { window.location.href = 'online-class.html'; return; }
+            if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
             
             if (!currentLesson.is_preview && currentUser) {
@@ -1139,7 +1139,7 @@
                     if (confirm('이 강의를 구매해야 시청할 수 있습니다. 강의 페이지로 이동하시겠습니까?')) { 
                         window.location.href = `course-detail.html?id=${currentLesson.course.id}`; 
                     } else { 
-                        window.location.href = 'online-class.html'; 
+                        window.location.href = 'courses.html'; 
                     } 
                     return; 
                 }
@@ -1147,7 +1147,7 @@
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')) { 
                     window.location.href = 'auth.html'; 
                 } else { 
-                    window.location.href = 'online-class.html'; 
+                    window.location.href = 'courses.html'; 
                 } 
                 return; 
             }
