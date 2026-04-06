@@ -626,13 +626,8 @@
             }
         }
 
-        async function signInWithNaver() {
-            // TODO: Supabase Naver Provider 설정 완료 후 활성화
-            // const { data, error } = await window.supabase.auth.signInWithOAuth({
-            //     provider: 'naver',
-            //     options: { redirectTo: window.location.origin + '/auth-callback.html' }
-            // });
-            alert('네이버 로그인은 현재 준비 중입니다.');
+        function signInWithNaver() {
+            window.location.href = 'https://fqxbfetyfjyzomgrczwi.supabase.co/functions/v1/naver-auth?action=login';
         }
 
         function showEmailLogin() {
