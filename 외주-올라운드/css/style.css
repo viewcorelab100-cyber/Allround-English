@@ -301,9 +301,10 @@ textarea {
 }
 
 .kakao-btn {
-  position: fixed;
-  top: 130px;
-  right: 40px;
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  margin-top: 12px;
   z-index: 996;
   display: inline-flex;
   align-items: center;
