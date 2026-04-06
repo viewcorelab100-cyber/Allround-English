@@ -1,0 +1,459 @@
+.sub-content {
+    min-width: 0;
+}
+
+.sub-visual {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    background: url("../img/sub-bg.png") no-repeat center top / cover;
+    padding: 0 20px 20px 20px;
+}
+
+.original-inner {
+    width: 100%;
+    max-width: 1318px;
+    padding-top: 37px;
+    position: relative;
+}
+
+.original-title-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: 80px;
+}
+
+.original-title {
+    font-family: "cabrito-didone-normal", serif;
+    font-size: 35px;
+    line-height: 1;
+    font-weight: 600;
+    color: #2f2725;
+    position: relative;
+    padding-left: 20px;
+}
+
+.original-title::before {
+    content: "";
+    width: 2px;
+    height: 22px;
+    background: #2f2725;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.original-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 18px 1px;
+    border-radius: 999px;
+    background: #2f2725;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+
+.original-card {
+    margin-top: 34px;
+    padding: 64px 56px 72px;
+    background: #fff;
+    border: 1px solid #ececeb;
+}
+
+.original-sec+.original-sec {
+    margin-top: 200px;
+}
+
+.original-sec-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+}
+
+.original-sec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+}
+
+.original-sec-grid-lg {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+}
+
+.original-sec-hero .original-figure img {
+    width: 100%;
+    max-width: 405px;
+}
+
+.original-sec-grid .original-figure img {
+    width: 100%;
+    max-width: 465px;
+    margin-top: 150px;
+}
+
+.original-sec-grid-lg .original-figure img {
+    width: 100%;
+    max-width: 592px;
+    position: relative;
+    top: -35px;
+    margin-top: 0;
+}
+
+.original-copy {
+    color: #2f2725;
+}
+
+.original-headline {
+    font-size: 35px;
+    line-height: 50px;
+    font-weight: 700;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.original-copy-text {
+    margin-top: 50px;
+}
+
+.original-copy-text-75 {
+    margin-top: 75px;
+}
+
+.original-copy-text-75 p {
+    font-size: 25px;
+    line-height: 45px;
+    color: #2f2725;
+}
+
+.original-copy-text p {
+    font-size: 25px;
+    line-height: 45px;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.original-copy-text p+p {
+    margin-top: 50px;
+}
+
+.original-copy-text strong {
+    font-weight: 700;
+}
+
+.sec-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 125px;
+    height: 35px;
+    padding: 0 14px;
+    border-radius: 4px;
+    background: #133528;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.original-sec-title {
+    margin-top: 23px;
+    font-size: 30px;
+    line-height: 45px;
+    font-weight: 600;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.original-list {
+    margin-top: 42px;
+}
+
+.original-list dl+dl {
+    margin-top: 42px;
+}
+
+.original-list dt {
+    font-size: 25px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #2f2725;
+    letter-spacing: -0.02em;
+}
+
+.original-list dd {
+    margin-top: 12px;
+    font-size: 25px;
+    line-height: 1.85;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.original-curri-title {
+    margin-top: 23px;
+}
+
+.curriculum-table-wrap {
+    margin-top: 38px;
+}
+
+.curriculum-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.curriculum-table thead th {
+    padding: 15px;
+    border-bottom: 2px solid #2f2725;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2f2725;
+    text-align: center;
+    line-height: 1;
+}
+
+.curriculum-table tbody td {
+    padding: 15px;
+    border-bottom: 1.5px solid #2f2725;
+    font-size: 17px;
+    line-height: 1;
+    color: #2f2725;
+    vertical-align: middle;
+    word-break: keep-all;
+    font-weight: 500;
+}
+
+.curriculum-table tbody tr:last-child td {
+    border-bottom: 2px solid #2f2725;
+}
+
+.curriculum-table tbody td:first-child {
+    text-align: left;
+    font-weight: 700;
+    padding-left: 30px;
+}
+
+.curriculum-note {
+    margin-top: 20px;
+    text-align: right;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.original-btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 38px;
+}
+
+.btn-original {
+    min-width: 120px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 4px;
+    background: #133528;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.sub-visual {
+    position: relative;
+}
+
+.sub-visual .kakao-btn {
+    position: absolute;
+    top: 15px;
+    right: 7%;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    padding: 0 26px 0 0;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.sub-visual .kakao-btn img {
+    width: 62px;
+    height: 62px;
+}
+
+.sub-visual .kakao-btn span {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d2d2d;
+    white-space: nowrap;
+}
+
+.menu-title.is-active {
+    color: #9fa0a0;
+}
+
+.menu-sub a.is-active {
+    color: #2f2725;
+}
+
+@media (max-width: 1920px) {
+    .sub-visual .kakao-btn {
+        right: 0;
+    }
+}
+
+@media (max-width: 1280px) {
+    .original-card {
+        padding: 48px 34px 56px;
+    }
+
+    .original-title-row {
+        margin-left: 0px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 1024px) {
+
+    .original-sec-hero,
+    .original-sec-grid,
+    .original-sec-grid-lg {
+        grid-template-columns: 1fr;
+    }
+
+    br.mo-br {
+        display: none;
+    }
+
+    .original-figure {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .original-sec-grid-lg .original-figure img {
+        position: initial;
+    }
+
+    .sub-visual .kakao-btn {
+        display: none;
+    }
+
+    .original-sec-grid .original-figure img {
+        margin-top: 0px;
+    }
+}
+
+@media (max-width: 768px) {
+    .original-inner {
+        padding-top: 26px;
+    }
+
+    .original-title-row {
+        gap: 10px;
+    }
+
+    .original-title {
+        font-size: 28px;
+        padding-left: 14px;
+    }
+
+    .original-title::before {
+        height: 18px;
+    }
+
+    .original-badge {
+        min-width: auto;
+        height: 24px;
+        font-size: 11px;
+        padding: 0 10px;
+    }
+
+    .original-card {
+        margin-top: 18px;
+        padding: 28px 18px 40px;
+    }
+
+    .original-sec+.original-sec {
+        margin-top: 60px;
+    }
+
+    .original-headline {
+        font-size: 24px;
+    }
+
+    .original-copy-text {
+        margin-top: 20px;
+    }
+
+    .original-copy-text p,
+    .original-list dd {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .original-sec-title {
+        font-size: 24px;
+        margin-top: 14px;
+    }
+
+    .original-list {
+        margin-top: 24px;
+    }
+
+    .original-list dl+dl {
+        margin-top: 24px;
+    }
+
+    .original-list dt {
+        font-size: 17px;
+    }
+
+    .sec-label {
+        min-width: 72px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .curriculum-table thead th {
+        font-size: 14px;
+        padding: 12px 10px;
+    }
+
+    .curriculum-table tbody td {
+        font-size: 13px;
+        padding: 12px 10px;
+    }
+
+    .curriculum-note {
+        font-size: 12px;
+        line-height: 1.5;
+        margin-top: 10px;
+    }
+
+    .btn-original {
+        min-width: 100px;
+        height: 38px;
+        font-size: 15px;
+    }
+    .curriculum-table tbody td:first-child {
+    padding-left: 15px;
+    text-align: center;
+}
+}
+
+@media (max-width: 900px) {
+    .original-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

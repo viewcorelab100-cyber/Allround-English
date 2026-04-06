@@ -1,0 +1,282 @@
+.online-class-page .sub-visual {
+    background: url("../img/sub-bg.png") no-repeat center top / cover;
+}
+
+.online-title-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: 80px;
+}
+
+.online-title {
+    font-family: "cabrito-didone-normal", serif;
+    font-size: 35px;
+    line-height: 1;
+    font-weight: 600;
+    color: #2f2725;
+    position: relative;
+    padding-left: 20px;
+}
+
+.online-title::before {
+    content: "";
+    width: 2px;
+    height: 22px;
+    background: #2f2725;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.online-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    height: 24px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #2f2725;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+
+.online-card {
+    margin-top: 34px;
+    padding: 40px 56px 48px;
+    background: #fff;
+    border: 1px solid #ececeb;
+}
+
+.online-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 28px;
+    padding-bottom: 40px;
+}
+
+.online-tabs a {
+    position: relative;
+    font-size: 22px;
+    font-weight: 700;
+    color: #9fa0a0;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.online-tabs a.is-active {
+    color: #2f2725;
+}
+
+.online-tabs a+a::before {
+    content: "";
+    width: 3px;
+    height: 18px;
+    background: #9fa0a0;
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+
+.online-item {
+    display: grid;
+    grid-template-columns: 312px 1fr;
+    gap: 34px;
+    align-items: start;
+}
+
+.online-item+.online-item {
+    margin-top: 42px;
+}
+
+.online-thumb {
+    display: block;
+    background: #2f2725;
+    aspect-ratio: 312 / 173;
+}
+
+.online-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.online-info {
+    padding-top: 4px;
+}
+
+.online-info-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.online-texts h3 {
+    font-size: 22px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.online-subtitle {
+    margin-top: 2px;
+    font-size: 22px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #2f2725;
+    letter-spacing: -0.03em;
+}
+
+.online-label {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    height: 26px;
+    padding: 0 16px;
+    border-radius: 4px;
+    background: #b5b5b5;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.online-desc {
+    margin-top: 24px;
+    font-size: 18px;
+    line-height: 1.9;
+    color: #6d6765;
+    letter-spacing: -0.03em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.online-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    margin-top: 54px;
+}
+
+.online-pagination a {
+    font-size: 22px;
+    line-height: 1;
+    color: #7e7a78;
+    letter-spacing: -0.03em;
+}
+
+.online-pagination a.is-active {
+    font-weight: 700;
+    color: #2f2725;
+}
+
+
+
+@media (max-width: 1280px) {
+    .online-title-row {
+        margin-left: 0;
+        flex-wrap: wrap;
+    }
+
+    .online-card {
+        padding: 40px 34px 48px;
+    }
+
+    .online-item {
+        grid-template-columns: 280px 1fr;
+    }
+}
+
+@media (max-width: 1116px) {
+    .online-tabs a {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .online-item {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .online-info-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .online-tabs a {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .online-title {
+        font-size: 28px;
+        padding-left: 14px;
+    }
+
+    .online-title::before {
+        height: 18px;
+    }
+
+    .online-badge {
+        font-size: 11px;
+        height: 22px;
+        padding: 0 10px;
+    }
+
+    .online-card {
+        padding: 28px 20px 36px;
+    }
+
+    .online-tabs {
+        gap: 10px 18px;
+        padding-bottom: 24px;
+    }
+
+    .online-tabs a {
+        text-align: center;
+    }
+
+    .online-tabs a+a::before {
+        height: 14px;
+        left: -9px;
+    }
+
+    .online-texts h3,
+    .online-subtitle {
+        font-size: 18px;
+    }
+
+    .online-desc {
+        margin-top: 16px;
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .online-pagination {
+        gap: 10px;
+        margin-top: 36px;
+    }
+
+    .online-pagination a {
+        font-size: 16px;
+    }
+
+    
+}
