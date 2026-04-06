@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-06T21:31:16.080Z",
+  "lastUpdated": "2026-04-06T21:33:14.212Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -14,9 +14,10 @@
     "reset-user-password",
     "delete-user",
     "외주-올라운드",
-    "naver-auth"
+    "naver-auth",
+    "design-unification"
   ],
-  "primaryFeature": "notification-system",
+  "primaryFeature": "design-unification",
   "features": {
     "demo-account": {
       "phase": "check",
@@ -200,6 +201,23 @@
         "lastUpdated": "2026-04-06T21:31:16.080Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\naver-auth\\index.ts"
+    },
+    "design-unification": {
+      "phase": "plan",
+      "phaseNumber": 1,
+      "matchRate": 0,
+      "iterationCount": 0,
+      "requirements": [
+        "page-shell.css 생성 (헤더/사이드바/푸터 스타일 추출)",
+        "sidebar.js를 새 디자인 클래스 기반으로 재작성",
+        "footer.js를 새 디자인 클래스 기반으로 재작성",
+        "기능 페이지 8개 헤더/사이드바/푸터 교체",
+        "모바일 메뉴 좌측 슬라이드로 통일",
+        "콘텐츠 배경 sub-bg.png 통일",
+        "반응형 동작 통일 (1024px/768px)"
+      ],
+      "createdAt": "2026-04-06T21:33:14.210Z",
+      "updatedAt": "2026-04-06T21:33:14.212Z"
     }
   },
   "pipeline": {
