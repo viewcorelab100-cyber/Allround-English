@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-05T20:10:17.215Z",
+  "lastUpdated": "2026-04-06T06:35:56.780Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -10,7 +10,8 @@
     "send-nhn-alimtalk",
     "auto-send-notifications",
     "send-nhn-sms",
-    "toss-webhook"
+    "toss-webhook",
+    "reset-user-password"
   ],
   "primaryFeature": "notification-system",
   "features": {
@@ -144,6 +145,19 @@
         "lastUpdated": "2026-04-03T14:26:59.884Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\toss-webhook\\index.ts"
+    },
+    "reset-user-password": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-06T06:35:56.780Z",
+        "lastUpdated": "2026-04-06T06:35:56.780Z"
+      },
+      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\reset-user-password\\index.ts"
     }
   },
   "pipeline": {
@@ -154,7 +168,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-05T20:10:17.215Z"
+    "lastActivity": "2026-04-06T06:35:56.780Z"
   },
   "history": [
     {
@@ -1102,6 +1116,12 @@
     {
       "timestamp": "2026-04-05T20:10:17.215Z",
       "feature": "js",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-06T06:35:56.780Z",
+      "feature": "reset-user-password",
       "phase": "do",
       "action": "updated"
     }
