@@ -142,6 +142,166 @@
       </div>
     </footer>
   </div>
+
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/courses.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    // === 상태 ===
+    var allCourses = [];
+    var filteredCourses = [];
+    var currentCategory = 'all';
+    var currentPage = 1;
+    var perPage = 6;
+
+    // === 강의 카드 렌더링 (외주 디자인 HTML 구조 유지) ===
+    function renderCourseCard(course) {
+      var totalMinutes = course.totalDuration || 0;
+      var durationText = '';
+      if (totalMinutes >= 60) {
+        var hours = Math.floor(totalMinutes / 60);
+        var mins = totalMinutes % 60;
+        durationText = mins > 0 ? hours + '시간 ' + mins + '분' : hours + '시간';
+      } else if (totalMinutes > 0) {
+        durationText = totalMinutes + '분';
+      }
+
+      var lessonCount = course.lessonCount || 0;
+      var lessonsText = lessonCount > 0 ? lessonCount + '강' : '';
+      var metaParts = [lessonsText, durationText].filter(Boolean).join(' · ');
+      var categoryLabel = course.category || '정규 강의';
+      var thumbUrl = course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80';
+      var descFirstLine = course.description ? course.description.split('\n')[0] : '';
+
+      return '<article class="online-item">' +
+        '<a href="../course-detail.html?id=' + course.id + '" class="online-thumb">' +
+          '<img src="' + thumbUrl + '" alt="' + course.title + '" />' +
+        '</a>' +
+        '<div class="online-info">' +
+          '<div class="online-info-top">' +
+            '<div class="online-texts">' +
+              '<h3>' + course.title + '</h3>' +
+              (descFirstLine ? '<p class="online-subtitle">' + descFirstLine + '</p>' : '') +
+            '</div>' +
+            '<span class="online-label">' + categoryLabel + '</span>' +
+          '</div>' +
+          '<p class="online-desc">' + (course.description || '') + '</p>' +
+          (metaParts ? '<p style="margin-top:12px; font-size:14px; color:#9fa0a0;">' + metaParts + '</p>' : '') +
+        '</div>' +
+      '</article>';
+    }
+
+    // === 리스트 렌더링 ===
+    function renderCourses() {
+      var list = document.getElementById('courses-list');
+      var start = (currentPage - 1) * perPage;
+      var pageCourses = filteredCourses.slice(start, start + perPage);
+
+      if (filteredCourses.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:#9fa0a0; padding:60px 0;">' +
+          '<p style="font-size:18px; margin-bottom:8px;">등록된 강의가 없습니다.</p>' +
+          '<p style="font-size:14px;">곧 새로운 강의가 업로드될 예정입니다.</p>' +
+        '</div>';
+      } else {
+        list.innerHTML = pageCourses.map(renderCourseCard).join('');
+      }
+
+      renderPagination();
+    }
+
+    // === 페이지네이션 ===
+    function renderPagination() {
+      var pagination = document.getElementById('pagination');
+      var totalPages = Math.ceil(filteredCourses.length / perPage);
+
+      if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
+      }
+
+      pagination.style.display = '';
+      var html = '';
+      for (var i = 1; i <= totalPages; i++) {
+        html += '<a href="#" class="' + (i === currentPage ? 'is-active' : '') + '" data-page="' + i + '">' + i + '</a>';
+      }
+      pagination.innerHTML = html;
+
+      // 페이지 클릭 이벤트
+      $(pagination).find('a').on('click', function(e) {
+        e.preventDefault();
+        currentPage = parseInt($(this).data('page'));
+        renderCourses();
+        document.getElementById('courses-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    // === 카테고리 필터 ===
+    function filterByCategory(category) {
+      currentCategory = category;
+      currentPage = 1;
+
+      if (category === 'all') {
+        filteredCourses = allCourses.slice();
+      } else {
+        filteredCourses = allCourses.filter(function(c) { return c.category === category; });
+      }
+
+      // 탭 활성 상태 업데이트
+      $('#category-tabs a').each(function() {
+        $(this).toggleClass('is-active', $(this).data('category') === category);
+      });
+
+      renderCourses();
+    }
+
+    // === 초기화 ===
+    async function initCourses() {
+      var result = await getAllCourses();
+
+      if (result.success) {
+        allCourses = result.data;
+        filteredCourses = allCourses.slice();
+
+        // 카테고리 탭 동적 생성
+        var categories = [];
+        allCourses.forEach(function(c) {
+          if (c.category && categories.indexOf(c.category) === -1) {
+            categories.push(c.category);
+          }
+        });
+
+        var tabContainer = document.getElementById('category-tabs');
+        var tabsHtml = '<a href="#" class="is-active" data-category="all">전체</a>';
+        categories.forEach(function(cat) {
+          tabsHtml += '<a href="#" data-category="' + cat + '">' + cat + '</a>';
+        });
+        tabContainer.innerHTML = tabsHtml;
+
+        // 탭 클릭 이벤트
+        $('#category-tabs a').on('click', function(e) {
+          e.preventDefault();
+          filterByCategory($(this).data('category'));
+        });
+
+        // URL 파라미터로 카테고리 필터
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlCategory = urlParams.get('category');
+        if (urlCategory && categories.indexOf(urlCategory) !== -1) {
+          filterByCategory(urlCategory);
+        } else {
+          renderCourses();
+        }
+      } else {
+        document.getElementById('courses-list').innerHTML =
+          '<div style="text-align:center; color:#9fa0a0; padding:60px 0;">' +
+            '<p style="font-size:18px; margin-bottom:8px;">강의를 불러올 수 없습니다.</p>' +
+            '<p style="font-size:14px;">잠시 후 다시 시도해주세요.</p>' +
+          '</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initCourses);
+  </script>
 </body>
 
 </html>
