@@ -25,11 +25,17 @@
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/page-shell.css">
-    <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
     <!-- 토스페이먼츠 SDK (v2) -->
     <script src="https://js.tosspayments.com/v2/standard"></script>
     <style>
+        :root {
+            --page-right: min(8.3vw, 159px);
+            --header-h: 60px;
+            --sidebar-right-edge: min(21.8vw, 418px);
+            --sidebar-gap: min(3.75vw, 72px);
+            --signup-right: min(13.44vw, 258px);
+        }
+        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
@@ -37,42 +43,67 @@
             overflow-x: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+        .content-area { background: url('img/sub-bg.png') no-repeat center top / cover; }
+        .sidebar-link { transition: color 0.2s ease; }
+        .sidebar-link:hover { color: #2F2725 !important; }
+        .mobile-menu-overlay { transition: opacity 0.3s ease; }
+        .mobile-menu-panel { transition: transform 0.3s ease; }
     </style>
 </head>
-<body data-active-page="payment">
+<body class="min-h-screen flex flex-col" data-active-page="payment">
 
-    <header class="main-header">
-      <div class="shell-container">
-        <div class="shell-logo-wrap">
-          <a href="index.html" class="shell-logo"><img src="img/logo.png" alt="ALLROUND"></a>
-        </div>
-        <div class="shell-header-right">
-          <div id="auth-buttons" class="shell-auth-buttons">
-            <a href="auth.html">Login</a>
-            <a href="auth.html?mode=signup">Sign up</a>
-          </div>
-          <div id="user-menu" class="shell-user-menu">
-            <a id="admin-link" class="admin-link" href="admin.html">관리자</a>
-            <a href="mypage.html">My Page</a>
-            <button onclick="signOut()">Logout</button>
-          </div>
-          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header"><img src="img/kakao-icon.png" alt=""></a>
-          <a href="#" class="menu-btn"><img src="img/menu-icon.png" alt="menu"></a>
-          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="shell-kakao-btn">
-            <img src="img/kakao-icon.png" alt="카카오톡"><span>카톡 상담</span>
-          </a>
-        </div>
-      </div>
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
+        <a href="index.html">
+            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+        </a>
+        <button id="hamburger-btn" onclick="toggleMobileMenu()">
+            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
+        </button>
     </header>
-    <div class="shell-menu-overlay"></div>
 
-    <main class="shell-main">
-      <div class="shell-grid">
-        <aside class="shell-left-bar">
-          <button type="button" class="shell-menu-close" aria-label="메뉴 닫기">&times;</button>
-          <div class="left-menu"></div>
-        </aside>
-        <section class="shell-content font-suit">
+    <!-- Desktop Header -->
+    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
+        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+            <a href="index.html">
+                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
+            </a>
+        </div>
+        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
+            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
+                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+            </div>
+            <div id="user-menu" class="hidden items-center gap-6">
+                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
+                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
+                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            </div>
+            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
+                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
+        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
+        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
+            <div class="p-6 pt-20">
+                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
+                <nav class="space-y-6"></nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative" style="padding-top: var(--header-h);">
+        <div class="flex h-[calc(100vh-var(--header-h))]">
+            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
+                <nav class="text-right space-y-6"></nav>
+            </aside>
+
+            <div class="flex-1 relative overflow-y-auto content-area font-suit">
                 <div class="px-6 md:px-12 py-12">
                     <div class="max-w-2xl md:ml-[24px]">
 
@@ -255,9 +286,20 @@
 
                     </div>
                 </div>
-        </section>
-      </div>
+            </div>
+        </div>
+
+        <!-- Mobile: 카톡 플로팅 -->
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
+           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
+            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
+            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
+                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+            </div>
+        </a>
     </main>
+
+    <div id="footer-container"></div>
 
     <!-- KB 에스크로 인증마크 숨겨진 폼 -->
     <form name="KB_AUTHMARK_FORM" method="get" style="display: none;">
@@ -284,6 +326,23 @@
             }
         }
 
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const panel = menu.querySelector('.mobile-menu-panel');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('translate-x-full');
+                    panel.classList.add('translate-x-0');
+                });
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.remove('translate-x-0');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => { menu.classList.add('hidden'); }, 300);
+                document.body.style.overflow = '';
+            }
+        }
     </script>
     <script src="js/sidebar.js"></script>
     <script src="js/footer.js"></script>

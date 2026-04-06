@@ -287,6 +287,20 @@
 
         async function handleSession(session) {
             const user = session.user;
+            console.log('[네이버 로그인] handleSession, user:', user.id, user.email);
+
+            // 세션이 확실히 저장되었는지 확인
+            const { data: { session: savedSession } } = await window.supabase.auth.getSession();
+            console.log('[네이버 로그인] 저장된 세션:', savedSession ? '있음' : '없음');
+
+            if (!savedSession) {
+                // 세션 수동 설정
+                console.log('[네이버 로그인] 세션 수동 설정 시도');
+                await window.supabase.auth.setSession({
+                    access_token: session.access_token,
+                    refresh_token: session.refresh_token,
+                });
+            }
 
             // 프로필 확인 — phone이 비어있으면 추가정보 필요
             const { data: profile } = await window.supabase
@@ -300,13 +314,18 @@
                 return;
             }
 
+            console.log('[네이버 로그인] 프로필:', profile);
+
             if (!profile.phone) {
                 // 최초 로그인 → 추가정보 입력
                 const userName = profile.name || user.user_metadata?.full_name || '';
                 showAdditionalInfoForm(userName);
             } else {
-                // 기존 유저 → 메인 페이지
-                window.location.href = 'index.html';
+                // 기존 유저 → 메인 페이지 (세션 저장 대기)
+                console.log('[네이버 로그인] 메인으로 이동');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500);
             }
         }
 

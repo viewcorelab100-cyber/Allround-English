@@ -27,8 +27,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/page-shell.css">
-    <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -218,46 +216,20 @@
         }
     </style>
 </head>
-<body class="bg-black text-white" data-active-page="lesson">
+<body class="bg-black text-white min-h-screen">
     
-    <header class="main-header">
-      <div class="shell-container">
-        <div class="shell-logo-wrap">
-          <a href="index.html" class="shell-logo"><img src="img/logo.png" alt="ALLROUND"></a>
+    <!-- 상단 네비게이션 바 (간소화) -->
+    <header class="fixed top-0 left-0 right-0 bg-black z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html"><img src="/logo.png" alt="ALLROUND" class="h-4 w-auto"></a>
+            <div id="course-title" class="text-[10px] text-gray-500 uppercase tracking-[0.2em] hidden md:block font-bold"></div>
+            <div class="flex items-center space-x-4">
+                <a href="#" id="back-to-course" class="text-[10px] text-gray-500 uppercase tracking-widest hover:text-white transition-colors font-bold">← Back to Course</a>
+            </div>
         </div>
-        <div class="shell-header-right">
-          <div id="auth-buttons" class="shell-auth-buttons">
-            <a href="auth.html">Login</a>
-            <a href="auth.html?mode=signup">Sign up</a>
-          </div>
-          <div id="user-menu" class="shell-user-menu">
-            <a id="admin-link" class="admin-link" href="admin.html">관리자</a>
-            <a href="mypage.html">My Page</a>
-            <button onclick="signOut()">Logout</button>
-          </div>
-          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header"><img src="img/kakao-icon.png" alt=""></a>
-          <a href="#" class="menu-btn"><img src="img/menu-icon.png" alt="menu"></a>
-          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="shell-kakao-btn">
-            <img src="img/kakao-icon.png" alt="카카오톡"><span>카톡 상담</span>
-          </a>
-        </div>
-      </div>
     </header>
-    <div class="shell-menu-overlay"></div>
 
-    <main class="shell-main">
-      <div class="shell-grid">
-        <aside class="shell-left-bar">
-          <button type="button" class="shell-menu-close" aria-label="메뉴 닫기">&times;</button>
-          <div class="left-menu"></div>
-        </aside>
-        <section class="shell-content">
-
-    <!-- Course title (hidden, for JS reference) -->
-    <div id="course-title" class="text-[10px] text-gray-500 uppercase tracking-[0.2em] hidden font-bold"></div>
-    <div class="mb-4">
-        <a href="#" id="back-to-course" class="text-[10px] text-gray-500 uppercase tracking-widest hover:text-white transition-colors font-bold">← Back to Course</a>
-    </div>
+    <div class="h-16"></div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto">
@@ -860,10 +832,6 @@
             </div>
         </div>
     </div>
-
-        </section>
-      </div>
-    </main>
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
@@ -2873,8 +2841,6 @@
             }
         });
     </script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>
 
