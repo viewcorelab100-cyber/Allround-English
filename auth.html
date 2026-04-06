@@ -618,6 +618,16 @@
             alert('네이버 로그인은 현재 준비 중입니다.');
         }
 
+        function showEmailSignup() {
+            document.getElementById('signup-method-select').classList.add('hidden');
+            document.getElementById('signup-email-form').classList.remove('hidden');
+        }
+
+        function showSignupMethodSelect() {
+            document.getElementById('signup-email-form').classList.add('hidden');
+            document.getElementById('signup-method-select').classList.remove('hidden');
+        }
+
         async function handleLogin() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
