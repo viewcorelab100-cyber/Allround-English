@@ -232,6 +232,8 @@
             // Edge Function에서 전달받은 naver_code로 token_hash 조회 → 세션 생성
             if (naverCode) {
                 try {
+                    console.log('[네이버 로그인] naver_code:', naverCode);
+
                     // Edge Function POST로 token_hash 조회
                     const res = await fetch('https://fqxbfetyfjyzomgrczwi.supabase.co/functions/v1/naver-auth', {
                         method: 'POST',
@@ -240,6 +242,7 @@
                     });
 
                     const result = await res.json();
+                    console.log('[네이버 로그인] Edge Function 응답:', result);
 
                     if (!res.ok || !result.success) {
                         showError('로그인 처리 실패: ' + (result.error || '알 수 없는 오류'));
@@ -247,22 +250,26 @@
                     }
 
                     // verifyOtp로 세션 생성
+                    console.log('[네이버 로그인] verifyOtp 시도, token_hash:', result.token_hash?.substring(0, 10) + '...');
                     const { data, error } = await window.supabase.auth.verifyOtp({
                         token_hash: result.token_hash,
                         type: 'magiclink',
                     });
 
                     if (error) {
+                        console.error('[네이버 로그인] verifyOtp 실패:', error);
                         showError('세션 생성 실패: ' + error.message);
                         return;
                     }
 
+                    console.log('[네이버 로그인] 세션 생성 성공');
                     if (data.session) {
                         window.history.replaceState({}, '', 'auth-callback.html');
                         await handleSession(data.session);
                         return;
                     }
                 } catch (err) {
+                    console.error('[네이버 로그인] 에러:', err);
                     showError('네트워크 오류: ' + err.message);
                     return;
                 }
