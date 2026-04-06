@@ -438,21 +438,6 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.classList.remove('translate-x-full');
-                });
-            } else {
-                panel.classList.add('translate-x-full');
-                setTimeout(() => menu.classList.add('hidden'), 300);
-            }
-        }
-
         let currentUser = null;
         let userProfile = null;
 
