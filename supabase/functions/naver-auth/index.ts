@@ -1,5 +1,9 @@
 // Supabase Edge Function: 네이버 로그인 OAuth 2.0 처리
 // Deno runtime
+//
+// 2가지 모드:
+// 1) GET ?action=login → 네이버 인증 페이지로 리다이렉트
+// 2) POST { code, state } → code 교환 + 유저 생성 + token_hash 반환 (API)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -9,7 +13,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 const SITE_URL = 'https://allround-english.co.kr'
-const CALLBACK_URL = `${SUPABASE_URL}/functions/v1/naver-auth`
+const NAVER_CALLBACK_URL = `${SITE_URL}/auth-callback.html`
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,36 +25,39 @@ Deno.serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const url = new URL(req.url)
-  const action = url.searchParams.get('action')
-  const code = url.searchParams.get('code')
-  const state = url.searchParams.get('state')
-  const error = url.searchParams.get('error')
-
   try {
-    // 1) 네이버 로그인 페이지로 리다이렉트
-    if (action === 'login') {
-      const csrfState = crypto.randomUUID()
-      const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&state=${csrfState}`
+    // 1) GET ?action=login → 네이버 인증 페이지로 리다이렉트
+    if (req.method === 'GET') {
+      const url = new URL(req.url)
+      const action = url.searchParams.get('action')
 
-      return new Response(null, {
-        status: 302,
-        headers: { Location: naverAuthUrl },
+      if (action === 'login') {
+        const csrfState = crypto.randomUUID()
+        const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&redirect_uri=${encodeURIComponent(NAVER_CALLBACK_URL)}&state=${csrfState}`
+        return new Response(null, {
+          status: 302,
+          headers: { Location: naverAuthUrl },
+        })
+      }
+
+      return new Response(JSON.stringify({ error: 'Invalid action' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // 2) 네이버 인증 에러 처리
-    if (error) {
-      const errorDesc = url.searchParams.get('error_description') || '인증 실패'
-      return new Response(null, {
-        status: 302,
-        headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent(errorDesc)}` },
-      })
-    }
+    // 2) POST { code, state } → 코드 교환 + 유저 생성 + token_hash 반환
+    if (req.method === 'POST') {
+      const { code, state } = await req.json()
 
-    // 3) 콜백: code → access_token → 프로필 → Supabase 유저 생성/로그인
-    if (code) {
-      // 3-1. code → access_token 교환
+      if (!code) {
+        return new Response(JSON.stringify({ error: 'code is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // 2-1. code → access_token 교환
       const tokenRes = await fetch('https://nid.naver.com/oauth2.0/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -60,27 +67,28 @@ Deno.serve(async (req) => {
           client_secret: NAVER_CLIENT_SECRET,
           code,
           state: state || '',
+          redirect_uri: NAVER_CALLBACK_URL,
         }),
       })
       const tokenData = await tokenRes.json()
 
       if (!tokenData.access_token) {
-        return new Response(null, {
-          status: 302,
-          headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('네이버 토큰 발급 실패')}` },
+        return new Response(JSON.stringify({ error: '네이버 토큰 발급 실패', detail: tokenData }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
-      // 3-2. access_token → 프로필 조회
+      // 2-2. access_token → 프로필 조회
       const profileRes = await fetch('https://openapi.naver.com/v1/nid/me', {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
       })
       const profileData = await profileRes.json()
 
       if (profileData.resultcode !== '00') {
-        return new Response(null, {
-          status: 302,
-          headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('네이버 프로필 조회 실패')}` },
+        return new Response(JSON.stringify({ error: '네이버 프로필 조회 실패' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
@@ -89,12 +97,12 @@ Deno.serve(async (req) => {
       const email = profile.email
       const name = profile.name || ''
 
-      // 3-3. Supabase Admin 클라이언트
+      // 2-3. Supabase Admin 클라이언트
       const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
         auth: { autoRefreshToken: false, persistSession: false },
       })
 
-      // 3-4. 기존 유저 확인 (naver_id로 프로필 조회)
+      // 2-4. 기존 유저 확인 (naver_id로 프로필 조회)
       const { data: existingProfile } = await supabase
         .from('profiles')
         .select('id')
@@ -104,10 +112,9 @@ Deno.serve(async (req) => {
       let userId: string
 
       if (existingProfile) {
-        // 기존 네이버 유저 → 로그인
         userId = existingProfile.id
       } else {
-        // 이메일로 기존 계정 확인 (이메일 중복 방지)
+        // 이메일로 기존 계정 확인
         const { data: existingByEmail } = await supabase
           .from('profiles')
           .select('id')
@@ -115,7 +122,6 @@ Deno.serve(async (req) => {
           .maybeSingle()
 
         if (existingByEmail) {
-          // 기존 이메일 계정에 네이버 연동
           userId = existingByEmail.id
           await supabase
             .from('profiles')
@@ -134,15 +140,14 @@ Deno.serve(async (req) => {
           })
 
           if (createError || !newUser.user) {
-            return new Response(null, {
-              status: 302,
-              headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('계정 생성 실패: ' + (createError?.message || ''))}` },
+            return new Response(JSON.stringify({ error: '계정 생성 실패', detail: createError?.message }), {
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             })
           }
 
           userId = newUser.user.id
 
-          // profiles에 naver_id 저장
           await supabase
             .from('profiles')
             .update({ naver_id: naverId, name })
@@ -150,52 +155,40 @@ Deno.serve(async (req) => {
         }
       }
 
-      // 3-5. 매직 링크 생성 → 토큰을 auth-callback.html로 직접 전달
+      // 2-5. 매직 링크 생성 → token_hash 반환
       const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email,
       })
 
       if (linkError || !linkData) {
-        return new Response(null, {
-          status: 302,
-          headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('세션 생성 실패')}` },
+        return new Response(JSON.stringify({ error: '세션 생성 실패', detail: linkError?.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
 
       const hashed_token = linkData.properties?.hashed_token
-      if (hashed_token) {
-        // 임시 코드 생성 → naver_auth_temp 테이블에 저장
-        const tempCode = crypto.randomUUID()
-        await supabase.from('naver_auth_temp').insert({
-          code: tempCode,
-          token_hash: hashed_token,
-          created_at: new Date().toISOString(),
-        })
-
-        return new Response(null, {
-          status: 302,
-          headers: { Location: `${SITE_URL}/auth-callback.html?naver_code=${tempCode}` },
-        })
-      }
-
-      return new Response(null, {
-        status: 302,
-        headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('토큰 생성 실패')}` },
+      return new Response(JSON.stringify({
+        success: true,
+        token_hash: hashed_token,
+        is_new: !existingProfile,
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // 알 수 없는 요청
-    return new Response(JSON.stringify({ error: 'Invalid request' }), {
-      status: 400,
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (err) {
     console.error('naver-auth error:', err)
-    return new Response(null, {
-      status: 302,
-      headers: { Location: `${SITE_URL}/auth.html?error=${encodeURIComponent('서버 오류가 발생했습니다')}` },
+    return new Response(JSON.stringify({ error: '서버 오류', detail: String(err) }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 })
