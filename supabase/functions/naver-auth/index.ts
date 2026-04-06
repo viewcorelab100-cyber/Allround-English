@@ -165,10 +165,12 @@ Deno.serve(async (req) => {
 
       const hashed_token = linkData.properties?.hashed_token
       if (hashed_token) {
-        // 토큰을 auth-callback.html로 전달, 클라이언트에서 verifyOtp 호출
-        return new Response(null, {
-          status: 302,
-          headers: { Location: `${SITE_URL}/auth-callback.html?token_hash=${hashed_token}&type=magiclink` },
+        // Chrome 302 리다이렉트 체인 이슈 회피 — HTML로 응답 후 JS로 이동
+        const redirectUrl = `${SITE_URL}/auth-callback.html?token_hash=${hashed_token}&type=magiclink`
+        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${redirectUrl}"><script>window.location.href="${redirectUrl}";</script></head><body>Redirecting...</body></html>`
+        return new Response(html, {
+          status: 200,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
         })
       }
 
