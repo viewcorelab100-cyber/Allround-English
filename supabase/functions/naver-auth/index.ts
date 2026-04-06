@@ -21,27 +21,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function htmlRedirect(url: string): Response {
-  const html = `<!DOCTYPE html>
-<html><head>
-<meta charset="utf-8">
-<title>Redirecting...</title>
-<script>
-if (window.top !== window.self) {
-  window.top.location.href = "${url}";
-} else {
-  window.location.href = "${url}";
-}
-</script>
-<noscript><meta http-equiv="refresh" content="0;url=${url}"></noscript>
-</head><body>Redirecting...</body></html>`
-  return new Response(html, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'X-Frame-Options': 'DENY',
-      'Content-Security-Policy': "frame-ancestors 'none'",
-    },
+function redirect(url: string): Response {
+  return new Response(null, {
+    status: 302,
+    headers: { Location: url },
   })
 }
 
