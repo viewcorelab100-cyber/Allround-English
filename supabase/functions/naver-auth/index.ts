@@ -165,12 +165,17 @@ Deno.serve(async (req) => {
 
       const hashed_token = linkData.properties?.hashed_token
       if (hashed_token) {
-        // Chrome 302 리다이렉트 체인 이슈 회피 — HTML로 응답 후 JS로 이동
-        const redirectUrl = `${SITE_URL}/auth-callback.html?token_hash=${hashed_token}&type=magiclink`
-        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${redirectUrl}"><script>window.location.href="${redirectUrl}";</script></head><body>Redirecting...</body></html>`
-        return new Response(html, {
-          status: 200,
-          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        // 임시 코드 생성 → naver_auth_temp 테이블에 저장
+        const tempCode = crypto.randomUUID()
+        await supabase.from('naver_auth_temp').insert({
+          code: tempCode,
+          token_hash: hashed_token,
+          created_at: new Date().toISOString(),
+        })
+
+        return new Response(null, {
+          status: 302,
+          headers: { Location: `${SITE_URL}/auth-callback.html?naver_code=${tempCode}` },
         })
       }
 
