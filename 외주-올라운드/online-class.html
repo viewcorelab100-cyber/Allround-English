@@ -144,8 +144,12 @@
   </div>
 
   <script src="../js/supabase-config.js"></script>
-  <script src="../js/courses.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/courses.js"></script>
+  <script>
+    // sidebar.js, footer.js는 로드하지 않음 (외주 디자인 HTML을 덮어쓰므로)
+    // sidebar.js의 injectSidebar()가 aside nav를 기존 디자인으로 교체하는 것이 원인
+  </script>
   <script>
     // === 상태 ===
     var allCourses = [];
