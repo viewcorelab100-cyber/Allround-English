@@ -658,6 +658,12 @@ br.br-pc-none {
   font-family: "cabrito-didone-normal", serif;
 }
 
+.menu-title-disabled {
+  color: #d0d0d0;
+  cursor: default;
+  pointer-events: none;
+}
+
 .menu-sub-text {
   display: block;
   font-size: 18px;
