@@ -62,9 +62,7 @@ serve(async (req) => {
       )
     }
 
-    // Service Role 클라이언트로 비밀번호 변경
-    const adminClient = createClient(supabaseUrl, supabaseServiceKey)
-
+    // Service Role 클라이언트로 비밀번호 변경 (위에서 생성한 adminClient 재사용)
     const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
       password: newPassword
     })
