@@ -4785,12 +4785,28 @@
             if (!confirm(`${memberName} 학생의 비밀번호를 "allround1234"로 초기화하시겠습니까?`)) return;
 
             try {
-                const { data, error } = await window.supabase.functions.invoke('reset-user-password', {
-                    body: { userId, newPassword: 'allround1234' }
+                // fetch로 직접 호출하여 정확한 에러 메시지 확인
+                const session = await window.supabase.auth.getSession();
+                const accessToken = session?.data?.session?.access_token;
+                if (!accessToken) throw new Error('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/reset-user-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                        'apikey': SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({ userId, newPassword: 'allround1234' })
                 });
 
-                if (error) throw error;
-                if (data && data.error) throw new Error(data.error);
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || `서버 오류 (${response.status})`);
+                }
+
+                if (result.error) throw new Error(result.error);
 
                 alert(`${memberName} 학생의 비밀번호가 초기화되었습니다.\n임시 비밀번호: allround1234`);
             } catch (error) {
