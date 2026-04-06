@@ -301,9 +301,10 @@ textarea {
 }
 
 .kakao-btn {
-  position: absolute;
-  top: 8%;
-  right: 7%;
+  position: fixed;
+  top: 130px;
+  right: 40px;
+  z-index: 996;
   display: inline-flex;
   align-items: center;
   gap: 14px;
@@ -620,6 +621,37 @@ br.br-pc-none {
   br.br-pc-none {
     display: block;
   }
+}
+
+/* 아코디언 */
+.menu-sub {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.35s ease;
+  margin-top: 0;
+}
+
+.menu-group.is-open .menu-sub {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 30px;
+}
+
+@media (max-width: 1024px) {
+  .menu-group.is-open .menu-sub {
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-group.is-open .menu-sub {
+    margin-top: 18px;
+  }
+}
+
+.menu-title {
+  cursor: pointer;
 }
 
 .font-style {

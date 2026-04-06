@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./css/original.css" />
   <link rel="stylesheet" href="./css/online-class.css" />
   <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css" />
+  <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
   <script src="./js/main.js"></script>
 </head>
@@ -24,9 +25,9 @@
         </div>
 
         <div class="header-right">
-          <a href="#">Login</a>
-          <a href="#">Sign up</a>
-          <a href="#" class="kakao-header">
+          <a href="../auth.html">Login</a>
+          <a href="../auth.html?mode=signup">Sign up</a>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
             <img src="./img/kakao-icon.png" alt="" />
           </a>
           <a href="#" class="menu-btn">
@@ -59,9 +60,9 @@
 
               <div class="menu-sub">
                 <a href="./online-class.html" class="is-active">정규 강의</a>
-                <a href="#">내신 강의</a>
-                <a href="#">외고 · 국제고</a>
-                <a href="#">과고 · 영재고</a>
+                <a href="../courses.html">내신 강의</a>
+                <a href="../courses.html">외고 · 국제고</a>
+                <a href="../courses.html">과고 · 영재고</a>
               </div>
             </div>
             <div class="menu-group">
@@ -74,7 +75,7 @@
               </div>
             </div>
             <div class="menu-group">
-              <a href="#" class="menu-title">상담 예약</a>
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
               <a href="#" class="menu-title">강사 채용</a>
             </div>
           </div>
@@ -82,7 +83,7 @@
         <section class="main-content sub-content online-class-page">
           <div class="sub-visual">
             <div class="sub-visual-inner original-inner">
-              <a href="#" class="kakao-btn">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
                 <img src="./img/kakao-icon.png" alt="카카오톡" />
                 <span>카톡 상담</span>
               </a>
@@ -91,134 +92,13 @@
                 <span class="online-badge">정규 강의</span>
               </div>
               <div class="online-card">
-                <div class="online-tabs">
-                  <a href="#" class="is-active">ALLROUND <br class="br-pc-none"> READING</a>
-                  <a href="#">ALLROUND <br class="br-pc-none">STRUCTURE</a>
-                  <a href="#">ALLROUND <br class="br-pc-none">GRAMMAR</a>
+                <div id="category-tabs" class="online-tabs">
+                  <a href="#" class="is-active" data-category="all">전체</a>
                 </div>
-                <div class="online-list">
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
-                  <article class="online-item">
-                    <a href="#" class="online-thumb">
-                      <img src="./img/online-thumb.jpg" alt="강의 썸네일" />
-                    </a>
-                    <div class="online-info">
-                      <div class="online-info-top">
-                        <div class="online-texts">
-                          <h3>강의 제목 - 01</h3>
-                          <p class="online-subtitle">강의 서브제목</p>
-                        </div>
-                        <span class="online-label">정규 강의</span>
-                      </div>
-                      <p class="online-desc">
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명
-                        강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 강의 설명 ....
-                      </p>
-                    </div>
-                  </article>
+                <div id="courses-list" class="online-list">
+                  <div style="text-align:center; color:#9fa0a0; padding:60px 0;">강의를 불러오는 중...</div>
                 </div>
-                <div class="online-pagination">
-                  <a href="#" class="is-active">1</a>
-                  <a href="#">2</a>
-                  <a href="#">3</a>
-                  <a href="#">4</a>
-                  <a href="#">5</a>
-                  <a href="#">6</a>
-                  <a href="#">7</a>
-                  <a href="#">8</a>
-                  <a href="#">9</a>
-                  <a href="#">10</a>
-                  <a href="#">...</a>
-                </div>
+                <div id="pagination" class="online-pagination" style="display:none;"></div>
               </div>
             </div>
           </div>
@@ -246,13 +126,13 @@
           </div>
           <div class="footer-right">
             <div class="footer-links">
-              <a href="#">[이용 약관]</a>
-              <a href="#">[환불 정책]</a>
-              <a href="#">[개인정보 처리 방침]</a>
+              <a href="../terms.html">[이용 약관]</a>
+              <a href="../refund.html">[환불 정책]</a>
+              <a href="../privacy.html">[개인정보 처리 방침]</a>
             </div>
             <div class="footer-sns">
               <a href="#"><img src="./img/insta.png" alt="instagram"></a>
-              <a href="#"><img src="./img/blog.png" alt="blog"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
               <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
             </div>
           </div>
@@ -260,6 +140,61 @@
       </div>
     </footer>
   </div>
+  <script>
+    var sb = supabase.createClient(
+      'https://fqxbfetyfjyzomgrczwi.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeGJmZXR5Zmp5em9tZ3JjendpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMzM0NjQsImV4cCI6MjA3OTYwOTQ2NH0.90t1jzTtyEUkIu0MBMhRUwN6b1fGRZGR2CfqXBMczn0'
+    );
+    var allCourses=[], filteredCourses=[], currentCategory='all', currentPage=1, perPage=6;
+
+    function renderCard(c) {
+      var mins=c.totalDuration||0, dt='';
+      if(mins>=60){var h=Math.floor(mins/60),m=mins%60; dt=m>0?h+'시간 '+m+'분':h+'시간';}
+      else if(mins>0) dt=mins+'분';
+      var lc=c.lessonCount||0, meta=[lc>0?lc+'강':'',dt].filter(Boolean).join(' · ');
+      var cat=c.category||'정규 강의', th=c.thumbnail_url||'./img/online-thumb.jpg';
+      var desc=c.description||'', df=desc.split('\n')[0];
+      return '<article class="online-item"><a href="./course-detail.html?id='+c.id+'" class="online-thumb"><img src="'+th+'" alt="'+c.title+'"/></a><div class="online-info"><div class="online-info-top"><div class="online-texts"><h3>'+c.title+'</h3>'+(df?'<p class="online-subtitle">'+df+'</p>':'')+'</div><span class="online-label">'+cat+'</span></div><p class="online-desc">'+desc+'</p>'+(meta?'<p style="margin-top:12px;font-size:14px;color:#9fa0a0;">'+meta+'</p>':'')+'</div></article>';
+    }
+    function render() {
+      var el=document.getElementById('courses-list'), s=(currentPage-1)*perPage, pg=filteredCourses.slice(s,s+perPage);
+      el.innerHTML = filteredCourses.length===0 ? '<div style="text-align:center;color:#9fa0a0;padding:60px 0;"><p style="font-size:18px;">등록된 강의가 없습니다.</p><p style="font-size:14px;">곧 새로운 강의가 업로드될 예정입니다.</p></div>' : pg.map(renderCard).join('');
+      renderPag();
+    }
+    function renderPag() {
+      var el=document.getElementById('pagination'), tp=Math.ceil(filteredCourses.length/perPage);
+      if(tp<=1){el.style.display='none';return;} el.style.display='';
+      var h=''; for(var i=1;i<=tp;i++) h+='<a href="#" class="'+(i===currentPage?'is-active':'')+'" data-page="'+i+'">'+i+'</a>';
+      el.innerHTML=h;
+      $(el).find('a').on('click',function(e){e.preventDefault();currentPage=parseInt($(this).data('page'));render();});
+    }
+    function filterCat(cat) {
+      currentCategory=cat; currentPage=1;
+      filteredCourses=cat==='all'?allCourses.slice():allCourses.filter(function(c){return c.category===cat;});
+      $('#category-tabs a').each(function(){$(this).toggleClass('is-active',$(this).data('category')===cat);});
+      render();
+    }
+    async function init() {
+      try {
+        var r=await sb.from('courses').select('*,lessons(id,duration)').eq('is_published',true).order('created_at',{ascending:false});
+        if(r.error) throw r.error;
+        allCourses=(r.data||[]).filter(function(c){return (c.visibility||'public')==='public';}).map(function(c){
+          var m=(c.lessons||[]).reduce(function(s,l){return s+(l.duration||0);},0);
+          return Object.assign({},c,{totalDuration:m,lessonCount:(c.lessons||[]).length});
+        });
+        filteredCourses=allCourses.slice();
+        var cats=[]; allCourses.forEach(function(c){if(c.category&&cats.indexOf(c.category)===-1)cats.push(c.category);});
+        var te=document.getElementById('category-tabs'), th='<a href="#" class="is-active" data-category="all">전체</a>';
+        cats.forEach(function(c){th+='<a href="#" data-category="'+c+'">'+c+'</a>';});
+        te.innerHTML=th;
+        $('#category-tabs a').on('click',function(e){e.preventDefault();filterCat($(this).data('category'));});
+        render();
+      } catch(e) {
+        document.getElementById('courses-list').innerHTML='<div style="text-align:center;color:#9fa0a0;padding:60px 0;"><p>강의를 불러올 수 없습니다.</p></div>';
+      }
+    }
+    document.addEventListener('DOMContentLoaded',init);
+  </script>
 </body>
 
 </html>
