@@ -426,7 +426,17 @@ async function getCurrentUser() {
         if (!window.supabase) {
             return null;
         }
-        const { data: { user } } = await window.supabase.auth.getUser();
+        const { data: { user }, error } = await window.supabase.auth.getUser();
+        if (error) {
+            // 403/401 = 무효한 세션 → 정리
+            if (error.status === 403 || error.status === 401 ||
+                error.message?.includes('invalid') || error.message?.includes('expired')) {
+                console.warn('무효한 세션 감지, 자동 정리');
+                localStorage.removeItem('allround_session_id');
+                await window.supabase.auth.signOut();
+            }
+            return null;
+        }
         return user;
     } catch (error) {
         console.error('Get current user error:', error);
