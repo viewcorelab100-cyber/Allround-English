@@ -494,29 +494,28 @@ async function updateAuthUI() {
 
     if (authButtons && userMenu) {
         if (user) {
-            authButtons.classList.add('hidden');
-            userMenu.classList.remove('hidden');
-            userMenu.classList.add('flex', 'flex-row');
+            authButtons.style.display = 'none';
+            userMenu.style.display = 'flex';
+            userMenu.style.alignItems = 'center';
 
             // 모바일 햄버거 메뉴 인증 상태
-            if (mobileAuthButtons) mobileAuthButtons.classList.add('hidden');
-            if (mobileUserMenu) mobileUserMenu.classList.remove('hidden');
+            if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
+            if (mobileUserMenu) mobileUserMenu.style.display = '';
 
             // 관리자 링크
             const adminOrDemoStatus = await isAdminOrDemo();
             if (adminLink) {
-                adminLink.classList.toggle('hidden', !adminOrDemoStatus);
+                adminLink.style.display = adminOrDemoStatus ? '' : 'none';
             }
         } else {
-            authButtons.classList.remove('hidden');
-            userMenu.classList.add('hidden');
-            userMenu.classList.remove('flex', 'flex-row');
+            authButtons.style.display = '';
+            userMenu.style.display = 'none';
 
             // 모바일 햄버거 메뉴 인증 상태
-            if (mobileAuthButtons) mobileAuthButtons.classList.remove('hidden');
-            if (mobileUserMenu) mobileUserMenu.classList.add('hidden');
+            if (mobileAuthButtons) mobileAuthButtons.style.display = '';
+            if (mobileUserMenu) mobileUserMenu.style.display = 'none';
 
-            if (adminLink) adminLink.classList.add('hidden');
+            if (adminLink) adminLink.style.display = 'none';
         }
     }
 }
