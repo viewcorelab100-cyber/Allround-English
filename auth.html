@@ -23,19 +23,13 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <!-- 다음 우편번호 서비스 -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <!-- Fonts: 메인 페이지 동일 -->
+    <link rel="stylesheet" href="./css/page-shell.css">
+    <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --page-right: min(8.28vw, 159px);
-            --header-h: 60px;
-            --sidebar-w: min(21.77vw, 418px);
-            --sidebar-gap: min(3.75vw, 72px);
-        }
-        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
             background-color: #ffffff;
@@ -43,11 +37,6 @@
             overflow-x: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
-        .sidebar-link { transition: color 0.2s ease; }
-        .sidebar-link:hover { color: #2F2725 !important; }
-        .kakao-btn { display: inline-block; }
-        .mobile-menu-overlay { transition: opacity 0.3s ease; }
-        .mobile-menu-panel { transition: transform 0.3s ease; }
 
         /* Auth form styles */
         .tab-active {
@@ -97,77 +86,76 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col" data-active-page="auth">
+<body data-active-page="auth">
 
-    <!-- Mobile Header -->
-    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
-        <a href="index.html">
-            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+    <!-- ===== 셸: online-class.html 복사 ===== -->
+    <header class="main-header">
+      <div class="container">
+        <div class="logo-wrap">
+          <a href="./index.html" class="logo">
+            <img src="./img/logo.png" alt="ALLROUND">
+          </a>
+        </div>
+        <div class="header-right">
+          <div id="auth-buttons" style="display:flex; align-items:center; gap:64px;">
+            <a href="auth.html">Login</a>
+            <a href="auth.html?mode=signup">Sign up</a>
+          </div>
+          <div id="user-menu" class="hidden" style="align-items:center; gap:24px;">
+            <a id="admin-link" href="admin.html" class="hidden">관리자</a>
+            <a href="mypage.html">My Page</a>
+            <button onclick="signOut()">Logout</button>
+          </div>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
+            <img src="./img/kakao-icon.png" alt="">
+          </a>
+          <a href="#" class="menu-btn">
+            <img src="./img/menu-icon.png" alt="menu">
+          </a>
+        </div>
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
+          <img src="./img/kakao-icon.png" alt="카카오톡">
+          <span>카톡 상담</span>
         </a>
-        <button id="hamburger-btn" onclick="toggleMobileMenu()">
-            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
-        </button>
+      </div>
     </header>
-
-    <!-- Desktop Header -->
-    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
-        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-            <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
-            </a>
-        </div>
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
-                <a href="auth.html?mode=signup" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Sign up</a>
+    <div class="menu-overlay"></div>
+    <main class="main-section">
+      <div class="main-grid">
+        <aside class="main-left-bar">
+          <button type="button" class="menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu">
+            <div class="menu-group">
+              <a href="./philosophy.html" class="menu-title">학원 소개</a>
+              <a href="#" class="menu-title">수업 안내</a>
+              <div class="menu-sub">
+                <a href="./firstee.html"><span class="font-style">ALLROUND firstee</span></a>
+                <a href="./original.html"><span class="font-style">ALLROUND original</span></a>
+                <a href="./strategy.html"><span class="font-style">ALLROUND strategy</span></a>
+              </div>
             </div>
-            <div id="user-menu" class="hidden items-center gap-6">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            <div class="menu-group">
+              <a href="./online-class.html" class="menu-title menu-title-icon">
+                <img src="./img/icon-video.png" alt="">
+                <span>온라인 강의</span>
+              </a>
             </div>
-            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
-            </button>
-        </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
-        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
-        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
-            <div class="p-6 pt-20">
-                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
-                <nav class="space-y-6">
-                    <!-- sidebar.js가 주입 -->
-                </nav>
+            <div class="menu-group">
+              <a href="#" class="menu-title">학원 소식</a>
+              <div class="menu-sub">
+                <span class="menu-sub-text">Instagram</span>
+                <span class="menu-sub-text">Youtube</span>
+                <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener">Blog</a>
+              </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex min-h-[calc(100vh-var(--header-h))]">
-
-            <!-- Left Sidebar (Desktop) -->
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-w); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6">
-                    <!-- sidebar.js가 주입 -->
-                </nav>
-            </aside>
-
-            <!-- 본문 컨텐츠 -->
-            <div class="flex-1 relative overflow-y-auto" style="background-color: #F5F5F5;">
-
-                <!-- 카톡 문의 -->
-                <div class="hidden lg:block fixed z-50" style="right: min(13.44vw, 258px); top: 143px;">
-                    <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn relative inline-block">
-                        <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-[62px] w-[187px] object-contain block">
-                        <div class="absolute inset-0 flex items-center justify-end pr-[16%] pointer-events-none">
-                            <span class="text-[#2F2725] text-[20px] font-bold tracking-[-0.2px]">카톡 상담</span>
-                        </div>
-                    </a>
-                </div>
+            <div class="menu-group">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
+              <span class="menu-title menu-title-disabled">강사 채용</span>
+            </div>
+          </div>
+        </aside>
+        <section class="main-content page-content-area">
+    <!-- ===== 콘텐츠 시작 ===== -->
 
                 <!-- Auth Card -->
                 <div class="flex items-start justify-center px-4 md:px-6 py-12 md:py-20">
@@ -397,9 +385,44 @@
                     </div>
                 </div>
 
-            </div>
-        </div>
+    <!-- ===== 콘텐츠 끝, 셸 재개 ===== -->
+        </section>
+      </div>
     </main>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>올라운드원격학원</strong>
+        </div>
+        <div class="footer-content-wrap">
+          <div class="footer-center">
+            <p>
+              학원설립·운영등록번호 : 제15256호 온라인원격학원 <br class="br-pc-none">신고기관명 : 서울특별시 강남교육지원청<br class="br-pc-none">
+              사업자등록번호 : 560-94-02154<br class="br-pc-none">
+              통신판매업신고 : 2026-서울강남-00399
+            </p>
+            <p>
+              대표 원장 : 개인정보보호책임자 : 배은영<br class="br-pc-none">
+              E-mail : contact@allroundedu.co.kr<br class="br-pc-none">
+              고객센터 : 0507-1339-3828<br class="br-pc-none">
+              주소 : 서울 강남구 대치동 943-29 3층 3138호
+            </p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-links">
+              <a href="terms.html">[이용 약관]</a>
+              <a href="refund.html">[환불 정책]</a>
+              <a href="privacy.html">[개인정보 처리 방침]</a>
+            </div>
+            <div class="footer-sns">
+              <a href="#"><img src="./img/insta.png" alt="instagram"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
+              <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
 
     <!-- 커스텀 모달 -->
     <div id="custom-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-6">
@@ -414,27 +437,8 @@
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/sidebar.js"></script>
+    <script src="js/page-shell-menu.js"></script>
     <script>
-        // 모바일 메뉴 토글
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            const overlay = menu.querySelector('.mobile-menu-overlay');
-
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.style.transform = 'translateX(0)';
-                    overlay.style.opacity = '1';
-                });
-            } else {
-                panel.style.transform = 'translateX(100%)';
-                overlay.style.opacity = '0';
-                setTimeout(() => menu.classList.add('hidden'), 300);
-            }
-        }
-
         // 커스텀 모달 함수
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
@@ -465,7 +469,7 @@
             forgotForm.classList.add('hidden');
             findEmailForm.classList.add('hidden');
 
-            // 모든 탭 비활성 (tab-active CSS가 color !important로 처리하므로, 비활성 시 색상만 설정)
+            // 모든 탭 비활성
             loginTab.classList.remove('tab-active');
             signupTab.classList.remove('tab-active');
             loginTab.style.color = '#9FA0A0';
@@ -474,11 +478,11 @@
             if (tab === 'login') {
                 loginForm.classList.remove('hidden');
                 loginTab.classList.add('tab-active');
-                loginTab.style.color = '';  // tab-active CSS !important가 처리
+                loginTab.style.color = '';
             } else if (tab === 'signup') {
                 signupForm.classList.remove('hidden');
                 signupTab.classList.add('tab-active');
-                signupTab.style.color = '';  // tab-active CSS !important가 처리
+                signupTab.style.color = '';
             }
         }
 
@@ -494,7 +498,6 @@
             document.getElementById('signup-form').classList.add('hidden');
             document.getElementById('forgot-form').classList.add('hidden');
             document.getElementById('find-email-form').classList.remove('hidden');
-            // Reset
             document.getElementById('find-name').value = '';
             document.getElementById('find-phone').value = '';
             const messageDiv = document.getElementById('find-email-message');
@@ -541,14 +544,12 @@
                     return;
                 }
 
-                // 이메일 마스킹 (보안: 전체 이메일 노출 방지)
                 const [localPart, domain] = data.email.split('@');
                 const masked = localPart.charAt(0) + '***@' + domain;
                 messageDiv.textContent = '등록된 이메일: ' + masked;
                 messageDiv.classList.remove('hidden', 'text-red-500', 'text-[#9FA0A0]');
                 messageDiv.classList.add('text-green-600');
             } catch (err) {
-                // RLS or network error fallback
                 messageDiv.innerHTML = '조회에 실패했습니다. <a href="https://pf.kakao.com/_KMbxon" target="_blank" class="underline underline-offset-2">카카오톡으로 문의해주세요.</a>';
                 messageDiv.classList.remove('hidden', 'text-green-600', 'text-[#9FA0A0]');
                 messageDiv.classList.add('text-red-500');
@@ -578,7 +579,6 @@
             }
         }
 
-        // 전화번호 자동 하이픈 포맷
         function formatPhoneNumber(input) {
             let value = input.value.replace(/[^0-9]/g, '');
             if (value.length > 11) {
@@ -756,6 +756,5 @@
             if (e.key === 'Enter') handleForgotPassword();
         });
     </script>
-    <script src="js/footer.js"></script>
 </body>
 </html>
