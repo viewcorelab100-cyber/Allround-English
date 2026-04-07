@@ -491,6 +491,18 @@ async function isAdminOrDemo() {
 
 // ========== UI 업데이트 함수 ==========
 
+// 요소 보이기/숨기기 (class + inline style 모두 제어)
+function showEl(el, display) {
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.style.display = display || '';
+}
+function hideEl(el) {
+    if (!el) return;
+    el.classList.add('hidden');
+    el.style.display = 'none';
+}
+
 // 로그인 상태에 따른 UI 업데이트
 async function updateAuthUI() {
     const user = await getCurrentUser();
@@ -502,28 +514,28 @@ async function updateAuthUI() {
 
     if (authButtons && userMenu) {
         if (user) {
-            authButtons.style.display = 'none';
-            userMenu.style.display = 'contents';
+            hideEl(authButtons);
+            showEl(userMenu, 'contents');
 
-            // 모바일 햄버거 메뉴 인증 상태
-            if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
-            if (mobileUserMenu) mobileUserMenu.style.display = '';
+            // 모바일 햄버거 메뉴
+            hideEl(mobileAuthButtons);
+            showEl(mobileUserMenu);
 
             // 관리자 링크 (getCurrentUser 재호출 없이 직접 프로필 조회)
             if (adminLink) {
                 const profile = await getUserProfile(user.id);
                 const isAdminUser = profile.success && (profile.data.role === 'admin' || profile.data.role === 'demo');
-                adminLink.style.display = isAdminUser ? '' : 'none';
+                isAdminUser ? showEl(adminLink) : hideEl(adminLink);
             }
         } else {
-            authButtons.style.display = 'contents';
-            userMenu.style.display = 'none';
+            showEl(authButtons, 'contents');
+            hideEl(userMenu);
 
-            // 모바일 햄버거 메뉴 인증 상태
-            if (mobileAuthButtons) mobileAuthButtons.style.display = '';
-            if (mobileUserMenu) mobileUserMenu.style.display = 'none';
+            // 모바일 햄버거 메뉴
+            showEl(mobileAuthButtons);
+            hideEl(mobileUserMenu);
 
-            if (adminLink) adminLink.style.display = 'none';
+            hideEl(adminLink);
         }
     }
 }
