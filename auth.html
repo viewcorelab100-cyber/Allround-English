@@ -510,6 +510,31 @@
     <script src="js/auth.js"></script>
     <script src="js/page-shell-menu.js"></script>
     <script>
+        // 네이버 로그인
+        function signInWithNaver() {
+            window.location.href = 'https://fqxbfetyfjyzomgrczwi.supabase.co/functions/v1/naver-auth?action=login';
+        }
+
+        function showEmailLogin() {
+            document.getElementById('login-method-select').classList.add('hidden');
+            document.getElementById('login-email-form').classList.remove('hidden');
+        }
+
+        function showLoginMethodSelect() {
+            document.getElementById('login-email-form').classList.add('hidden');
+            document.getElementById('login-method-select').classList.remove('hidden');
+        }
+
+        function showEmailSignup() {
+            document.getElementById('signup-method-select').classList.add('hidden');
+            document.getElementById('signup-email-form').classList.remove('hidden');
+        }
+
+        function showSignupMethodSelect() {
+            document.getElementById('signup-email-form').classList.add('hidden');
+            document.getElementById('signup-method-select').classList.remove('hidden');
+        }
+
         // 커스텀 모달 함수
         function showModal(title, message) {
             document.getElementById('modal-title').textContent = title;
