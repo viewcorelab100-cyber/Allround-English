@@ -69,7 +69,33 @@
   font-display: swap;
 }
 
-/* === style.css 66~115줄 글로벌 리셋 제외 === */
+/* === style.css 66~115줄 글로벌 리셋 중 font-family만 복원 === */
+body {
+  font-family: 'Pretendard', sans-serif;
+  color: #222;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+/* Tailwind 페이지에서 a 태그 스타일 보호 */
+.main-header a,
+.main-left-bar a,
+.footer a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.footer-links a {
+  font-size: 12px !important;
+  color: #4e4e4e !important;
+  letter-spacing: -0.04em;
+}
+
+.footer-sns a img {
+  display: block !important;
+  width: 42px !important;
+  height: 42px !important;
+}
 
 /* Tailwind의 .container와 충돌 방지 - !important로 우선순위 확보 */
 .container {
