@@ -71,11 +71,12 @@
 
 /* === style.css 66~115줄 글로벌 리셋 제외 === */
 
+/* Tailwind의 .container와 충돌 방지 - !important로 우선순위 확보 */
 .container {
-  width: 100%;
-  max-width: 1640px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100% !important;
+  max-width: 1640px !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
 }
 
 /* header */
