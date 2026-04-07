@@ -24,29 +24,18 @@
     <title>결제 완료 — ALLROUND</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="stylesheet" href="./css/page-shell.css">
+    <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Libre+Bodoni:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --page-right: min(8.3vw, 159px);
-            --header-h: 60px;
-            --sidebar-right-edge: min(21.8vw, 418px);
-            --sidebar-gap: min(3.75vw, 72px);
-        }
-        @media (min-width: 1024px) { :root { --header-h: 126px; } }
         body {
             font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
-            background-color: #ffffff;
             margin: 0;
             overflow-x: hidden;
         }
         .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
-        .sidebar-link { transition: color 0.2s ease; }
-        .sidebar-link:hover { color: #2F2725 !important; }
-        .mobile-menu-overlay { transition: opacity 0.3s ease; }
-        .mobile-menu-panel { transition: transform 0.3s ease; }
 
         @keyframes checkmark {
             0% { stroke-dashoffset: 100; }
@@ -65,306 +54,351 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col" data-active-page="payment-success">
+<body data-active-page="payment-success">
 
-    <!-- Mobile Header -->
-    <header class="lg:hidden fixed top-0 left-0 right-0 bg-white z-50 flex items-center justify-between px-5 h-[60px]">
-        <a href="index.html">
-            <img src="logo.png" alt="ALLROUND" class="h-[13px] w-auto" style="filter: brightness(0);">
+    <!-- ===== 셸 시작: online-class.html에서 복사 ===== -->
+    <header class="main-header">
+      <div class="container">
+        <div class="logo-wrap">
+          <a href="./index.html" class="logo">
+            <img src="./img/logo.png" alt="ALLROUND">
+          </a>
+        </div>
+        <div class="header-right">
+          <div id="auth-buttons" style="display:flex; align-items:center; gap:64px;">
+            <a href="auth.html">Login</a>
+            <a href="auth.html?mode=signup">Sign up</a>
+          </div>
+          <div id="user-menu" class="hidden" style="align-items:center; gap:24px;">
+            <a id="admin-link" href="admin.html" class="hidden">관리자</a>
+            <a href="mypage.html">My Page</a>
+            <button onclick="signOut()">Logout</button>
+          </div>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
+            <img src="./img/kakao-icon.png" alt="">
+          </a>
+          <a href="#" class="menu-btn">
+            <img src="./img/menu-icon.png" alt="menu">
+          </a>
+        </div>
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
+          <img src="./img/kakao-icon.png" alt="카카오톡">
+          <span>카톡 상담</span>
         </a>
-        <button id="hamburger-btn" onclick="toggleMobileMenu()">
-            <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-[18px] w-auto">
-        </button>
+      </div>
     </header>
-
-    <!-- Desktop Header -->
-    <header class="hidden lg:flex fixed top-0 left-0 right-0 bg-white z-50 items-center" style="height: var(--header-h);">
-        <div class="flex-shrink-0 flex justify-end" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
-            <a href="index.html">
-                <img src="logo.png" alt="ALLROUND" class="h-[17px] w-auto" style="filter: brightness(0);">
-            </a>
-        </div>
-        <div class="ml-auto flex items-center" style="padding-right: var(--page-right); gap: 67px;">
-            <div id="auth-buttons" class="flex items-center" style="gap: 59px;">
-                <a href="auth.html" class="text-[#3E3A39] font-bold text-[20px] leading-[20px] tracking-[-0.2px] hover:opacity-60 transition-opacity">Login</a>
+    <div class="menu-overlay"></div>
+    <main class="main-section">
+      <div class="main-grid">
+        <aside class="main-left-bar">
+          <button type="button" class="menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu">
+            <div class="menu-group">
+              <a href="./philosophy.html" class="menu-title">학원 소개</a>
+              <a href="#" class="menu-title">수업 안내</a>
+              <div class="menu-sub">
+                <a href="./firstee.html"><span class="font-style">ALLROUND firstee</span></a>
+                <a href="./original.html"><span class="font-style">ALLROUND original</span></a>
+                <a href="./strategy.html"><span class="font-style">ALLROUND strategy</span></a>
+              </div>
             </div>
-            <div id="user-menu" class="hidden items-center gap-6">
-                <a id="admin-link" href="admin.html" class="text-yellow-600 font-medium text-sm hidden">관리자</a>
-                <a href="mypage.html" class="text-[#3E3A39] font-medium text-xl hover:opacity-60 transition-opacity">My Page</a>
-                <button onclick="signOut()" class="text-[#9FA0A0] font-medium text-xl hover:opacity-60 transition-opacity">Logout</button>
+            <div class="menu-group">
+              <a href="./online-class.html" class="menu-title menu-title-icon">
+                <img src="./img/icon-video.png" alt="">
+                <span>온라인 강의</span>
+              </a>
             </div>
-            <button class="flex-shrink-0 hover:opacity-60 transition-opacity">
-                <img src="asset/main/햄버거버튼.png" alt="메뉴" class="h-6 w-auto">
-            </button>
-        </div>
-    </header>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="fixed inset-0 z-[60] hidden">
-        <div class="mobile-menu-overlay absolute inset-0 bg-black/40" onclick="toggleMobileMenu()"></div>
-        <div class="mobile-menu-panel absolute top-0 right-0 w-[280px] h-full bg-white shadow-xl translate-x-full overflow-y-auto">
-            <div class="p-6 pt-20">
-                <button class="absolute top-5 right-5 text-2xl text-[#2F2725]" onclick="toggleMobileMenu()">&times;</button>
-                <nav class="space-y-6"></nav>
+            <div class="menu-group">
+              <a href="#" class="menu-title">학원 소식</a>
+              <div class="menu-sub">
+                <span class="menu-sub-text">Instagram</span>
+                <span class="menu-sub-text">Youtube</span>
+                <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener">Blog</a>
+              </div>
             </div>
-        </div>
-    </div>
+            <div class="menu-group">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
+              <span class="menu-title menu-title-disabled">강사 채용</span>
+            </div>
+          </div>
+        </aside>
+        <section class="main-content page-content-area">
+    <!-- ===== 셸 끝, 콘텐츠 시작 ===== -->
 
-    <!-- Main Content -->
-    <main class="flex-1 relative" style="padding-top: var(--header-h);">
-        <div class="flex h-[calc(100vh-var(--header-h))]">
-            <aside class="hidden lg:flex flex-col justify-center flex-shrink-0 bg-white relative z-10" style="width: var(--sidebar-right-edge); padding-right: var(--sidebar-gap);">
-                <nav class="text-right space-y-6"></nav>
-            </aside>
+          <div class="px-6 md:px-12 py-12 font-suit">
+            <div class="max-w-xl md:ml-[24px]">
 
-            <div class="flex-1 relative overflow-y-auto bg-[#F5F5F5] font-suit">
-                <div class="px-6 md:px-12 py-12">
-                    <div class="max-w-xl md:ml-[24px]">
+                <!-- 로딩 상태 -->
+                <div id="loading-state" class="text-center py-20">
+                    <div class="text-[#8B95A1]">결제를 확인하는 중...</div>
+                </div>
 
-                        <!-- 로딩 상태 -->
-                        <div id="loading-state" class="text-center py-20">
-                            <div class="text-[#8B95A1]">결제를 확인하는 중...</div>
-                        </div>
+                <!-- 가상계좌 입금 대기 상태 -->
+                <div id="virtual-account-content" class="hidden space-y-6">
+                    <!-- 대기 아이콘 -->
+                    <div class="flex justify-center pt-4">
+                        <svg class="w-20 h-20" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                            <text x="50" y="58" text-anchor="middle" font-size="36" fill="#f59e0b" font-weight="bold">!</text>
+                        </svg>
+                    </div>
 
-                        <!-- 가상계좌 입금 대기 상태 -->
-                        <div id="virtual-account-content" class="hidden space-y-6">
-                            <!-- 대기 아이콘 -->
-                            <div class="flex justify-center pt-4">
-                                <svg class="w-20 h-20" viewBox="0 0 100 100">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" stroke-width="3"/>
-                                    <text x="50" y="58" text-anchor="middle" font-size="36" fill="#f59e0b" font-weight="bold">!</text>
-                                </svg>
+                    <!-- 메시지 -->
+                    <div class="text-center space-y-2">
+                        <h1 class="text-[26px] font-bold text-[#2F2725]">입금 대기 중</h1>
+                        <p class="text-[#8B95A1] text-[15px]">아래 계좌로 입금해주시면 자동으로 수강이 시작됩니다.</p>
+                    </div>
+
+                    <!-- 가상계좌 정보 -->
+                    <div class="bg-amber-50 rounded-2xl border border-amber-200 p-6 space-y-4">
+                        <h2 class="text-[16px] font-bold text-[#2F2725] text-center">입금 계좌 정보</h2>
+                        <div class="w-full h-px bg-amber-200"></div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">은행</span>
+                                <span id="va-bank" class="text-[#2F2725] font-semibold">-</span>
                             </div>
-
-                            <!-- 메시지 -->
-                            <div class="text-center space-y-2">
-                                <h1 class="text-[26px] font-bold text-[#2F2725]">입금 대기 중</h1>
-                                <p class="text-[#8B95A1] text-[15px]">아래 계좌로 입금해주시면 자동으로 수강이 시작됩니다.</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#8B95A1]">계좌번호</span>
+                                <span id="va-account" class="text-[#2F2725] font-bold text-lg tracking-wide">-</span>
                             </div>
-
-                            <!-- 가상계좌 정보 -->
-                            <div class="bg-amber-50 rounded-2xl border border-amber-200 p-6 space-y-4">
-                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">입금 계좌 정보</h2>
-                                <div class="w-full h-px bg-amber-200"></div>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">은행</span>
-                                        <span id="va-bank" class="text-[#2F2725] font-semibold">-</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-[#8B95A1]">계좌번호</span>
-                                        <span id="va-account" class="text-[#2F2725] font-bold text-lg tracking-wide">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">예금주</span>
-                                        <span id="va-holder" class="text-[#2F2725]">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">입금 금액</span>
-                                        <span id="va-amount" class="text-[#2F2725] font-bold">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">입금 기한</span>
-                                        <span id="va-due" class="text-red-500 font-semibold">-</span>
-                                    </div>
-                                </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">예금주</span>
+                                <span id="va-holder" class="text-[#2F2725]">-</span>
                             </div>
-
-                            <!-- 주문 정보 -->
-                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
-                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">주문 내역</h2>
-                                <div class="w-full h-px bg-gray-100"></div>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">주문번호</span>
-                                        <span id="va-order-id" class="text-[#2F2725] text-sm">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">상품명</span>
-                                        <span id="va-order-name" class="text-[#2F2725]">-</span>
-                                    </div>
-                                </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">입금 금액</span>
+                                <span id="va-amount" class="text-[#2F2725] font-bold">-</span>
                             </div>
-
-                            <!-- 안내 -->
-                            <div class="bg-gray-50 rounded-2xl p-5 text-sm text-[#8B95A1] space-y-2">
-                                <p>입금 기한 내에 입금하지 않으시면 주문이 자동 취소됩니다.</p>
-                                <p>입금 확인 후 강의가 자동으로 열리며, 마이페이지에서 확인하실 수 있습니다.</p>
-                            </div>
-
-                            <!-- 버튼 -->
-                            <div class="space-y-3 pb-8">
-                                <a href="mypage.html" class="block w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1817] transition-colors">마이페이지에서 확인</a>
-                                <a href="index.html" class="block w-full py-4 bg-white text-[#2F2725] font-semibold rounded-2xl text-center border border-gray-200 hover:bg-gray-50 transition-colors">홈으로 돌아가기</a>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">입금 기한</span>
+                                <span id="va-due" class="text-red-500 font-semibold">-</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 성공 상태 -->
-                        <div id="success-content" class="hidden space-y-6">
-
-                            <!-- 성공 아이콘 -->
-                            <div class="flex justify-center pt-4">
-                                <svg class="w-20 h-20" viewBox="0 0 100 100">
-                                    <circle class="success-circle" cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="3"/>
-                                    <path class="success-check" d="M30 50 L45 65 L70 35" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
+                    <!-- 주문 정보 -->
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                        <h2 class="text-[16px] font-bold text-[#2F2725] text-center">주문 내역</h2>
+                        <div class="w-full h-px bg-gray-100"></div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">주문번호</span>
+                                <span id="va-order-id" class="text-[#2F2725] text-sm">-</span>
                             </div>
-
-                            <!-- 메시지 -->
-                            <div class="text-center space-y-2">
-                                <h1 class="text-[26px] font-bold text-[#2F2725]">결제가 완료되었습니다!</h1>
-                                <p class="text-[#8B95A1] text-[15px]">강의를 바로 수강하실 수 있습니다.</p>
-                            </div>
-
-                            <!-- 결제 정보 -->
-                            <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
-                                <h2 class="text-[16px] font-bold text-[#2F2725] text-center">결제 내역</h2>
-                                <div class="w-full h-px bg-gray-100"></div>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">주문번호</span>
-                                        <span id="order-id" class="text-[#2F2725] text-sm">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">상품명</span>
-                                        <span id="order-name" class="text-[#2F2725]">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">결제 금액</span>
-                                        <span id="order-amount" class="text-[#2F2725] font-bold">-</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-[#8B95A1]">결제 일시</span>
-                                        <span id="order-date" class="text-[#2F2725]">-</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 배송지 입력 섹션 -->
-                            <div id="shipping-section" class="hidden space-y-6">
-                                <div class="p-5 bg-amber-50 rounded-2xl border border-amber-200">
-                                    <div>
-                                        <h3 class="text-[#2F2725] font-semibold">교재 배송 안내</h3>
-                                        <p class="text-[#8B95A1] text-sm mt-1">구매하신 강의에 교재가 포함되어 있습니다. 배송받으실 주소를 확인해주세요.</p>
-                                    </div>
-                                </div>
-
-                                <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
-                                    <h2 class="text-[16px] font-bold text-[#2F2725]">배송 정보</h2>
-                                    <div class="w-full h-px bg-gray-100"></div>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">받는 분</label>
-                                            <input type="text" id="shipping-name"
-                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                placeholder="받는 분 성함">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">연락처</label>
-                                            <input type="tel" id="shipping-phone"
-                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                placeholder="010-0000-0000"
-                                                oninput="formatPhoneNumber(this)"
-                                                maxlength="13">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">우편번호</label>
-                                            <div class="flex space-x-2">
-                                                <input type="text" id="shipping-zipcode"
-                                                    class="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                    placeholder="우편번호" readonly>
-                                                <button onclick="searchAddress()" class="px-4 py-3 bg-gray-100 rounded-xl text-[#2F2725] hover:bg-gray-200 transition-colors border border-gray-200">
-                                                    주소 검색
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">주소</label>
-                                            <input type="text" id="shipping-address"
-                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                placeholder="기본 주소" readonly>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">상세 주소 <span class="text-red-500">* (필수)</span></label>
-                                            <input type="text" id="shipping-address-detail"
-                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                placeholder="상세 주소 (동/호수 등)">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm text-[#8B95A1] mb-1">배송 메모</label>
-                                            <input type="text" id="shipping-memo"
-                                                class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
-                                                placeholder="배송 시 요청사항 (선택)">
-                                        </div>
-                                    </div>
-                                    <button onclick="saveShippingInfo()" class="w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl hover:bg-[#1a1716] transition-colors">
-                                        교재 배송하기
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- 배송 정보 완료 섹션 -->
-                            <div id="shipping-complete-section" class="hidden">
-                                <div class="p-5 bg-green-50 rounded-2xl border border-green-200">
-                                    <div class="flex-1">
-                                        <h3 class="text-[#2F2725] font-semibold">배송 정보가 등록되었습니다</h3>
-                                        <p class="text-[#8B95A1] text-sm mt-1">교재가 곧 발송될 예정입니다. 마이페이지에서 배송 상태를 확인하실 수 있습니다.</p>
-                                        <div id="shipping-info-display" class="mt-3 text-sm text-[#4E5968]"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 버튼 -->
-                            <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                                <a href="mypage.html" class="flex-1 px-6 py-4 bg-white text-[#2F2725] font-semibold rounded-2xl border border-gray-200 text-center hover:bg-gray-50 transition-colors">
-                                    마이페이지
-                                </a>
-                                <a id="go-to-course" href="courses.html" class="flex-1 px-6 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
-                                    강의 바로가기
-                                </a>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">상품명</span>
+                                <span id="va-order-name" class="text-[#2F2725]">-</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 오류 상태 -->
-                        <div id="error-state" class="hidden text-center py-20 space-y-6">
-                            <div class="flex justify-center">
-                                <svg class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="space-y-2">
-                                <h1 class="text-[26px] font-bold text-[#2F2725]">결제 처리 중 오류가 발생했습니다</h1>
-                                <p id="error-message" class="text-[#8B95A1]">다시 시도해주세요.</p>
-                            </div>
-                            <div class="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
-                                <a href="courses.html" class="px-8 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
-                                    강의 목록으로
-                                </a>
-                            </div>
-                        </div>
+                    <!-- 안내 -->
+                    <div class="bg-gray-50 rounded-2xl p-5 text-sm text-[#8B95A1] space-y-2">
+                        <p>입금 기한 내에 입금하지 않으시면 주문이 자동 취소됩니다.</p>
+                        <p>입금 확인 후 강의가 자동으로 열리며, 마이페이지에서 확인하실 수 있습니다.</p>
+                    </div>
 
+                    <!-- 버튼 -->
+                    <div class="space-y-3 pb-8">
+                        <a href="mypage.html" class="block w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1817] transition-colors">마이페이지에서 확인</a>
+                        <a href="index.html" class="block w-full py-4 bg-white text-[#2F2725] font-semibold rounded-2xl text-center border border-gray-200 hover:bg-gray-50 transition-colors">홈으로 돌아가기</a>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Mobile: 카톡 플로팅 -->
-        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener"
-           class="lg:hidden fixed bottom-5 right-5 z-40 inline-block">
-            <img src="asset/main/카톡 배경.png" alt="카톡 상담" class="h-10 w-auto object-contain drop-shadow-lg block">
-            <div class="absolute inset-0 flex items-center justify-end pr-[18%] pointer-events-none">
-                <span class="text-[#2F2725] text-[10px] font-bold tracking-wide">카톡 상담</span>
+                <!-- 성공 상태 -->
+                <div id="success-content" class="hidden space-y-6">
+
+                    <!-- 성공 아이콘 -->
+                    <div class="flex justify-center pt-4">
+                        <svg class="w-20 h-20" viewBox="0 0 100 100">
+                            <circle class="success-circle" cx="50" cy="50" r="45" fill="none" stroke="#22c55e" stroke-width="3"/>
+                            <path class="success-check" d="M30 50 L45 65 L70 35" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- 메시지 -->
+                    <div class="text-center space-y-2">
+                        <h1 class="text-[26px] font-bold text-[#2F2725]">결제가 완료되었습니다!</h1>
+                        <p class="text-[#8B95A1] text-[15px]">강의를 바로 수강하실 수 있습니다.</p>
+                    </div>
+
+                    <!-- 결제 정보 -->
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                        <h2 class="text-[16px] font-bold text-[#2F2725] text-center">결제 내역</h2>
+                        <div class="w-full h-px bg-gray-100"></div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">주문번호</span>
+                                <span id="order-id" class="text-[#2F2725] text-sm">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">상품명</span>
+                                <span id="order-name" class="text-[#2F2725]">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">결제 금액</span>
+                                <span id="order-amount" class="text-[#2F2725] font-bold">-</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#8B95A1]">결제 일시</span>
+                                <span id="order-date" class="text-[#2F2725]">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 배송지 입력 섹션 -->
+                    <div id="shipping-section" class="hidden space-y-6">
+                        <div class="p-5 bg-amber-50 rounded-2xl border border-amber-200">
+                            <div>
+                                <h3 class="text-[#2F2725] font-semibold">교재 배송 안내</h3>
+                                <p class="text-[#8B95A1] text-sm mt-1">구매하신 강의에 교재가 포함되어 있습니다. 배송받으실 주소를 확인해주세요.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                            <h2 class="text-[16px] font-bold text-[#2F2725]">배송 정보</h2>
+                            <div class="w-full h-px bg-gray-100"></div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">받는 분</label>
+                                    <input type="text" id="shipping-name"
+                                        class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                        placeholder="받는 분 성함">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">연락처</label>
+                                    <input type="tel" id="shipping-phone"
+                                        class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                        placeholder="010-0000-0000"
+                                        oninput="formatPhoneNumber(this)"
+                                        maxlength="13">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">우편번호</label>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="shipping-zipcode"
+                                            class="flex-1 px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                            placeholder="우편번호" readonly>
+                                        <button onclick="searchAddress()" class="px-4 py-3 bg-gray-100 rounded-xl text-[#2F2725] hover:bg-gray-200 transition-colors border border-gray-200">
+                                            주소 검색
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">주소</label>
+                                    <input type="text" id="shipping-address"
+                                        class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                        placeholder="기본 주소" readonly>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">상세 주소 <span class="text-red-500">* (필수)</span></label>
+                                    <input type="text" id="shipping-address-detail"
+                                        class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                        placeholder="상세 주소 (동/호수 등)">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#8B95A1] mb-1">배송 메모</label>
+                                    <input type="text" id="shipping-memo"
+                                        class="w-full px-4 py-3 bg-gray-50 rounded-xl text-[#2F2725] focus:outline-none focus:ring-2 focus:ring-[#2F2725]/20 border border-gray-200"
+                                        placeholder="배송 시 요청사항 (선택)">
+                                </div>
+                            </div>
+                            <button onclick="saveShippingInfo()" class="w-full py-4 bg-[#2F2725] text-white font-semibold rounded-2xl hover:bg-[#1a1716] transition-colors">
+                                교재 배송하기
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 배송 정보 완료 섹션 -->
+                    <div id="shipping-complete-section" class="hidden">
+                        <div class="p-5 bg-green-50 rounded-2xl border border-green-200">
+                            <div class="flex-1">
+                                <h3 class="text-[#2F2725] font-semibold">배송 정보가 등록되었습니다</h3>
+                                <p class="text-[#8B95A1] text-sm mt-1">교재가 곧 발송될 예정입니다. 마이페이지에서 배송 상태를 확인하실 수 있습니다.</p>
+                                <div id="shipping-info-display" class="mt-3 text-sm text-[#4E5968]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <a href="mypage.html" class="flex-1 px-6 py-4 bg-white text-[#2F2725] font-semibold rounded-2xl border border-gray-200 text-center hover:bg-gray-50 transition-colors">
+                            마이페이지
+                        </a>
+                        <a id="go-to-course" href="courses.html" class="flex-1 px-6 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
+                            강의 바로가기
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 오류 상태 -->
+                <div id="error-state" class="hidden text-center py-20 space-y-6">
+                    <div class="flex justify-center">
+                        <svg class="w-20 h-20 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="space-y-2">
+                        <h1 class="text-[26px] font-bold text-[#2F2725]">결제 처리 중 오류가 발생했습니다</h1>
+                        <p id="error-message" class="text-[#8B95A1]">다시 시도해주세요.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
+                        <a href="courses.html" class="px-8 py-4 bg-[#2F2725] text-white font-semibold rounded-2xl text-center hover:bg-[#1a1716] transition-colors">
+                            강의 목록으로
+                        </a>
+                    </div>
+                </div>
+
             </div>
-        </a>
+          </div>
+
+    <!-- ===== 콘텐츠 끝, 셸 재개 ===== -->
+        </section>
+      </div>
     </main>
-
-    <div id="footer-container"></div>
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>올라운드원격학원</strong>
+        </div>
+        <div class="footer-content-wrap">
+          <div class="footer-center">
+            <p>
+              학원설립·운영등록번호 : 제15256호 온라인원격학원 <br class="br-pc-none">신고기관명 : 서울특별시 강남교육지원청<br class="br-pc-none">
+              사업자등록번호 : 560-94-02154<br class="br-pc-none">
+              통신판매업신고 : 2026-서울강남-00399
+            </p>
+            <p>
+              대표 원장 : 개인정보보호책임자 : 배은영<br class="br-pc-none">
+              E-mail : contact@allroundedu.co.kr<br class="br-pc-none">
+              고객센터 : 0507-1339-3828<br class="br-pc-none">
+              주소 : 서울 강남구 대치동 943-29 3층 3138호
+            </p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-links">
+              <a href="terms.html">[이용 약관]</a>
+              <a href="refund.html">[환불 정책]</a>
+              <a href="privacy.html">[개인정보 처리 방침]</a>
+            </div>
+            <div class="footer-sns">
+              <a href="#"><img src="./img/insta.png" alt="instagram"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
+              <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- ===== 셸 완전 끝 ===== -->
 
     <!-- 다음 주소 검색 API -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/page-shell-menu.js"></script>
     <script src="js/popup-notice.js"></script>
     <script>
         function escapeHTML(str) {
@@ -532,11 +566,10 @@
                 currentOrder = order;
                 currentCourse = course;
 
-                // 가상계좌 입금 대기 분기 (단, pending payments가 있으면 다음 결제 먼저 진행)
+                // 가상계좌 입금 대기 분기
                 if (data.isWaitingForDeposit && data.virtualAccountInfo) {
                     const pendingPaymentsStr = sessionStorage.getItem('pendingPayments');
                     if (pendingPaymentsStr) {
-                        // 다음 결제(교재비 등)가 남아있으면 진행
                         document.getElementById('loading-state').innerHTML = `
                             <div class="text-center space-y-6">
                                 <div class="flex justify-center">
@@ -700,26 +733,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', handlePaymentSuccess);
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.classList.remove('translate-x-full');
-                    panel.classList.add('translate-x-0');
-                });
-                document.body.style.overflow = 'hidden';
-            } else {
-                panel.classList.remove('translate-x-0');
-                panel.classList.add('translate-x-full');
-                setTimeout(() => { menu.classList.add('hidden'); }, 300);
-                document.body.style.overflow = '';
-            }
-        }
     </script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/footer.js"></script>
 </body>
 </html>
