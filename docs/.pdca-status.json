@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-06T21:43:03.625Z",
+  "lastUpdated": "2026-04-07T12:35:11.579Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -49,9 +49,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-08T05:18:15.368Z",
-        "lastUpdated": "2026-04-06T21:42:14.098Z"
+        "lastUpdated": "2026-04-07T12:35:11.578Z"
       },
-      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\footer.js"
+      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\page-shell-menu.js"
     },
     "confirm-payment": {
       "phase": "do",
@@ -228,7 +228,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-06T21:43:03.625Z"
+    "lastActivity": "2026-04-07T12:35:11.579Z"
   },
   "history": [
     {
@@ -1314,6 +1314,12 @@
     {
       "timestamp": "2026-04-06T21:43:03.624Z",
       "feature": "naver-auth",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-07T12:35:11.579Z",
+      "feature": "js",
       "phase": "do",
       "action": "updated"
     }
