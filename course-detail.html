@@ -626,26 +626,6 @@
 
         document.addEventListener('DOMContentLoaded', loadCourseDetail);
     </script>
-    <script src="js/sidebar.js"></script>
-    <script src="js/footer.js"></script>
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            const panel = menu.querySelector('.mobile-menu-panel');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    panel.classList.remove('translate-x-full');
-                    panel.classList.add('translate-x-0');
-                });
-                document.body.style.overflow = 'hidden';
-            } else {
-                panel.classList.remove('translate-x-0');
-                panel.classList.add('translate-x-full');
-                setTimeout(() => { menu.classList.add('hidden'); }, 300);
-                document.body.style.overflow = '';
-            }
-        }
-    </script>
+    <script src="js/page-shell-menu.js"></script>
 </body>
 </html>
