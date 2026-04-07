@@ -97,11 +97,9 @@
           </a>
         </div>
         <div class="header-right">
-          <div id="auth-buttons" style="display:flex; align-items:center; gap:64px;">
-            <a href="auth.html">Login</a>
-            <a href="auth.html?mode=signup">Sign up</a>
-          </div>
-          <div id="user-menu" class="hidden" style="align-items:center; gap:24px;">
+          <a href="auth.html" id="auth-link-login">Login</a>
+          <a href="auth.html?mode=signup" id="auth-link-signup">Sign up</a>
+          <div id="user-menu" class="hidden" style="display:none; align-items:center; gap:24px;">
             <a id="admin-link" href="admin.html" class="hidden">관리자</a>
             <a href="mypage.html">My Page</a>
             <button onclick="signOut()">Logout</button>
