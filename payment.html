@@ -52,10 +52,10 @@
             <a href="auth.html">Login</a>
             <a href="auth.html?mode=signup">Sign up</a>
           </div>
-          <div id="user-menu" class="hidden" style="display:none; align-items:center; gap:24px;">
-            <a id="admin-link" href="admin.html" class="hidden">관리자</a>
+          <div id="user-menu" style="display:none;">
+            <a id="admin-link" href="admin.html" style="display:none;">관리자</a>
             <a href="mypage.html">My Page</a>
-            <button onclick="signOut()">Logout</button>
+            <a href="#" onclick="signOut(); return false;">Logout</a>
           </div>
           <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
             <img src="./img/kakao-icon.png" alt="">
