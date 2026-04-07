@@ -509,13 +509,14 @@ async function updateAuthUI() {
             if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
             if (mobileUserMenu) mobileUserMenu.style.display = '';
 
-            // 관리자 링크
-            const adminOrDemoStatus = await isAdminOrDemo();
+            // 관리자 링크 (getCurrentUser 재호출 없이 직접 프로필 조회)
             if (adminLink) {
-                adminLink.style.display = adminOrDemoStatus ? '' : 'none';
+                const profile = await getUserProfile(user.id);
+                const isAdminUser = profile.success && (profile.data.role === 'admin' || profile.data.role === 'demo');
+                adminLink.style.display = isAdminUser ? '' : 'none';
             }
         } else {
-            authButtons.style.display = '';
+            authButtons.style.display = 'contents';
             userMenu.style.display = 'none';
 
             // 모바일 햄버거 메뉴 인증 상태
