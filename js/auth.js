@@ -495,8 +495,7 @@ async function updateAuthUI() {
     if (authButtons && userMenu) {
         if (user) {
             authButtons.style.display = 'none';
-            userMenu.style.display = 'flex';
-            userMenu.style.alignItems = 'center';
+            userMenu.style.display = 'contents';
 
             // 모바일 햄버거 메뉴 인증 상태
             if (mobileAuthButtons) mobileAuthButtons.style.display = 'none';
