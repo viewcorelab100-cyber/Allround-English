@@ -25,8 +25,15 @@
         </div>
 
         <div class="header-right">
-          <a href="auth.html">Login</a>
-          <a href="auth.html?mode=signup">Sign up</a>
+          <div id="auth-buttons" style="display:contents;">
+            <a href="auth.html">Login</a>
+            <a href="auth.html?mode=signup">Sign up</a>
+          </div>
+          <div id="user-menu" class="hidden" style="display:none; align-items:center; gap:24px;">
+            <a id="admin-link" href="admin.html" class="hidden">관리자</a>
+            <a href="mypage.html">My Page</a>
+            <button onclick="signOut()">Logout</button>
+          </div>
           <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
             <img src="./img/kakao-icon.png" alt="" />
           </a>
