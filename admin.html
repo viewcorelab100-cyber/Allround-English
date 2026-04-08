@@ -359,6 +359,20 @@
     <script>
         // 페이지 로딩 중 클릭 시 ReferenceError 방지 스텁 (메인 스크립트가 덮어씀)
         function showSection(s) { window._pendingSection = s; }
+
+        // 모바일 사이드바 토글
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isOpen = sidebar.classList.contains('mobile-open');
+            if (isOpen) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('mobile-open');
+                overlay.classList.add('active');
+            }
+        }
     </script>
     <!-- 사이드바 오버레이 (모바일용) -->
     <div id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
