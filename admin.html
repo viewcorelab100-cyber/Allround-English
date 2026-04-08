@@ -7113,7 +7113,7 @@
                     `${paymentUrl}\n` +
                     `* ${expiresHours}시간 내 결제해주세요.`;
 
-                const smsResult = await window.supabase.functions.invoke('send-nhn-sms', {
+                const smsResult = await window.supabase.functions.invoke('send-alimtalk', {
                     body: { phone, message }
                 });
 
@@ -7232,7 +7232,7 @@
                     `${paymentUrl}\n` +
                     `* ${remainHours}시간 내 결제해주세요.`;
 
-                const smsResult = await window.supabase.functions.invoke('send-nhn-sms', {
+                const smsResult = await window.supabase.functions.invoke('send-alimtalk', {
                     body: { phone, message }
                 });
 
