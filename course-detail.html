@@ -197,6 +197,47 @@
         </div>
     </div>
 
+    <!-- 결제 방법 선택 모달 -->
+    <div id="pay-choice-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm shadow-xl">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-[#2F2725]">결제 방법 선택</h3>
+                    <button onclick="document.getElementById('pay-choice-modal').classList.add('hidden')" class="text-[#8B95A1] hover:text-[#2F2725]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 space-y-3">
+                <button onclick="goSelfPayment()" class="w-full p-4 bg-[#2F2725] text-white rounded-xl hover:bg-[#1a1716] transition-colors text-left">
+                    <p class="font-semibold text-[15px]">본인 결제</p>
+                    <p class="text-[12px] text-white/70 mt-1">직접 카드/간편결제로 결제합니다</p>
+                </button>
+                <button onclick="showParentPayForm()" class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl hover:border-[#2F2725] transition-colors text-left">
+                    <p class="font-semibold text-[15px] text-[#2F2725]">학부모 결제</p>
+                    <p class="text-[12px] text-[#8B95A1] mt-1">학부모님에게 결제 링크를 SMS로 보냅니다</p>
+                </button>
+            </div>
+
+            <!-- 학부모 결제 폼 (토글) -->
+            <div id="parent-pay-form" class="hidden px-6 pb-6 space-y-4">
+                <div class="border-t border-gray-200 pt-4">
+                    <label class="block text-[12px] font-semibold text-[#8B95A1] mb-2">학부모 연락처</label>
+                    <input type="tel" id="parent-phone-input" placeholder="010-0000-0000"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl text-[#2F2725] text-[15px] focus:outline-none focus:border-[#2F2725]"
+                        oninput="formatParentPhone(this)" maxlength="13">
+                    <p id="parent-pay-status" class="text-[12px] text-[#8B95A1] mt-2">결제 링크가 SMS로 발송됩니다.</p>
+                </div>
+                <button onclick="sendParentPaymentLink()" id="parent-pay-btn"
+                    class="w-full py-3 bg-[#2F2725] text-white font-semibold rounded-xl text-[14px] hover:bg-[#1a1716] transition-colors">
+                    결제 링크 보내기
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 토스페이먼츠 결제 모달 (리디자인: 흰색 테마) -->
     <div id="payment-modal" class="fixed inset-0 bg-black/40 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-lg my-8 shadow-xl">
