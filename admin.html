@@ -429,24 +429,24 @@
             <!-- 강의 관리 섹션 -->
             <section id="section-courses" class="hidden">
                 <!-- 헤더 -->
-                <div class="flex items-end justify-between mb-12">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-12">
                     <div>
                         <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Content Management</span>
-                        <h1 class="text-4xl font-bold text-white tracking-tight">Courses</h1>
+                        <h1 class="text-2xl md:text-4xl font-bold text-white tracking-tight">Courses</h1>
                     </div>
                     <div class="flex space-x-3">
-                        <button onclick="openCategoryModal()" class="btn-admin-outline demo-restricted">
+                        <button onclick="openCategoryModal()" class="btn-admin-outline demo-restricted text-[11px] md:text-xs">
                             Categories
                         </button>
-                        <button onclick="openCourseModal()" class="btn-admin-primary demo-restricted">
+                        <button onclick="openCourseModal()" class="btn-admin-primary demo-restricted text-[11px] md:text-xs">
                             Add New Course
                         </button>
                     </div>
                 </div>
 
                 <!-- 강의 목록 테이블 -->
-                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5">
-                    <table class="admin-table">
+                <div class="bg-white bg-opacity-[0.02] border border-white border-opacity-5 overflow-x-auto -mx-4 md:mx-0">
+                    <table class="admin-table min-w-[600px] md:min-w-0">
                         <thead>
                             <tr>
                                 <th>Course Title</th>
