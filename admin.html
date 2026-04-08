@@ -334,9 +334,17 @@
     <!-- 상단 헤더 -->
     <header class="fixed top-0 left-0 right-0 z-50 border-b border-gray-300" style="background-color:#F0F1F3;">
         <div class="px-8 py-5 flex items-center justify-between">
-            <a href="index.html" class="flex items-center">
-                <img src="/logo.png" alt="ALLROUND" class="h-3.5 w-auto">
-            </a>
+            <div class="flex items-center gap-3">
+                <!-- 모바일 햄버거 버튼 -->
+                <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" class="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5">
+                    <span class="block w-5 h-0.5 bg-gray-700 transition-all" id="hamburger-top"></span>
+                    <span class="block w-5 h-0.5 bg-gray-700 transition-all" id="hamburger-mid"></span>
+                    <span class="block w-5 h-0.5 bg-gray-700 transition-all" id="hamburger-bot"></span>
+                </button>
+                <a href="index.html" class="flex items-center">
+                    <img src="/logo.png" alt="ALLROUND" class="h-3.5 w-auto">
+                </a>
+            </div>
             <div class="flex items-center space-x-6">
                 <div class="flex flex-col items-end">
                     <span class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Administrator</span>
