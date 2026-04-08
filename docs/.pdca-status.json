@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-08T20:21:10.143Z",
+  "lastUpdated": "2026-04-08T20:21:20.062Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -134,7 +134,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-29T13:55:06.756Z",
-        "lastUpdated": "2026-04-08T20:21:10.143Z"
+        "lastUpdated": "2026-04-08T20:21:20.062Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\supabase\\functions\\send-nhn-sms\\index.ts"
     },
@@ -242,7 +242,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-08T20:21:10.143Z"
+    "lastActivity": "2026-04-08T20:21:20.062Z"
   },
   "history": [
     {
@@ -1387,6 +1387,12 @@
     },
     {
       "timestamp": "2026-04-08T20:21:10.143Z",
+      "feature": "send-nhn-sms",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-08T20:21:20.062Z",
       "feature": "send-nhn-sms",
       "phase": "do",
       "action": "updated"

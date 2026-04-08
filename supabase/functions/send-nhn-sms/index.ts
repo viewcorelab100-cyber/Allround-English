@@ -43,9 +43,17 @@ serve(async (req) => {
     }
 
     // API 키 검증
-    if (!NHN_CLOUD_APP_KEY || !NHN_SENDER_PHONE) {
+    if (!NHN_CLOUD_APP_KEY) {
+      console.error('NHN_CLOUD_APP_KEY / NHN_APP_KEY 환경변수 미설정')
       return new Response(
-        JSON.stringify({ success: false, error: 'NHN Cloud API 키가 설정되지 않았습니다.' }),
+        JSON.stringify({ success: false, error: 'NHN Cloud API 키가 설정되지 않았습니다.', detail: 'NHN_CLOUD_APP_KEY or NHN_APP_KEY missing' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+    if (!NHN_SENDER_PHONE) {
+      console.error('NHN_SENDER_PHONE 환경변수 미설정')
+      return new Response(
+        JSON.stringify({ success: false, error: '발신번호가 설정되지 않았습니다.', detail: 'NHN_SENDER_PHONE missing' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
