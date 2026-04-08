@@ -10,8 +10,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// NHN Cloud API 설정 (환경변수에서 로드, 알림톡과 동일한 키 폴백)
-const NHN_CLOUD_APP_KEY = Deno.env.get('NHN_CLOUD_APP_KEY') || Deno.env.get('NHN_APP_KEY') || ''
+// NHN Cloud API 설정 (NHN_APP_KEY 우선 사용 - 알림톡과 동일한 프로젝트 키)
+const NHN_CLOUD_APP_KEY = Deno.env.get('NHN_APP_KEY') || Deno.env.get('NHN_CLOUD_APP_KEY') || ''
 const NHN_SENDER_PHONE = Deno.env.get('NHN_SENDER_PHONE') || ''
 
 serve(async (req) => {
