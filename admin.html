@@ -1452,8 +1452,108 @@
                 </div>
             </section>
 
+            <!-- ========== 결제 링크 발송 섹션 ========== -->
+            <section id="section-payment-links" class="hidden">
+                <div class="flex items-end justify-between mb-12">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Payment</span>
+                        <h1 class="text-4xl font-bold tracking-tight" style="color:#111;">결제 링크 발송</h1>
+                    </div>
+                    <button onclick="openPaymentLinkModal()" class="btn-admin-primary demo-restricted">
+                        새 결제 링크
+                    </button>
+                </div>
+
+                <!-- 필터 -->
+                <div class="flex gap-3 mb-6">
+                    <select id="plink-filter-status" onchange="loadPaymentLinks()" class="text-sm px-3 py-2 border border-gray-300 bg-white">
+                        <option value="all">전체 상태</option>
+                        <option value="pending">대기중</option>
+                        <option value="paid">결제완료</option>
+                        <option value="expired">만료</option>
+                        <option value="cancelled">취소</option>
+                    </select>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="bg-white border border-gray-200 overflow-hidden" style="background:#fff !important;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>학생</th>
+                                <th>강의</th>
+                                <th>금액</th>
+                                <th>수신번호</th>
+                                <th>상태</th>
+                                <th>발송일</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plink-table-body">
+                            <tr>
+                                <td colspan="7" class="px-6 py-20 text-center text-gray-400 uppercase tracking-widest text-[10px]">
+                                    Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             </div><!-- end p-12 wrapper -->
         </main>
+    </div>
+
+    <!-- 결제 링크 발송 모달 -->
+    <div id="plink-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-lg max-h-[90vh] flex flex-col" style="color:#111;">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+                <h2 class="text-lg font-bold">결제 링크 발송</h2>
+                <button onclick="closePaymentLinkModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">학생 선택 *</label>
+                    <select id="plink-student" onchange="onPlinkStudentChange()" class="w-full px-3 py-2 border border-gray-300 text-sm">
+                        <option value="">학생을 선택하세요</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">강의 선택 *</label>
+                    <select id="plink-course" onchange="onPlinkCourseChange()" class="w-full px-3 py-2 border border-gray-300 text-sm">
+                        <option value="">강의를 선택하세요</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">강의비 (원)</label>
+                    <input type="number" id="plink-amount" class="w-full px-3 py-2 border border-gray-300 text-sm bg-gray-50" readonly>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">유효기간</label>
+                    <select id="plink-expires" class="w-full px-3 py-2 border border-gray-300 text-sm">
+                        <option value="24">24시간</option>
+                        <option value="48">48시간</option>
+                        <option value="72" selected>72시간</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">학부모 연락처 *</label>
+                    <input type="tel" id="plink-phone" placeholder="010-0000-0000" class="w-full px-3 py-2 border border-gray-300 text-sm">
+                </div>
+
+                <!-- SMS 미리보기 -->
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">SMS 미리보기</label>
+                    <div id="plink-preview" class="p-3 bg-gray-50 border border-gray-200 text-xs text-gray-600 whitespace-pre-line" style="font-family:monospace;">
+                        학생과 강의를 선택하면 미리보기가 표시됩니다.
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 p-6 border-t border-gray-200 flex-shrink-0">
+                <button onclick="closePaymentLinkModal()" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">취소</button>
+                <button onclick="sendPaymentLink()" id="plink-send-btn" class="btn-admin-primary demo-restricted">발송하기</button>
+            </div>
+        </div>
     </div>
 
     <!-- 공지 팝업 생성/수정 모달 -->
