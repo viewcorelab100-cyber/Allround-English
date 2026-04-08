@@ -1832,6 +1832,13 @@
 
         // 섹션 전환 함수
         function showSection(section) {
+            // 모바일: 사이드바 닫기
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('admin-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar) sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.classList.remove('active');
+            }
             // 모든 섹션 숨기기
             document.querySelectorAll('main section[id^="section-"]').forEach(s => s.classList.add('hidden'));
             // 모든 네비게이션 활성화 해제
