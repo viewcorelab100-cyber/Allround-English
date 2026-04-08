@@ -153,7 +153,11 @@
       var lc=c.lessonCount||0, meta=[lc>0?lc+'강':'',dt].filter(Boolean).join(' · ');
       var cat=c.category||'정규 강의', th=c.thumbnail_url||'./img/online-thumb.jpg';
       var desc=c.description||'', df=desc.split('\n')[0];
-      return '<article class="online-item"><a href="./course-detail.html?id='+c.id+'" class="online-thumb"><img src="'+th+'" alt="'+c.title+'"/></a><div class="online-info"><div class="online-info-top"><div class="online-texts"><h3>'+c.title+'</h3>'+(df?'<p class="online-subtitle">'+df+'</p>':'')+'</div><span class="online-label">'+cat+'</span></div><p class="online-desc">'+desc+'</p>'+(meta?'<p style="margin-top:12px;font-size:14px;color:#9fa0a0;">'+meta+'</p>':'')+'</div></article>';
+      var adminBadge='';
+      if(!c.is_published) adminBadge='<span style="display:inline-block;background:#e74c3c;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;margin-left:6px;">미발행</span>';
+      else if((c.visibility||'public')!=='public') adminBadge='<span style="display:inline-block;background:#f39c12;color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;margin-left:6px;">비공개</span>';
+      var opacity=(!c.is_published||(c.visibility||'public')!=='public')?'style="opacity:0.6;"':'';
+      return '<article class="online-item" '+opacity+'><a href="./course-detail.html?id='+c.id+'" class="online-thumb"><img src="'+th+'" alt="'+c.title+'"/></a><div class="online-info"><div class="online-info-top"><div class="online-texts"><h3>'+c.title+adminBadge+'</h3>'+(df?'<p class="online-subtitle">'+df+'</p>':'')+'</div><span class="online-label">'+cat+'</span></div><p class="online-desc">'+desc+'</p>'+(meta?'<p style="margin-top:12px;font-size:14px;color:#9fa0a0;">'+meta+'</p>':'')+'</div></article>';
     }
     function render() {
       var el=document.getElementById('courses-list'), s=(currentPage-1)*perPage, pg=filteredCourses.slice(s,s+perPage);
