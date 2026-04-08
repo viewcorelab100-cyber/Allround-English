@@ -175,9 +175,19 @@
     }
     async function init() {
       try {
-        var r=await sb.from('courses').select('*,lessons(id,duration)').eq('is_published',true).order('created_at',{ascending:false});
+        // 관리자 여부 확인 (auth.js의 isAdmin 사용)
+        var adminUser = false;
+        try { adminUser = await isAdmin(); } catch(e) {}
+
+        var query = sb.from('courses').select('*,lessons(id,duration)');
+        if (!adminUser) query = query.eq('is_published', true);
+        query = query.order('created_at',{ascending:false});
+        var r = await query;
         if(r.error) throw r.error;
-        allCourses=(r.data||[]).filter(function(c){return (c.visibility||'public')==='public';}).map(function(c){
+        allCourses=(r.data||[]).filter(function(c){
+          if (adminUser) return true;
+          return (c.visibility||'public')==='public';
+        }).map(function(c){
           var m=(c.lessons||[]).reduce(function(s,l){return s+(l.duration||0);},0);
           return Object.assign({},c,{totalDuration:m,lessonCount:(c.lessons||[]).length});
         });
