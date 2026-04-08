@@ -40,6 +40,19 @@ CREATE POLICY "admin_all" ON payment_links FOR ALL
   USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'))
   WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
 
+-- 학생: 본인이 생성한 링크 INSERT + 본인 링크 SELECT/UPDATE
+CREATE POLICY "student_insert_own" ON payment_links FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = student_id AND auth.uid() = created_by);
+
+CREATE POLICY "student_select_own" ON payment_links FOR SELECT
+  TO authenticated USING (auth.uid() = student_id OR auth.uid() = created_by);
+
+CREATE POLICY "student_update_own" ON payment_links FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = student_id OR auth.uid() = created_by)
+  WITH CHECK (auth.uid() = student_id OR auth.uid() = created_by);
+
 -- 비로그인(anon): token 기반 SELECT (학부모 결제 페이지 접근용)
 CREATE POLICY "anon_select" ON payment_links FOR SELECT
   TO anon USING (true);
