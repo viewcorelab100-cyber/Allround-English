@@ -484,7 +484,136 @@
                 return;
             }
 
+            // 본인결제 / 학부모결제 선택 모달
+            document.getElementById('parent-pay-form').classList.add('hidden');
+            document.getElementById('parent-phone-input').value = '';
+            document.getElementById('parent-pay-status').textContent = '결제 링크가 SMS로 발송됩니다.';
+            document.getElementById('parent-pay-status').className = 'text-[12px] text-[#8B95A1] mt-2';
+
+            // 프로필에서 학부모 번호 자동 입력
+            try {
+                const { data: profile } = await window.supabase
+                    .from('profiles')
+                    .select('guardian_phone')
+                    .eq('id', user.id)
+                    .single();
+                if (profile?.guardian_phone) {
+                    document.getElementById('parent-phone-input').value = profile.guardian_phone;
+                }
+            } catch(e) {}
+
+            document.getElementById('pay-choice-modal').classList.remove('hidden');
+        }
+
+        function goSelfPayment() {
+            document.getElementById('pay-choice-modal').classList.add('hidden');
             window.location.href = `payment.html?courseId=${currentCourse.id}`;
+        }
+
+        function showParentPayForm() {
+            document.getElementById('parent-pay-form').classList.remove('hidden');
+        }
+
+        function formatParentPhone(input) {
+            let v = input.value.replace(/[^0-9]/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length <= 3) input.value = v;
+            else if (v.length <= 7) input.value = v.slice(0,3) + '-' + v.slice(3);
+            else input.value = v.slice(0,3) + '-' + v.slice(3,7) + '-' + v.slice(7);
+        }
+
+        async function sendParentPaymentLink() {
+            const phone = document.getElementById('parent-phone-input').value.replace(/[^0-9]/g, '');
+            const statusEl = document.getElementById('parent-pay-status');
+            const btn = document.getElementById('parent-pay-btn');
+
+            if (!phone || phone.length < 10) {
+                statusEl.textContent = '올바른 연락처를 입력해주세요.';
+                statusEl.className = 'text-[12px] text-red-500 mt-2';
+                return;
+            }
+
+            const user = await getCurrentUser();
+            if (!user) return;
+
+            btn.disabled = true;
+            btn.textContent = '발송 중...';
+            statusEl.textContent = 'SMS를 발송하고 있습니다...';
+            statusEl.className = 'text-[12px] text-[#8B95A1] mt-2';
+
+            try {
+                // 프로필에서 학생 이름
+                const { data: profile } = await window.supabase
+                    .from('profiles')
+                    .select('name')
+                    .eq('id', user.id)
+                    .single();
+                const studentName = profile?.name || user.email?.split('@')[0] || '학생';
+
+                // 토큰 생성
+                const token = crypto.randomUUID().replace(/-/g, '') +
+                              crypto.randomUUID().replace(/-/g, '').substring(0, 32);
+                const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72시간
+
+                // payment_links INSERT
+                const { error: insertError } = await window.supabase
+                    .from('payment_links')
+                    .insert({
+                        token,
+                        student_id: user.id,
+                        course_id: currentCourse.id,
+                        amount: currentCourse.price || 0,
+                        created_by: user.id,
+                        guardian_phone: phone,
+                        student_name: studentName,
+                        course_title: currentCourse.title,
+                        expires_at: expiresAt.toISOString()
+                    });
+
+                if (insertError) throw insertError;
+
+                // SMS 발송
+                const paymentUrl = `${location.origin}/payment-link.html?token=${token}`;
+                const amount = currentCourse.price || 0;
+                const message = `[올라운드영어] 수강료 결제 안내\n` +
+                    `${studentName}님의 ${currentCourse.title} 수강료(${amount.toLocaleString()}원) 결제 링크입니다.\n` +
+                    `${paymentUrl}\n` +
+                    `* 72시간 내 결제해주세요.`;
+
+                const smsResult = await window.supabase.functions.invoke('send-nhn-sms', {
+                    body: { phone, message }
+                });
+
+                // SMS 상태 업데이트
+                await window.supabase
+                    .from('payment_links')
+                    .update({
+                        sms_sent_at: new Date().toISOString(),
+                        sms_status: smsResult.data?.success ? 'sent' : 'failed'
+                    })
+                    .eq('token', token);
+
+                if (smsResult.data?.success) {
+                    statusEl.textContent = '결제 링크가 발송되었습니다! 학부모님의 결제를 기다려주세요.';
+                    statusEl.className = 'text-[12px] text-green-600 mt-2 font-semibold';
+                    btn.textContent = '발송 완료';
+                    // 3초 후 모달 닫기
+                    setTimeout(() => {
+                        document.getElementById('pay-choice-modal').classList.add('hidden');
+                    }, 3000);
+                } else {
+                    statusEl.textContent = 'SMS 발송에 실패했습니다. 번호를 확인 후 다시 시도해주세요.';
+                    statusEl.className = 'text-[12px] text-red-500 mt-2';
+                    btn.disabled = false;
+                    btn.textContent = '결제 링크 보내기';
+                }
+            } catch(e) {
+                console.error('학부모 결제 링크 발송 오류:', e);
+                statusEl.textContent = '오류가 발생했습니다: ' + (e.message || '');
+                statusEl.className = 'text-[12px] text-red-500 mt-2';
+                btn.disabled = false;
+                btn.textContent = '결제 링크 보내기';
+            }
         }
 
         async function handleFreePurchase(user) {
