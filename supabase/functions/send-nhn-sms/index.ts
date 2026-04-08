@@ -50,10 +50,14 @@ serve(async (req) => {
       )
     }
 
-    // SMS 발송
-    const smsUrl = `https://api-sms.cloud.toast.com/sms/v3.0/appkeys/${NHN_CLOUD_APP_KEY}/sender/sms`
-    
-    const smsBody = {
+    // SMS/LMS 자동 전환 (90바이트 초과 시 LMS)
+    const messageBytes = new TextEncoder().encode(message).length
+    const isLms = messageBytes > 90
+    const smsUrl = isLms
+      ? `https://api-sms.cloud.toast.com/sms/v3.0/appkeys/${NHN_CLOUD_APP_KEY}/sender/lms`
+      : `https://api-sms.cloud.toast.com/sms/v3.0/appkeys/${NHN_CLOUD_APP_KEY}/sender/sms`
+
+    const smsBody: Record<string, unknown> = {
       body: message,
       sendNo: NHN_SENDER_PHONE,
       recipientList: [
@@ -64,7 +68,12 @@ serve(async (req) => {
       ]
     }
 
-    console.log('NHN SMS API 호출:', smsUrl)
+    // LMS는 title 필드 필요
+    if (isLms) {
+      smsBody.title = '[올라운드영어]'
+    }
+
+    console.log(`NHN ${isLms ? 'LMS' : 'SMS'} API 호출 (${messageBytes}bytes):`, smsUrl)
 
     const smsResponse = await fetch(smsUrl, {
       method: 'POST',
