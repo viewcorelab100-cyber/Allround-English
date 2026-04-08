@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>결제 완료 — ALLROUND</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { corePlugins: { container: false } }</script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            margin: 0;
+            background: #F5F5F5;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white border-b border-gray-200">
+            <div class="max-w-2xl mx-auto px-6 py-4">
+                <a href="./index.html">
+                    <img src="./img/logo.png" alt="ALLROUND" style="height:28px;">
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-1">
+            <div class="max-w-2xl mx-auto px-6 py-10">
+
+                <!-- 로딩 -->
+                <div id="state-loading" class="text-center py-20">
+                    <div class="text-[#8B95A1]">결제를 처리하는 중...</div>
+                </div>
+
+                <!-- 결제 성공 -->
+                <div id="state-success" class="hidden text-center py-16 space-y-6">
+                    <svg class="w-20 h-20 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <div class="space-y-2">
+                        <h1 class="text-[28px] font-bold text-[#2F2725]">결제가 완료되었습니다</h1>
+                        <p id="success-detail" class="text-[#8B95A1]">수강권이 자동으로 부여됩니다.</p>
+                    </div>
+                    <div id="success-info" class="bg-white rounded-2xl border border-gray-200 p-6 text-left space-y-3 max-w-sm mx-auto"></div>
+                    <p class="text-xs text-[#8B95A1]">문의: 0507-1339-3828</p>
+                </div>
+
+                <!-- 가상계좌 대기 -->
+                <div id="state-virtual" class="hidden text-center py-16 space-y-6">
+                    <svg class="w-20 h-20 mx-auto text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="space-y-2">
+                        <h1 class="text-[28px] font-bold text-[#2F2725]">가상계좌가 발급되었습니다</h1>
+                        <p class="text-[#8B95A1]">아래 계좌로 입금해주시면 수강권이 자동 부여됩니다.</p>
+                    </div>
+                    <div id="virtual-info" class="bg-white rounded-2xl border border-gray-200 p-6 text-left space-y-3 max-w-sm mx-auto"></div>
+                    <p class="text-xs text-[#8B95A1]">입금 기한 내 미입금 시 자동 취소됩니다.</p>
+                </div>
+
+                <!-- 오류 -->
+                <div id="state-error" class="hidden text-center py-20 space-y-4">
+                    <svg class="w-16 h-16 mx-auto text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    <h2 class="text-2xl font-bold text-[#2F2725]">결제 처리 중 오류가 발생했습니다</h2>
+                    <p id="error-detail" class="text-[#8B95A1]">-</p>
+                    <a id="retry-link" href="#" class="inline-block mt-4 text-[#2F2725] underline font-semibold">다시 시도</a>
+                </div>
+
+            </div>
+        </main>
+
+        <footer class="bg-white border-t border-gray-200 py-6">
+            <div class="max-w-2xl mx-auto px-6 text-center text-xs text-[#8B95A1] space-y-1">
+                <p><strong>올라운드원격학원</strong></p>
+                <p>사업자등록번호: 560-94-02154 | 대표: 배은영</p>
+                <p>고객센터: 0507-1339-3828</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        var sb = supabase.createClient(
+            'https://fqxbfetyfjyzomgrczwi.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxeGJmZXR5Zmp5em9tZ3JjendpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMzM0NjQsImV4cCI6MjA3OTYwOTQ2NH0.90t1jzTtyEUkIu0MBMhRUwN6b1fGRZGR2CfqXBMczn0'
+        );
+
+        function show(id) {
+            ['state-loading','state-success','state-virtual','state-error'].forEach(function(s) {
+                document.getElementById(s).classList.add('hidden');
+            });
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        async function handleSuccess() {
+            var params = new URLSearchParams(location.search);
+            var token = params.get('token');
+            var paymentKey = params.get('paymentKey');
+            var orderId = params.get('orderId');
+            var amount = params.get('amount');
+
+            if (!token || !paymentKey || !orderId || !amount) {
+                document.getElementById('error-detail').textContent = '결제 정보가 올바르지 않습니다.';
+                show('state-error');
+                return;
+            }
+
+            // 재시도 링크 설정
+            document.getElementById('retry-link').href = 'payment-link.html?token=' + token;
+
+            try {
+                var { data, error } = await sb.functions.invoke('confirm-payment-link', {
+                    body: {
+                        paymentKey: paymentKey,
+                        orderId: orderId,
+                        amount: parseInt(amount),
+                        token: token
+                    }
+                });
+
+                if (error) {
+                    var errMsg = '결제 승인 처리 중 오류가 발생했습니다.';
+                    try {
+                        if (error.context && typeof error.context.json === 'function') {
+                            var errBody = await error.context.json();
+                            errMsg = errBody.error || errMsg;
+                        }
+                    } catch(e) {}
+                    document.getElementById('error-detail').textContent = errMsg;
+                    show('state-error');
+                    return;
+                }
+
+                if (!data || !data.success) {
+                    document.getElementById('error-detail').textContent = (data && data.error) || '결제 승인에 실패했습니다.';
+                    show('state-error');
+                    return;
+                }
+
+                // 가상계좌 분기
+                if (data.isWaitingForDeposit && data.virtualAccountInfo) {
+                    var vi = data.virtualAccountInfo;
+                    var dueDate = vi.dueDate ? new Date(vi.dueDate) : null;
+                    var dueDateStr = dueDate ?
+                        dueDate.getFullYear() + '.' +
+                        String(dueDate.getMonth()+1).padStart(2,'0') + '.' +
+                        String(dueDate.getDate()).padStart(2,'0') + ' ' +
+                        String(dueDate.getHours()).padStart(2,'0') + ':' +
+                        String(dueDate.getMinutes()).padStart(2,'0') : '-';
+
+                    document.getElementById('virtual-info').innerHTML =
+                        '<div class="flex justify-between"><span class="text-[#8B95A1]">은행</span><span class="font-medium">' + (vi.bankName || '-') + '</span></div>' +
+                        '<div class="flex justify-between"><span class="text-[#8B95A1]">계좌번호</span><span class="font-bold text-[#2F2725]">' + (vi.accountNumber || '-') + '</span></div>' +
+                        '<div class="flex justify-between"><span class="text-[#8B95A1]">입금 금액</span><span class="font-bold text-[#2F2725]">\u20A9' + parseInt(amount).toLocaleString() + '</span></div>' +
+                        '<div class="flex justify-between"><span class="text-[#8B95A1]">입금 기한</span><span class="text-red-500 font-medium">' + dueDateStr + '</span></div>';
+                    show('state-virtual');
+                    return;
+                }
+
+                // 즉시 결제 성공
+                var courseTitle = (data.course && data.course.title) || '온라인 강의';
+                var studentName = data.studentName || '';
+                document.getElementById('success-detail').textContent =
+                    studentName ? studentName + '님의 수강권이 자동으로 부여됩니다.' : '수강권이 자동으로 부여됩니다.';
+                document.getElementById('success-info').innerHTML =
+                    '<div class="flex justify-between"><span class="text-[#8B95A1]">강의</span><span class="font-medium">' + courseTitle + '</span></div>' +
+                    '<div class="flex justify-between"><span class="text-[#8B95A1]">결제 금액</span><span class="font-bold text-[#2F2725]">\u20A9' + parseInt(amount).toLocaleString() + '</span></div>';
+                show('state-success');
+
+            } catch(e) {
+                console.error('결제 처리 오류:', e);
+                document.getElementById('error-detail').textContent = e.message || '알 수 없는 오류';
+                show('state-error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', handleSuccess);
+    </script>
+</body>
+</html>
