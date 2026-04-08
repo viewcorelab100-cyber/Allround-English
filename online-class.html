@@ -183,6 +183,17 @@
         var adminUser = false;
         try { adminUser = await isAdmin(); } catch(e) {}
 
+        // 로그인 사용자의 승인된 강의 ID 목록 조회
+        var approvedIds = [];
+        var currentUser = null;
+        try { currentUser = await getCurrentUser(); } catch(e) {}
+        if (currentUser && !adminUser) {
+          var permRes = await sb.from('course_access_permissions')
+            .select('course_id')
+            .eq('user_id', currentUser.id);
+          if (permRes.data) approvedIds = permRes.data.map(function(p){ return p.course_id; });
+        }
+
         var query = sb.from('courses').select('*,lessons(id,duration)');
         if (!adminUser) query = query.eq('is_published', true);
         query = query.order('created_at',{ascending:false});
@@ -190,7 +201,8 @@
         if(r.error) throw r.error;
         allCourses=(r.data||[]).filter(function(c){
           if (adminUser) return true;
-          return (c.visibility||'public')==='public';
+          if ((c.visibility||'public')==='public') return true;
+          return approvedIds.indexOf(c.id) !== -1;
         }).map(function(c){
           var m=(c.lessons||[]).reduce(function(s,l){return s+(l.duration||0);},0);
           return Object.assign({},c,{totalDuration:m,lessonCount:(c.lessons||[]).length});
