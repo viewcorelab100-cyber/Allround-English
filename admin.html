@@ -289,6 +289,44 @@
         /* Ring & focus */
         .focus\:ring-white:focus { --tw-ring-color: #93C5FD !important; }
         .ring-white { --tw-ring-color: #E5E7EB !important; }
+
+        /* ===== Mobile Responsive ===== */
+        @media (max-width: 767px) {
+            /* 사이드바: 기본 숨김, 오버레이로 표시 */
+            body > div > aside {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 40;
+                width: 256px;
+            }
+            body > div > aside.mobile-open {
+                transform: translateX(0);
+            }
+            /* 사이드바 오버레이 배경 */
+            #sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.3);
+                z-index: 39;
+            }
+            #sidebar-overlay.active {
+                display: block;
+            }
+            /* 메인 컨텐츠: 사이드바 마진 제거 */
+            main.ml-64 {
+                margin-left: 0 !important;
+            }
+            /* 패딩 축소 */
+            main .p-12 {
+                padding: 16px !important;
+            }
+            /* 헤더 패딩 축소 */
+            header .px-8 {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#EAECF0] text-gray-900 min-h-screen">
