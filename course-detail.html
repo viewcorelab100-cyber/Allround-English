@@ -580,7 +580,7 @@
                     `${paymentUrl}\n` +
                     `* 72시간 내 결제해주세요.`;
 
-                const smsResult = await window.supabase.functions.invoke('send-nhn-sms', {
+                const smsResult = await window.supabase.functions.invoke('send-alimtalk', {
                     body: { phone, message }
                 });
 
