@@ -1,12 +1,87 @@
 /**
  * Custom Vimeo Player
  * Vimeo Player SDK를 사용한 커스텀 비디오 플레이어
- * 
+ *
  * 사용법:
  * 1. <script src="https://player.vimeo.com/api/player.js"></script> 추가
  * 2. <script src="js/vimeo-custom-player.js"></script> 추가
  * 3. createCustomVimeoPlayer('container-id', 'vimeo-video-id')
+ *
+ * 에러 처리 정책 (2026-04 개편):
+ *   - Vimeo error.name 6종+ → 학생 카피 4종 (A/B/C/D)
+ *   - 모든 에러는 Supabase playback_errors 테이블에 자동 적재
+ *   - 카톡 인앱은 inapp-detect.js 가 사전 차단 (A 카피)
+ *   - 비공개 강의 권한 없음은 course-detail.html 에서 처리 (C 카피)
+ *   - vimeo-custom-player.js 는 B/D 카피만 표시
  */
+
+/**
+ * Vimeo error.name → 학생 카피 + 로깅 분류
+ * 학생 카피는 4종 (A/B/C/D), 내부 분류는 6종+
+ */
+const VIMEO_ERROR_MAP = {
+    'PrivacyError':    { copy: 'D', logName: 'PrivacyError' },
+    'PasswordError':   { copy: 'D', logName: 'PasswordError' },
+    'NotFoundError':   { copy: 'B', logName: 'NotFoundError' },
+    'UnsupportedError':{ copy: 'D', logName: 'UnsupportedError' },
+    'RangeError':      { copy: 'IGNORE', logName: 'RangeError' }, // 자동 0초 리셋
+    'TypeError':       { copy: 'D', logName: 'TypeError' }
+    // 그 외 → copy: 'D', logName: 'Unknown' (기본값)
+};
+
+/**
+ * 학생용 카피 4종 (A/B/C/D 중 B·D만 여기서 사용)
+ * A: inapp-detect.js 가 사전 처리
+ * C: course-detail.html 이 직접 처리 (비공개 강의 권한 없음)
+ */
+const COPY_TEMPLATES = {
+    'B': {
+        title: '영상이 사라졌어요',
+        body: '원장님께 "<strong>영상 다시 올려 달래요</strong>"라고 말해주세요'
+    },
+    'D': {
+        title: '영상이 안 열려요',
+        body: '1) 새로고침 한 번 해보세요<br/>2) 그래도 안 되면 원장님께 "<strong>○○ 강의 영상이 안 열려요</strong>"라고 말해주세요'
+    }
+};
+
+/**
+ * Supabase playback_errors 테이블에 에러 적재
+ * 실패해도 학생 화면에 영향 없음 (silent fail)
+ */
+async function logPlaybackError(errorData) {
+    if (!window.supabase) return;
+
+    try {
+        // 현재 사용자 (비로그인 가능)
+        let userId = null;
+        try {
+            const userRes = await window.supabase.auth.getUser();
+            userId = userRes && userRes.data && userRes.data.user ? userRes.data.user.id : null;
+        } catch (e) {}
+
+        // 인앱 감지 (inapp-detect.js의 함수 재사용)
+        const detection = (typeof window.detectInAppBrowser === 'function')
+            ? window.detectInAppBrowser()
+            : { isInApp: false, type: null, isKakao: false };
+
+        await window.supabase.from('playback_errors').insert({
+            user_id: userId,
+            lesson_id: window.currentLessonId || null,
+            course_id: window.currentCourseId || null,
+            error_name: errorData.error_name,
+            error_message: errorData.error_message || '',
+            error_method: errorData.error_method || '',
+            ua: navigator.userAgent,
+            is_kakao_inapp: detection.isKakao,
+            is_inapp: detection.isInApp,
+            inapp_type: detection.type,
+            page_url: window.location.href
+        });
+    } catch (e) {
+        console.error('logPlaybackError failed:', e);
+    }
+}
 
 class CustomVimeoPlayer {
     constructor(containerId, videoId, options = {}) {
