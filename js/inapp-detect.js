@@ -24,11 +24,15 @@
         var ua = navigator.userAgent;
         var type = null;
 
+        // false positive 방지 (CTO 코드 분석 H-3 반영):
+        //  - 네이버 웨일(Whale) 정식 브라우저 제외
+        //  - Line 은 버전 숫자 동반하는 패턴만 (AirLine, RedLine 등 오탐 방지)
+        //  - Instagram 도 버전 숫자 동반 패턴
         if (/KAKAOTALK/i.test(ua)) type = 'kakao';
-        else if (/NAVER\(inapp/i.test(ua)) type = 'naver';
-        else if (/Instagram/i.test(ua)) type = 'instagram';
+        else if (/NAVER\(inapp/i.test(ua) && !/Whale\//i.test(ua)) type = 'naver';
+        else if (/\bInstagram\s[\d.]+/i.test(ua)) type = 'instagram';
         else if (/FB_IAB|FBAN|FBAV/i.test(ua)) type = 'facebook';
-        else if (/Line\//i.test(ua)) type = 'line';
+        else if (/\bLine\/[\d.]+/i.test(ua)) type = 'line';
 
         return {
             isInApp: type !== null,
