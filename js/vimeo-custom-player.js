@@ -20,12 +20,13 @@
  * 학생 카피는 4종 (A/B/C/D), 내부 분류는 6종+
  */
 const VIMEO_ERROR_MAP = {
-    'PrivacyError':    { copy: 'D', logName: 'PrivacyError' },
-    'PasswordError':   { copy: 'D', logName: 'PasswordError' },
-    'NotFoundError':   { copy: 'B', logName: 'NotFoundError' },
-    'UnsupportedError':{ copy: 'D', logName: 'UnsupportedError' },
-    'RangeError':      { copy: 'IGNORE', logName: 'RangeError' }, // 자동 0초 리셋
-    'TypeError':       { copy: 'D', logName: 'TypeError' }
+    'PrivacyError':     { copy: 'D', logName: 'PrivacyError' },
+    'PasswordError':    { copy: 'D', logName: 'PasswordError' },
+    'NotFoundError':    { copy: 'B', logName: 'NotFoundError' },
+    'NotPlayableError': { copy: 'D', logName: 'NotPlayableError' }, // 카톡 인앱에서 가장 빈발 — 분류 정확도 위해 명시
+    'UnsupportedError': { copy: 'D', logName: 'UnsupportedError' },
+    'RangeError':       { copy: 'IGNORE', logName: 'RangeError' }, // 자동 0초 리셋
+    'TypeError':        { copy: 'D', logName: 'TypeError' }
     // 그 외 → copy: 'D', logName: 'Unknown' (기본값)
 };
 
