@@ -460,22 +460,50 @@ class CustomVimeoPlayer {
     }
 
     showError(template) {
-        // template = { title: '...', body: '...' }
-        // 하위호환: 문자열 전달 시 D 카피로 자동 변환
+        // template = { title: '...', body: '...' } — 항상 COPY_TEMPLATES 상수에서 옴
+        // 하위호환: 문자열 전달 시 D 카피로 자동 변환 (legacy 호출자 보호)
         if (typeof template === 'string') {
             template = { title: '영상이 안 열려요', body: template };
         }
-        this.videoWrapper.innerHTML = `
-            <div class="aspect-video flex items-center justify-center bg-[#F5F5F5]">
-                <div class="text-center text-[#2F2725] p-6 max-w-[340px]" style="font-family:'Pretendard Variable',Pretendard,sans-serif;letter-spacing:-0.02em;">
-                    <svg class="w-12 h-12 mx-auto mb-4 text-[#8B95A1]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-                    </svg>
-                    <p class="text-[20px] font-bold mb-3" style="line-height:1.4;">${template.title}</p>
-                    <p class="text-[14px] text-[#8B95A1]" style="line-height:1.7;">${template.body}</p>
-                </div>
-            </div>
-        `;
+        if (!template || typeof template !== 'object') {
+            template = COPY_TEMPLATES.D;
+        }
+
+        // DOM API 사용 — 제목은 textContent (안전), body는 trusted 상수 마크업만 허용
+        // (H-1 반영: 외부 입력 주입 경로 차단)
+        var wrapper = document.createElement('div');
+        wrapper.className = 'aspect-video flex items-center justify-center bg-[#F5F5F5]';
+
+        var inner = document.createElement('div');
+        inner.className = 'text-center text-[#2F2725] p-6 max-w-[340px]';
+        inner.style.fontFamily = "'Pretendard Variable',Pretendard,sans-serif";
+        inner.style.letterSpacing = '-0.02em';
+
+        // 정보 아이콘 (단색 SVG, 글로벌 CLAUDE.md 기준)
+        inner.insertAdjacentHTML('beforeend',
+            '<svg class="w-12 h-12 mx-auto mb-4 text-[#8B95A1]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>' +
+            '</svg>'
+        );
+
+        // 제목 — 항상 textContent 로 안전 처리
+        var titleEl = document.createElement('p');
+        titleEl.className = 'text-[20px] font-bold mb-3';
+        titleEl.style.lineHeight = '1.4';
+        titleEl.textContent = template.title;
+        inner.appendChild(titleEl);
+
+        // 본문 — COPY_TEMPLATES에 정의된 trusted 마크업(<strong>, <br/>)만 사용
+        // 여기 들어오는 template.body는 코드 내 const 객체뿐이라 안전
+        var bodyEl = document.createElement('p');
+        bodyEl.className = 'text-[14px] text-[#8B95A1]';
+        bodyEl.style.lineHeight = '1.7';
+        bodyEl.innerHTML = template.body; // trusted constants only
+        inner.appendChild(bodyEl);
+
+        wrapper.appendChild(inner);
+        this.videoWrapper.replaceChildren(wrapper);
+
         // 컨트롤 바 숨기기
         if (this.controlsBar) {
             this.controlsBar.style.display = 'none';
