@@ -148,11 +148,30 @@ class CustomVimeoPlayer {
             dnt: true,
         });
 
-        // 에러 핸들링
-        this.player.on('error', (error) => {
+        // 에러 핸들링 — 6종 분류 → 4종 학생 카피 + Supabase 자동 로깅
+        this.player.on('error', async (error) => {
             console.error('Vimeo Player Error:', error);
             this.loadingIndicator.classList.add('hidden');
-            this.showError('영상을 불러올 수 없습니다. 관리자에게 문의해주세요.');
+
+            // 1. 에러 분류
+            const mapping = VIMEO_ERROR_MAP[error.name] || { copy: 'D', logName: 'Unknown' };
+
+            // 2. 학생 화면 표시 (RangeError 등 IGNORE는 무시)
+            if (mapping.copy !== 'IGNORE') {
+                const template = COPY_TEMPLATES[mapping.copy];
+                this.showError(template);
+            }
+
+            // 3. 백그라운드 로깅 (실패해도 학생 화면 영향 없음)
+            try {
+                await logPlaybackError({
+                    error_name: mapping.logName,
+                    error_message: (error && error.message) || '',
+                    error_method: (error && error.method) || ''
+                });
+            } catch (logErr) {
+                console.error('Failed to log playback error:', logErr);
+            }
         });
 
         // 이벤트 리스너

@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-12T00:38:47.785Z",
+  "lastUpdated": "2026-04-12T00:39:00.243Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -50,9 +50,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-08T05:18:15.368Z",
-        "lastUpdated": "2026-04-12T00:38:47.785Z"
+        "lastUpdated": "2026-04-12T00:39:00.243Z"
       },
-      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\inapp-detect.js"
+      "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\vimeo-custom-player.js"
     },
     "confirm-payment": {
       "phase": "do",
@@ -242,7 +242,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-12T00:38:47.785Z"
+    "lastActivity": "2026-04-12T00:39:00.243Z"
   },
   "history": [
     {
@@ -1411,6 +1411,12 @@
     },
     {
       "timestamp": "2026-04-12T00:38:47.785Z",
+      "feature": "js",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-12T00:39:00.243Z",
       "feature": "js",
       "phase": "do",
       "action": "updated"
