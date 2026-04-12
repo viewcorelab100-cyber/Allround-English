@@ -86,6 +86,11 @@
 
     /**
      * Phase 2: 차단 모드 — 안드로이드는 intent://, iOS는 안내 오버레이
+     *
+     * 안전 패턴 (CTO 코드 분석 C-2 반영):
+     *   - URL hash(#) 제거 — intent URI 자체가 # 이후를 fragment로 파싱
+     *   - S.browser_fallback_url 추가 — Chrome 미설치 안드로이드에서 안전 폴백
+     *   - 원본 URL은 fallback에 encodeURIComponent로 보존
      */
     function redirectToExternalBrowser(detection) {
         if (!detection.isInApp) return;
@@ -94,8 +99,16 @@
         var currentUrl = window.location.href;
 
         if (os === 'android') {
-            var cleanUrl = currentUrl.replace(/^https?:\/\//, '');
-            location.href = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
+            var urlObj;
+            try { urlObj = new URL(currentUrl); } catch (e) { return; }
+            // intent URI 본체에는 hash 제외 (intent fragment와 충돌)
+            var cleanUrl = urlObj.host + urlObj.pathname + urlObj.search;
+            // hash까지 보존하려면 fallback url로 (Chrome 미설치 시 폴백)
+            var fallback = encodeURIComponent(currentUrl);
+            location.href = 'intent://' + cleanUrl
+                + '#Intent;scheme=https;package=com.android.chrome'
+                + ';S.browser_fallback_url=' + fallback
+                + ';end';
             return;
         }
 
