@@ -155,35 +155,96 @@
 
     /**
      * iOS 안내 오버레이 (확정 카피)
+     * DOM API 사용 — innerHTML 회피 (H-1/H-2)
      */
     function showIosOverlay(detection) {
         if (document.getElementById('inapp-ios-overlay')) return;
 
         var name = getInAppDisplayName(detection.type);
+
         var overlay = document.createElement('div');
         overlay.id = 'inapp-ios-overlay';
-        overlay.innerHTML =
-            '<div style="position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;font-family:\'Pretendard Variable\',Pretendard,sans-serif;">' +
-            '<div style="background:#fff;border-radius:20px;padding:24px;max-width:340px;text-align:center;letter-spacing:-0.02em;">' +
-            '<p style="font-size:20px;font-weight:700;color:#2F2725;margin:0 0 12px 0;line-height:1.4;">' + name + '에서는 영상이<br/>잘 안 나와요</p>' +
-            '<p style="font-size:14px;color:#8B95A1;margin:0 0 20px 0;line-height:1.7;">' +
-            '1) 화면 오른쪽 위에 점 세 개(⋯) 누르기<br/>' +
-            '2) "다른 브라우저로 열기" 누르기<br/>' +
-            '3) Safari로 다시 열어주세요' +
-            '</p>' +
-            '<button id="inapp-overlay-continue" style="width:100%;padding:14px;background:#2F2725;color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px;font-family:inherit;">그래도 계속 보기</button>' +
-            '<button id="inapp-overlay-close" style="width:100%;padding:10px;background:transparent;color:#8B95A1;border:none;font-size:13px;cursor:pointer;font-family:inherit;">닫기</button>' +
-            '</div>' +
-            '</div>';
-        document.body.appendChild(overlay);
+        Object.assign(overlay.style, {
+            position: 'fixed',
+            top: '0', left: '0', right: '0', bottom: '0',
+            zIndex: '10000',
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            fontFamily: "'Pretendard Variable',Pretendard,sans-serif"
+        });
 
-        document.getElementById('inapp-overlay-continue').onclick = function () {
+        var card = document.createElement('div');
+        Object.assign(card.style, {
+            background: '#fff',
+            borderRadius: '20px',
+            padding: '24px',
+            maxWidth: '340px',
+            textAlign: 'center',
+            letterSpacing: '-0.02em'
+        });
+
+        // 제목
+        var title = document.createElement('p');
+        Object.assign(title.style, {
+            fontSize: '20px', fontWeight: '700', color: '#2F2725',
+            margin: '0 0 12px 0', lineHeight: '1.4'
+        });
+        title.appendChild(document.createTextNode(name + '에서는 영상이'));
+        title.appendChild(document.createElement('br'));
+        title.appendChild(document.createTextNode('잘 안 나와요'));
+        card.appendChild(title);
+
+        // 본문
+        var body = document.createElement('p');
+        Object.assign(body.style, {
+            fontSize: '14px', color: '#8B95A1',
+            margin: '0 0 20px 0', lineHeight: '1.7'
+        });
+        var lines = [
+            '1) 화면 오른쪽 위에 점 세 개(⋯) 누르기',
+            '2) "다른 브라우저로 열기" 누르기',
+            '3) Safari로 다시 열어주세요'
+        ];
+        lines.forEach(function (line, i) {
+            body.appendChild(document.createTextNode(line));
+            if (i < lines.length - 1) body.appendChild(document.createElement('br'));
+        });
+        card.appendChild(body);
+
+        // 계속 버튼
+        var continueBtn = document.createElement('button');
+        continueBtn.textContent = '그래도 계속 보기';
+        Object.assign(continueBtn.style, {
+            width: '100%', padding: '14px',
+            background: '#2F2725', color: '#fff',
+            border: 'none', borderRadius: '16px',
+            fontSize: '15px', fontWeight: '600',
+            cursor: 'pointer', marginBottom: '8px',
+            fontFamily: 'inherit'
+        });
+        continueBtn.onclick = function () {
             overlay.remove();
             try { sessionStorage.setItem('inapp_dismissed', '1'); } catch (e) {}
         };
-        document.getElementById('inapp-overlay-close').onclick = function () {
-            overlay.remove();
-        };
+        card.appendChild(continueBtn);
+
+        // 닫기 버튼
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = '닫기';
+        Object.assign(closeBtn.style, {
+            width: '100%', padding: '10px',
+            background: 'transparent', color: '#8B95A1',
+            border: 'none', fontSize: '13px',
+            cursor: 'pointer', fontFamily: 'inherit'
+        });
+        closeBtn.onclick = function () { overlay.remove(); };
+        card.appendChild(closeBtn);
+
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
     }
 
     /**
