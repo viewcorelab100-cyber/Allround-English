@@ -374,14 +374,20 @@ class CustomVimeoPlayer {
         this.volumeSlider.style.setProperty('--volume-percent', `${percent}%`);
     }
 
-    showError(message) {
+    showError(template) {
+        // template = { title: '...', body: '...' }
+        // 하위호환: 문자열 전달 시 D 카피로 자동 변환
+        if (typeof template === 'string') {
+            template = { title: '영상이 안 열려요', body: template };
+        }
         this.videoWrapper.innerHTML = `
-            <div class="aspect-video flex items-center justify-center bg-gray-900">
-                <div class="text-center text-white p-4">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            <div class="aspect-video flex items-center justify-center bg-[#F5F5F5]">
+                <div class="text-center text-[#2F2725] p-6 max-w-[340px]" style="font-family:'Pretendard Variable',Pretendard,sans-serif;letter-spacing:-0.02em;">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-[#8B95A1]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
                     </svg>
-                    <p class="text-lg">${message}</p>
+                    <p class="text-[20px] font-bold mb-3" style="line-height:1.4;">${template.title}</p>
+                    <p class="text-[14px] text-[#8B95A1]" style="line-height:1.7;">${template.body}</p>
                 </div>
             </div>
         `;
