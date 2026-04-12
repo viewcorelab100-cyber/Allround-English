@@ -1125,7 +1125,11 @@
             const lessonResult = await getLessonById(lessonId);
             if (!lessonResult.success) { window.location.href = 'courses.html'; return; }
             currentLesson = lessonResult.data;
-            
+
+            // playback_errors 로깅용 컨텍스트 노출
+            window.currentLessonId = currentLesson.id;
+            window.currentCourseId = currentLesson.course && currentLesson.course.id ? currentLesson.course.id : null;
+
             if (!currentLesson.is_preview && currentUser) {
                 const accessResult = await hasAccessToCourse(currentUser.id, currentLesson.course.id);
                 if (!accessResult.hasAccess) { 
