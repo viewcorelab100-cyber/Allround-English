@@ -68,24 +68,56 @@
 
     /**
      * Phase 1: 노란 띠 경고 (학생은 그대로 사용 가능)
+     * DOM API 사용 — innerHTML 회피로 XSS 방어선 강화 (H-1/H-2)
      */
     function showInAppWarning(detection) {
         if (!detection.isInApp) return;
         if (document.getElementById('inapp-warning-banner')) return;
 
         var name = getInAppDisplayName(detection.type);
+
         var banner = document.createElement('div');
         banner.id = 'inapp-warning-banner';
-        banner.innerHTML =
-            '<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#FEF3C7;color:#78350F;padding:12px 16px;font-size:14px;text-align:center;border-bottom:1px solid #FCD34D;font-family:\'Pretendard Variable\',Pretendard,sans-serif;line-height:1.5;">' +
-            '<strong>알림</strong> ' + name + '에서는 영상이 잘 안 나올 수 있어요.' +
-            ' <button id="inapp-warning-close" style="margin-left:8px;background:transparent;border:none;color:#78350F;text-decoration:underline;cursor:pointer;font-size:14px;font-family:inherit;">닫기</button>' +
-            '</div>';
-        document.body.appendChild(banner);
+        Object.assign(banner.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            right: '0',
+            zIndex: '9999',
+            background: '#FEF3C7',
+            color: '#78350F',
+            padding: '12px 16px',
+            fontSize: '14px',
+            textAlign: 'center',
+            borderBottom: '1px solid #FCD34D',
+            fontFamily: "'Pretendard Variable',Pretendard,sans-serif",
+            lineHeight: '1.5',
+            letterSpacing: '-0.02em'
+        });
 
-        document.getElementById('inapp-warning-close').onclick = function () {
+        var strong = document.createElement('strong');
+        strong.textContent = '알림 ';
+        banner.appendChild(strong);
+        banner.appendChild(document.createTextNode(name + '에서는 영상이 잘 안 나올 수 있어요. '));
+
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = '닫기';
+        Object.assign(closeBtn.style, {
+            marginLeft: '8px',
+            background: 'transparent',
+            border: 'none',
+            color: '#78350F',
+            textDecoration: 'underline',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontFamily: 'inherit'
+        });
+        closeBtn.onclick = function () {
             banner.remove();
         };
+        banner.appendChild(closeBtn);
+
+        document.body.appendChild(banner);
     }
 
     /**
