@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-08T20:23:26.410Z",
+  "lastUpdated": "2026-04-12T00:31:26.145Z",
   "activeFeatures": [
     "notification-system",
     "demo-account",
@@ -50,7 +50,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-08T05:18:15.368Z",
-        "lastUpdated": "2026-04-07T14:14:26.464Z"
+        "lastUpdated": "2026-04-12T00:31:26.145Z"
       },
       "lastFile": "C:\\Users\\이현수\\Documents\\GitHub\\Allround-English\\js\\auth.js"
     },
@@ -242,7 +242,7 @@
   "session": {
     "startedAt": "2026-02-08T05:10:34.375Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-08T20:23:26.410Z"
+    "lastActivity": "2026-04-12T00:31:26.145Z"
   },
   "history": [
     {
@@ -1400,6 +1400,12 @@
     {
       "timestamp": "2026-04-08T20:23:26.410Z",
       "feature": "send-nhn-sms",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-12T00:31:26.145Z",
+      "feature": "js",
       "phase": "do",
       "action": "updated"
     }

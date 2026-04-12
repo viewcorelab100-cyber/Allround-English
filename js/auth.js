@@ -28,8 +28,19 @@ function getDeviceInfo() {
         }
     }
     
-    // 브라우저 감지
-    if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
+    // 브라우저 감지 (인앱 브라우저 우선 — Chrome/Safari 검사보다 먼저)
+    // 카톡 인앱과 진짜 Chrome이 같은 device_info로 잡혀 강제 로그아웃되는 버그 방지
+    if (/KAKAOTALK/i.test(ua)) {
+        browser = 'KakaoTalk 인앱';
+    } else if (/NAVER\(inapp/i.test(ua)) {
+        browser = 'Naver 인앱';
+    } else if (/Instagram/i.test(ua)) {
+        browser = 'Instagram 인앱';
+    } else if (/FB_IAB|FBAN|FBAV/i.test(ua)) {
+        browser = 'Facebook 인앱';
+    } else if (/Line\//i.test(ua)) {
+        browser = 'Line 인앱';
+    } else if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
         browser = 'Chrome';
     } else if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
         browser = 'Safari';
