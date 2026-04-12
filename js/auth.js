@@ -30,15 +30,16 @@ function getDeviceInfo() {
     
     // 브라우저 감지 (인앱 브라우저 우선 — Chrome/Safari 검사보다 먼저)
     // 카톡 인앱과 진짜 Chrome이 같은 device_info로 잡혀 강제 로그아웃되는 버그 방지
+    // false positive 방지 정규식 (inapp-detect.js와 동일 — H-3 반영)
     if (/KAKAOTALK/i.test(ua)) {
         browser = 'KakaoTalk 인앱';
-    } else if (/NAVER\(inapp/i.test(ua)) {
+    } else if (/NAVER\(inapp/i.test(ua) && !/Whale\//i.test(ua)) {
         browser = 'Naver 인앱';
-    } else if (/Instagram/i.test(ua)) {
+    } else if (/\bInstagram\s[\d.]+/i.test(ua)) {
         browser = 'Instagram 인앱';
     } else if (/FB_IAB|FBAN|FBAV/i.test(ua)) {
         browser = 'Facebook 인앱';
-    } else if (/Line\//i.test(ua)) {
+    } else if (/\bLine\/[\d.]+/i.test(ua)) {
         browser = 'Line 인앱';
     } else if (/Chrome/.test(ua) && !/Edge|Edg/.test(ua)) {
         browser = 'Chrome';
