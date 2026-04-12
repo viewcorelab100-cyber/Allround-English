@@ -49,17 +49,30 @@ const COPY_TEMPLATES = {
 /**
  * Supabase playback_errors 테이블에 에러 적재
  * 실패해도 학생 화면에 영향 없음 (silent fail)
+ *
+ * 성능 노트:
+ *   - auth.getSession()은 캐시된 세션을 반환 (네트워크 왕복 없음)
+ *   - 비로그인 시 user_id=null로 시도하지만, RLS가 차단하므로 silent insert 실패
+ *     (insert_anon 정책 제거 — 2026-04-13 마이그레이션)
  */
 async function logPlaybackError(errorData) {
-    if (!window.supabase) return;
+    if (!window.supabase) {
+        console.warn('[logPlaybackError] supabase not ready, dropping error');
+        return;
+    }
 
     try {
-        // 현재 사용자 (비로그인 가능)
+        // 현재 세션 (캐시 — 네트워크 왕복 없음)
         let userId = null;
         try {
-            const userRes = await window.supabase.auth.getUser();
-            userId = userRes && userRes.data && userRes.data.user ? userRes.data.user.id : null;
+            const sessionRes = await window.supabase.auth.getSession();
+            userId = sessionRes && sessionRes.data && sessionRes.data.session && sessionRes.data.session.user
+                ? sessionRes.data.session.user.id
+                : null;
         } catch (e) {}
+
+        // 비로그인은 RLS가 어차피 차단하므로 insert 시도 자체를 skip
+        if (!userId) return;
 
         // 인앱 감지 (inapp-detect.js의 함수 재사용)
         const detection = (typeof window.detectInAppBrowser === 'function')
@@ -71,13 +84,13 @@ async function logPlaybackError(errorData) {
             lesson_id: window.currentLessonId || null,
             course_id: window.currentCourseId || null,
             error_name: errorData.error_name,
-            error_message: errorData.error_message || '',
-            error_method: errorData.error_method || '',
-            ua: navigator.userAgent,
+            error_message: (errorData.error_message || '').slice(0, 500),
+            error_method: (errorData.error_method || '').slice(0, 64),
+            ua: navigator.userAgent.slice(0, 500),
             is_kakao_inapp: detection.isKakao,
             is_inapp: detection.isInApp,
             inapp_type: detection.type,
-            page_url: window.location.href
+            page_url: window.location.href.slice(0, 1000)
         });
     } catch (e) {
         console.error('logPlaybackError failed:', e);
