@@ -897,16 +897,38 @@
         }
 
         // 구간 추적: 시청한 초를 Set에 기록
+        // seek 이벤트 기반으로 "건너뛰기" vs "글리치(탭 전환/버퍼링)" 구별
         function recordWatchedSecond(currentTime) {
             const curSec = Math.floor(currentTime);
-            // 이전 기록 ~ 현재 사이 초를 모두 채움 (timeupdate 간격 누락 방지, 5초 이내만)
-            if (lastRecordedSec >= 0 && curSec > lastRecordedSec && curSec - lastRecordedSec < 5) {
+
+            if (lastRecordedSec < 0) {
+                watchedSet.add(curSec);
+                lastRecordedSec = curSec;
+                return;
+            }
+
+            const recentlySeeked = Date.now() - lastSeekedAt < 1500;
+            const gap = curSec - lastRecordedSec;
+
+            if (recentlySeeked || gap <= 0) {
+                // 사용자가 seek했거나 뒤로 이동 → 구간 채우지 않음 (건너뛰기 방지)
+                watchedSet.add(curSec);
+            } else if (gap < 5) {
+                // 정상 재생 구간 → 채움
                 for (let s = lastRecordedSec + 1; s <= curSec; s++) {
                     watchedSet.add(s);
                 }
             } else {
+                // seek 없이 큰 간격 발생 = 글리치 (탭 전환/버퍼링/throttle)
+                // → 구간 복구하되 부정행위 방지용으로 최대 60초 cap
+                const MAX_GLITCH_FILL = 60;
+                const fillEnd = Math.min(curSec, lastRecordedSec + MAX_GLITCH_FILL);
+                for (let s = lastRecordedSec + 1; s <= fillEnd; s++) {
+                    watchedSet.add(s);
+                }
                 watchedSet.add(curSec);
             }
+
             lastRecordedSec = curSec;
         }
 
