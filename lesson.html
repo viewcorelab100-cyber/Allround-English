@@ -857,8 +857,7 @@
         const progressDiag = {
             glitchCount: 0,       // 글리치 복구 발화 횟수
             seekSkipCount: 0,     // seek으로 인한 구간 미인정 횟수
-            maxGapSeconds: 0,     // 관찰된 가장 큰 timeupdate 간격
-            loggedThisSession: false
+            maxGapSeconds: 0      // 관찰된 가장 큰 timeupdate 간격
         };
         function resetProgressDiag() {
             progressDiag.glitchCount = 0;
