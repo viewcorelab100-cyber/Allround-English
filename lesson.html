@@ -1036,6 +1036,7 @@
             // 일시정지 시 진도 저장
             vimeoPlayer.on('pause', function() {
                 saveVimeoProgress();
+                logProgressDiagnostic();
             });
 
             // 영상 종료 시 진도 저장 및 과제 모달 표시
@@ -1047,6 +1048,7 @@
                     for (let s = 0; s <= totalSec; s++) watchedSet.add(s);
                 }
                 saveVimeoProgress();
+                logProgressDiagnostic();
                 showAssignmentSequence();
             });
 
