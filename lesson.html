@@ -853,6 +853,19 @@
         let isTabVisible = true; // 탭 가시성 상태
         let lastSeekedAt = 0; // seek 이벤트 발생 시각 (ms) — 글리치/건너뛰기 구분용
 
+        // 진도 추적 진단 카운터 (2026-04-17~ 1주간 관찰용)
+        const progressDiag = {
+            glitchCount: 0,       // 글리치 복구 발화 횟수
+            seekSkipCount: 0,     // seek으로 인한 구간 미인정 횟수
+            maxGapSeconds: 0,     // 관찰된 가장 큰 timeupdate 간격
+            loggedThisSession: false
+        };
+        function resetProgressDiag() {
+            progressDiag.glitchCount = 0;
+            progressDiag.seekSkipCount = 0;
+            progressDiag.maxGapSeconds = 0;
+        }
+
         function getLessonId() {
             const params = new URLSearchParams(window.location.search);
             return params.get('id');
