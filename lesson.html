@@ -988,6 +988,7 @@
             isTabVisible = !document.hidden;
             if (!isTabVisible) {
                 saveCurrentProgress();
+                logProgressDiagnostic();
             }
         });
 
