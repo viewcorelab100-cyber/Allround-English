@@ -960,6 +960,14 @@
                 loadLastPositionForVimeo();
             });
 
+            // Seek 이벤트 추적 — 건너뛰기 구간 감지용
+            vimeoPlayer.on('seeking', function() {
+                lastSeekedAt = Date.now();
+            });
+            vimeoPlayer.on('seeked', function() {
+                lastSeekedAt = Date.now();
+            });
+
             // 재생 시간 업데이트 이벤트
             vimeoPlayer.on('timeupdate', function(data) {
                 const currentTime = data.seconds;
