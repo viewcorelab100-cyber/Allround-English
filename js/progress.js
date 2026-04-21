@@ -59,6 +59,7 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
             progress_percent: displayPercent,
             is_completed: isCompleted,
             last_position: lastPosition,
+            max_last_position: newMaxPosition,
             updated_at: new Date().toISOString()
         };
 
