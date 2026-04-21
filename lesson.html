@@ -1039,13 +1039,12 @@
             });
 
             // 영상 종료 시 진도 저장 및 과제 모달 표시
+            // ended 이벤트 = "끝까지 시청 완료"의 가장 강한 증거이므로
+            // watchedSet이 timeupdate 누락으로 부족하더라도 조건 없이 꽉 채운다
+            // (기존 progress>=90 조건은 Case B 회귀 주범이었음)
             vimeoPlayer.on('ended', function() {
-                const progress = getWatchedProgress(videoDuration);
-                if (progress >= 90) {
-                    // 90% 이상 시청 시 나머지 초도 채워서 100% 처리
-                    const totalSec = Math.floor(videoDuration);
-                    for (let s = 0; s <= totalSec; s++) watchedSet.add(s);
-                }
+                const totalSec = Math.floor(videoDuration);
+                for (let s = 0; s <= totalSec; s++) watchedSet.add(s);
                 saveVimeoProgress();
                 logProgressDiagnostic();
                 showAssignmentSequence();
