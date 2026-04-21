@@ -1022,6 +1022,9 @@
 
                 recordWatchedSecond(currentTime);
 
+                // 세션 최대 도달 위치 추적 (앞으로 감기 후에도 "끝 근처 도달 이력" 보존)
+                if (currentTime > sessionMaxPosition) sessionMaxPosition = currentTime;
+
                 // UI 업데이트 (시청 진도 바)
                 const progress = getWatchedProgress(duration);
                 document.getElementById('progress-bar').style.width = `${progress}%`;
