@@ -71,15 +71,24 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
                 const newPositionRatio = (progressData.lastPosition || 0) / progressData.totalSeconds;
                 const recomputedCompleted = existing.is_completed ||
                     existingWatchedRatio >= 0.70 ||
-                    (newPositionRatio >= 0.95 && existingWatchedRatio >= 0.30);
+                    (newPositionRatio >= 0.95 && existingWatchedRatio >= 0.40);
+
+                // 방금 position 기반으로 완료 전환된 경우 progress_percent=100으로 표시
+                const justCompletedByPosition =
+                    !existing.is_completed && recomputedCompleted &&
+                    existingWatchedRatio < 0.70 && newPositionRatio >= 0.95;
+                const updatePayload = {
+                    last_position: progressData.lastPosition || 0,
+                    is_completed: recomputedCompleted,
+                    updated_at: new Date().toISOString()
+                };
+                if (justCompletedByPosition) {
+                    updatePayload.progress_percent = 100;
+                }
 
                 const { data, error } = await window.supabase
                     .from('lesson_progress')
-                    .update({
-                        last_position: progressData.lastPosition || 0,
-                        is_completed: recomputedCompleted,
-                        updated_at: new Date().toISOString()
-                    })
+                    .update(updatePayload)
                     .eq('id', existing.id)
                     .select()
                     .single();
