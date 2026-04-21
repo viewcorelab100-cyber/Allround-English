@@ -2033,8 +2033,11 @@
                         }
 
                         // 전체 완료 여부 판단 (이미지는 제출만 해도 완료로 인정)
+                        // 진도: watchRate 80% 이상 OR DB is_completed=true (자동 보정 포함)
+                        // → 시스템이 완료로 판정한 학생은 admin에서도 완료로 간주
                         const imageComplete = imageStatus === 'submitted' || imageStatus === 'graded';
-                        const isCompleted = checklistCount === 3 && imageComplete && watchRate >= 80 && (quizTotal === 0 || quizScore >= 60);
+                        const progressCompleted = watchRate >= 80 || (prog && prog.is_completed === true);
+                        const isCompleted = checklistCount === 3 && imageComplete && progressCompleted && (quizTotal === 0 || quizScore >= 60);
                         const hasActivity = submission || prog || quizzes.length > 0;
 
                         allSubmissions.push({
