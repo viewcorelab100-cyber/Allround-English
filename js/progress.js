@@ -24,14 +24,22 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
 
         const progressPercent = Math.round((watchedSeconds / progressData.totalSeconds) * 100);
 
+        // 완료 판정: 시청 비율 70% 이상 OR 마지막 위치가 영상 끝 95% 이상에 도달
+        // watched_seconds는 timeupdate 누락으로 부족할 수 있으므로, last_position이 끝에 도달했다면
+        // 실제 시청한 것으로 인정 (seek 방지 로직은 lesson.html:recordWatchedSecond에서 담당)
+        const lastPosition = progressData.lastPosition || 0;
+        const watchedRatio = watchedSeconds / progressData.totalSeconds;
+        const positionRatio = lastPosition / progressData.totalSeconds;
+        const isCompleted = watchedRatio >= 0.70 || positionRatio >= 0.95;
+
         const progressRecord = {
             user_id: userId,
             lesson_id: lessonId,
             watched_seconds: watchedSeconds,
             total_seconds: progressData.totalSeconds,
             progress_percent: Math.min(progressPercent, 100),
-            is_completed: watchedSeconds >= progressData.totalSeconds * 0.90,
-            last_position: progressData.lastPosition || 0,
+            is_completed: isCompleted,
+            last_position: lastPosition,
             updated_at: new Date().toISOString()
         };
 
