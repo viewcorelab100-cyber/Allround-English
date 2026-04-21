@@ -75,21 +75,22 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
                 if (error) throw error;
                 result = data;
             } else {
-                // watchedSeconds가 기존보다 작거나 같아도 last_position은 갱신 가능
-                // is_completed도 기존 watched_seconds + 새 last_position으로 재평가
+                // watchedSeconds가 기존보다 작거나 같아도 last_position 및 max_last_position 은 갱신 가능
+                // is_completed도 기존 watched_seconds + max_last_position 으로 재평가
                 // (완료 기준 완화 후 기존 Case B 행이 재접속 시 자동 해소되도록)
                 const existingWatchedRatio = existing.watched_seconds / progressData.totalSeconds;
-                const newPositionRatio = (progressData.lastPosition || 0) / progressData.totalSeconds;
+                const maxPositionRatioRecomputed = newMaxPosition / progressData.totalSeconds;
                 const recomputedCompleted = existing.is_completed ||
                     existingWatchedRatio >= 0.70 ||
-                    (newPositionRatio >= 0.95 && existingWatchedRatio >= 0.40);
+                    (maxPositionRatioRecomputed >= 0.95 && existingWatchedRatio >= 0.40);
 
                 // 방금 position 기반으로 완료 전환된 경우 progress_percent=100으로 표시
                 const justCompletedByPosition =
                     !existing.is_completed && recomputedCompleted &&
-                    existingWatchedRatio < 0.70 && newPositionRatio >= 0.95;
+                    existingWatchedRatio < 0.70 && maxPositionRatioRecomputed >= 0.95;
                 const updatePayload = {
                     last_position: progressData.lastPosition || 0,
+                    max_last_position: newMaxPosition,
                     is_completed: recomputedCompleted,
                     updated_at: new Date().toISOString()
                 };
