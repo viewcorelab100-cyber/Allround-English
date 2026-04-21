@@ -2237,6 +2237,23 @@
                 });
             }
 
+            // 정렬 적용 (드롭다운 선택값 기준)
+            const sortBy = document.getElementById('assignment-sort')?.value || 'recent';
+            if (sortBy === 'watchRateAsc') {
+                // 수강률 낮은순: 아직 보지 않은 학생(watchRate=0)을 먼저 → 진도 낮은 학생 우선
+                filtered = [...filtered].sort((a, b) => {
+                    if (a.watchRate !== b.watchRate) return a.watchRate - b.watchRate;
+                    // 동률이면 학생명 가나다순 (정렬 일관성)
+                    return (a.studentName || '').localeCompare(b.studentName || '');
+                });
+            } else if (sortBy === 'watchRateDesc') {
+                filtered = [...filtered].sort((a, b) => {
+                    if (a.watchRate !== b.watchRate) return b.watchRate - a.watchRate;
+                    return (a.studentName || '').localeCompare(b.studentName || '');
+                });
+            }
+            // 'recent' 은 allSubmissions 생성 시점의 updated_at 정렬 그대로 유지
+
             // 페이지네이션 적용
             initPagination('assignments');
             paginationState['assignments'].allData = filtered;
