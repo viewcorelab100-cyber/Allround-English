@@ -1080,6 +1080,9 @@
                 if (result.data.watched_seconds) {
                     dbWatchedSeconds = result.data.watched_seconds;
                 }
+                // DB 기존 max_last_position 복원 (이전 세션에서의 최대 도달점)
+                dbMaxLastPosition = Number(result.data.max_last_position || 0);
+                if (dbMaxLastPosition > sessionMaxPosition) sessionMaxPosition = dbMaxLastPosition;
                 if (result.data.last_position && videoDuration > 0) {
                     const isCompleted = result.data.progress_percent >= 90 || result.data.is_completed;
                     if (!isCompleted) {
