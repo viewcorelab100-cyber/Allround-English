@@ -26,15 +26,25 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
 
         // 완료 판정 (이중 조건):
         //   A. 시청 비율 70% 이상, OR
-        //   B. 마지막 위치 95% 이상 도달 AND 최소 40% 이상 시청 (seek-only 부정행위 차단)
-        // watched_seconds는 timeupdate 누락으로 부족할 수 있으므로, last_position이 끝에 도달했다면
-        // 실제 시청한 것으로 인정하되, 40% 하한으로 스킵 악용 방지
+        //   B. max_last_position 95% 이상 도달 AND 최소 40% 이상 시청 (seek-only 부정행위 차단)
+        // max_last_position = 영상에서 도달했던 최대 위치 (앞으로 감기 이력에 영향받지 않음)
+        // → "끝까지 갔다가 앞으로 감은" 경우도 정확히 감지
         const lastPosition = progressData.lastPosition || 0;
+        const clientMaxPosition = progressData.maxLastPosition || 0;
+        const existingMaxPosition = existing ? Number(existing.max_last_position || 0) : 0;
+        // 서버 max = max(기존 DB max, 기존 DB last_position, 클라 세션 max, 현재 position)
+        const newMaxPosition = Math.max(
+            existingMaxPosition,
+            existing ? Number(existing.last_position || 0) : 0,
+            clientMaxPosition,
+            lastPosition
+        );
+
         const watchedRatio = watchedSeconds / progressData.totalSeconds;
-        const positionRatio = lastPosition / progressData.totalSeconds;
+        const maxPositionRatio = newMaxPosition / progressData.totalSeconds;
         const isCompleted =
             watchedRatio >= 0.70 ||
-            (positionRatio >= 0.95 && watchedRatio >= 0.40);
+            (maxPositionRatio >= 0.95 && watchedRatio >= 0.40);
 
         // position 기반으로 완료 인정된 경우(watched<70%)엔 화면에 100%로 표시
         // → "완료됐는데 왜 47%?" 혼란 방지. watched_seconds 원본은 보존(관리자 watchRate 분석용)
