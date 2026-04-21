@@ -1107,11 +1107,15 @@
 
             try {
                 const currentTime = await player.getCurrentTime();
-                
+
+                // 세션 최대 위치도 갱신 (getCurrentTime 호출 시점에 놓치지 않도록 한 번 더 비교)
+                if (currentTime > sessionMaxPosition) sessionMaxPosition = currentTime;
+
                 const progressData = {
                     watchedSeconds: Math.max(watchedSet.size, dbWatchedSeconds),
                     totalSeconds: videoDuration,
-                    lastPosition: currentTime
+                    lastPosition: currentTime,
+                    maxLastPosition: Math.max(sessionMaxPosition, dbMaxLastPosition)
                 };
 
                 await updateLessonProgress(currentUser.id, currentLesson.id, progressData);
