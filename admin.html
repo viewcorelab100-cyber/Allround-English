@@ -951,24 +951,33 @@
                     </div>
                 </div>
 
-                <!-- 필터 탭 -->
-                <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 mb-8 w-fit">
-                    <button onclick="filterAssignments('pending')" id="filter-assign-pending" 
-                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
-                        Pending
-                    </button>
-                    <button onclick="filterAssignments('all')" id="filter-assign-all" 
-                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
-                        All
-                    </button>
-                    <button onclick="filterAssignments('graded')" id="filter-assign-graded" 
-                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
-                        Graded
-                    </button>
-                    <button onclick="filterAssignments('returned')" id="filter-assign-returned" 
-                            class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
-                        Returned
-                    </button>
+                <!-- 필터 탭 + 정렬 -->
+                <div class="flex items-center gap-4 mb-8 flex-wrap">
+                    <div class="flex bg-white bg-opacity-[0.03] border border-white border-opacity-5 p-1 w-fit">
+                        <button onclick="filterAssignments('pending')" id="filter-assign-pending"
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-white bg-white bg-opacity-10 transition-all">
+                            Pending
+                        </button>
+                        <button onclick="filterAssignments('all')" id="filter-assign-all"
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                            All
+                        </button>
+                        <button onclick="filterAssignments('graded')" id="filter-assign-graded"
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                            Graded
+                        </button>
+                        <button onclick="filterAssignments('returned')" id="filter-assign-returned"
+                                class="px-6 py-2 text-[10px] uppercase tracking-widest font-bold text-gray-500 hover:text-white transition-all">
+                            Returned
+                        </button>
+                    </div>
+
+                    <select id="assignment-sort" onchange="applyAssignmentFilters()"
+                            class="bg-white bg-opacity-[0.03] border border-white border-opacity-5 px-4 py-2 text-[10px] uppercase tracking-widest font-bold text-white focus:outline-none focus:border-opacity-20 transition-all">
+                        <option value="recent" class="bg-black">최신순</option>
+                        <option value="watchRateAsc" class="bg-black">수강률 낮은순</option>
+                        <option value="watchRateDesc" class="bg-black">수강률 높은순</option>
+                    </select>
                 </div>
 
                 <!-- 과제 목록 -->
