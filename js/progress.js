@@ -59,10 +59,20 @@ async function updateLessonProgress(userId, lessonId, progressData, retryCount =
                 if (error) throw error;
                 result = data;
             } else {
+                // watchedSeconds가 기존보다 작거나 같아도 last_position은 갱신 가능
+                // is_completed도 기존 watched_seconds + 새 last_position으로 재평가
+                // (완료 기준 완화 후 기존 Case B 행이 재접속 시 자동 해소되도록)
+                const existingWatchedRatio = existing.watched_seconds / progressData.totalSeconds;
+                const newPositionRatio = (progressData.lastPosition || 0) / progressData.totalSeconds;
+                const recomputedCompleted = existing.is_completed ||
+                    existingWatchedRatio >= 0.70 ||
+                    (newPositionRatio >= 0.95 && existingWatchedRatio >= 0.30);
+
                 const { data, error } = await window.supabase
                     .from('lesson_progress')
                     .update({
                         last_position: progressData.lastPosition || 0,
+                        is_completed: recomputedCompleted,
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', existing.id)
