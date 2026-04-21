@@ -852,6 +852,8 @@
         let currentProgress = 0; // 현재 진도율
         let isTabVisible = true; // 탭 가시성 상태
         let lastSeekedAt = 0; // seek 이벤트 발생 시각 (ms) — 글리치/건너뛰기 구분용
+        let sessionMaxPosition = 0; // 이번 세션에서 도달한 최대 위치 (초) — 끝 근처 → 앞으로 감기 감지용
+        let dbMaxLastPosition = 0; // DB에 저장된 기존 max_last_position (세션 간 누적 보존)
 
         // 진도 추적 진단 카운터 (2026-04-17~ 1주간 관찰용)
         const progressDiag = {
