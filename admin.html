@@ -7019,6 +7019,314 @@
         }
         // ========== 공지 팝업 관리 끝 ==========
 
+
+        // ========== 사용 가이드 게시판 관리 ==========
+        let guidesData = [];
+        let guideEditorInstance = null;
+        let guideSlugManuallyEdited = false;
+
+        // 안전한 DOMPurify 설정 (sanitize 결과를 학생 페이지에서 그대로 렌더)
+        const GUIDE_PURIFY_CONFIG = {
+            ALLOWED_TAGS: [
+                'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'ul', 'ol', 'li',
+                'strong', 'em', 'u', 's', 'del',
+                'a', 'img',
+                'blockquote', 'code', 'pre',
+                'br', 'hr',
+                'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                'span', 'div'
+            ],
+            ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel'],
+            ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+            FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'link', 'meta'],
+            FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit', 'style']
+        };
+
+        function purifyGuideHtml(html) {
+            if (!window.DOMPurify) return '';
+            // 외부 링크 자동 target=_blank + rel=noopener
+            DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+                if (node.tagName === 'A') {
+                    const href = node.getAttribute('href') || '';
+                    if (href.startsWith('http')) {
+                        node.setAttribute('target', '_blank');
+                        node.setAttribute('rel', 'noopener noreferrer');
+                    }
+                }
+            });
+            const clean = DOMPurify.sanitize(html, GUIDE_PURIFY_CONFIG);
+            DOMPurify.removeAllHooks();
+            return clean;
+        }
+
+        // slug 자동 생성: 한글 유지 + 공백→하이픈 + 제어/특수문자 제거
+        function slugify(str) {
+            return (str || '')
+                .trim()
+                .toLowerCase()
+                .replace(/[\s　]+/g, '-')
+                .replace(/[^\p{L}\p{N}\-]/gu, '')
+                .replace(/-{2,}/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 100);
+        }
+
+        function autoGenerateGuideSlug() {
+            if (guideSlugManuallyEdited) return;
+            const title = document.getElementById('guide-title').value;
+            document.getElementById('guide-slug').value = slugify(title);
+        }
+
+        // 마크다운에서 미리보기용 plain text 추출
+        function markdownToPlainText(md, maxLen = 200) {
+            if (!md) return '';
+            const html = marked.parse(md, { gfm: true, breaks: true });
+            const clean = purifyGuideHtml(html);
+            const tmp = document.createElement('div');
+            tmp.innerHTML = clean;
+            const text = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+            return text.slice(0, maxLen);
+        }
+
+        async function loadGuides() {
+            const tbody = document.getElementById('guide-table-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 uppercase tracking-widest text-[10px]">Loading...</td></tr>';
+
+            const { data, error } = await window.supabase
+                .from('guides')
+                .select('*')
+                .order('display_order', { ascending: true })
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Guides load error:', error);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500 text-sm">로드 실패: ' + error.message + '</td></tr>';
+                return;
+            }
+
+            guidesData = data || [];
+            renderGuideList();
+        }
+
+        function renderGuideList() {
+            const tbody = document.getElementById('guide-table-body');
+            const catFilter = document.getElementById('guide-filter-category').value;
+            const statusFilter = document.getElementById('guide-filter-status').value;
+            const searchTerm = (document.getElementById('guide-filter-search').value || '').toLowerCase().trim();
+
+            let filtered = guidesData;
+            if (catFilter)   filtered = filtered.filter(g => g.category === catFilter);
+            if (statusFilter === 'published') filtered = filtered.filter(g => g.is_published);
+            if (statusFilter === 'draft')     filtered = filtered.filter(g => !g.is_published);
+            if (searchTerm)  filtered = filtered.filter(g => (g.title || '').toLowerCase().includes(searchTerm));
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 text-sm">조건에 맞는 가이드가 없습니다</td></tr>';
+                return;
+            }
+
+            const escapeHtml = (s) => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+            tbody.innerHTML = filtered.map(g => {
+                const statusBadge = g.is_published
+                    ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-green-50 text-green-600 uppercase">게시중</span>'
+                    : '<span class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 text-gray-500 uppercase">임시저장</span>';
+                const publishedStr = g.published_at ? new Date(g.published_at).toLocaleDateString('ko-KR') : '-';
+                return `<tr>
+                    <td class="px-6 py-4 text-sm font-medium" style="color:#111;">${escapeHtml(g.title)}</td>
+                    <td class="px-6 py-4 text-xs text-gray-600">${escapeHtml(g.category)}</td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">${g.view_count || 0}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">${publishedStr}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="togglePublishGuide('${g.id}', ${g.is_published})" class="text-xs ${g.is_published ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'} mr-3 demo-restricted">${g.is_published ? '비공개' : '게시'}</button>
+                        <button onclick="editGuide('${g.id}')" class="text-xs text-blue-600 hover:text-blue-800 mr-3 demo-restricted">수정</button>
+                        <button onclick="deleteGuide('${g.id}')" class="text-xs text-red-500 hover:text-red-700 demo-restricted">삭제</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function initGuideEditor(initialMarkdown = '') {
+            if (guideEditorInstance) {
+                try { guideEditorInstance.destroy(); } catch (e) {}
+                guideEditorInstance = null;
+            }
+            const container = document.getElementById('guide-editor');
+            container.innerHTML = '';
+
+            guideEditorInstance = new toastui.Editor({
+                el: container,
+                height: '420px',
+                initialEditType: 'wysiwyg',
+                previewStyle: 'vertical',
+                language: 'ko-KR',
+                usageStatistics: false,
+                initialValue: initialMarkdown,
+                hooks: {
+                    addImageBlobHook: async (blob, callback) => {
+                        try {
+                            if (blob.size > 5 * 1024 * 1024) {
+                                alert('이미지 크기는 5MB 이하만 가능합니다.');
+                                return;
+                            }
+                            const ext = (blob.name && blob.name.split('.').pop().toLowerCase()) || 'png';
+                            const filePath = `inline/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+                            const { error } = await window.supabase.storage
+                                .from('guide-images')
+                                .upload(filePath, blob, { upsert: false, contentType: blob.type });
+                            if (error) {
+                                console.error('Guide image upload error:', error);
+                                alert('이미지 업로드 실패: ' + error.message);
+                                return;
+                            }
+                            const { data: urlData } = window.supabase.storage
+                                .from('guide-images')
+                                .getPublicUrl(filePath);
+                            callback(urlData.publicUrl, '');
+                        } catch (e) {
+                            console.error(e);
+                            alert('이미지 업로드 중 오류가 발생했습니다.');
+                        }
+                    }
+                }
+            });
+        }
+
+        function openGuideModal(editId = null) {
+            document.getElementById('guide-modal').classList.remove('hidden');
+            document.getElementById('guide-edit-id').value = '';
+            document.getElementById('guide-modal-title').textContent = '새 가이드 작성';
+            document.getElementById('guide-title').value = '';
+            document.getElementById('guide-slug').value = '';
+            document.getElementById('guide-category').value = '시작하기';
+            document.getElementById('guide-order').value = 0;
+            document.getElementById('guide-thumbnail').value = '';
+            guideSlugManuallyEdited = false;
+
+            let initialMarkdown = '';
+            if (editId) {
+                const g = guidesData.find(x => x.id === editId);
+                if (!g) return;
+                document.getElementById('guide-edit-id').value = g.id;
+                document.getElementById('guide-modal-title').textContent = '가이드 수정';
+                document.getElementById('guide-title').value = g.title || '';
+                document.getElementById('guide-slug').value = g.slug || '';
+                document.getElementById('guide-category').value = g.category || '시작하기';
+                document.getElementById('guide-order').value = g.display_order || 0;
+                document.getElementById('guide-thumbnail').value = g.thumbnail_url || '';
+                guideSlugManuallyEdited = true;  // 수정 시엔 자동 갱신 안 함
+                initialMarkdown = g.content_markdown || '';
+            }
+
+            // slug 수동 편집 감지
+            const slugInput = document.getElementById('guide-slug');
+            slugInput.oninput = () => { guideSlugManuallyEdited = true; };
+
+            // 에디터는 모달 표시 후 초기화 (display:none 상태에서 init하면 높이 0 이슈)
+            setTimeout(() => initGuideEditor(initialMarkdown), 50);
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guide-modal').classList.add('hidden');
+            if (guideEditorInstance) {
+                try { guideEditorInstance.destroy(); } catch (e) {}
+                guideEditorInstance = null;
+            }
+        }
+
+        function editGuide(id) { openGuideModal(id); }
+
+        async function ensureUniqueSlug(slug, excludeId) {
+            if (!slug) return null;
+            let candidate = slug;
+            let suffix = 1;
+            while (true) {
+                const query = window.supabase.from('guides').select('id').eq('slug', candidate).limit(1);
+                const { data, error } = await query;
+                if (error) { console.error(error); return null; }
+                const conflict = (data || []).find(r => r.id !== excludeId);
+                if (!conflict) return candidate;
+                suffix += 1;
+                candidate = `${slug}-${suffix}`;
+            }
+        }
+
+        async function saveGuide(publish) {
+            const title = document.getElementById('guide-title').value.trim();
+            const category = document.getElementById('guide-category').value;
+            let slug = (document.getElementById('guide-slug').value || '').trim();
+            const displayOrder = parseInt(document.getElementById('guide-order').value) || 0;
+            const thumbnailUrl = document.getElementById('guide-thumbnail').value.trim() || null;
+            const editId = document.getElementById('guide-edit-id').value;
+
+            if (!title) { alert('제목을 입력하세요.'); return; }
+            if (!guideEditorInstance) { alert('에디터가 초기화되지 않았습니다.'); return; }
+
+            const markdown = guideEditorInstance.getMarkdown();
+            if (!markdown.trim()) { alert('본문을 입력하세요.'); return; }
+
+            // slug 정규화 + 충돌 회피
+            if (!slug) slug = slugify(title);
+            if (!slug) slug = 'guide-' + Date.now();
+            slug = await ensureUniqueSlug(slug, editId || null);
+            if (!slug) { alert('Slug 검증 실패'); return; }
+
+            const contentText = markdownToPlainText(markdown, 200);
+
+            const payload = {
+                title,
+                category,
+                slug,
+                content_markdown: markdown,
+                content_text: contentText,
+                thumbnail_url: thumbnailUrl,
+                display_order: displayOrder,
+                is_published: !!publish
+            };
+
+            // 현재 사용자 id (created_by)
+            const { data: userData } = await window.supabase.auth.getUser();
+            if (userData && userData.user && !editId) {
+                payload.created_by = userData.user.id;
+            }
+
+            let error;
+            if (editId) {
+                ({ error } = await window.supabase.from('guides').update(payload).eq('id', editId));
+            } else {
+                ({ error } = await window.supabase.from('guides').insert(payload));
+            }
+
+            if (error) {
+                console.error('Guide save error:', error);
+                alert('저장 실패: ' + error.message);
+                return;
+            }
+
+            closeGuideModal();
+            loadGuides();
+        }
+
+        async function togglePublishGuide(id, currentState) {
+            const next = !currentState;
+            const payload = { is_published: next };
+            if (next) payload.published_at = new Date().toISOString();
+            const { error } = await window.supabase.from('guides').update(payload).eq('id', id);
+            if (error) { alert('상태 변경 실패: ' + error.message); return; }
+            loadGuides();
+        }
+
+        async function deleteGuide(id) {
+            const g = guidesData.find(x => x.id === id);
+            if (!confirm(`"${g ? g.title : '이 가이드'}" 를 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.`)) return;
+            const { error } = await window.supabase.from('guides').delete().eq('id', id);
+            if (error) { alert('삭제 실패: ' + error.message); return; }
+            loadGuides();
+        }
+        // ========== 사용 가이드 게시판 관리 끝 ==========
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
