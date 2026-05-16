@@ -51,8 +51,9 @@
 
 | 구분 | 선택 | 이유 |
 |------|------|------|
-| 에디터 | **Quill 2.x** (CDN) | 무료, 가벼움(~80KB), 자체 데이터 모델(Delta) + HTML 변환, 한글 IME 안정적. TinyMCE는 무료 한도/유료 라이선스 함정이 있음 |
-| Sanitize | **DOMPurify 3.x** (CDN) | de facto standard. 단일 라이브러리로 충분 |
+| 에디터 | **Toast UI Editor 3.x** (CDN) | 국내 다수 서비스(네이버/카카오/토스) 검증. 한글 IME 안정. WYSIWYG/Markdown 토글. 이미지 업로드 hook 내장 |
+| 마크다운 → HTML | **marked.js 11.x** (CDN) | 가장 가벼움(~30KB), 표준 GFM. `gfm:true, breaks:true` 옵션 |
+| Sanitize | **DOMPurify 3.x** (CDN) | de facto standard |
 | 렌더 페이지 | 정적 HTML (`guide.html`, `guide-detail.html`) | 기존 사이트 일관성. SSR 도입 없음 |
 | DB | Supabase Postgres | 기존 스택 그대로 |
 | 이미지 저장 | Supabase Storage 신규 버킷 `guide-images` | popup-images와 분리하여 권한·용량 별도 관리 |
