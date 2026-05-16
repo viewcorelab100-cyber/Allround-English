@@ -4423,11 +4423,11 @@
         function updatePaymentStats() {
             const courseTotal = allPayments
                 .filter(p => (p.payment_type || 'course') === 'course')
-                .reduce((sum, p) => sum + (p.amount || 0), 0);
+                .reduce((sum, p) => sum + (p.paid_amount ?? p.amount ?? 0), 0);
 
             const textbookTotal = allPayments
                 .filter(p => p.payment_type === 'textbook')
-                .reduce((sum, p) => sum + (p.amount || 0), 0);
+                .reduce((sum, p) => sum + (p.paid_amount ?? p.amount ?? 0), 0);
 
             const totalAmount = courseTotal + textbookTotal;
 
