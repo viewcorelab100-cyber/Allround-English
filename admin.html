@@ -1470,14 +1470,19 @@
 
             <!-- 게시판 관리 섹션 -->
             <section id="section-guides" class="hidden">
-                <div class="flex items-end justify-between mb-12">
+                <div class="flex items-end justify-between mb-12 flex-wrap gap-4">
                     <div>
                         <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mb-2 block">Board</span>
                         <h1 class="text-4xl font-bold tracking-tight" style="color:#111;">게시판 관리</h1>
                     </div>
-                    <button onclick="openGuideModal()" class="btn-admin-primary demo-restricted">
-                        새 글 작성
-                    </button>
+                    <div class="flex gap-3">
+                        <button onclick="openGuideCategoryModal()" class="btn-admin-outline demo-restricted text-[11px] md:text-xs">
+                            카테고리 관리
+                        </button>
+                        <button onclick="openGuideModal()" class="btn-admin-primary demo-restricted">
+                            새 글 작성
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 필터 바 -->
