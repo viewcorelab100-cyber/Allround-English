@@ -7196,7 +7196,6 @@
             document.getElementById('guide-category').value = '시작하기';
             document.getElementById('guide-order').value = 0;
             document.getElementById('guide-thumbnail').value = '';
-            guideSlugManuallyEdited = false;
 
             let initialMarkdown = '';
             if (editId) {
@@ -7209,13 +7208,8 @@
                 document.getElementById('guide-category').value = g.category || '시작하기';
                 document.getElementById('guide-order').value = g.display_order || 0;
                 document.getElementById('guide-thumbnail').value = g.thumbnail_url || '';
-                guideSlugManuallyEdited = true;  // 수정 시엔 자동 갱신 안 함
                 initialMarkdown = g.content_markdown || '';
             }
-
-            // slug 수동 편집 감지
-            const slugInput = document.getElementById('guide-slug');
-            slugInput.oninput = () => { guideSlugManuallyEdited = true; };
 
             // 에디터는 모달 표시 후 초기화 (display:none 상태에서 init하면 높이 0 이슈)
             setTimeout(() => initGuideEditor(initialMarkdown), 50);
