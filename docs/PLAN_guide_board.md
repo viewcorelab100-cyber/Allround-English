@@ -230,8 +230,8 @@ CREATE INDEX idx_guides_slug ON guides(slug) WHERE is_published = true;
 
 | 리스크 | 등급 | 대응 |
 |--------|------|------|
-| WYSIWYG XSS | 높음 | DOMPurify 이중 적용 + Phase 5 침투 테스트 |
-| Quill 한글 IME 이슈 | 중간 | Phase 2에서 1차 검증, 문제 시 ProseMirror로 대체 검토 |
+| 마크다운 → HTML 변환 시 XSS | 중간 | marked.js raw HTML 입력 비활성화 + DOMPurify sanitize + Phase 5 침투 테스트 |
+| Toast UI Editor 한글 IME 이슈 | 낮음 | 국내 검증 라이브러리. 기본 안정 |
 | 헤더 분산 — sed 일괄 수정 위험 | 중간 | Phase 4 시작 시 헤더 공통화 가능성 먼저 평가 |
 | 이미지 업로드 용량 폭증 | 낮음 | 5MB 제한 + Phase 5 후 30일 운영 보고 시 검토 |
 | 관리자 계정 탈취 시 가이드 위·변조 | 중간 | 본 페이즈 범위 밖. 차기에 admin 2FA 검토 권고 |
