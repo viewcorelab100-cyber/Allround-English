@@ -32,17 +32,18 @@
 
 ---
 
-## 1. CTO 권고: WYSIWYG 보안 정책 (절대 양보 불가)
+## 1. CTO 권고: 보안 정책 (절대 양보 불가)
 
-WYSIWYG는 XSS의 단골 진입점입니다. 다음 정책은 **선택 옵션이 아니라 구현 전제 조건**입니다.
+저장 형식은 마크다운이지만, 렌더는 결국 HTML이 됩니다. 다음 정책은 **선택 옵션이 아니라 구현 전제 조건**입니다.
 
 | 정책 | 구현 위치 |
 |------|----------|
-| **저장 시점 sanitize**: 관리자가 저장 버튼 누를 때 `DOMPurify.sanitize()` 통과한 HTML만 DB 저장 | admin.html 폼 submit 핸들러 |
-| **렌더 시점 sanitize**: 학생 페이지에서 DB의 HTML을 innerHTML 주입하기 직전 다시 한 번 sanitize | guide.html 렌더 함수 |
-| **허용 태그 화이트리스트**: `p, h2, h3, h4, ul, ol, li, strong, em, u, a, img, blockquote, code, pre, br, hr` 만 허용. `script, iframe, object, embed, on*` 속성 전부 제거 | DOMPurify 설정 |
+| **저장 형식 = 마크다운 텍스트** (HTML 아님). marked.js의 raw HTML 입력 옵션 비활성화 | Toast UI Editor 설정 + DB 컬럼 `content_markdown` |
+| **렌더 시점 sanitize**: 학생 페이지에서 marked.js로 마크다운 → HTML 변환 직후 `DOMPurify.sanitize()` 통과 | guide-detail.html 렌더 함수 |
+| **허용 태그 화이트리스트**: `p, h2, h3, h4, ul, ol, li, strong, em, u, a, img, blockquote, code, pre, br, hr, table, thead, tbody, tr, th, td` | DOMPurify 설정 |
 | **이미지 URL 검증**: `img` 태그의 `src`는 Supabase Storage 도메인 화이트리스트만 통과 | DOMPurify ALLOWED_URI_REGEXP |
-| **링크 검증**: `a href`는 `http://`, `https://`, `mailto:`만. `javascript:` 차단 | DOMPurify |
+| **링크 검증**: `a href`는 `http://`, `https://`, `mailto:`만. `javascript:` 차단. 외부 링크는 `rel="noopener noreferrer"` 자동 부여 | DOMPurify hook |
+| **Toast UI Editor의 `useCommandShortcut: true`, `extendedAutolinks: false`** 로 raw HTML 입력 경로 차단 | admin.html 에디터 초기화 |
 
 ---
 
