@@ -66,20 +66,20 @@
 ### 3.1 테이블: `guides`
 ```sql
 CREATE TABLE guides (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  category      TEXT NOT NULL,              -- '시작하기', '결제', '강의 시청' 등
-  title         TEXT NOT NULL,
-  slug          TEXT UNIQUE NOT NULL,       -- URL용. title에서 자동 생성 + 충돌 시 -2, -3
-  content_html  TEXT NOT NULL,              -- sanitized HTML (Quill 출력)
-  content_text  TEXT,                       -- 검색·미리보기용 plain text (서버에서 자동 추출)
-  thumbnail_url TEXT,                       -- 목록 카드용 (선택)
-  display_order INT DEFAULT 0,              -- 카테고리 내 정렬
-  is_published  BOOLEAN DEFAULT false,      -- 임시저장 vs 게시
-  view_count    INT DEFAULT 0,
-  published_at  TIMESTAMPTZ,
-  created_at    TIMESTAMPTZ DEFAULT now(),
-  updated_at    TIMESTAMPTZ DEFAULT now(),
-  created_by    UUID REFERENCES profiles(id)
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category         TEXT NOT NULL,              -- '시작하기', '강의 시청', '결제·환불', 'FAQ'
+  title            TEXT NOT NULL,
+  slug             TEXT UNIQUE NOT NULL,       -- URL용. title에서 자동 생성 + 충돌 시 -2, -3
+  content_markdown TEXT NOT NULL,              -- 원본 마크다운 (Toast UI Editor 출력)
+  content_text     TEXT,                       -- 검색·미리보기용 plain text (마크다운에서 자동 추출)
+  thumbnail_url    TEXT,                       -- 목록 카드용 (선택)
+  display_order    INT DEFAULT 0,              -- 카테고리 내 정렬
+  is_published     BOOLEAN DEFAULT false,      -- 임시저장 vs 게시
+  view_count       INT DEFAULT 0,
+  published_at     TIMESTAMPTZ,
+  created_at       TIMESTAMPTZ DEFAULT now(),
+  updated_at       TIMESTAMPTZ DEFAULT now(),
+  created_by       UUID REFERENCES profiles(id)
 );
 
 CREATE INDEX idx_guides_published ON guides(is_published, category, display_order);
