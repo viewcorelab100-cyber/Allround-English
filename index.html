@@ -260,6 +260,59 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
 
+    <script>
+      // 메인 페이지 게시판 미리보기 로드
+      (function () {
+        function escapeHTML(s) {
+          if (s === null || s === undefined) return '';
+          return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        async function loadHomeBoard() {
+          const listEl = document.getElementById('home-board-list');
+          if (!listEl) return;
+          if (!window.supabase || !window.supabase.from) {
+            setTimeout(loadHomeBoard, 80);
+            return;
+          }
+          const { data, error } = await window.supabase
+            .from('guides')
+            .select('slug, category, title, content_text, published_at')
+            .eq('is_published', true)
+            .order('display_order', { ascending: true })
+            .order('published_at', { ascending: false })
+            .limit(3);
+
+          if (error) {
+            console.warn('home board load error:', error);
+            listEl.innerHTML = '<div class="home-board-empty">게시판을 불러오지 못했습니다.</div>';
+            return;
+          }
+          if (!data || data.length === 0) {
+            listEl.innerHTML = '<div class="home-board-empty">아직 게시된 글이 없습니다.</div>';
+            return;
+          }
+          listEl.innerHTML = data.map(g => {
+            const slug = encodeURIComponent(g.slug);
+            const dateStr = g.published_at ? new Date(g.published_at).toLocaleDateString('ko-KR') : '';
+            const preview = (g.content_text || '').slice(0, 80);
+            return `<a href="./guide-detail.html?slug=${slug}" class="home-board-card">
+              <span class="home-board-card-cat">${escapeHTML(g.category)}</span>
+              <h3 class="home-board-card-title">${escapeHTML(g.title)}</h3>
+              <p class="home-board-card-desc">${escapeHTML(preview)}</p>
+              <span class="home-board-card-date">${dateStr}</span>
+            </a>`;
+          }).join('');
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadHomeBoard);
+        } else {
+          loadHomeBoard();
+        }
+      })();
+    </script>
+
 </body>
 
 </html>
