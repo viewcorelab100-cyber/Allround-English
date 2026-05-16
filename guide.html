@@ -37,15 +37,66 @@
             font-weight: 600;
         }
         .guide-card {
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 20px;
+            background: #fff;
+            border: 1px solid #ececeb;
             transition: border-color .15s ease-in-out;
         }
         .guide-card:hover {
-            border-color: rgba(0,0,0,0.2);
+            border-color: #c0c0bf;
         }
         .empty-state {
             color: #8B95A1;
+        }
+
+        /* 게시판 목록: philosophy.html 패턴 — sub-bg.png 회색은 .page-content-area가 담당 */
+        .board-sub-visual {
+            padding: 0 20px 60px;
+        }
+        .board-sub-visual-inner {
+            width: 100%;
+            max-width: 1318px;
+            margin: 0 auto;
+            padding-top: 63px;
+        }
+        .board-sub-page-title {
+            font-family: "cabrito-didone-normal", serif;
+            font-size: 35px;
+            line-height: 1;
+            font-weight: 600;
+            color: #2F2725;
+            position: relative;
+            padding-left: 20px;
+            margin-left: 80px;
+        }
+        .board-sub-page-title::before {
+            content: "";
+            width: 2px;
+            height: 22px;
+            background: #2F2725;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .board-card {
+            background: #fff;
+            border: 1px solid #ececeb;
+            padding: 60px 48px;
+            margin-top: 33px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (max-width: 1024px) {
+            .board-sub-page-title { font-size: 28px; margin-left: 20px; }
+            .board-card { padding: 44px 28px; }
+        }
+        @media (max-width: 768px) {
+            .board-sub-visual { padding: 0 16px 40px; }
+            .board-sub-visual-inner { padding-top: 40px; }
+            .board-sub-page-title { font-size: 24px; margin-left: 0; }
+            .board-card { padding: 32px 20px; margin-top: 24px; }
         }
     </style>
 </head>
