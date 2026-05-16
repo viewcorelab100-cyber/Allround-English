@@ -118,35 +118,65 @@
             font-weight: 600;
         }
 
+        /* 관련 글 카드 (philosophy 톤: 흰색 + 얇은 보더) */
         .related-card {
-            border: 1px solid rgba(0,0,0,0.08);
-            border-radius: 20px;
+            background: #fff;
+            border: 1px solid #ececeb;
             transition: border-color .15s ease-in-out;
         }
         .related-card:hover {
-            border-color: rgba(0,0,0,0.2);
+            border-color: #c0c0bf;
         }
 
-        /* 게시판 상세: 회색 외곽 + 흰색 본문 카드 */
-        .guide-detail-outer {
-            background-color: #F4F5F7;
-            padding: 60px 20px 80px;
+        /* 게시판 상세: philosophy.html 패턴 — sub-bg.png 회색은 .page-content-area가 담당 */
+        .board-sub-visual {
+            padding: 0 20px 60px;
         }
-        .guide-detail-card {
-            background-color: #ffffff;
-            border-radius: 20px;
-            padding: 56px 48px;
-            max-width: 768px;
+        .board-sub-visual-inner {
+            width: 100%;
+            max-width: 1318px;
             margin: 0 auto;
+            padding-top: 63px;
+        }
+        .board-sub-page-title {
+            font-family: "cabrito-didone-normal", serif;
+            font-size: 35px;
+            line-height: 1;
+            font-weight: 600;
+            color: #2F2725;
+            position: relative;
+            padding-left: 20px;
+            margin-left: 80px;
+        }
+        .board-sub-page-title::before {
+            content: "";
+            width: 2px;
+            height: 22px;
+            background: #2F2725;
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .board-card {
+            background: #fff;
+            border: 1px solid #ececeb;
+            padding: 80px 60px;
+            margin-top: 33px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (max-width: 1024px) {
+            .board-sub-page-title { font-size: 28px; margin-left: 20px; }
+            .board-card { padding: 48px 28px; }
         }
         @media (max-width: 768px) {
-            .guide-detail-outer {
-                padding: 32px 16px 48px;
-            }
-            .guide-detail-card {
-                padding: 32px 24px;
-                border-radius: 16px;
-            }
+            .board-sub-visual { padding: 0 16px 40px; }
+            .board-sub-visual-inner { padding-top: 40px; }
+            .board-sub-page-title { font-size: 24px; margin-left: 0; }
+            .board-card { padding: 36px 20px; margin-top: 24px; }
         }
     </style>
 </head>
