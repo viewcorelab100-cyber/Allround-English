@@ -4413,7 +4413,7 @@
                         </td>
                         <td class="text-white font-medium">${payment.course?.title || payment.order_name || '-'}</td>
                         <td><span class="text-[9px] uppercase tracking-widest font-bold ${typeColor}">${typeLabel}</span></td>
-                        <td class="text-right text-white font-bold">₩${(payment.amount || 0).toLocaleString()}</td>
+                        <td class="text-right text-white font-bold">₩${(payment.paid_amount ?? payment.amount ?? 0).toLocaleString()}</td>
                         <td><span class="text-[9px] uppercase tracking-widest font-bold ${statusColor}">${statusLabel}</span></td>
                     </tr>
                 `;
