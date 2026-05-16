@@ -225,7 +225,7 @@
             const grid = document.getElementById('guide-grid');
             if (error) {
                 console.error('Public guides load error:', error);
-                grid.innerHTML = '<div class="empty-state col-span-full text-center py-20 text-sm">가이드를 불러오지 못했습니다.</div>';
+                grid.innerHTML = '<div class="empty-state col-span-full text-center py-20 text-sm">게시판을 불러오지 못했습니다.</div>';
                 return;
             }
             publicGuides = data || [];
