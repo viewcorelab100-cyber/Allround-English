@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://js.sentry-cdn.com/66380daacfe58e2b4bc11f2296836b00.min.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" id="meta-description" content="올라운드 영어 학원 사용 가이드">
+    <meta property="og:title" id="meta-og-title" content="이용 가이드 — ALLROUND">
+    <meta property="og:description" id="meta-og-description" content="올라운드 영어 학원 사용 가이드">
+    <meta property="og:type" content="article">
+    <title id="page-title">이용 가이드 — ALLROUND</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { corePlugins: { container: false } }</script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <link rel="stylesheet" href="./css/page-shell.css">
+    <link rel="stylesheet" href="https://use.typekit.net/jmj4ims.css">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <!-- Markdown 렌더 + Sanitize -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            letter-spacing: -0.02em;
+        }
+        .font-suit { font-family: 'SUIT Variable', 'SUIT', sans-serif; }
+
+        /* 본문 prose 스타일 (가이드 본문 전용) */
+        .guide-prose {
+            color: #2F2725;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+        .guide-prose h1, .guide-prose h2, .guide-prose h3, .guide-prose h4 {
+            color: #2F2725;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-top: 2em;
+            margin-bottom: 0.7em;
+            letter-spacing: -0.02em;
+        }
+        .guide-prose h1 { font-size: 26px; }
+        .guide-prose h2 { font-size: 22px; }
+        .guide-prose h3 { font-size: 18px; }
+        .guide-prose h4 { font-size: 16px; }
+        .guide-prose p { margin: 0.9em 0; }
+        .guide-prose ul, .guide-prose ol {
+            margin: 0.9em 0;
+            padding-left: 1.6em;
+        }
+        .guide-prose ul { list-style: disc; }
+        .guide-prose ol { list-style: decimal; }
+        .guide-prose li { margin: 0.4em 0; }
+        .guide-prose strong { font-weight: 700; color: #111; }
+        .guide-prose em { font-style: italic; }
+        .guide-prose a {
+            color: #2F2725;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .guide-prose a:hover { color: #000; }
+        .guide-prose blockquote {
+            border-left: 3px solid #2F2725;
+            padding: 0.5em 1em;
+            margin: 1.2em 0;
+            color: #4E5968;
+            background: #F8F9FA;
+        }
+        .guide-prose code {
+            background: #F1F3F5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+        .guide-prose pre {
+            background: #F8F9FA;
+            border: 1px solid #E9ECEF;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2em 0;
+        }
+        .guide-prose pre code {
+            background: transparent;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .guide-prose img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.4em 0;
+        }
+        .guide-prose hr {
+            border: none;
+            border-top: 1px solid #E9ECEF;
+            margin: 2em 0;
+        }
+        .guide-prose table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1.4em 0;
+        }
+        .guide-prose th, .guide-prose td {
+            border: 1px solid #E9ECEF;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        .guide-prose th {
+            background: #F8F9FA;
+            font-weight: 600;
+        }
+
+        .related-card {
+            transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 20px;
+        }
+        .related-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+    </style>
+</head>
+<body data-active-page="guide">
+
+    <header class="main-header">
+      <div class="container">
+        <div class="logo-wrap">
+          <a href="./index.html" class="logo">
+            <img src="./img/logo.png" alt="ALLROUND">
+          </a>
+        </div>
+        <div class="header-right">
+          <div id="auth-buttons" style="display:contents;">
+            <a href="auth.html">Login</a>
+            <a href="auth.html?mode=signup">Sign up</a>
+          </div>
+          <div id="user-menu" style="display:none;">
+            <a id="admin-link" href="admin.html" style="display:none;">관리자</a>
+            <a href="mypage.html">My Page</a>
+            <a href="#" onclick="signOut(); return false;">Logout</a>
+          </div>
+          <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-header">
+            <img src="./img/kakao-icon.png" alt="">
+          </a>
+          <a href="#" class="menu-btn">
+            <img src="./img/menu-icon.png" alt="menu">
+          </a>
+        </div>
+        <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="kakao-btn">
+          <img src="./img/kakao-icon.png" alt="카카오톡">
+          <span>카톡 상담</span>
+        </a>
+      </div>
+    </header>
+    <div class="menu-overlay"></div>
+
+    <main class="main-section">
+      <div class="main-grid">
+        <aside class="main-left-bar">
+          <button type="button" class="menu-close" aria-label="메뉴 닫기">&times;</button>
+          <div class="left-menu">
+            <div class="menu-group">
+              <a href="./philosophy.html" class="menu-title">학원 소개</a>
+              <a href="#" class="menu-title">수업 안내</a>
+              <div class="menu-sub">
+                <a href="./firstee.html"><span class="font-style">ALLROUND firstee</span></a>
+                <a href="./original.html"><span class="font-style">ALLROUND original</span></a>
+                <a href="./strategy.html"><span class="font-style">ALLROUND strategy</span></a>
+              </div>
+            </div>
+            <div class="menu-group">
+              <a href="./online-class.html" class="menu-title menu-title-icon">
+                <img src="./img/icon-video.png" alt="">
+                <span>온라인 강의</span>
+              </a>
+            </div>
+            <div class="menu-group">
+              <a href="#" class="menu-title">학원 소식</a>
+              <div class="menu-sub">
+                <span class="menu-sub-text">Instagram</span>
+                <span class="menu-sub-text">Youtube</span>
+                <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener">Blog</a>
+                <a href="./guide.html"><span class="font-style">이용 가이드</span></a>
+              </div>
+            </div>
+            <div class="menu-group">
+              <a href="https://pf.kakao.com/_KMbxon" target="_blank" rel="noopener" class="menu-title">상담 예약</a>
+              <span class="menu-title menu-title-disabled">강사 채용</span>
+            </div>
+          </div>
+        </aside>
+
+        <section class="main-content page-content-area">
+          <section class="py-12 md:py-20 px-6 md:px-10 lg:px-16">
+            <div class="max-w-3xl mx-auto">
+
+              <!-- 로딩 -->
+              <div id="guide-loading" class="py-20 text-center text-sm text-[#8B95A1]">불러오는 중...</div>
+
+              <!-- 본문 -->
+              <article id="guide-article" class="hidden">
+                <a href="./guide.html" class="inline-flex items-center gap-1 text-[12px] text-[#8B95A1] hover:text-[#2F2725] mb-6">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                  </svg>
+                  목록으로
+                </a>
+
+                <div class="mb-8 space-y-3">
+                  <span id="guide-category" class="inline-block text-[11px] text-[#8B95A1] uppercase tracking-[0.2em] font-medium"></span>
+                  <h1 id="guide-title" class="text-2xl md:text-3xl font-bold text-[#2F2725]" style="line-height:1.35;"></h1>
+                  <div class="flex items-center gap-3 text-[12px] text-[#8B95A1]">
+                    <span id="guide-published-at"></span>
+                    <span>·</span>
+                    <span>조회 <span id="guide-view-count">0</span></span>
+                  </div>
+                </div>
+
+                <div id="guide-content" class="guide-prose"></div>
+
+                <!-- 관련 가이드 -->
+                <div id="related-section" class="hidden mt-16 pt-10 border-t border-gray-200">
+                  <h2 class="text-base font-bold text-[#2F2725] mb-5 tracking-wider uppercase">같은 카테고리의 다른 가이드</h2>
+                  <div id="related-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                </div>
+              </article>
+
+              <!-- 404 -->
+              <div id="guide-notfound" class="hidden py-20 text-center">
+                <p class="text-[#2F2725] text-base font-bold mb-2">가이드를 찾을 수 없습니다</p>
+                <p class="text-sm text-[#8B95A1] mb-6">삭제되었거나 비공개 상태입니다.</p>
+                <a href="./guide.html" class="inline-block px-5 py-2.5 border border-[#2F2725] text-[#2F2725] text-sm font-bold hover:bg-[#2F2725] hover:text-white transition-colors">가이드 목록으로</a>
+              </div>
+
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div class="footer-left">
+          <strong>올라운드원격학원</strong>
+        </div>
+        <div class="footer-content-wrap">
+          <div class="footer-center">
+            <p>학원설립·운영등록번호 : 제15256호 온라인원격학원 <br class="br-pc-none">신고기관명 : 서울특별시 강남교육지원청<br class="br-pc-none">사업자등록번호 : 560-94-02154<br class="br-pc-none">통신판매업신고 : 2026-서울강남-00399</p>
+            <p>대표 원장 : 개인정보보호책임자 : 배은영<br class="br-pc-none">E-mail : contact@allroundedu.co.kr<br class="br-pc-none">고객센터 : 0507-1339-3828<br class="br-pc-none">주소 : 서울 강남구 대치동 943-29 3층 3138호</p>
+          </div>
+          <div class="footer-right">
+            <div class="footer-links">
+              <a href="terms.html">[이용 약관]</a>
+              <a href="refund.html">[환불 정책]</a>
+              <a href="privacy.html">[개인정보 처리 방침]</a>
+            </div>
+            <div class="footer-sns">
+              <a href="#"><img src="./img/insta.png" alt="instagram"></a>
+              <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener"><img src="./img/blog.png" alt="blog"></a>
+              <a href="#"><img src="./img/youtube.png" alt="youtube"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/popup-notice.js"></script>
+    <script>
+        // ============================
+        //  가이드 상세 페이지 렌더
+        //  핵심 보안: marked.js → DOMPurify → innerHTML
+        //  raw HTML 입력 비활성화 (marked option: mangle=false 등)
+        // ============================
+
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        const PURIFY_CONFIG = {
+            ALLOWED_TAGS: [
+                'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'ul', 'ol', 'li',
+                'strong', 'em', 'u', 's', 'del',
+                'a', 'img',
+                'blockquote', 'code', 'pre',
+                'br', 'hr',
+                'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                'span', 'div'
+            ],
+            ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'target', 'rel'],
+            ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+            FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'link', 'meta'],
+            FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onchange', 'onsubmit', 'style']
+        };
+
+        // marked 옵션: GFM, 줄바꿈 자동 변환, raw HTML 차단은 DOMPurify가 처리
+        if (window.marked) {
+            marked.setOptions({
+                gfm: true,
+                breaks: true,
+                mangle: false,
+                headerIds: false
+            });
+        }
+
+        function renderMarkdown(md) {
+            if (!md) return '';
+            const rawHtml = marked.parse(md);
+            DOMPurify.addHook('afterSanitizeAttributes', function (node) {
+                if (node.tagName === 'A') {
+                    const href = node.getAttribute('href') || '';
+                    if (href.startsWith('http')) {
+                        node.setAttribute('target', '_blank');
+                        node.setAttribute('rel', 'noopener noreferrer');
+                    }
+                }
+            });
+            const clean = DOMPurify.sanitize(rawHtml, PURIFY_CONFIG);
+            DOMPurify.removeAllHooks();
+            return clean;
+        }
+
+        function showNotFound() {
+            document.getElementById('guide-loading').classList.add('hidden');
+            document.getElementById('guide-article').classList.add('hidden');
+            document.getElementById('guide-notfound').classList.remove('hidden');
+        }
+
+        function getSlugFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const slug = params.get('slug') || '';
+            // 길이 제한 + 위험 문자 차단
+            if (!slug || slug.length > 200) return null;
+            return slug;
+        }
+
+        async function loadGuide() {
+            const slug = getSlugFromQuery();
+            if (!slug) { showNotFound(); return; }
+
+            const { data, error } = await window.supabase
+                .from('guides')
+                .select('id, slug, category, title, content_markdown, content_text, published_at, view_count')
+                .eq('slug', slug)
+                .eq('is_published', true)
+                .maybeSingle();
+
+            if (error) { console.error(error); showNotFound(); return; }
+            if (!data) { showNotFound(); return; }
+
+            // 메타데이터
+            document.getElementById('page-title').textContent = `${data.title} — ALLROUND`;
+            const desc = (data.content_text || '').slice(0, 150);
+            document.getElementById('meta-description').setAttribute('content', desc);
+            document.getElementById('meta-og-title').setAttribute('content', data.title);
+            document.getElementById('meta-og-description').setAttribute('content', desc);
+
+            // 본문 렌더 (XSS 방지의 핵심)
+            document.getElementById('guide-category').textContent = data.category || '';
+            document.getElementById('guide-title').textContent = data.title || '';
+            document.getElementById('guide-published-at').textContent = data.published_at
+                ? new Date(data.published_at).toLocaleDateString('ko-KR')
+                : '';
+            document.getElementById('guide-view-count').textContent = data.view_count || 0;
+
+            const safeHtml = renderMarkdown(data.content_markdown || '');
+            document.getElementById('guide-content').innerHTML = safeHtml;
+
+            document.getElementById('guide-loading').classList.add('hidden');
+            document.getElementById('guide-article').classList.remove('hidden');
+
+            // 조회수 증가 (RPC)
+            try {
+                await window.supabase.rpc('increment_guide_view_count', { p_slug: slug });
+            } catch (e) {
+                console.warn('view_count rpc 실패:', e);
+            }
+
+            // 관련 가이드
+            loadRelated(data.category, data.id);
+        }
+
+        async function loadRelated(category, currentId) {
+            if (!category) return;
+            const { data, error } = await window.supabase
+                .from('guides')
+                .select('slug, category, title, content_text, published_at')
+                .eq('is_published', true)
+                .eq('category', category)
+                .neq('id', currentId)
+                .order('display_order', { ascending: true })
+                .order('published_at', { ascending: false })
+                .limit(3);
+
+            if (error || !data || data.length === 0) return;
+
+            const listEl = document.getElementById('related-list');
+            listEl.innerHTML = data.map(g => {
+                const safeSlug = encodeURIComponent(g.slug);
+                const preview = (g.content_text || '').slice(0, 70);
+                return `<a href="./guide-detail.html?slug=${safeSlug}" class="related-card block bg-white p-5">
+                    <h3 class="text-sm font-bold text-[#2F2725] mb-2" style="line-height:1.4;">${escapeHTML(g.title)}</h3>
+                    ${preview ? `<p class="text-xs text-[#4E5968] leading-relaxed line-clamp-2">${escapeHTML(preview)}</p>` : ''}
+                </a>`;
+            }).join('');
+            document.getElementById('related-section').classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tryLoad = () => {
+                if (window.supabase && window.supabase.from) {
+                    loadGuide();
+                } else {
+                    setTimeout(tryLoad, 50);
+                }
+            };
+            tryLoad();
+        });
+    </script>
+</body>
+</html>
