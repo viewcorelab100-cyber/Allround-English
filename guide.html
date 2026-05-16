@@ -203,21 +203,37 @@
         }
 
         async function loadPublicGuides() {
-            const { data, error } = await window.supabase
-                .from('guides')
-                .select('id, slug, category, title, content_text, thumbnail_url, published_at, display_order, view_count')
-                .eq('is_published', true)
-                .order('display_order', { ascending: true })
-                .order('published_at', { ascending: false });
+            // 카테고리 + 게시글 병렬 로드
+            const [catRes, guideRes] = await Promise.all([
+                window.supabase.from('guide_categories').select('name, display_order').order('display_order', { ascending: true }).order('name', { ascending: true }),
+                window.supabase.from('guides').select('id, slug, category, title, content_text, thumbnail_url, published_at, display_order, view_count').eq('is_published', true).order('display_order', { ascending: true }).order('published_at', { ascending: false })
+            ]);
+
+            renderCategoryTabs((catRes.data || []).map(c => c.name));
 
             const grid = document.getElementById('guide-grid');
-            if (error) {
-                console.error('Public guides load error:', error);
+            if (guideRes.error) {
+                console.error('Public guides load error:', guideRes.error);
                 grid.innerHTML = '<div class="empty-state col-span-full text-center py-20 text-sm">게시판을 불러오지 못했습니다.</div>';
                 return;
             }
-            publicGuides = data || [];
+            publicGuides = guideRes.data || [];
             renderPublicGuides();
+        }
+
+        function renderCategoryTabs(categoryNames) {
+            const tabs = document.getElementById('guide-category-tabs');
+            if (!tabs) return;
+            const tabHtml = ['<button onclick="setPublicCategoryFilter(\'\')" data-cat="" class="guide-tab-btn active px-4 py-2 text-[#2F2725] text-sm tracking-wider">전체</button>'];
+            (categoryNames || []).forEach(name => {
+                const safe = escapeHTML(name);
+                tabHtml.push(`<button onclick="setPublicCategoryFilter('${safe.replace(/'/g, "\\'")}')" data-cat="${safe}" class="guide-tab-btn px-4 py-2 text-[#8B95A1] text-sm tracking-wider">${safe}</button>`);
+            });
+            tabs.innerHTML = tabHtml.join('');
+            // 현재 선택된 카테고리가 사라졌다면 전체로 리셋
+            if (currentCategory && !categoryNames.includes(currentCategory)) {
+                currentCategory = '';
+            }
         }
 
         function setPublicCategoryFilter(cat) {
