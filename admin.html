@@ -7122,7 +7122,7 @@
             if (searchTerm)  filtered = filtered.filter(g => (g.title || '').toLowerCase().includes(searchTerm));
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 text-sm">조건에 맞는 가이드가 없습니다</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 text-sm">조건에 맞는 글이 없습니다</td></tr>';
                 return;
             }
 
