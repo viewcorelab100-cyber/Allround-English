@@ -124,18 +124,20 @@ CREATE INDEX idx_guides_slug ON guides(slug) WHERE is_published = true;
 
 ---
 
-### Phase 2 — 관리자 페이지 CRUD (5~6h)
-**목표**: admin.html 내에 게시판 관리 섹션 추가. WYSIWYG 에디터로 작성/수정/삭제 가능.
+### Phase 2 — 관리자 페이지 CRUD (4~5h)
+**목표**: admin.html 내에 게시판 관리 섹션 추가. Toast UI Editor로 작성/수정/삭제 가능.
 
 **작업 분해**
 1. admin.html 사이드바에 `Guides` 메뉴 추가 (`#guides` 섹션)
 2. 목록 뷰: 카테고리 필터 + 게시 상태 필터 + 검색 + 페이지네이션
 3. 작성/수정 모달
-   - Quill 에디터 임베드 (CDN)
-   - 이미지 업로드 핸들러 (Quill toolbar → Storage 업로드 → URL 삽입)
-   - DOMPurify로 저장 직전 sanitize
-   - 임시저장 / 게시 두 버튼 분리
-   - slug 자동 생성 (title의 한글은 그대로, 공백은 `-`, 충돌 시 `-2` 부여)
+   - Toast UI Editor 임베드 (CDN: `@toast-ui/editor`)
+   - 옵션: `initialEditType:'wysiwyg'` (PM이 WYSIWYG 모드로 시작), `previewStyle:'vertical'`, `usageStatistics:false`
+   - **이미지 업로드 hook**: `addImageBlobHook` 콜백 → Supabase Storage(`guide-images`)에 업로드 → public URL 반환 → 에디터가 `![](URL)` 자동 삽입
+   - 저장: `editor.getMarkdown()` 결과를 그대로 DB 저장 (HTML로 변환하지 않음)
+   - 임시저장 / 게시 두 버튼 분리 (`is_published` 토글)
+   - slug 자동 생성 (title의 공백은 `-`, 특수문자 제거, 충돌 시 `-2` 부여)
+   - `content_text` 자동 추출: 마크다운 → HTML → textContent 200자 슬라이스
 4. 삭제: soft delete 아닌 hard delete (단방향 가이드 특성상 복구 요구 낮음). 단 삭제 전 확인 모달 필수.
 5. `view_count` 칼럼은 표시만 (수정 불가)
 
