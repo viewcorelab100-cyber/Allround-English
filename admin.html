@@ -4606,12 +4606,12 @@
                 // 회원별 구매 정보 매핑
                 allMembers = (profiles || []).map(profile => {
                     const memberOrders = (orders || []).filter(o => o.user_id === profile.id);
-                    const totalPaid = memberOrders.reduce((sum, o) => sum + (o.amount || 0), 0);
-                    
+                    const totalPaid = memberOrders.reduce((sum, o) => sum + (o.paid_amount ?? o.amount ?? 0), 0);
+
                     // 이번달 결제 금액
                     const thisMonthPaid = memberOrders
                         .filter(o => o.created_at && new Date(o.created_at) >= thisMonthStart)
-                        .reduce((sum, o) => sum + (o.amount || 0), 0);
+                        .reduce((sum, o) => sum + (o.paid_amount ?? o.amount ?? 0), 0);
                     
                     const purchasedCourses = memberOrders.map(o => ({
                         ...o,
