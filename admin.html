@@ -7110,20 +7110,46 @@
             const tbody = document.getElementById('guide-table-body');
             tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-400 uppercase tracking-widest text-[10px]">Loading...</td></tr>';
 
-            const { data, error } = await window.supabase
-                .from('guides')
-                .select('*')
-                .order('display_order', { ascending: true })
-                .order('created_at', { ascending: false });
+            // 카테고리 + 게시글 병렬 로드
+            const [catRes, guideRes] = await Promise.all([
+                window.supabase.from('guide_categories').select('*').order('display_order', { ascending: true }).order('name', { ascending: true }),
+                window.supabase.from('guides').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: false })
+            ]);
 
-            if (error) {
-                console.error('Guides load error:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500 text-sm">로드 실패: ' + error.message + '</td></tr>';
+            if (catRes.error) console.warn('Guide categories load error:', catRes.error);
+            guideCategoriesData = catRes.data || [];
+
+            if (guideRes.error) {
+                console.error('Guides load error:', guideRes.error);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-red-500 text-sm">로드 실패: ' + guideRes.error.message + '</td></tr>';
                 return;
             }
 
-            guidesData = data || [];
+            guidesData = guideRes.data || [];
+            applyGuideCategoryDropdowns();
             renderGuideList();
+        }
+
+        // 카테고리 드롭다운 옵션을 DB 데이터로 갱신
+        function applyGuideCategoryDropdowns() {
+            const escape = (s) => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+            // 필터 드롭다운 (전체 + 카테고리들)
+            const filterSel = document.getElementById('guide-filter-category');
+            if (filterSel) {
+                const prev = filterSel.value;
+                filterSel.innerHTML = '<option value="">전체 카테고리</option>' +
+                    guideCategoriesData.map(c => `<option value="${escape(c.name)}">${escape(c.name)}</option>`).join('');
+                filterSel.value = guideCategoriesData.some(c => c.name === prev) ? prev : '';
+            }
+
+            // 게시글 모달 카테고리 드롭다운
+            const formSel = document.getElementById('guide-category');
+            if (formSel) {
+                const prev = formSel.value;
+                formSel.innerHTML = guideCategoriesData.map(c => `<option value="${escape(c.name)}">${escape(c.name)}</option>`).join('');
+                if (guideCategoriesData.some(c => c.name === prev)) formSel.value = prev;
+            }
         }
 
         function renderGuideList() {
