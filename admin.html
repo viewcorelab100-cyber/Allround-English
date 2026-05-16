@@ -5123,7 +5123,8 @@
                 const orderDate = new Date(order.created_at).toLocaleDateString('ko-KR');
                 const orderId = order.id.substring(0, 12) + '...';
                 const productName = order.courses?.title || order.order_name || '-';
-                const amount = order.amount ? `₩${order.amount.toLocaleString()}` : '-';
+                const displayAmount = order.paid_amount ?? order.amount;
+                const amount = displayAmount ? `₩${displayAmount.toLocaleString()}` : '-';
                 const customerName = demoMask(order.profiles?.name || order.customer_name, 'name') || '-';
                 const customerEmail = demoMask(order.profiles?.email || order.customer_email, 'email') || '-';
                 const shippingAddress = order.shipping_address
