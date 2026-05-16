@@ -7379,6 +7379,141 @@
             if (error) { alert('삭제 실패: ' + error.message); return; }
             loadGuides();
         }
+
+        // ---------- 카테고리 관리 ----------
+        async function openGuideCategoryModal() {
+            document.getElementById('guide-category-modal').classList.remove('hidden');
+            document.getElementById('new-guide-category-name').value = '';
+            await refreshGuideCategoryList();
+        }
+
+        function closeGuideCategoryModal() {
+            document.getElementById('guide-category-modal').classList.add('hidden');
+        }
+
+        async function refreshGuideCategoryList() {
+            const ul = document.getElementById('guide-category-list');
+            ul.innerHTML = '<li class="text-sm text-gray-400 text-center py-6">Loading...</li>';
+
+            const { data, error } = await window.supabase
+                .from('guide_categories')
+                .select('*')
+                .order('display_order', { ascending: true })
+                .order('name', { ascending: true });
+
+            if (error) {
+                ul.innerHTML = '<li class="text-sm text-red-500 text-center py-6">로드 실패: ' + error.message + '</li>';
+                return;
+            }
+            guideCategoriesData = data || [];
+            applyGuideCategoryDropdowns();
+
+            if (guideCategoriesData.length === 0) {
+                ul.innerHTML = '<li class="text-sm text-gray-400 text-center py-6">등록된 카테고리가 없습니다.</li>';
+                return;
+            }
+
+            // 사용 중인 카테고리별 게시글 수
+            const counts = {};
+            (guidesData || []).forEach(g => {
+                counts[g.category] = (counts[g.category] || 0) + 1;
+            });
+
+            const escape = (s) => (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+            ul.innerHTML = guideCategoriesData.map(c => {
+                const usedCount = counts[c.name] || 0;
+                return `<li class="flex items-center gap-2 p-3 border border-gray-200">
+                    <input type="text" value="${escape(c.name)}" data-cat-id="${c.id}" data-cat-name="${escape(c.name)}"
+                           class="flex-1 px-2 py-1.5 border border-gray-200 text-sm focus:outline-none focus:border-gray-500 guide-cat-input">
+                    <span class="text-[11px] text-gray-400 whitespace-nowrap">${usedCount}개 글</span>
+                    <button onclick="renameGuideCategory('${c.id}')" class="px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold hover:bg-blue-100 demo-restricted">저장</button>
+                    <button onclick="deleteGuideCategory('${c.id}')" class="px-3 py-1.5 bg-red-50 text-red-600 text-xs font-bold hover:bg-red-100 demo-restricted">삭제</button>
+                </li>`;
+            }).join('');
+        }
+
+        async function addGuideCategory() {
+            const input = document.getElementById('new-guide-category-name');
+            const name = (input.value || '').trim();
+            if (!name) { alert('카테고리 이름을 입력하세요.'); return; }
+            if (name.length > 50) { alert('카테고리 이름은 50자 이하만 가능합니다.'); return; }
+
+            // 중복 체크 (마스터)
+            if (guideCategoriesData.some(c => c.name === name)) {
+                alert('이미 존재하는 카테고리입니다.');
+                return;
+            }
+
+            const maxOrder = guideCategoriesData.reduce((m, c) => Math.max(m, c.display_order || 0), 0);
+            const { error } = await window.supabase
+                .from('guide_categories')
+                .insert({ name, display_order: maxOrder + 10 });
+
+            if (error) {
+                alert('카테고리 추가 실패: ' + error.message);
+                return;
+            }
+            input.value = '';
+            await refreshGuideCategoryList();
+        }
+
+        async function renameGuideCategory(catId) {
+            const li = document.querySelector(`input.guide-cat-input[data-cat-id="${catId}"]`);
+            if (!li) return;
+            const oldName = li.dataset.catName;
+            const newName = (li.value || '').trim();
+            if (!newName) { alert('카테고리 이름을 입력하세요.'); return; }
+            if (newName === oldName) { alert('변경된 이름이 없습니다.'); return; }
+            if (newName.length > 50) { alert('카테고리 이름은 50자 이하만 가능합니다.'); return; }
+            if (guideCategoriesData.some(c => c.name === newName && c.id !== catId)) {
+                alert('이미 존재하는 카테고리 이름입니다.');
+                return;
+            }
+
+            const usedCount = (guidesData || []).filter(g => g.category === oldName).length;
+            const confirmMsg = usedCount > 0
+                ? `"${oldName}" 카테고리를 "${newName}" 로 변경합니다.\n해당 카테고리의 게시글 ${usedCount}개의 카테고리도 함께 변경됩니다.\n계속할까요?`
+                : `"${oldName}" 카테고리를 "${newName}" 로 변경합니다.\n계속할까요?`;
+            if (!confirm(confirmMsg)) return;
+
+            // RPC: 트랜잭션으로 마스터 + guides.category 동시 변경
+            const { error: rpcError } = await window.supabase.rpc('rename_guide_category', {
+                p_old_name: oldName,
+                p_new_name: newName
+            });
+
+            if (rpcError) {
+                alert('카테고리 이름 변경 실패: ' + rpcError.message);
+                return;
+            }
+            // 새로고침
+            await loadGuides();
+            await refreshGuideCategoryList();
+            alert('카테고리 이름이 변경되었습니다.');
+        }
+
+        async function deleteGuideCategory(catId) {
+            const c = guideCategoriesData.find(x => x.id === catId);
+            if (!c) return;
+            const usedCount = (guidesData || []).filter(g => g.category === c.name).length;
+            if (usedCount > 0) {
+                alert(`"${c.name}" 카테고리에 게시글 ${usedCount}개가 있어 삭제할 수 없습니다.\n게시글의 카테고리를 먼저 변경하거나 삭제해 주세요.`);
+                return;
+            }
+            if (!confirm(`"${c.name}" 카테고리를 삭제하시겠습니까?`)) return;
+
+            const { error } = await window.supabase
+                .from('guide_categories')
+                .delete()
+                .eq('id', catId);
+
+            if (error) {
+                alert('카테고리 삭제 실패: ' + error.message);
+                return;
+            }
+            await refreshGuideCategoryList();
+        }
         // ========== 게시판 관리 끝 ==========
 
         document.addEventListener('DOMContentLoaded', init);
