@@ -7063,12 +7063,6 @@
                 .slice(0, 100);
         }
 
-        function autoGenerateGuideSlug() {
-            if (guideSlugManuallyEdited) return;
-            const title = document.getElementById('guide-title').value;
-            document.getElementById('guide-slug').value = slugify(title);
-        }
-
         // 마크다운에서 미리보기용 plain text 추출
         function markdownToPlainText(md, maxLen = 200) {
             if (!md) return '';
