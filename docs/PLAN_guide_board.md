@@ -162,7 +162,7 @@ CREATE INDEX idx_guides_slug ON guides(slug) WHERE is_published = true;
    - SEO 메타태그 (title, description, og:image)
 2. `guide-detail.html?slug=xxx`
    - slug로 조회, 못 찾으면 404 처리
-   - DOMPurify로 한 번 더 sanitize 후 innerHTML
+   - **렌더 파이프라인**: DB의 `content_markdown` → `marked.parse(md, {gfm:true, breaks:true})` → `DOMPurify.sanitize(html)` → innerHTML 주입
    - 본문 스타일은 `.prose` 클래스(Tailwind Typography 또는 자체 정의)
    - 하단 "다른 가이드" 동일 카테고리 3개 표시
    - view_count 증가 (anon RPC 함수 한 번 호출, 어뷰징 방지 위해 같은 IP 5분 내 중복 카운트 안 함은 v2로 이연)
