@@ -4835,7 +4835,7 @@
                                             <p class="text-white">${order.courseTitle}</p>
                                             <p class="text-xs text-gray-500">${order.created_at ? new Date(order.created_at).toLocaleDateString('ko-KR') : ''} 구매</p>
                                         </div>
-                                        <p class="text-green-400">₩${(order.amount || 0).toLocaleString()}</p>
+                                        <p class="text-green-400">₩${(order.paid_amount ?? order.amount ?? 0).toLocaleString()}</p>
                                     </div>
                                 `).join('')}
                             </div>
