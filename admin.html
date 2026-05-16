@@ -7239,12 +7239,20 @@
         }
 
         function openGuideModal(editId = null) {
+            if (!guideCategoriesData || guideCategoriesData.length === 0) {
+                alert('카테고리가 없습니다. 먼저 카테고리를 추가해 주세요.');
+                openGuideCategoryModal();
+                return;
+            }
+
             document.getElementById('guide-modal').classList.remove('hidden');
             document.getElementById('guide-edit-id').value = '';
             document.getElementById('guide-modal-title').textContent = '새 글 작성';
             document.getElementById('guide-title').value = '';
             document.getElementById('guide-slug').value = '';
-            document.getElementById('guide-category').value = '시작하기';
+            applyGuideCategoryDropdowns();
+            // 첫 카테고리를 기본값으로
+            document.getElementById('guide-category').value = guideCategoriesData[0].name;
             document.getElementById('guide-order').value = 0;
             document.getElementById('guide-thumbnail').value = '';
 
@@ -7256,7 +7264,15 @@
                 document.getElementById('guide-modal-title').textContent = '글 수정';
                 document.getElementById('guide-title').value = g.title || '';
                 document.getElementById('guide-slug').value = g.slug || '';
-                document.getElementById('guide-category').value = g.category || '시작하기';
+                // 카테고리가 마스터에 없으면 임시 옵션으로 추가
+                const catSel = document.getElementById('guide-category');
+                if (g.category && !guideCategoriesData.some(c => c.name === g.category)) {
+                    const opt = document.createElement('option');
+                    opt.value = g.category;
+                    opt.textContent = g.category + ' (마스터에 없음)';
+                    catSel.appendChild(opt);
+                }
+                catSel.value = g.category || guideCategoriesData[0].name;
                 document.getElementById('guide-order').value = g.display_order || 0;
                 document.getElementById('guide-thumbnail').value = g.thumbnail_url || '';
                 initialMarkdown = g.content_markdown || '';
