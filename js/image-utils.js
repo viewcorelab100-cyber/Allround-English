@@ -53,9 +53,10 @@ async function convertToWebP(file, options = {}) {
                         return;
                     }
 
-                    // 파일명에서 확장자 제거 후 .webp 추가
-                    const originalName = file.name.replace(/\.[^/.]+$/, '');
-                    const newFileName = `${originalName}.webp`;
+                    // Storage Key 안전성을 위해 영문/숫자 기반 고유 파일명 생성
+                    // (한글, 공백, 괄호 등이 포함되면 Supabase Storage가 거부함)
+                    const safeStem = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                    const newFileName = `${safeStem}.webp`;
 
                     const convertedFile = new File([blob], newFileName, {
                         type: 'image/webp',
