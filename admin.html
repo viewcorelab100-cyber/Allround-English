@@ -4451,8 +4451,8 @@
                     maxHeight: 600
                 });
 
-                // Supabase Storage에 업로드
-                const fileName = `thumbnails/${Date.now()}_${convertedFile.name}`;
+                // Supabase Storage에 업로드 (convertedFile.name은 image-utils.js에서 안전한 고유명으로 생성됨)
+                const fileName = `thumbnails/${convertedFile.name}`;
                 const { data, error } = await window.supabase.storage
                     .from('course-thumbnails')
                     .upload(fileName, convertedFile, {
