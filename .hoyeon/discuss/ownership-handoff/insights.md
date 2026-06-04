@@ -29,7 +29,8 @@
 - **데이터 유실:** Supabase 이전은 비가역. Phase 0 DB 덤프가 최후 보루.
 
 ## Open Questions & Unknowns
-- Supabase 클라 조직에 **유료 플랜 + 결제수단**이 준비됐는가? (transfer 선행조건)
+- Supabase 클라 조직 Pro 업그레이드 + 결제수단 준비됐는가? (하드 요구는 아니나, 현 프로젝트가 Pro라 Free 수령 시 기능상실/다운타임 + Free 2프로젝트 제한 → 사실상 Pro 필요)
+- 보내는 Supabase 프로젝트에 transfer 차단조건 있는가? → **GitHub integration OFF, project-scoped role 없음, log drain 없음** 이어야 함. (출처: https://supabase.com/docs/guides/platform/project-transfer )
 - 도메인 DNS 관리 방식(Vercel nameserver vs 외부 레지스트라 A/CNAME)? 스위치 방법이 달라짐.
 - 운영 결제 경로가 `payment-app`인가? → payment-app의 토스 키가 `test_ck_`(테스트키)라, 운영이 이 앱 경유면 실결제 불가. 루트 `payment-link.html` 경로일 가능성도 확인 필요.
 
