@@ -19,7 +19,7 @@
 - **Phase 0 — 백업(비가역 작업 전 필수):** Supabase DB 전체 덤프, repo 로컬 클론, Vercel 설정 스크린샷, Edge Function secrets 목록, 이전 전 정상작동 baseline(로그인/결제/알림톡) 캡처.
 - **Phase 1 — GitHub:** repo Settings → Transfer ownership → 클라 계정. (Vercel 연결 잠시 끊김 정상)
 - **Phase 2 — Vercel(다운타임 위험 구간):** 클라 Vercel에서 클라 소유 repo Import→새 프로젝트 배포 → env 3개 입력 → 정상 확인 후에만 도메인 스위치(새벽 권장) → 기존 dev 프로젝트 삭제.
-- **Phase 3 — Supabase(사이트 안 끊김):** 클라 조직 유료플랜+결제수단 확인 → Transfer project → Edge Functions 정상 호출 테스트(결제/알림톡) → 결제 주체 전환 확인.
+- **Phase 3 — Supabase(사이트 안 끊김):** [선행 차단조건 해소] 보내는 프로젝트의 Supabase GitHub integration OFF / project-scoped role 없음 / log drain 없음 확인 → dev를 클라 조직 member로 추가, dev는 source org owner 확인 → 클라 조직 Pro 업그레이드+결제수단(필수는 아니나 현 프로젝트가 Pro라 Free로 받으면 기능상실+1~2분 다운타임, Free는 프로젝트 2개 제한이라 사실상 Pro 필요) → Transfer project → Edge Functions 정상 호출 테스트(결제/알림톡) → 결제 주체 전환 확인.
 - **Phase 4 — 정리(1~2주 모니터 후):** 청구 전환 확인(클라 카드 O / dev 카드 0) → dev 계정 권한 회수 → 완전 퇴장.
 
 ## Identified Risks & Failure Modes
