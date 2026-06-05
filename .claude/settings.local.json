@@ -33,7 +33,8 @@
       "Bash(npx supabase secrets set:*)",
       "WebSearch",
       "WebFetch(domain:swarmify.com)",
-      "Skill(bkit:pdca)"
+      "Skill(bkit:pdca)",
+      "PowerShell(Get-CimInstance *)"
     ]
   },
   "hooks": {
