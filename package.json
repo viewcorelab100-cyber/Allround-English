@@ -1,11 +1,8 @@
 {
   "name": "allround-english",
   "version": "1.0.0",
-  "description": "Allround English Auto-commit System",
-  "scripts": {
-    "watch": "node auto-commit.js",
-    "start": "node auto-commit.js"
-  },
+  "description": "Allround English",
+  "scripts": {},
   "dependencies": {
     "chokidar": "^4.0.3",
     "clsx": "^2.1.1",
