@@ -12,11 +12,322 @@
     ]
   },
   "contracts": {
-    "artifact": null,
-    "interfaces": [],
-    "invariants": []
+    "artifact": "contracts.md",
+    "interfaces": [
+      "Chapter Template",
+      "Image Spec Table",
+      "Capture Convention"
+    ],
+    "invariants": [
+      "INV-1: 모든 챕터는 동일 템플릿(개요→기능별 캡처+동선→경고→이미지규격) 구조",
+      "INV-2: 이미지 규격은 단일 출처 표의 값만 사용(썸네일 16:9/800×450, 팝업 가로800/5MB)",
+      "INV-3: ⚠️ 경고는 정확히 3개 작업에만(회원삭제/과제전체초기화/강의·영상삭제)",
+      "INV-4: 캡처는 챕터별 폴더 분리+전 챕터 뷰포트 고정+학생정보 마스킹",
+      "INV-5: 문서화 대상은 8개 섹션, 알림톡·배송 제외",
+      "INV-6: 말미 비용 고지(수정 20만원/신규 협의)"
+    ]
   },
-  "tasks": [],
-  "journeys": [],
-  "verify_plan": []
+  "tasks": [
+    {
+      "id": "T1",
+      "layer": "L0",
+      "action": "메뉴얼 골격 확정: 8챕터 목차 + 공통 챕터 템플릿(개요→기능별 캡처+클릭동선→경고→이미지규격) 정의",
+      "fulfills": [
+        "R-U1.1",
+        "R-U1.2",
+        "R-B2.1"
+      ],
+      "depends_on": [],
+      "parallel_safe": false
+    },
+    {
+      "id": "T2",
+      "layer": "L0",
+      "action": "브라우저 자동화 캡처 환경 구축: 뷰포트 고정, 학생정보 마스킹 규칙, 챕터별 출력 폴더 구조 세팅",
+      "fulfills": [
+        "R-U4.2"
+      ],
+      "depends_on": [],
+      "parallel_safe": false
+    },
+    {
+      "id": "T3",
+      "layer": "L1",
+      "action": "8개 섹션 관리자 화면 자동 캡처 실행 → 챕터별 폴더에 원본 저장",
+      "fulfills": [
+        "R-U4.2",
+        "R-B3.1"
+      ],
+      "depends_on": [
+        "T1",
+        "T2"
+      ],
+      "parallel_safe": true
+    },
+    {
+      "id": "T4",
+      "layer": "L1",
+      "action": "8개 챕터 본문 작성: 각 기능을 캡처 + '① 클릭 → ② 입력 → ③ 결과' 동선으로 비개발자 눈높이 서술",
+      "fulfills": [
+        "R-B1.1",
+        "R-B1.2",
+        "R-B3.1",
+        "R-U1.2"
+      ],
+      "depends_on": [
+        "T1",
+        "T3"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T5",
+      "layer": "L1",
+      "action": "이미지 규격 박스 작성(썸네일·팝업, 단일출처 값) + 올바른/잘못된(잘림) 예시 이미지 쌍 제작",
+      "fulfills": [
+        "R-U2.1",
+        "R-U2.2",
+        "R-U2.3",
+        "R-T1.1",
+        "R-T1.2",
+        "R-B3.2"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": true
+    },
+    {
+      "id": "T6",
+      "layer": "L1",
+      "action": "위험 작업 3개(회원삭제/과제전체초기화/강의·영상삭제) 사용법 바로 밑에 ⚠️ 한 줄 경고 삽입",
+      "fulfills": [
+        "R-U3.1"
+      ],
+      "depends_on": [
+        "T4"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T7",
+      "layer": "L1",
+      "action": "메뉴얼 말미 비용 고지 블록 작성(기존 기능 수정 20만원 / 신규 기능 별도 협의)",
+      "fulfills": [
+        "R-B4.1"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": true
+    },
+    {
+      "id": "T8",
+      "layer": "L2",
+      "action": "캡처+본문+이미지규격+경고+비용고지를 단일 PDF로 조립(챕터별 캡처 폴더 참조, 교체 가능 구조 유지)",
+      "fulfills": [
+        "R-U4.1",
+        "R-B3.1",
+        "R-B3.2"
+      ],
+      "depends_on": [
+        "T4",
+        "T5",
+        "T6",
+        "T7"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T9",
+      "layer": "L2",
+      "action": "최종 일관성 검수: 8섹션 누락無·알림톡/배송 제외 확인, 규격값 단일출처 일치, ⚠️경고 정확히 3개, 비용블록 존재",
+      "fulfills": [
+        "R-B2.1",
+        "R-B3.1",
+        "R-B3.2"
+      ],
+      "depends_on": [
+        "T8"
+      ],
+      "parallel_safe": false
+    }
+  ],
+  "journeys": [
+    {
+      "id": "J1",
+      "name": "클라이언트가 메뉴얼만 보고 강의+썸네일 등록 완료",
+      "composes": [
+        "R-U1.2",
+        "R-U2.1",
+        "R-U2.3",
+        "R-B1.1"
+      ],
+      "given": "비개발자 클라이언트가 메뉴얼 PDF만 가지고 있음",
+      "when": "강의 챕터의 클릭 동선을 따라 강의를 만들고 16:9 썸네일을 업로드",
+      "then": "썸네일이 잘리지 않고 정상 등록되며 추가 문의가 필요 없다"
+    },
+    {
+      "id": "J2",
+      "name": "클라이언트가 팝업 규격 안내 따라 올바른 이미지 업로드",
+      "composes": [
+        "R-U2.2",
+        "R-U2.3",
+        "R-B1.1"
+      ],
+      "given": "클라이언트가 프로모션 팝업을 띄우려 함",
+      "when": "팝업 챕터의 규격 박스(가로800·5MB·세로주의)와 예시를 보고 이미지를 준비해 업로드",
+      "then": "팝업이 잘림 없이 의도대로 표시된다"
+    }
+  ],
+  "verify_plan": [
+    {
+      "target": "R-B1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "target": "R-B1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-B2.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-B3.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-B3.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-B4.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U2.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U2.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U2.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U3.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U4.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-U4.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-T1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-T1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "J1",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J2",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    }
+  ]
 }
