@@ -2032,6 +2032,25 @@
         let allSubmissions = [];
         let currentAssignmentFilter = 'pending';
 
+        // Supabase 기본 1000행 상한 우회: 1000건씩 끊어서 전체 행을 조회한다.
+        // (lesson_progress가 1000건을 넘으면서 최근 진도가 잘려 NOT STARTED로 표시되던 문제 수정)
+        async function fetchAllRows(table, select = '*') {
+            const size = 1000;
+            let from = 0;
+            let all = [];
+            while (true) {
+                const { data, error } = await window.supabase
+                    .from(table)
+                    .select(select)
+                    .range(from, from + size - 1);
+                if (error) throw error;
+                all = all.concat(data || []);
+                if (!data || data.length < size) break;
+                from += size;
+            }
+            return all;
+        }
+
         async function loadStudentAssignments() {
             try {
                 // 1. 모든 프로필 데이터
