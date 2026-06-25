@@ -1,0 +1,22 @@
+{
+  "schema": "plan/v1",
+  "meta": {
+    "type": "feature",
+    "goal": "클라이언트가 직접 따라 할 수 있는 관리자 페이지 PDF 사용 설명서 제작 (8개 섹션)",
+    "non_goals": [
+      "PM 본인용 내부 메모/치트시트",
+      "개발자·인수인계용 기술 운영 문서",
+      "관리자 페이지 자체의 코드/UI 개선",
+      "알림톡 섹션 문서화",
+      "배송/주문 섹션 문서화"
+    ]
+  },
+  "contracts": {
+    "artifact": null,
+    "interfaces": [],
+    "invariants": []
+  },
+  "tasks": [],
+  "journeys": [],
+  "verify_plan": []
+}
