@@ -2088,11 +2088,11 @@
                 console.log('과제 제출 데이터 (체크리스트):', submissions?.length || 0, '건');
 
                 // 5. 진도율 데이터 (lesson_progress 테이블)
-                const { data: progress, error: progressError } = await window.supabase
-                    .from('lesson_progress')
-                    .select('*');
-
-                if (progressError) {
+                // 1000행 상한으로 최근 진도가 누락되던 문제 수정 → 전체 페이지네이션 조회
+                let progress;
+                try {
+                    progress = await fetchAllRows('lesson_progress');
+                } catch (progressError) {
                     console.error('진도율 데이터 로드 오류:', progressError);
                     throw progressError;
                 }
