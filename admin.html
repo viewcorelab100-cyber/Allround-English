@@ -4309,10 +4309,44 @@
             document.getElementById('lesson-modal').classList.add('hidden');
         }
 
+        // 세션 유효성 보장: 만료(임박)면 자동 갱신, 실패 시 false → 호출측에서 재로그인 유도.
+        // (쓰기 작업 전 호출 — 토큰 만료로 RLS 거부되는 "기기별 저장 오류" 방지)
+        async function ensureValidSession() {
+            try {
+                if (!window.supabase) return false;
+                const { data: { session } } = await window.supabase.auth.getSession();
+                if (!session) return false;
+                const expiresAtMs = (session.expires_at || 0) * 1000;
+                if (Date.now() > expiresAtMs - 60000) {  // 만료됐거나 60초 내 만료 예정 → 갱신
+                    const { data, error } = await window.supabase.auth.refreshSession();
+                    if (error || !data || !data.session) return false;
+                }
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // 인증/RLS 계열 오류 판별 (세션 만료 시 lessons 저장에서 42501 발생)
+        function isAuthError(error) {
+            const code = (error && error.code) || '';
+            const msg = ((error && error.message) || '').toLowerCase();
+            return code === '42501' || code === 'PGRST301'
+                || msg.includes('row-level security') || msg.includes('jwt')
+                || msg.includes('not authenticated');
+        }
+
         // 레슨 저장
         document.getElementById('lesson-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            // 저장 전 세션 유효성 보장 (만료 시 자동 갱신, 갱신 실패 시 재로그인 유도)
+            if (!(await ensureValidSession())) {
+                alert('로그인 세션이 만료되었습니다.\n다시 로그인한 뒤 저장해 주세요.');
+                window.location.href = 'auth.html';
+                return;
+            }
+
             const lessonId = document.getElementById('lesson-id').value;
             const lessonData = {
                 course_id: selectedCourseId,
