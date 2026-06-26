@@ -4400,7 +4400,12 @@
                 alert((lessonId ? '영상이 수정되었습니다.' : '영상이 추가되었습니다.') + quizMsg);
             } catch (error) {
                 console.error('Save lesson error:', error);
-                alert('영상 저장 중 오류가 발생했습니다: ' + error.message);
+                if (isAuthError(error)) {
+                    alert('로그인 세션이 만료되었거나 권한이 없습니다.\n다시 로그인한 뒤 저장해 주세요.');
+                    window.location.href = 'auth.html';
+                } else {
+                    alert('영상 저장 중 오류가 발생했습니다: ' + error.message);
+                }
             }
         });
 
