@@ -39,7 +39,7 @@
       ],
       "depends_on": [],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T2",
@@ -52,7 +52,8 @@
       "depends_on": [
         "T1"
       ],
-      "parallel_safe": true
+      "parallel_safe": true,
+      "status": "running"
     },
     {
       "id": "T3",

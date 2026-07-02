@@ -1,0 +1,2 @@
+- 2026-07-02T05:24:52Z T1 done (migrations written, PROD APPLY PENDING gate)
+- 2026-07-02T05:24:52Z T2 running (create-admin edge fn)
