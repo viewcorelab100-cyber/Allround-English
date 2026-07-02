@@ -7672,11 +7672,15 @@
         }
 
         // 기존 첨부파일 삭제 (Storage 오브젝트 + guide_attachments 행)
-        async function deleteGuideAttachmentInModal(attachmentId, guideId, fileUrl) {
+        async function deleteGuideAttachmentInModal(attachmentId, guideId) {
             if (!checkDemoWriteAccess('첨부파일 삭제')) return;
             if (!confirm('이 첨부파일을 삭제하시겠습니까?')) return;
 
             try {
+                // file_url은 XSS 방지를 위해 DOM으로 넘기지 않고 id로 조회
+                const { data: row } = await window.supabase
+                    .from('guide_attachments').select('file_url').eq('id', attachmentId).single();
+                const fileUrl = row?.file_url || '';
                 const marker = '/guide-files/';
                 const idx = fileUrl.indexOf(marker);
                 if (idx !== -1) {
