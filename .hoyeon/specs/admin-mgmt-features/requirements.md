@@ -161,11 +161,9 @@ non_goals:
 
 ## Open Decisions
 
-### OD-1: 관리자 계정 비활성화 표식
-- context: 비활성화를 role='student'로 내리면 강사 계정이 학생 목록(57명)에 섞여 오염됨
-- options: [전용 'disabled' role 신설, profiles.is_active 불리언 플래그, 그냥 'student'로]
-- impact: R-B1.2 / R-T1.3 구현 방식, 기존 회원목록·학생목록 쿼리 영향
-- tentative: 전용 표식(disabled role 또는 is_active) — 학생 목록 오염 방지
+### OD-1: 관리자 계정 비활성화 표식 — [확정 2026-07-02]
+- 결정: 강사 계정은 '활성(전체 관리자)' / '비활성' 두 상태뿐. 학생으로 내리지 않음.
+- 구현: 전용 '비활성' 표식(disabled role 또는 is_active=false). 활성/비활성 무관하게 학생 목록에 미표시 (student 목록 쿼리에서 강사 role 전부 제외).
 
 ### OD-2: 잠정 채택 기본값 (PM 부재로 자동 결정)
 - context: 인터뷰 2라운드 무응답으로 권장값 채택
