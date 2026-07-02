@@ -18,6 +18,34 @@ COMMENT ON COLUMN public.profiles.is_active IS
     '관리자 계정 활성 여부. false면 admin 접근 차단. 학생은 항상 true.';
 
 -- ---------------------------------------------------------------
+-- 1b) prevent_role_change 트리거 함수 보정
+--     기존: 호출자가 admin이 아니면 role 변경 되돌림 → 그런데 service_role
+--           (서버 Edge Function) 컨텍스트는 auth.uid()=NULL이라 "비관리자"로
+--           판정돼 create-admin의 role='admin' 설정이 되돌려짐.
+--     보정: 'auth.uid()가 NULL이 아닌 인증 사용자'가 비관리자일 때만 차단.
+--           NULL(서버/service_role) 및 관리자는 허용. service_role은 호출자
+--           admin 검증을 마친 Edge Function에서만 쓰이므로 안전.
+-- ---------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.prevent_role_change()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+BEGIN
+    IF auth.uid() IS NOT NULL
+       AND NOT EXISTS (
+           SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
+       ) THEN
+        IF NEW.role IS DISTINCT FROM OLD.role THEN
+            NEW.role := OLD.role;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$function$;
+
+-- ---------------------------------------------------------------
 -- 2) site_settings (key-value, value=jsonb)
 -- ---------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.site_settings (
