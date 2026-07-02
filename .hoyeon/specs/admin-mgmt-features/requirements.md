@@ -128,14 +128,14 @@ non_goals:
 ## R-T3: 설정 저장 + 공통 스크립트 (B안)
 
 #### R-T3.1: 설정 테이블
-- given: 강사채용/유튜브 등 사이트 전역 설정
+- given: 강사채용 토글·노션링크 (admin 관리 대상)
 - when: 저장/조회
-- then: key-value 설정 테이블(site_settings)에 저장, 공개 읽기 RLS, 쓰기 admin only
+- then: key-value 설정 테이블(site_settings)에 저장, 공개 읽기 RLS, 쓰기 admin only. (유튜브 URL은 DB 아닌 스크립트 상수)
 
 #### R-T3.2: 공통 설정 스크립트 주입 (B안 핵심)
 - given: 라이브 15개 페이지 + footer.js
 - when: 페이지 로드
-- then: 단일 site-config.js가 설정을 읽어 (a)유튜브 링크 세팅 (b)강사채용 활성화/링크 반영. 기존 레이아웃·템플릿 미변경
+- then: 단일 site-config.js가 (a)유튜브 링크를 상수로 세팅 (b)DB site_settings를 읽어 강사채용 활성화/링크 반영. 기존 레이아웃·템플릿 미변경
 
 #### R-T3.3: 안전한 링크 주입
 - given: DB 설정 링크를 DOM에 주입
