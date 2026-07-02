@@ -159,7 +159,8 @@
         "T5",
         "T8"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     }
   ],
   "journeys": [

@@ -2,3 +2,5 @@
 - 2026-07-02T05:24:52Z T2 running (create-admin edge fn)
 - 2026-07-02T05:37:17Z WORKER_RESULT admin-domain done (T3,T4,T7 + T5-admin). syntax ok.
 - 2026-07-02T05:39:34Z WORKER_RESULT public-domain done (T5-reader,T6,T8). syntax ok.
+- 2026-07-02T05:52:02Z VERIFY_RESULT code-review=NEEDS_FIXES → 2 blocking fixed (XSS admin.html:7660 escape+id-lookup; RLS is_active x8 in migration). syntax 0 err.
+- 2026-07-02T05:52:02Z GATE T9 deploy pending PM approval (prod DB / edge deploy / live push).
