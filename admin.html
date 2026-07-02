@@ -7626,7 +7626,7 @@
             const category = document.getElementById('guide-category').value;
             let slug = (document.getElementById('guide-slug').value || '').trim();
             const displayOrder = parseInt(document.getElementById('guide-order').value) || 0;
-            const thumbnailUrl = document.getElementById('guide-thumbnail').value.trim() || null;
+            let thumbnailUrl = document.getElementById('guide-thumbnail').value.trim() || null;
             const editId = document.getElementById('guide-edit-id').value;
 
             if (!title) { alert('제목을 입력하세요.'); return; }
@@ -7634,6 +7634,15 @@
 
             const markdown = guideEditorInstance.getMarkdown();
             if (!markdown.trim()) { alert('본문을 입력하세요.'); return; }
+
+            // 썸네일/첨부파일 크기 사전 검증 (50MB 초과 시 업로드 시도 전 차단)
+            const thumbnailFileInput = document.getElementById('guide-thumbnail-file');
+            const thumbnailFile = thumbnailFileInput?.files?.[0] || null;
+            if (thumbnailFile && !validateFileSizeInput(thumbnailFileInput, GUIDE_FILE_MAX_BYTES, '썸네일')) return;
+
+            const attachmentInput = document.getElementById('guide-attachment-files');
+            const attachmentFiles = attachmentInput?.files ? Array.from(attachmentInput.files) : [];
+            if (attachmentFiles.length > 0 && !validateFileSizeInput(attachmentInput, GUIDE_FILE_MAX_BYTES, '첨부파일')) return;
 
             // slug 정규화 + 충돌 회피
             if (!slug) slug = slugify(title);
@@ -7643,38 +7652,103 @@
 
             const contentText = markdownToPlainText(markdown, 200);
 
-            const payload = {
-                title,
-                category,
-                slug,
-                content_markdown: markdown,
-                content_text: contentText,
-                thumbnail_url: thumbnailUrl,
-                display_order: displayOrder,
-                is_published: !!publish
-            };
+            setGuideSaveButtonsDisabled(true);
+            try {
+                // 1) 썸네일 파일이 선택되었으면 먼저 업로드하고 URL로 대체
+                if (thumbnailFile) {
+                    setGuideUploadStatus('썸네일 업로드 중...');
+                    const thumbPath = `thumbnails/${Date.now()}-${thumbnailFile.name}`;
+                    const { error: thumbErr } = await window.supabase.storage
+                        .from('guide-files')
+                        .upload(thumbPath, thumbnailFile);
+                    if (thumbErr) {
+                        setGuideUploadStatus(`썸네일 업로드 실패: ${thumbErr.message}`, true);
+                        alert('썸네일 업로드 실패: ' + thumbErr.message);
+                        return;
+                    }
+                    const { data: thumbPublic } = window.supabase.storage.from('guide-files').getPublicUrl(thumbPath);
+                    thumbnailUrl = thumbPublic.publicUrl;
+                }
 
-            // 현재 사용자 id (created_by)
-            const { data: userData } = await window.supabase.auth.getUser();
-            if (userData && userData.user && !editId) {
-                payload.created_by = userData.user.id;
+                const payload = {
+                    title,
+                    category,
+                    slug,
+                    content_markdown: markdown,
+                    content_text: contentText,
+                    thumbnail_url: thumbnailUrl,
+                    display_order: displayOrder,
+                    is_published: !!publish
+                };
+
+                // 현재 사용자 id (created_by)
+                const { data: userData } = await window.supabase.auth.getUser();
+                if (userData && userData.user && !editId) {
+                    payload.created_by = userData.user.id;
+                }
+
+                // 2) 글 저장 (신규는 id를 얻기 위해 select 포함)
+                setGuideUploadStatus('글 저장 중...');
+                let guideId = editId || null;
+                let error;
+                if (editId) {
+                    ({ error } = await window.supabase.from('guides').update(payload).eq('id', editId));
+                } else {
+                    const { data: inserted, error: insertErr } = await window.supabase
+                        .from('guides')
+                        .insert(payload)
+                        .select('id')
+                        .single();
+                    error = insertErr;
+                    if (inserted) guideId = inserted.id;
+                }
+
+                if (error) {
+                    console.error('Guide save error:', error);
+                    setGuideUploadStatus(`저장 실패: ${error.message}`, true);
+                    alert('저장 실패: ' + error.message);
+                    return;
+                }
+
+                // 3) 첨부파일 업로드 (글 저장 후 guideId 확보된 상태에서 진행)
+                if (attachmentFiles.length > 0 && guideId) {
+                    for (const file of attachmentFiles) {
+                        if (file.size > GUIDE_FILE_MAX_BYTES) {
+                            setGuideUploadStatus(`${file.name}: 50MB 초과로 건너뜀`, true);
+                            continue;
+                        }
+                        setGuideUploadStatus(`${file.name} 업로드 중...`);
+                        const attachPath = `attachments/${guideId}/${Date.now()}-${file.name}`;
+                        const { error: upErr } = await window.supabase.storage
+                            .from('guide-files')
+                            .upload(attachPath, file);
+                        if (upErr) {
+                            console.error('첨부파일 업로드 실패:', upErr);
+                            setGuideUploadStatus(`${file.name}: 업로드 실패`, true);
+                            continue;
+                        }
+                        const { data: attachPublic } = window.supabase.storage.from('guide-files').getPublicUrl(attachPath);
+                        const { error: rowErr } = await window.supabase.from('guide_attachments').insert({
+                            guide_id: guideId,
+                            kind: 'attachment',
+                            file_url: attachPublic.publicUrl,
+                            file_name: file.name,
+                            file_size: file.size
+                        });
+                        if (rowErr) {
+                            console.error('첨부파일 메타 저장 실패:', rowErr);
+                            setGuideUploadStatus(`${file.name}: 메타 저장 실패`, true);
+                        } else {
+                            setGuideUploadStatus(`${file.name} 완료`);
+                        }
+                    }
+                }
+
+                closeGuideModal();
+                loadGuides();
+            } finally {
+                setGuideSaveButtonsDisabled(false);
             }
-
-            let error;
-            if (editId) {
-                ({ error } = await window.supabase.from('guides').update(payload).eq('id', editId));
-            } else {
-                ({ error } = await window.supabase.from('guides').insert(payload));
-            }
-
-            if (error) {
-                console.error('Guide save error:', error);
-                alert('저장 실패: ' + error.message);
-                return;
-            }
-
-            closeGuideModal();
-            loadGuides();
         }
 
         async function togglePublishGuide(id, currentState) {
