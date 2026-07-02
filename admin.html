@@ -4792,7 +4792,7 @@
                 // 모든 회원 정보 로드
                 const { data: profiles, error: profileError } = await window.supabase
                     .from('profiles')
-                    .select('id, name, email, phone, student_phone, created_at, student_type, role, parent_name, parent_phone, guardian_phone, notification_enabled')
+                    .select('id, name, email, phone, student_phone, created_at, student_type, role, is_active, parent_name, parent_phone, guardian_phone, notification_enabled')
                     .order('created_at', { ascending: false });
 
                 if (profileError) throw profileError;
