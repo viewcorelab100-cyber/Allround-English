@@ -11,11 +11,458 @@
     ]
   },
   "contracts": {
-    "artifact": null,
-    "interfaces": [],
-    "invariants": []
+    "artifact": "contracts.md",
+    "interfaces": [
+      "AdminAccountAPI",
+      "GuideStorageAPI",
+      "SiteConfigScript"
+    ],
+    "invariants": [
+      "INV-1: create-admin service_role 서버측 전용, 브라우저 노출 금지",
+      "INV-2: create-admin은 호출자 JWT role='admin' 아니면 거부(권한상승 차단)",
+      "INV-3: is_active=false 계정은 학생목록·로그인·접근 제외",
+      "INV-4: 게시판 업로드 50MB 초과 거부, MIME 제한 없음",
+      "INV-5: site-config.js는 http/https href만 주입, javascript: 등 차단",
+      "INV-6: site-config.js는 href/class/target만 변경, 레이아웃/CSS 불변",
+      "INV-7: 1000행급 테이블 목록은 fetchAllRows() 페이지네이션",
+      "INV-8: 유튜브 URL은 site-config.js 코드 상수(admin 편집 불가)"
+    ]
   },
-  "tasks": [],
-  "journeys": [],
-  "verify_plan": []
+  "tasks": [
+    {
+      "id": "T1",
+      "layer": "L0",
+      "action": "Write shared contracts note and create DB/storage migrations: is_active column on profiles, site_settings key-value table, guide_attachments table, public-read/admin-write RLS plus public guide-files Storage bucket",
+      "fulfills": [
+        "R-T2.1",
+        "R-T3.1"
+      ],
+      "depends_on": [],
+      "parallel_safe": false
+    },
+    {
+      "id": "T2",
+      "layer": "L1",
+      "action": "Implement the create-admin Edge Function that verifies the caller's admin JWT and uses service_role to create the auth user and insert the admin profile",
+      "fulfills": [
+        "R-T1.1",
+        "R-T1.2"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": true
+    },
+    {
+      "id": "T3",
+      "layer": "L1",
+      "action": "Build the admin account creation UI that submits email/password/name to the Edge Function, refreshes the member list on success, and surfaces duplicate and weak-password errors",
+      "fulfills": [
+        "R-B1.1",
+        "R-U1.1"
+      ],
+      "depends_on": [
+        "T2"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T4",
+      "layer": "L1",
+      "action": "Implement admin account deactivation via is_active flag, add is_active enforcement to the admin access checks, exclude deactivated admins from the student list, and preserve their profile",
+      "fulfills": [
+        "R-B1.2",
+        "R-T1.3"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T5",
+      "layer": "L1",
+      "action": "Implement board thumbnail and attachment upload to Storage with a 50MB per-file limit, paginated list reads, upload progress/failure feedback, and downloadable attachment display on the guide detail page",
+      "fulfills": [
+        "R-B2.1",
+        "R-B2.2",
+        "R-B2.3",
+        "R-T2.2",
+        "R-U1.2",
+        "R-U2.2"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T6",
+      "layer": "L1",
+      "action": "Add the YouTube-link and recruit-tab data markers to the nav and footer across all fifteen live pages and the shared footer script",
+      "fulfills": [],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": true
+    },
+    {
+      "id": "T7",
+      "layer": "L1",
+      "action": "Build the admin site-settings UI to toggle the instructor-recruitment feature on/off and save its Notion URL, with save-confirmation feedback",
+      "fulfills": [
+        "R-B3.1",
+        "R-U1.3"
+      ],
+      "depends_on": [
+        "T1"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T8",
+      "layer": "L2",
+      "action": "Implement the shared site-config script that reads site_settings, wires the constant YouTube links to open in a new tab, activates or greys out the recruitment tab across all pages with correct visual state and Notion new-tab click, and validates injected URLs against the scheme whitelist",
+      "fulfills": [
+        "R-B3.2",
+        "R-B3.3",
+        "R-B4.1",
+        "R-T3.2",
+        "R-T3.3",
+        "R-U2.1"
+      ],
+      "depends_on": [
+        "T1",
+        "T6",
+        "T7"
+      ],
+      "parallel_safe": false
+    },
+    {
+      "id": "T9",
+      "layer": "L3",
+      "action": "Commit the completed changes to the client repository under the client authorship so the client Vercel project auto-deploys to production",
+      "fulfills": [
+        "R-T4.1"
+      ],
+      "depends_on": [
+        "T3",
+        "T4",
+        "T5",
+        "T8"
+      ],
+      "parallel_safe": false
+    }
+  ],
+  "journeys": [
+    {
+      "id": "J1",
+      "name": "관리자 계정 생성→비활성화 라이프사이클",
+      "composes": [
+        "R-B1.1",
+        "R-B1.2",
+        "R-T1.3"
+      ],
+      "given": "전체 관리자로 로그인한 상태",
+      "when": "admin에서 email/pw/name으로 새 관리자 생성 → 그 계정으로 로그인 확인 → 다시 비활성화",
+      "then": "생성 직후엔 로그인 가능, 비활성화 후엔 admin 접근 불가하고 학생 목록에도 안 뜸"
+    },
+    {
+      "id": "J2",
+      "name": "게시판 썸네일·첨부 발행→독자 다운로드",
+      "composes": [
+        "R-B2.1",
+        "R-B2.2",
+        "R-U2.2"
+      ],
+      "given": "admin 게시판 글쓰기 모달",
+      "when": "썸네일 이미지 업로드 + 본문 첨부파일 업로드 후 발행 → 독자가 guide-detail 열람",
+      "then": "썸네일이 목록에 보이고 상세에서 첨부 다운로드 링크가 동작"
+    },
+    {
+      "id": "J3",
+      "name": "강사채용 토글 ON→사용자 클릭",
+      "composes": [
+        "R-B3.1",
+        "R-B3.2",
+        "R-U2.1"
+      ],
+      "given": "강사채용 OFF(회색) 상태",
+      "when": "admin에서 ON + 노션URL 저장 → 사용자가 아무 페이지에서 강사채용 탭 확인·클릭",
+      "then": "회색이 풀려 활성 표시되고 클릭 시 노션 링크가 새 탭으로 열림"
+    },
+    {
+      "id": "J4",
+      "name": "[regression] is_active 체크 추가 후 기존 관리자 로그인 유지",
+      "composes": [
+        "R-B1.2",
+        "R-T1.3"
+      ],
+      "given": "기존 관리자 계정(is_active 기본 true)",
+      "when": "checkAdminAccess/isAdmin에 is_active 체크가 추가된 뒤 로그인",
+      "then": "기존 관리자는 이전과 동일하게 admin 접근 가능(비활성만 차단)"
+    },
+    {
+      "id": "J5",
+      "name": "[regression] 마커+site-config 주입 후 15개 페이지 레이아웃 불변",
+      "composes": [
+        "R-T3.2",
+        "R-B4.1"
+      ],
+      "given": "라이브 15개 페이지 + footer",
+      "when": "data-* 마커 추가 및 site-config.js 로드",
+      "then": "기존 레이아웃·CSS는 그대로이고 유튜브/강사채용 링크만 올바르게 세팅됨"
+    }
+  ],
+  "verify_plan": [
+    {
+      "target": "R-B1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B2.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B2.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B2.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-B3.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B3.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B3.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-B4.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U1.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U2.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-U2.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T1.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T1.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T1.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T2.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T2.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-T3.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T3.2",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "R-T3.3",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2
+      ]
+    },
+    {
+      "target": "R-T4.1",
+      "type": "sub_req",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J1",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J2",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J3",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J4",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "target": "J5",
+      "type": "journey",
+      "gates": [
+        1,
+        2,
+        3
+      ]
+    }
+  ]
 }
