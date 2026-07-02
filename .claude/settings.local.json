@@ -34,7 +34,8 @@
       "WebSearch",
       "WebFetch(domain:swarmify.com)",
       "Skill(bkit:pdca)",
-      "PowerShell(Get-CimInstance *)"
+      "PowerShell(Get-CimInstance *)",
+      "Skill(hoyeon:execute)"
     ]
   },
   "hooks": {

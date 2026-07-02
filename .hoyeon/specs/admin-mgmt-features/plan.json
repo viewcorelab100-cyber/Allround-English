@@ -38,7 +38,8 @@
         "R-T3.1"
       ],
       "depends_on": [],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T2",
