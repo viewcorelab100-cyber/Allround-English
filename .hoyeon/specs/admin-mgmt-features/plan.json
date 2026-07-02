@@ -1,0 +1,21 @@
+{
+  "schema": "plan/v1",
+  "meta": {
+    "type": "feature",
+    "goal": "관리자가 코드 수정 없이 admin 페이지에서 관리자 계정 생성·게시판 파일첨부·강사채용 탭 on/off·유튜브 링크를 관리한다",
+    "non_goals": [
+      "강사별 세분화 권한(RBAC) — admin 있음/없음 2단계만",
+      "라이브 15개 페이지 전체 템플릿 통합/리디자인 (별도 과제)",
+      "게시판 일반 사용자 글쓰기 개방 — admin 전용 유지",
+      "관리자 계정 완전 삭제(Auth 제거) — Phase 1은 비활성화만"
+    ]
+  },
+  "contracts": {
+    "artifact": null,
+    "interfaces": [],
+    "invariants": []
+  },
+  "tasks": [],
+  "journeys": [],
+  "verify_plan": []
+}
