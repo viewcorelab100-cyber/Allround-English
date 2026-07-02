@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "task": "admin-domain worker (admin.html + js/auth.js)",
+    "date": "2026-07-02",
+    "learnings": [
+      "Actual applied migration (migrations/20260702_admin_mgmt_features.up.sql) differs from contracts.md on two points — followed the migration since it's the real DB shape: (1) Storage bucket is 'guide-files', not 'guide-attachments'; (2) site_settings uses a single row key='recruit' with value={enabled,url}, not two separate keys 'recruit_tab_enabled'/'recruit_tab_url'. contracts.md should be regenerated to match.",
+      "guide_attachments table has no mime_type or uploaded_by column (contracts.md listed both) — actual columns are id, guide_id, kind, file_url, file_name, file_size, created_at.",
+      "create-admin Edge Function already returns localized Korean error messages with correct status codes (409 duplicate email, 400 weak password/invalid email, 403 no admin permission) — client just needs to parse error.context.json() from the FunctionsHttpError to surface Response body message, since supabase-js functions.invoke() error.message is a generic non-2xx string, not the body.",
+      "demo-restricted class (existing pattern) fully hides elements via classList.add('hidden') in applyDemoMode(), not just disables them — applied it consistently to new write buttons (admin creation submit, activate/deactivate toggle, site-settings save) but NOT to plain view/input fields, matching the existing convention where inputs stay visible/read-only-by-omission and only action buttons get hidden.",
+      "checkAdminAccess() (admin.html) and isAdmin()/isAdminOrDemo() (js/auth.js) now treat profiles.is_active === false as non-admin; used !== false (not truthy check) so old rows without the column, or role='demo' rows, remain unaffected.",
+      "Attachment uploads require the guide's id, so saveGuide() was restructured: thumbnail file (if any) uploads first and overrides the thumbnail_url column value, then the guide row is inserted/updated (insert now does .select('id').single() to get the new id), then attachment files upload afterward using that id — satisfies the 'save guide first to get id' requirement for both new and edit flows."
+    ]
+  }
+]
