@@ -442,6 +442,9 @@
             document.getElementById('guide-loading').classList.add('hidden');
             document.getElementById('guide-article').classList.remove('hidden');
 
+            // 첨부파일 목록
+            loadAttachments(data.id);
+
             // 조회수 증가 (RPC)
             try {
                 await window.supabase.rpc('increment_guide_view_count', { p_slug: slug });
