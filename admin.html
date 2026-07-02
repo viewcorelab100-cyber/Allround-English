@@ -7761,7 +7761,7 @@
                 // 1) 썸네일 파일이 선택되었으면 먼저 업로드하고 URL로 대체
                 if (thumbnailFile) {
                     setGuideUploadStatus('썸네일 업로드 중...');
-                    const thumbPath = `thumbnails/${Date.now()}-${thumbnailFile.name}`;
+                    const thumbPath = `thumbnails/${Date.now()}-${safeStorageName(thumbnailFile.name)}`;
                     const { error: thumbErr } = await window.supabase.storage
                         .from('guide-files')
                         .upload(thumbPath, thumbnailFile);
