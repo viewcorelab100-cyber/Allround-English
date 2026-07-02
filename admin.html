@@ -7815,19 +7815,23 @@
                 }
 
                 // 3) 첨부파일 업로드 (글 저장 후 guideId 확보된 상태에서 진행)
+                const attachFailures = [];
                 if (attachmentFiles.length > 0 && guideId) {
                     for (const file of attachmentFiles) {
                         if (file.size > GUIDE_FILE_MAX_BYTES) {
+                            attachFailures.push(`${file.name}: 50MB 초과`);
                             setGuideUploadStatus(`${file.name}: 50MB 초과로 건너뜀`, true);
                             continue;
                         }
                         setGuideUploadStatus(`${file.name} 업로드 중...`);
-                        const attachPath = `attachments/${guideId}/${Date.now()}-${file.name}`;
+                        // Storage 키는 비ASCII 불가 → 경로 파일명 정규화(원본명은 DB에 보존)
+                        const attachPath = `attachments/${guideId}/${Date.now()}-${safeStorageName(file.name)}`;
                         const { error: upErr } = await window.supabase.storage
                             .from('guide-files')
                             .upload(attachPath, file);
                         if (upErr) {
                             console.error('첨부파일 업로드 실패:', upErr);
+                            attachFailures.push(`${file.name}: ${upErr.message}`);
                             setGuideUploadStatus(`${file.name}: 업로드 실패`, true);
                             continue;
                         }
@@ -7841,11 +7845,17 @@
                         });
                         if (rowErr) {
                             console.error('첨부파일 메타 저장 실패:', rowErr);
+                            attachFailures.push(`${file.name}: ${rowErr.message}`);
                             setGuideUploadStatus(`${file.name}: 메타 저장 실패`, true);
                         } else {
                             setGuideUploadStatus(`${file.name} 완료`);
                         }
                     }
+                }
+
+                // 첨부 실패가 있으면 모달을 닫기 전에 사용자에게 알림 (조용한 실패 방지)
+                if (attachFailures.length > 0) {
+                    alert('글은 저장됐지만 일부 첨부파일이 실패했습니다:\n\n' + attachFailures.join('\n'));
                 }
 
                 closeGuideModal();
