@@ -99,7 +99,7 @@
         "T1"
       ],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T6",
@@ -110,7 +110,7 @@
         "T1"
       ],
       "parallel_safe": true,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T7",
@@ -144,7 +144,7 @@
         "T7"
       ],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T9",

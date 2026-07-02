@@ -7657,10 +7657,11 @@
                     return;
                 }
 
+                const escAttach = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
                 container.innerHTML = data.map(a => `
                     <div class="flex items-center justify-between px-3 py-2 border border-gray-200 text-xs">
-                        <a href="${a.file_url}" target="_blank" rel="noopener" class="text-blue-600 hover:underline truncate max-w-[260px]">${a.file_name}</a>
-                        <button type="button" onclick="deleteGuideAttachmentInModal('${a.id}', '${guideId}', '${a.file_url.replace(/'/g, "\\'")}')"
+                        <a href="${escAttach(a.file_url)}" target="_blank" rel="noopener" class="text-blue-600 hover:underline truncate max-w-[260px]">${escAttach(a.file_name)}</a>
+                        <button type="button" onclick="deleteGuideAttachmentInModal('${escAttach(a.id)}', '${escAttach(guideId)}')"
                                 class="text-red-500 hover:text-red-700 font-bold demo-restricted ml-2">삭제</button>
                     </div>
                 `).join('');

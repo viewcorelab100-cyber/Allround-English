@@ -1,3 +1,4 @@
 - 2026-07-02T05:24:52Z T1 done (migrations written, PROD APPLY PENDING gate)
 - 2026-07-02T05:24:52Z T2 running (create-admin edge fn)
 - 2026-07-02T05:37:17Z WORKER_RESULT admin-domain done (T3,T4,T7 + T5-admin). syntax ok.
+- 2026-07-02T05:39:34Z WORKER_RESULT public-domain done (T5-reader,T6,T8). syntax ok.
