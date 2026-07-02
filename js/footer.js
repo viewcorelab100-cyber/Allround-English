@@ -60,7 +60,7 @@ function loadGlobalFooter() {
                             <a href="https://blog.naver.com/silvy_english" target="_blank" rel="noopener" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Blog">
                                 <img src="asset/main/블로그.png" alt="Blog" class="w-full h-full object-contain">
                             </a>
-                            <a href="#" class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Youtube">
+                            <a href="#" data-youtube-link class="block w-[38px] h-[38px] hover:opacity-70 transition-opacity" aria-label="Youtube">
                                 <img src="asset/main/유투브.png" alt="Youtube" class="w-full h-full object-contain">
                             </a>
                         </div>
