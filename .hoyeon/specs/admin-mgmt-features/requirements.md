@@ -151,8 +151,8 @@ non_goals:
 
 ## Pre-work
 
-- [ ] 4개 잠정 결정 최종 확인: 생성항목(email+pw+name) / 첨부형식(이미지+PDF) / 용량(10MB) / 유튜브 admin 편집성 (non-blocking — 권장 기본값 채택됨)
 - [ ] Edge Function 배포 환경·service_role 시크릿 주입 확인 (blocking — R-T1 선행)
+- [ ] 첨부 '모든 형식 허용' — Storage는 admin 전용 쓰기이므로 악성 업로드 위험 낮음. 비이미지/비PDF 첨부는 인라인 실행 대신 다운로드(Content-Disposition)로 서빙 (non-blocking 안전장치)
 
 ## Open Decisions
 
