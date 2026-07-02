@@ -456,6 +456,36 @@
             loadRelated(data.category, data.id);
         }
 
+        async function loadAttachments(guideId) {
+            const { data, error } = await window.supabase
+                .from('guide_attachments')
+                .select('file_name, file_url')
+                .eq('guide_id', guideId)
+                .eq('kind', 'attachment');
+
+            if (error) { console.warn('첨부파일 조회 실패:', error); return; }
+            if (!data || data.length === 0) return;
+
+            const listEl = document.getElementById('guide-attachments-list');
+            const itemsHtml = data
+                .filter(att => /^https?:\/\//i.test(att.file_url || ''))
+                .map(att => {
+                    const safeUrl = escapeHTML(att.file_url);
+                    const safeName = escapeHTML(att.file_name || '첨부파일');
+                    return `<li>
+                        <a href="${safeUrl}" download="${safeName}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm text-[#2F2725] underline underline-offset-2 hover:text-black transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            ${safeName}
+                        </a>
+                    </li>`;
+                }).join('');
+
+            if (!itemsHtml) return;
+
+            listEl.innerHTML = itemsHtml;
+            document.getElementById('guide-attachments-section').classList.remove('hidden');
+        }
+
         async function loadRelated(category, currentId) {
             if (!category) return;
             const { data, error } = await window.supabase
