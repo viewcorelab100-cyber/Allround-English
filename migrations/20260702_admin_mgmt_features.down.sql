@@ -24,5 +24,24 @@ DROP POLICY IF EXISTS "site_settings admin write" ON public.site_settings;
 DROP POLICY IF EXISTS "site_settings public read" ON public.site_settings;
 DROP TABLE IF EXISTS public.site_settings;
 
+-- 1b) prevent_role_change 원복 (auth.uid() NULL 허용 로직 제거)
+CREATE OR REPLACE FUNCTION public.prevent_role_change()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'
+    ) THEN
+        IF NEW.role IS DISTINCT FROM OLD.role THEN
+            NEW.role := OLD.role;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$function$;
+
 -- 1) profiles.is_active
 ALTER TABLE public.profiles DROP COLUMN IF EXISTS is_active;
