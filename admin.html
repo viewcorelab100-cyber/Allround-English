@@ -3691,6 +3691,13 @@
                 return false;
             }
 
+            // 비활성화된(is_active=false) 관리자 계정은 admin 접근 차단 (역할은 유지, 접근만 차단)
+            if (role === 'admin' && profile.data.is_active === false) {
+                alert('비활성화된 관리자 계정입니다. 다른 관리자에게 문의하세요.');
+                window.location.href = 'index.html';
+                return false;
+            }
+
             isDemoMode = (role === 'demo');
             if (isDemoMode) {
                 applyDemoMode();
