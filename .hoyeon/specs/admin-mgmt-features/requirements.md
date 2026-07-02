@@ -60,17 +60,12 @@ non_goals:
 - then: 기존 회색 비활성(클릭 불가) 유지
 
 ## R-B4: 유튜브 링크 연결
-- behavior: 전 페이지의 유튜브 링크가 관리자가 지정한 채널 URL로 연결되어 새 탭으로 열린다.
+- behavior: 전 페이지의 유튜브 링크가 고정된 채널 URL로 연결되어 새 탭으로 열린다. (admin 편집 불필요 — 코드 상수)
 
-#### R-B4.1: 유튜브 링크 설정
-- given: admin 설정 화면
-- when: 유튜브 URL 입력·저장 (기본값 https://www.youtube.com/@allround_edu)
-- then: DB에 저장됨
-
-#### R-B4.2: 전 페이지 반영
-- given: 유튜브 URL 설정됨
+#### R-B4.1: 전 페이지 반영
+- given: 공통 스크립트에 유튜브 URL 상수(https://www.youtube.com/@allround_edu)가 정의됨
 - when: 사용자가 아무 페이지의 유튜브 아이콘/링크를 클릭
-- then: 지정 채널이 새 탭으로 열림 (기존 href="#" 죽은 링크 전부 대체)
+- then: 해당 채널이 새 탭으로 열림 (기존 href="#" 죽은 링크 전부 대체)
 
 ## R-U1: 관리자 상호작용 (admin 경험)
 
