@@ -2096,6 +2096,65 @@
                 loadPopupNotices();
             } else if (section === 'guides') {
                 loadGuides();
+            } else if (section === 'settings') {
+                loadSiteSettings();
+            }
+        }
+
+        // ========== 사이트 설정 (강사채용 탭) ==========
+
+        function setSiteSettingsStatus(text, isError) {
+            const el = document.getElementById('site-settings-status');
+            if (!el) return;
+            el.textContent = text || '';
+            el.className = `text-[11px] mt-3 ${isError ? 'text-red-400' : 'text-green-400'}`;
+        }
+
+        async function loadSiteSettings() {
+            try {
+                const { data, error } = await window.supabase
+                    .from('site_settings')
+                    .select('value')
+                    .eq('key', 'recruit')
+                    .maybeSingle();
+                if (error) throw error;
+
+                const value = (data && data.value) || { enabled: false, url: '' };
+                document.getElementById('setting-recruit-enabled').checked = !!value.enabled;
+                document.getElementById('setting-recruit-url').value = value.url || '';
+                setSiteSettingsStatus('');
+            } catch (err) {
+                console.error('사이트 설정 로드 오류:', err);
+                setSiteSettingsStatus('설정을 불러오지 못했습니다: ' + (err.message || '알 수 없는 오류'), true);
+            }
+        }
+
+        async function saveSiteSettings() {
+            if (!checkDemoWriteAccess('사이트 설정 저장')) return;
+
+            const enabled = document.getElementById('setting-recruit-enabled').checked;
+            const url = document.getElementById('setting-recruit-url').value.trim();
+
+            // INV-5와 동일한 스킴 화이트리스트: http/https만 허용
+            if (url && !/^https?:\/\//i.test(url)) {
+                alert('노션 URL은 http:// 또는 https:// 로 시작해야 합니다.');
+                return;
+            }
+            if (enabled && !url) {
+                alert('강사채용 탭을 켜려면 노션 URL을 입력하세요.');
+                return;
+            }
+
+            try {
+                const { error } = await window.supabase
+                    .from('site_settings')
+                    .upsert({ key: 'recruit', value: { enabled, url }, updated_at: new Date().toISOString() });
+                if (error) throw error;
+
+                setSiteSettingsStatus('저장되었습니다.');
+            } catch (err) {
+                console.error('사이트 설정 저장 오류:', err);
+                setSiteSettingsStatus('저장 실패: ' + (err.message || '알 수 없는 오류'), true);
             }
         }
 
