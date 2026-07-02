@@ -7715,6 +7715,16 @@
             }
         }
 
+        // Supabase Storage 키는 한글/공백 등 비ASCII를 허용하지 않으므로 경로용 파일명을 정규화.
+        // (원본 파일명은 표시용으로 guide_attachments.file_name / guides에 그대로 보존)
+        function safeStorageName(name) {
+            const dot = (name || '').lastIndexOf('.');
+            const base = dot > 0 ? name.slice(0, dot) : (name || 'file');
+            const ext = dot > 0 ? name.slice(dot + 1).replace(/[^A-Za-z0-9]/g, '') : '';
+            const safeBase = base.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '') || 'file';
+            return ext ? `${safeBase}.${ext}` : safeBase;
+        }
+
         async function saveGuide(publish) {
             const title = document.getElementById('guide-title').value.trim();
             const category = document.getElementById('guide-category').value;
