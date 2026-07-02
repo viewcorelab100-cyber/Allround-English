@@ -1657,13 +1657,30 @@
                         <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">썸네일 URL (선택)</label>
                         <input type="text" id="guide-thumbnail" placeholder="목록 카드용 이미지 URL"
                                class="w-full px-3 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-500">
+                        <p class="text-[10px] text-gray-400 mt-1">아래에서 파일을 업로드하면 이 URL 대신 사용됩니다 (파일 50MB 이하).</p>
+                        <input type="file" id="guide-thumbnail-file" accept="image/*"
+                               onchange="validateFileSizeInput(this, GUIDE_FILE_MAX_BYTES, '썸네일')"
+                               class="w-full mt-1 text-xs">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">첨부파일 (선택, 각 50MB 이하, 형식 제한 없음)</label>
+                    <input type="file" id="guide-attachment-files" multiple
+                           onchange="validateFileSizeInput(this, GUIDE_FILE_MAX_BYTES, '첨부파일')"
+                           class="w-full text-xs mb-2">
+                    <div id="guide-attachments-list" class="space-y-1">
+                        <p class="text-[11px] text-gray-400">새 글 저장 후 첨부파일을 추가할 수 있습니다.</p>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-3 p-6 border-t border-gray-200 flex-shrink-0">
-                <button onclick="closeGuideModal()" class="flex-1 px-4 py-2 border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50">취소</button>
-                <button onclick="saveGuide(false)" class="flex-1 px-4 py-2 border border-gray-400 text-sm font-bold text-gray-700 hover:bg-gray-50 demo-restricted">임시저장</button>
-                <button onclick="saveGuide(true)" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-bold hover:bg-green-700 demo-restricted">게시</button>
+            <div class="p-6 border-t border-gray-200 flex-shrink-0">
+                <p id="guide-upload-status" class="text-[11px] text-gray-500 mb-2 min-h-[14px]"></p>
+                <div class="flex gap-3">
+                    <button onclick="closeGuideModal()" class="flex-1 px-4 py-2 border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50">취소</button>
+                    <button id="guide-save-draft-btn" onclick="saveGuide(false)" class="flex-1 px-4 py-2 border border-gray-400 text-sm font-bold text-gray-700 hover:bg-gray-50 demo-restricted">임시저장</button>
+                    <button id="guide-save-publish-btn" onclick="saveGuide(true)" class="flex-1 px-4 py-2 bg-green-600 text-white text-sm font-bold hover:bg-green-700 demo-restricted">게시</button>
+                </div>
             </div>
         </div>
     </div>
