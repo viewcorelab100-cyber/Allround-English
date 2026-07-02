@@ -10,5 +10,17 @@
       "checkAdminAccess() (admin.html) and isAdmin()/isAdminOrDemo() (js/auth.js) now treat profiles.is_active === false as non-admin; used !== false (not truthy check) so old rows without the column, or role='demo' rows, remain unaffected.",
       "Attachment uploads require the guide's id, so saveGuide() was restructured: thumbnail file (if any) uploads first and overrides the thumbnail_url column value, then the guide row is inserted/updated (insert now does .select('id').single() to get the new id), then attachment files upload afterward using that id — satisfies the 'save guide first to get id' requirement for both new and edit flows."
     ]
+  },
+  {
+    "task": "public-domain worker (js/site-config.js + 15 live pages + js/footer.js + guide-detail.html attachments)",
+    "date": "2026-07-02",
+    "learnings": [
+      "Confirmed independently from the applied migration (migrations/20260702_admin_mgmt_features.up.sql) that site_settings is a single row key='recruit' with value jsonb {enabled, url} — matches the other worker's note in this file. site-config.js queries .eq('key','recruit').single() and reads value.enabled/value.url, not two separate keys.",
+      "None of the 15 live pages load js/footer.js — each has its own hardcoded footer markup (footer.js is only used by non-target pages like about.html, courses.html, terms.html, privacy.html, refund.html, report.html, master.html, cards-interaction.html). Still added data-youtube-link to footer.js's youtube anchor per task instructions in case it gets adopted later, but it has no live-page effect today.",
+      "Pages use js/supabase-config.js (not 'supabase-init.js' as the task brief assumed) as the Supabase client bootstrap script; site-config.js was inserted after js/auth.js (last of the supabase-related scripts) on every page rather than strictly 'after supabase init', since auth.js runs its own init logic too and is the natural insertion point already used consistently across all 15 pages.",
+      "The 강사채용 span's disabled look is driven entirely by the single CSS class .menu-title-disabled in css/style.css (color #d0d0d0, cursor default, pointer-events none) — no Tailwind utility classes are present on the live nav despite some pages using Tailwind elsewhere for page content. Removing just that one class fully reactivates the existing .menu-title base style (cursor:pointer already defined there). Kept the defensive removal of 'text-[#C5C5C5]'/'pointer-events-none' Tailwind class names in site-config.js as a no-op safety net in case a future redesign adds them.",
+      "guide-detail.html already destructures { data, error } from the guides select as `data.id`, so loadAttachments(data.id) could be called directly inside loadGuide() right after the article is shown, using the same window.supabase.from(...).select().eq() pattern and escapeHTML() helper already defined in the page — no new dependencies added.",
+      "All edits were markup-only (added data-youtube-link / data-recruit-tab attributes and one <script> tag per page) plus one small insertion in guide-detail.html for the attachments list container — no existing classes, layout structure, or CSS were changed, per INV-6."
+    ]
   }
 ]

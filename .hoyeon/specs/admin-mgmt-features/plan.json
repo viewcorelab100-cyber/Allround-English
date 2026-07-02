@@ -67,7 +67,7 @@
         "T2"
       ],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T4",
@@ -81,7 +81,7 @@
         "T1"
       ],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T5",
@@ -124,7 +124,7 @@
         "T1"
       ],
       "parallel_safe": false,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T8",
