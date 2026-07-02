@@ -53,7 +53,7 @@
         "T1"
       ],
       "parallel_safe": true,
-      "status": "running"
+      "status": "done"
     },
     {
       "id": "T3",
@@ -66,7 +66,8 @@
       "depends_on": [
         "T2"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T4",
@@ -79,7 +80,8 @@
       "depends_on": [
         "T1"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T5",
@@ -96,7 +98,8 @@
       "depends_on": [
         "T1"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T6",
@@ -106,7 +109,8 @@
       "depends_on": [
         "T1"
       ],
-      "parallel_safe": true
+      "parallel_safe": true,
+      "status": "running"
     },
     {
       "id": "T7",
@@ -119,7 +123,8 @@
       "depends_on": [
         "T1"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T8",
@@ -138,7 +143,8 @@
         "T6",
         "T7"
       ],
-      "parallel_safe": false
+      "parallel_safe": false,
+      "status": "running"
     },
     {
       "id": "T9",
