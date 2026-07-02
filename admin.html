@@ -7478,6 +7478,11 @@
             document.getElementById('guide-category').value = guideCategoriesData[0].name;
             document.getElementById('guide-order').value = 0;
             document.getElementById('guide-thumbnail').value = '';
+            document.getElementById('guide-thumbnail-file').value = '';
+            document.getElementById('guide-attachment-files').value = '';
+            setGuideUploadStatus('');
+            document.getElementById('guide-attachments-list').innerHTML =
+                '<p class="text-[11px] text-gray-400">새 글 저장 후 첨부파일을 추가할 수 있습니다.</p>';
 
             let initialMarkdown = '';
             if (editId) {
@@ -7499,6 +7504,7 @@
                 document.getElementById('guide-order').value = g.display_order || 0;
                 document.getElementById('guide-thumbnail').value = g.thumbnail_url || '';
                 initialMarkdown = g.content_markdown || '';
+                loadGuideAttachmentsForModal(g.id);
             }
 
             // 에디터는 모달 표시 후 초기화 (display:none 상태에서 init하면 높이 0 이슈)
@@ -7510,6 +7516,91 @@
             if (guideEditorInstance) {
                 try { guideEditorInstance.destroy(); } catch (e) {}
                 guideEditorInstance = null;
+            }
+        }
+
+        // ========== 게시판 파일 업로드 (썸네일/첨부) ==========
+
+        const GUIDE_FILE_MAX_BYTES = 50 * 1024 * 1024; // 50MB, MIME 제한 없음
+
+        // 파일 선택 즉시 50MB 초과 여부 검증 (업로드 전 사전 차단)
+        function validateFileSizeInput(inputEl, maxBytes, label) {
+            const files = Array.from(inputEl.files || []);
+            const tooBig = files.find(f => f.size > maxBytes);
+            if (tooBig) {
+                alert(`${label} "${tooBig.name}" 파일이 50MB를 초과합니다. 다른 파일을 선택하세요.`);
+                inputEl.value = '';
+                return false;
+            }
+            return true;
+        }
+
+        function setGuideUploadStatus(text, isError) {
+            const el = document.getElementById('guide-upload-status');
+            if (!el) return;
+            el.textContent = text || '';
+            el.className = `text-[11px] mb-2 min-h-[14px] ${isError ? 'text-red-500' : 'text-gray-500'}`;
+        }
+
+        function setGuideSaveButtonsDisabled(disabled) {
+            const draftBtn = document.getElementById('guide-save-draft-btn');
+            const publishBtn = document.getElementById('guide-save-publish-btn');
+            if (draftBtn) draftBtn.disabled = disabled;
+            if (publishBtn) publishBtn.disabled = disabled;
+        }
+
+        // 특정 글의 첨부파일 목록 로드 (건당 첨부 수가 적어 fetchAllRows 페이지네이션 대상 아님 — contracts.md 참고)
+        async function loadGuideAttachmentsForModal(guideId) {
+            const container = document.getElementById('guide-attachments-list');
+            if (!container) return;
+            container.innerHTML = '<p class="text-[11px] text-gray-400">불러오는 중...</p>';
+            try {
+                const { data, error } = await window.supabase
+                    .from('guide_attachments')
+                    .select('id, file_name, file_url, file_size')
+                    .eq('guide_id', guideId)
+                    .eq('kind', 'attachment')
+                    .order('created_at', { ascending: true });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-[11px] text-gray-400">첨부된 파일이 없습니다.</p>';
+                    return;
+                }
+
+                container.innerHTML = data.map(a => `
+                    <div class="flex items-center justify-between px-3 py-2 border border-gray-200 text-xs">
+                        <a href="${a.file_url}" target="_blank" rel="noopener" class="text-blue-600 hover:underline truncate max-w-[260px]">${a.file_name}</a>
+                        <button type="button" onclick="deleteGuideAttachmentInModal('${a.id}', '${guideId}', '${a.file_url.replace(/'/g, "\\'")}')"
+                                class="text-red-500 hover:text-red-700 font-bold demo-restricted ml-2">삭제</button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('첨부파일 목록 로드 오류:', err);
+                container.innerHTML = '<p class="text-[11px] text-red-500">첨부파일 목록을 불러오지 못했습니다.</p>';
+            }
+        }
+
+        // 기존 첨부파일 삭제 (Storage 오브젝트 + guide_attachments 행)
+        async function deleteGuideAttachmentInModal(attachmentId, guideId, fileUrl) {
+            if (!checkDemoWriteAccess('첨부파일 삭제')) return;
+            if (!confirm('이 첨부파일을 삭제하시겠습니까?')) return;
+
+            try {
+                const marker = '/guide-files/';
+                const idx = fileUrl.indexOf(marker);
+                if (idx !== -1) {
+                    const storagePath = fileUrl.substring(idx + marker.length);
+                    await window.supabase.storage.from('guide-files').remove([storagePath]);
+                }
+
+                const { error } = await window.supabase.from('guide_attachments').delete().eq('id', attachmentId);
+                if (error) throw error;
+
+                loadGuideAttachmentsForModal(guideId);
+            } catch (err) {
+                console.error('첨부파일 삭제 오류:', err);
+                alert('첨부파일 삭제 실패: ' + (err.message || '알 수 없는 오류'));
             }
         }
 
