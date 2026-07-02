@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "task": "admin-domain worker (admin.html + js/auth.js)",
+    "date": "2026-07-02",
+    "issue": "Out of scope per delegation: guide-detail.html was not touched. It must read guide_attachments (kind='attachment') by guide_id and render download links for readers to satisfy R-U2.2 / journey J2's second half ('독자가 guide-detail 열람 → 첨부 다운로드 링크가 동작'). Admin-side upload/list/delete in admin.html is complete and guide_attachments rows are being created correctly (bucket 'guide-files', path attachments/<guideId>/<timestamp>-<filename>), but nothing renders them on the public guide-detail page yet."
+  }
+]
