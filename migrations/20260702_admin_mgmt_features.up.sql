@@ -72,8 +72,8 @@ DROP POLICY IF EXISTS "site_settings admin write" ON public.site_settings;
 CREATE POLICY "site_settings admin write"
     ON public.site_settings FOR ALL
     TO authenticated
-    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'))
-    WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE))
+    WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE));
 
 -- ---------------------------------------------------------------
 -- 3) guide_attachments (게시판 썸네일/첨부 메타)
@@ -104,8 +104,8 @@ DROP POLICY IF EXISTS "guide_attachments admin write" ON public.guide_attachment
 CREATE POLICY "guide_attachments admin write"
     ON public.guide_attachments FOR ALL
     TO authenticated
-    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'))
-    WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+    USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE))
+    WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE));
 
 -- ---------------------------------------------------------------
 -- 4) guide-files Storage 버킷 (공개 읽기, 쓰기 admin)
@@ -126,7 +126,7 @@ CREATE POLICY "guide-files admin insert"
     TO authenticated
     WITH CHECK (
         bucket_id = 'guide-files'
-        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE)
     );
 
 DROP POLICY IF EXISTS "guide-files admin update" ON storage.objects;
@@ -135,11 +135,11 @@ CREATE POLICY "guide-files admin update"
     TO authenticated
     USING (
         bucket_id = 'guide-files'
-        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE)
     )
     WITH CHECK (
         bucket_id = 'guide-files'
-        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE)
     );
 
 DROP POLICY IF EXISTS "guide-files admin delete" ON storage.objects;
@@ -148,5 +148,5 @@ CREATE POLICY "guide-files admin delete"
     TO authenticated
     USING (
         bucket_id = 'guide-files'
-        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+        AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin' AND is_active IS NOT FALSE)
     );
