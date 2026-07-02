@@ -5,3 +5,4 @@
 - 2026-07-02T05:52:02Z VERIFY_RESULT code-review=NEEDS_FIXES → 2 blocking fixed (XSS admin.html:7660 escape+id-lookup; RLS is_active x8 in migration). syntax 0 err.
 - 2026-07-02T05:52:02Z GATE T9 deploy pending PM approval (prod DB / edge deploy / live push).
 - 2026-07-02T23:00:10Z FUNCTIONAL VERIFY (browser, prod backend): create-admin OK(test@test.com role=admin) / upload Korean-key bug REPRODUCED+FIXED(sanitize) / reader shows attachment / recruit toggle+span click→notion / youtube anchor+span→@allround_edu / deactivation blocks admin access. test data cleaned, recruit OFF, test acct DEACTIVATED.
+- 2026-07-02T23:11:25Z T9 LIVE DEPLOY: pushed to client repo allroundedu/allroundedu main (60a11bb..41225ad) as allroundedu author. Preserved client fixes(a3899b3,60a11bb) + package.json; applied 22 feature files only. Vercel auto-deploy triggered.
