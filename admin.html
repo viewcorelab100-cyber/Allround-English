@@ -7825,7 +7825,8 @@
                         }
                         setGuideUploadStatus(`${file.name} 업로드 중...`);
                         // Storage 키는 비ASCII 불가 → 경로 파일명 정규화(원본명은 DB에 보존)
-                        const attachPath = `attachments/${guideId}/${Date.now()}-${safeStorageName(file.name)}`;
+                        const uniq = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+                        const attachPath = `attachments/${guideId}/${uniq}-${safeStorageName(file.name)}`;
                         const { error: upErr } = await window.supabase.storage
                             .from('guide-files')
                             .upload(attachPath, file);
