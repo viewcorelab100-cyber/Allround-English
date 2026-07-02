@@ -476,13 +476,15 @@ async function getUserProfile(userId) {
 }
 
 // 관리자 권한 확인
+// is_active=false인 관리자 계정은 비활성화된 것으로 간주하고 admin 취급하지 않는다
+// (profiles.is_active 컬럼이 없는 과거 스키마에서도 undefined는 활성으로 취급 — !== false)
 async function isAdmin() {
     const user = await getCurrentUser();
     if (!user) return false;
 
     // DB의 role 컬럼만 신뢰
     const profile = await getUserProfile(user.id);
-    return profile.success && profile.data.role === 'admin';
+    return profile.success && profile.data.role === 'admin' && profile.data.is_active !== false;
 }
 
 // 데모 사용자 확인
@@ -494,11 +496,14 @@ async function isDemoUser() {
 }
 
 // 관리자 또는 데모 사용자 확인 (관리자 페이지 접근용)
+// 비활성화된(is_active=false) 관리자는 제외. 데모 계정은 is_active 대상이 아니므로 그대로 허용.
 async function isAdminOrDemo() {
     const user = await getCurrentUser();
     if (!user) return false;
     const profile = await getUserProfile(user.id);
-    return profile.success && (profile.data.role === 'admin' || profile.data.role === 'demo');
+    if (!profile.success) return false;
+    if (profile.data.role === 'admin') return profile.data.is_active !== false;
+    return profile.data.role === 'demo';
 }
 
 // ========== UI 업데이트 함수 ==========
