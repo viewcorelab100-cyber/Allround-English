@@ -116,7 +116,7 @@ non_goals:
 #### R-T1.3: 비활성화 처리
 - given: 관리자 계정 비활성화 실행
 - when: admin이 비활성 요청
-- then: 해당 계정 role을 비관리자 값으로 변경해 admin 접근을 즉시 차단 (학생 목록 오염 방지 위해 전용 'disabled' 표식 권장 — OD-1)
+- then: 해당 계정을 전용 '비활성' 표식(disabled role 또는 is_active=false)으로 전환해 admin 접근 즉시 차단. 강사 계정은 활성/비활성 무관하게 학생 목록에 표시되지 않음 (role='student'로 내리지 않음 — OD-1 확정)
 
 ## R-T2: 스토리지 아키텍처
 
